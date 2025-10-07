@@ -16,7 +16,7 @@ type InventorySection = {
 };
 
 type Trait = { name: string; description: string };
-type Badge = { name: string; earned: boolean };
+type Badge = { name: string; earned: boolean; image?: string };
 
 type Character = {
   name: string;
@@ -56,7 +56,7 @@ function migrate(raw: any): Character {
       personality: '',
       typeSpecialty: '',
       traits: [],
-      badges: Array.from({ length: 8 }, (_, i) => ({ name: i===0? 'string' : i===1? 'ranch' : i===2? 'generic fight badge' : '', earned: false })),
+  badges: Array.from({ length: 8 }, (_, i) => ({ name: i===0? 'string' : i===1? 'ranch' : i===2? 'generic fight badge' : '', earned: false, image: undefined })),
       level: 1,
       hpCurrent: 0,
       spCurrent: 0,
@@ -79,7 +79,7 @@ function migrate(raw: any): Character {
       personality: String(raw.personality || ''),
       typeSpecialty: String(raw.typeSpecialty || ''),
       traits: Array.isArray(raw.traits) ? raw.traits.map((t: any) => ({ name: String(t?.name || ''), description: String(t?.description || '') })) : [],
-      badges: Array.isArray(raw.badges) && raw.badges.length ? raw.badges.slice(0,8).map((b: any, i: number) => ({ name: String((b && b.name) || (i===0? 'string' : i===1? 'ranch' : i===2? 'generic fight badge' : '')), earned: !!(b && b.earned) })) : Array.from({ length: 8 }, (_, i) => ({ name: i===0? 'string' : i===1? 'ranch' : i===2? 'generic fight badge' : '', earned: false })),
+  badges: Array.isArray(raw.badges) && raw.badges.length ? raw.badges.slice(0,8).map((b: any, i: number) => ({ name: String((b && b.name) || (i===0? 'string' : i===1? 'ranch' : i===2? 'generic fight badge' : '')), earned: !!(b && b.earned), image: (b && typeof b.image==='string') ? b.image : undefined })) : Array.from({ length: 8 }, (_, i) => ({ name: i===0? 'string' : i===1? 'ranch' : i===2? 'generic fight badge' : '', earned: false, image: undefined })),
       level: Number(raw.level || 1),
       hpCurrent: Number(raw.hpCurrent || 0),
       spCurrent: Number(raw.spCurrent || 0),
@@ -94,7 +94,7 @@ function migrate(raw: any): Character {
     personality: String(raw.notes || ''),
     typeSpecialty: '',
     traits: [],
-    badges: Array.from({ length: 8 }, (_, i) => ({ name: i===0? 'string' : i===1? 'ranch' : i===2? 'generic fight badge' : '', earned: false })),
+  badges: Array.from({ length: 8 }, (_, i) => ({ name: i===0? 'string' : i===1? 'ranch' : i===2? 'generic fight badge' : '', earned: false, image: undefined })),
     level: 1,
     hpCurrent: 0,
     spCurrent: 0,
@@ -132,9 +132,9 @@ export function CharacterSheet() {
     return map;
   }, [ch.inventory]);
 
-  // Derived maxes; tweak formulas here if your rules change
-  const hpMax = useMemo(() => 10 + (ch.stats.fortitude||0) * 2 + (ch.stats.strength||0), [ch.stats]);
-  const spMax = useMemo(() => 10 + (ch.stats.athletics||0) + (ch.stats.fortitude||0) + Math.floor((ch.stats.luck||0)/2), [ch.stats]);
+  // Derived maxes; updated per latest spec: HP = 10 + Fortitude; SP = 5 + Athletics
+  const hpMax = useMemo(() => 10 + (ch.stats.fortitude||0), [ch.stats]);
+  const spMax = useMemo(() => 5 + (ch.stats.athletics||0), [ch.stats]);
   // Clamp current pools whenever stats change
   useEffect(() => {
     setCh(prev => ({ ...prev, hpCurrent: Math.max(0, Math.min(hpMax, prev.hpCurrent||0)), spCurrent: Math.max(0, Math.min(spMax, prev.spCurrent||0)) }));
@@ -261,11 +261,15 @@ export function CharacterSheet() {
 
           {/* Inventory (tabbed, skinnier, scrollable) */}
           <section style={{ border:'1px solid var(--accent)', borderRadius:6, padding:8 }}>
-            <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+            <div style={{ display:'flex', gap:6, flexWrap:'wrap', alignItems:'center' }}>
               {ch.inventory.map(sec => (
-                <button key={sec.key} className={activeInvTab===sec.key? 'active':'secondary'} onClick={()=> setActiveInvTab(sec.key)}>{sec.label}</button>
+                <button key={sec.key} className={activeInvTab===sec.key? 'active tab-btn':'secondary tab-btn'} onClick={()=> setActiveInvTab(sec.key)}>{sec.label}</button>
               ))}
-              <div style={{ marginLeft:'auto', display:'flex', gap:6 }}>
+              <div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
+                <div className="chip dim" title="Money" style={{ display:'flex', alignItems:'center', gap:6 }}>
+                  <span>₽</span>
+                  <input type="number" min={0} value={ch.money||0} onChange={e=> setCh({ ...ch, money: Math.max(0, Number(e.target.value)||0) })} style={{ width:100, textAlign:'right' }} />
+                </div>
                 <button className="mini" onClick={()=>{
                   const idx = ch.inventory.findIndex(s => s.key===activeInvTab);
                   if (idx<0) return; const nn = prompt('Rename section', ch.inventory[idx].label);
@@ -282,7 +286,7 @@ export function CharacterSheet() {
                 <button onClick={()=>{ addItemToSection(activeInvTab, newItemName, newItemCount); setNewItemName(''); setNewItemCount(1); setAddingItem(false); }}>Save</button>
               </div>
             )}
-            <div style={{ maxHeight:220, overflowY:'auto', marginTop:8, display:'grid', gap:6 }}>
+            <div style={{ maxHeight:560, overflowY:'auto', marginTop:8, display:'grid', gap:6 }}>
               {(invParsed[activeInvTab] || []).map((it, i) => (
                 <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr auto auto', gap:8, alignItems:'center', border:'1px solid var(--accent)', borderRadius:4, padding:'4px 6px' }}>
                   <div className="dim" style={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{it.name}</div>
@@ -326,8 +330,90 @@ export function CharacterSheet() {
               </div>
             ))}
           </div>
+          <div style={{marginTop:8}}>
+            <button onClick={()=> setSelectedTrait(-1)}>Add Traits</button>
+          </div>
         </div>
       </div>
+
+      {/* Badge Case */}
+      <div style={{ marginTop:12, border:'1px solid var(--accent)', borderRadius:6, padding:8 }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <h3 style={{ margin:0 }}>Badge Case</h3>
+          <span className="dim">Mark earned badges and label them</span>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:8, marginTop:8 }}>
+          {ch.badges.map((b, i) => (
+            <div key={i} style={{ border:'1px solid var(--accent)', borderRadius:6, padding:6, display:'grid', gap:6, alignItems:'center', justifyItems:'center' }}>
+              <div style={{ width:'100%', display:'grid', gap:6, justifyItems:'center' }}>
+                <div style={{ width:'100%', display:'grid', justifyItems:'center' }}>
+                  {b.image ? (
+                    <img src={b.image} alt="Badge" style={{ maxWidth:'100%', maxHeight:64, objectFit:'contain' }} />
+                  ) : (
+                    <div className="dim" style={{ height:64, display:'flex', alignItems:'center', justifyContent:'center', width:'100%' }}>No image</div>
+                  )}
+                </div>
+                <div style={{ display:'flex', gap:6 }}>
+                  <button className={`badge-btn ${b.earned? 'earned':''}`} onClick={()=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, earned: !x.earned } : x) })}>
+                    {b.earned? 'Earned' : '—'}
+                  </button>
+                  <button className="mini" onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = () => {
+                      const f = input.files && input.files[0];
+                      if (!f) return;
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const dataUrl = String(reader.result || '');
+                        setCh(prev => ({ ...prev, badges: prev.badges.map((x,idx)=> idx===i ? { ...x, image: dataUrl } : x) }));
+                      };
+                      reader.readAsDataURL(f);
+                    };
+                    input.click();
+                  }}>Add Image</button>
+                  {b.image && <button className="mini" onClick={()=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, image: undefined } : x) })}>Clear</button>}
+                </div>
+              </div>
+              <input value={b.name} onChange={e=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, name: e.target.value } : x) })} placeholder={`Badge ${i+1}`} style={{ width:'100%', textAlign:'center' }} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Trait Catalog Dialog */}
+      {selectedTrait===-1 && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)', display:'flex', alignItems:'center', justifyContent:'center', padding:16 }} onClick={()=> setSelectedTrait(null)}>
+          <div className="panel" style={{ width:720, maxHeight:'80vh', overflowY:'auto' }} onClick={e=> e.stopPropagation()}>
+            <h3 style={{marginTop:0}}>Add Traits</h3>
+            <div className="dim" style={{marginBottom:8}}>Only eligible traits are enabled based on your stats and type specialty.</div>
+            <div style={{ display:'grid', gap:8 }}>
+              {traitCatalog.map((t, idx) => {
+                const eligible = canTake(t);
+                return (
+                  <div key={idx} style={{ border:'1px solid var(--accent)', borderRadius:6, padding:8, display:'grid', gap:4 }}>
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
+                      <strong>{t.name}</strong>
+                      {t.reqText && <span className="chip dim">Req: {t.reqText}</span>}
+                    </div>
+                    <div className="dim" style={{ whiteSpace:'pre-wrap' }}>{t.desc}</div>
+                    <div style={{ display:'flex', gap:8, justifyContent:'flex-end' }}>
+                      <button disabled={!eligible || hasTrait(t.name)} onClick={()=>{
+                        const next = { name: t.name, description: t.desc } as Trait;
+                        setCh({ ...ch, traits: [...ch.traits, next] });
+                      }}>Add</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display:'flex', justifyContent:'flex-end', marginTop:12 }}>
+              <button onClick={()=> setSelectedTrait(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

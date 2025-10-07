@@ -92,7 +92,7 @@ async function main() {
   const argv = process.argv.slice(2);
   const copyAll = argv.includes('--all');
   const setsArg = argv.find(a => a.startsWith('--sets='));
-  const sets = copyAll ? ['__ALL__'] : (setsArg ? setsArg.replace(/^--sets=/, '').split(',') : ['gen5','gen5-shiny','gen5icons','types','home','trainers']);
+  const sets = copyAll ? ['__ALL__'] : (setsArg ? setsArg.replace(/^--sets=/, '').split(',') : ['gen5','gen5-shiny','gen5-back','gen5-back-shiny','gen5icons','types','home','trainers']);
   if (sets.includes('__ALL__')) {
     await cp(spritesSrc, spritesDest, { recursive: true });
   } else {

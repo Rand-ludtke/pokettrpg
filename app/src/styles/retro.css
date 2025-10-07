@@ -50,7 +50,7 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
 .topbar{display:flex;align-items:center;justify-content:space-between;border:2px solid var(--accent);padding:10px 12px;background:var(--panel-bg);border-radius:10px}
 .brand{font-weight:700}
 .tabs button{margin-right:8px;background:transparent;border:1px solid var(--accent);color:var(--fg);padding:6px 10px;cursor:pointer;border-radius:8px}
-.tabs button.active{background:var(--accent);color:white}
+.tabs button.active{background:linear-gradient(180deg, var(--accent2), var(--accent)); color:white; box-shadow:0 0 0 2px rgba(16,152,194,0.25) inset}
 .panel{border:2px solid var(--panel-outer);padding:12px;background:var(--panel-bg);border-radius:10px}
 .pc-layout{display:grid;grid-template-columns: 2fr 1fr; gap:12px}
 .box-grid .box-header{display:flex;align-items:center;justify-content:space-between;margin:0 0 8px 0}
@@ -105,3 +105,7 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
 .field-row.fainted{filter:grayscale(1) brightness(.85)}
 .panel.battle img{transition:opacity .25s ease}
 .hp-fill{transition:width .3s ease-out}
+
+/* Inventory tabs inside Character Sheet */
+.tab-btn{border:1px solid var(--accent); background:transparent; color:var(--fg); padding:4px 8px; border-radius:6px}
+.tab-btn.active{background:linear-gradient(180deg, var(--accent2), var(--accent)); color:#fff; box-shadow:0 0 0 2px rgba(16,152,194,0.25) inset}

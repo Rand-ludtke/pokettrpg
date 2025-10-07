@@ -257,7 +257,8 @@ function toAscii(s: string): string {
 }
 
 export function spriteUrl(speciesId: string, shiny = false, options?: { base?: string, setOverride?: SpriteSet, cosmetic?: string, back?: boolean }) {
-  const base = options?.base ?? '/vendor/showdown/sprites';
+  // Default to the stable /showdown mount; electron main and Vite dev both serve this locally
+  const base = options?.base ?? '/showdown/sprites';
   const chosen = options?.setOverride ?? getSpriteSettings().set;
   // Construct folder and extension
   const folder = (() => {
@@ -300,7 +301,7 @@ export function speciesFormesInfo(name: string, dex: DexIndex) {
 }
 
 export function iconUrl(speciesId: string, options?: { base?: string }) {
-  const base = options?.base ?? '/vendor/showdown/sprites';
+  const base = options?.base ?? '/showdown/sprites';
   return `${base}/gen5icons/${normalizeName(speciesId)}.png`;
 }
 
@@ -317,7 +318,7 @@ export function spriteUrlWithFallback(
   onError: (nextUrl: string) => void,
   options?: { shiny?: boolean; base?: string; setOverride?: SpriteSet; cosmetic?: string; back?: boolean }
 ) {
-  const base = options?.base ?? '/vendor/showdown/sprites';
+  const base = options?.base ?? '/showdown/sprites';
   const shiny = !!options?.shiny;
   const back = !!options?.back;
   const chosen = options?.setOverride ?? getSpriteSettings().set;
