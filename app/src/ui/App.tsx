@@ -18,6 +18,7 @@ type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'character' | 'help' | { kind:'p
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
+  const [updateStatus, setUpdateStatus] = useState<string | null>(null);
   const [extraTabs, setExtraTabs] = useState<Array<{ kind:'psbattle'; id:string; title:string }>>([]);
   // Keep battle iframes mounted even when not active to avoid tearing down connections
   const [mountedBattles, setMountedBattles] = useState<Record<string,{id:string; title:string}>>({});
@@ -251,6 +252,30 @@ export function App() {
             <option value="gen5">Gen 5</option>
             <option value="home">HOME</option>
           </select>
+          {/* Windows-only manual updater button */}
+          {typeof (window as any).env !== 'undefined' && (window as any).env.platform === 'win32' && (
+            <>
+              <button
+                title="Check for updates"
+                onClick={async ()=>{
+                  try {
+                    setUpdateStatus('checking…');
+                    const r = await (window as any).updates?.check?.();
+                    if (r && r.ok) {
+                      setUpdateStatus('up to date');
+                    } else {
+                      setUpdateStatus('no updates');
+                    }
+                  } catch (e) {
+                    setUpdateStatus('error');
+                  } finally {
+                    setTimeout(()=> setUpdateStatus(null), 3000);
+                  }
+                }}
+              >Check Updates</button>
+              {updateStatus && <span className="dim" style={{marginLeft:6}}>{updateStatus}</span>}
+            </>
+          )}
         </div>
       </header>
 

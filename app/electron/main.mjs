@@ -136,6 +136,20 @@ app.whenReady().then(() => {
   } catch {}
 });
 
+// Manual update checks from renderer (Windows only by default)
+ipcMain.handle('update:check', async () => {
+  try {
+    const disableUpdater = process.env.POKETTRPG_DISABLE_UPDATER === '1' || process.env.POKETTRPG_DISABLE_UPDATER === 'true';
+    if (!app.isPackaged || process.platform === 'darwin' || disableUpdater) {
+      return { ok: false, error: 'updates-disabled' };
+    }
+    const result = await autoUpdater.checkForUpdates();
+    return { ok: true, result: result && result.updateInfo ? result.updateInfo : null };
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
+});
+
 app.on('second-instance', () => {
   const wins = BrowserWindow.getAllWindows();
   if (wins.length) {

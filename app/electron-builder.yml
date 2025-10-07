@@ -27,7 +27,7 @@ publish:
   provider: github
   owner: Rand-ludtke
   repo: pokettrpg
-  releaseType: draft
+  releaseType: release
 afterSign: electron/sign-mac-app
 asar: true
 asarUnpack:

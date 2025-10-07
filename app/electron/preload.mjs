@@ -37,3 +37,19 @@ contextBridge.exposeInMainWorld('lan', {
       buffer: async (roomId) => ipcRenderer.invoke('lan:room:buffer', { roomId })
     }
 });
+
+// Expose a minimal updates API for Windows manual checks
+contextBridge.exposeInMainWorld('updates', {
+  check: async () => ipcRenderer.invoke('update:check'),
+  install: async () => ipcRenderer.invoke('update:install'),
+  on: (event, listener) => {
+    const handler = (_e, data) => listener(data);
+    ipcRenderer.on(`update:${event}`, handler);
+    return () => ipcRenderer.off(`update:${event}`, handler);
+  }
+});
+
+// Expose environment hints
+contextBridge.exposeInMainWorld('env', {
+  platform: process.platform,
+});
