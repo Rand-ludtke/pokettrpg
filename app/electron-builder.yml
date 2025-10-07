@@ -28,7 +28,6 @@ publish:
   owner: Rand-ludtke
   repo: pokettrpg
   releaseType: release
-afterSign: electron/sign-mac-app
 asar: true
 asarUnpack:
   - node_modules/**

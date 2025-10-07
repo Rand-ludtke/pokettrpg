@@ -19,6 +19,7 @@ type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'character' | 'help' | { kind:'p
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
   const [updateStatus, setUpdateStatus] = useState<string | null>(null);
+  const [updateDownloaded, setUpdateDownloaded] = useState<boolean>(false);
   const [extraTabs, setExtraTabs] = useState<Array<{ kind:'psbattle'; id:string; title:string }>>([]);
   // Keep battle iframes mounted even when not active to avoid tearing down connections
   const [mountedBattles, setMountedBattles] = useState<Record<string,{id:string; title:string}>>({});
@@ -55,6 +56,25 @@ export function App() {
     };
     window.addEventListener('pokettrpg-room-start', onWsRoomStart as any);
     return () => { off && off(); window.removeEventListener('pokettrpg-room-start', onWsRoomStart as any); };
+  }, []);
+
+  // Listen for updater events on Windows to surface install option
+  useEffect(() => {
+    const w: any = window as any;
+    if (!w.updates || !w.updates.on) return;
+    const offAvail = w.updates.on('available', (_info: any) => {
+      setUpdateStatus('update found');
+      setTimeout(()=> setUpdateStatus(null), 3000);
+    });
+    const offDl = w.updates.on('downloaded', (_info: any) => {
+      setUpdateDownloaded(true);
+      setUpdateStatus('ready to install');
+    });
+    const offErr = w.updates.on('error', (_err: any) => {
+      setUpdateStatus('update error');
+      setTimeout(()=> setUpdateStatus(null), 4000);
+    });
+    return () => { offAvail && offAvail(); offDl && offDl(); offErr && offErr(); };
   }, []);
 
   // Rehydrate on tab activation (non-host): whenever tab changes to lobby or a battle tab
@@ -273,6 +293,14 @@ export function App() {
                   }
                 }}
               >Check Updates</button>
+              {updateDownloaded && (
+                <button
+                  title="Install downloaded update and restart"
+                  onClick={async ()=>{
+                    try { await (window as any).updates?.install?.(); } catch {}
+                  }}
+                >Install and Restart</button>
+              )}
               {updateStatus && <span className="dim" style={{marginLeft:6}}>{updateStatus}</span>}
             </>
           )}
