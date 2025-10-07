@@ -1,0 +1,35 @@
+appId: com.rand.pokettrpg
+productName: Pokettrpg
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**
+  - electron/**
+  - node_modules/**
+  - package.json
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+icon: build/icon.ico
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.games
+  hardenedRuntime: true
+  entitlements: electron/nwjs-entitlements.entitlements
+  entitlementsInherit: electron/nwjs-entitlements.entitlements
+  notarize: false
+publish:
+  provider: github
+  owner: Rand-ludtke
+  repo: pokettrpg
+  releaseType: draft
+afterSign: electron/sign-mac-app
+asar: true
+asarUnpack:
+  - node_modules/**
