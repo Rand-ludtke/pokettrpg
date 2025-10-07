@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import { autoUpdater } from 'electron-updater';
+import updater from 'electron-updater';
+const { autoUpdater } = updater;
 import path from 'node:path';
 import { createServer } from 'node:http';
 import serveStatic from 'serve-static';
