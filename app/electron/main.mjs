@@ -119,7 +119,9 @@ app.whenReady().then(createWindow);
 // Auto-updates: check on ready and periodically when packaged
 app.whenReady().then(() => {
   try {
-    if (app.isPackaged) {
+    const disableUpdater = process.env.POKETTRPG_DISABLE_UPDATER === '1' || process.env.POKETTRPG_DISABLE_UPDATER === 'true';
+    // Skip auto-updates on macOS by default, or if disabled via env
+    if (app.isPackaged && process.platform !== 'darwin' && !disableUpdater) {
       autoUpdater.autoDownload = true;
       autoUpdater.autoInstallOnAppQuit = true;
       autoUpdater.checkForUpdatesAndNotify().catch(()=>{});

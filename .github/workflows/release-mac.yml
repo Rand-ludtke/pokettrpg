@@ -1,0 +1,47 @@
+name: Release macOS build (unsigned)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build_macos:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app (Vite + TS)
+        run: npm run build
+
+      - name: Build macOS artifacts (unsigned)
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: 'true'
+        run: npx electron-builder -m --publish always
+
+      - name: Upload artifacts (optional)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-dist
+          path: app/release/**
+          if-no-files-found: ignore

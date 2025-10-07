@@ -20,9 +20,8 @@ mac:
     - dmg
     - zip
   category: public.app-category.games
-  hardenedRuntime: true
-  entitlements: electron/nwjs-entitlements.entitlements
-  entitlementsInherit: electron/nwjs-entitlements.entitlements
+  hardenedRuntime: false
+  identity: null
   notarize: false
 publish:
   provider: github
