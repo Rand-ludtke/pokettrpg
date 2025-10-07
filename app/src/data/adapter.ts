@@ -39,7 +39,8 @@ export function normalizeName(id: string) {
 }
 
 export async function loadShowdownDex(options?: { base?: string }) {
-  const base = options?.base ?? '/vendor/showdown/data';
+  // Use the stable /showdown mount for packaged and dev
+  const base = options?.base ?? '/showdown/data';
   // prefer JSON if present for faster parse
   const [pokedex, moves, abilities, items, learnsets, aliases] = await Promise.all([
     fetch(`${base}/pokedex.json`).then(r => r.json()),
