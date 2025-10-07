@@ -120,6 +120,10 @@ export function CharacterSheet() {
     try { const parsed = JSON.parse(localStorage.getItem(LS_KEY) || ''); return migrate(parsed); } catch { return migrate(null); }
   });
   const [selectedTrait, setSelectedTrait] = useState<number | null>(null);
+  const [activeInvTab, setActiveInvTab] = useState<string>(() => (DEFAULT_SECTIONS[0].key));
+  const [addingItem, setAddingItem] = useState<boolean>(false);
+  const [newItemName, setNewItemName] = useState<string>('');
+  const [newItemCount, setNewItemCount] = useState<number>(1);
   useEffect(() => { try { localStorage.setItem(LS_KEY, JSON.stringify(ch)); } catch {} }, [ch]);
 
   const invParsed = useMemo(() => {
@@ -181,203 +185,149 @@ export function CharacterSheet() {
 
   const canTake = (t: {req?: Req}) => (t.req ? t.req(ch.stats, hasTrait, hasTypeSpec) : true);
 
+  // Helpers to rebuild inventory lines from parsed list
+  function setSectionLinesByKey(key: string, newLines: string) {
+    const idx = ch.inventory.findIndex(s => s.key === key);
+    if (idx < 0) return;
+    setCh({ ...ch, inventory: ch.inventory.map((s,i)=> i===idx ? { ...s, lines: newLines } : s) });
+  }
+  function setItemCount(key: string, index: number, nextCount: number) {
+    const list = (invParsed[key] || []).slice();
+    if (index < 0 || index >= list.length) return;
+    if (nextCount <= 0) { list.splice(index, 1); } else { list[index] = { ...list[index], count: nextCount }; }
+    const text = list.map(it => `${it.name}${it.count>1?` x${it.count}`:''}`).join('\n');
+    setSectionLinesByKey(key, text);
+  }
+  function addItemToSection(key: string, name: string, count: number) {
+    name = name.trim(); if (!name) return;
+    const cur = ch.inventory.find(s => s.key === key)?.lines || '';
+    const next = (cur ? (cur.trim() + '\n') : '') + `${name}${count>1?` x${count}`:''}`;
+    setSectionLinesByKey(key, next);
+  }
+
+  // Layout (skinnier, three columns similar to the reference)
   return (
-    <section className="panel" style={{ padding: 12, display: 'grid', gap: 12 }}>
-      <h2>Character Sheet</h2>
-
-      {/* Top: identity and money */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 12 }}>
-        <label>
-          <div className="label"><strong>Name</strong></div>
-          <input value={ch.name} onChange={e => setCh({ ...ch, name: e.target.value })} />
-        </label>
-        <label>
-          <div className="label"><strong>Type Specialty</strong></div>
-          <input value={ch.typeSpecialty} onChange={e => setCh({ ...ch, typeSpecialty: e.target.value })} />
-        </label>
-        <label>
-          <div className="label"><strong>Money</strong></div>
-          <input type="number" min={0} value={ch.money} onChange={e => setCh({ ...ch, money: Math.max(0, Number(e.target.value)||0) })} />
-        </label>
-      </div>
-
-  {/* Level, HP & SP */}
-  <section style={{ border: '1px solid var(--accent)', borderRadius: 6, padding: 8 }}>
-        <h3 style={{ marginTop: 0 }}>Trainer Status</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr', gap: 12, alignItems: 'end' }}>
-          <label>
-            <div className="label"><strong>Level</strong></div>
-            <input type="number" min={1} value={ch.level} onChange={e => setCh({ ...ch, level: Math.max(1, Number(e.target.value)||1) })} />
-          </label>
-          <div>
-            <div className="label"><strong>HP</strong></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '120px auto', gap: 8, alignItems: 'center' }}>
-              <input type="number" min={0} max={hpMax} value={ch.hpCurrent} onChange={e => setCh({ ...ch, hpCurrent: Math.max(0, Math.min(hpMax, Number(e.target.value)||0)) })} />
-              <div className="dim">/ {hpMax}</div>
-            </div>
-            <div className="hpbar large" style={{ marginTop: 4 }}><span style={{ width: `${(hpMax ? (ch.hpCurrent/hpMax) : 0)*100}%` }} /></div>
-          </div>
-          <div>
-            <div className="label"><strong>SP</strong></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '120px auto', gap: 8, alignItems: 'center' }}>
-              <input type="number" min={0} max={spMax} value={ch.spCurrent} onChange={e => setCh({ ...ch, spCurrent: Math.max(0, Math.min(spMax, Number(e.target.value)||0)) })} />
-              <div className="dim">/ {spMax}</div>
-            </div>
-            <div className="hpbar spbar" style={{ marginTop: 4 }}><span style={{ width: `${(spMax ? (ch.spCurrent/spMax) : 0)*100}%` }} /></div>
-          </div>
-        </div>
-      </section>
-
-  {/* Stats */}
-  <section style={{ border: '1px solid var(--accent)', borderRadius: 6, padding: 8 }}>
-        <h3 style={{ marginTop: 0 }}>Stats</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
+    <section className="panel" style={{ padding: 12 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'160px 1fr 280px', gap:12 }}>
+        {/* Left: Stats vertical */}
+        <div style={{ display:'grid', alignContent:'start', gap:8 }}>
           {([
             ['strength','Strength'],
             ['athletics','Athletics'],
             ['intelligence','Intelligence'],
             ['speech','Speech'],
             ['fortitude','Fortitude'],
-            ['luck','Luck'],
           ] as const).map(([k,label]) => (
-            <label key={k}>
-              <div className="label"><strong>{label}</strong></div>
-              <input type="number" value={(ch.stats as any)[k] || 0} onChange={e => setCh({ ...ch, stats: { ...ch.stats, [k]: Number(e.target.value)||0 } })} />
-            </label>
+            <div key={k} style={{ display:'grid', gridTemplateColumns:'1fr auto', alignItems:'center', gap:6 }}>
+              <span className="dim" style={{fontSize:'0.9em'}}>{label}</span>
+              <input type="number" value={(ch.stats as any)[k] || 0} onChange={e => setCh({ ...ch, stats: { ...ch.stats, [k]: Number(e.target.value)||0 } })} style={{ width:60, textAlign:'center' }} />
+            </div>
           ))}
+          <div style={{ marginTop:4 }}>
+            <span className="dim">LUCK:</span>
+            <input type="number" value={ch.stats.luck||0} onChange={(e)=> setCh({ ...ch, stats: { ...ch.stats, luck: Number(e.target.value)||0 }})} style={{ width:60, marginLeft:6, textAlign:'center' }} />
+          </div>
         </div>
-      </section>
 
-      {/* Personality */}
-      <label>
-        <div className="label"><strong>Personality</strong></div>
-        <textarea rows={3} value={ch.personality} onChange={e => setCh({ ...ch, personality: e.target.value })} />
-      </label>
+        {/* Middle: Name, status, Inventory */}
+        <div style={{ display:'grid', gap:12 }}>
+          {/* Name row */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:12, alignItems:'center' }}>
+            <input value={ch.name} onChange={e => setCh({ ...ch, name: e.target.value })} placeholder="Name"
+              style={{ fontSize:'1.6em', fontWeight:600, textAlign:'center', padding:'8px 12px' }} />
+            <div style={{ display:'grid', gap:6, justifyItems:'center' }}>
+              <label className="dim">lvl:</label>
+              <input type="number" min={1} value={ch.level} onChange={e => setCh({ ...ch, level: Math.max(1, Number(e.target.value)||1) })} style={{ width:60, textAlign:'center' }} />
+            </div>
+          </div>
 
-  {/* Inventory */}
-  <section style={{ border: '1px solid var(--accent)', borderRadius: 6, padding: 8 }}>
-        <h3 style={{ marginTop: 0 }}>Inventory</h3>
-        <div className="dim" style={{ marginBottom: 6 }}>Enter one item per line. Append “xN” to set a count, e.g., “Potion x3”.</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {ch.inventory.map((sec, idx) => (
-            <div key={sec.key} className="panel" style={{ padding: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                <strong>{sec.label}</strong>
-                {/* Optional: section rename */}
-                <button className="mini" onClick={() => {
-                  const nn = prompt('Rename section', sec.label);
+          {/* HP / SP small boxes */}
+          <div style={{ display:'flex', gap:16 }}>
+            <div>
+              <div className="dim" style={{textAlign:'center'}}>HP</div>
+              <input type="number" min={0} max={hpMax} value={ch.hpCurrent}
+                onChange={e => setCh({ ...ch, hpCurrent: Math.max(0, Math.min(hpMax, Number(e.target.value)||0)) })}
+                style={{ width:68, textAlign:'center' }} />
+              <div className="dim" style={{textAlign:'center'}}>{`(${hpMax})`}</div>
+            </div>
+            <div>
+              <div className="dim" style={{textAlign:'center'}}>SP</div>
+              <input type="number" min={0} max={spMax} value={ch.spCurrent}
+                onChange={e => setCh({ ...ch, spCurrent: Math.max(0, Math.min(spMax, Number(e.target.value)||0)) })}
+                style={{ width:68, textAlign:'center' }} />
+              <div className="dim" style={{textAlign:'center'}}>{`(${spMax})`}</div>
+            </div>
+          </div>
+
+          {/* Inventory (tabbed, skinnier, scrollable) */}
+          <section style={{ border:'1px solid var(--accent)', borderRadius:6, padding:8 }}>
+            <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+              {ch.inventory.map(sec => (
+                <button key={sec.key} className={activeInvTab===sec.key? 'active':'secondary'} onClick={()=> setActiveInvTab(sec.key)}>{sec.label}</button>
+              ))}
+              <div style={{ marginLeft:'auto', display:'flex', gap:6 }}>
+                <button className="mini" onClick={()=>{
+                  const idx = ch.inventory.findIndex(s => s.key===activeInvTab);
+                  if (idx<0) return; const nn = prompt('Rename section', ch.inventory[idx].label);
                   if (nn==null) return; const label = nn.trim(); if (!label) return;
-                  setCh({ ...ch, inventory: ch.inventory.map((s,i)=> i===idx ? { ...s, label } : s) });
+                  setCh({ ...ch, inventory: ch.inventory.map((s,i)=> i===idx? { ...s, label }: s) });
                 }}>Rename</button>
-              </div>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:6 }}>
-                <textarea rows={6} value={sec.lines} onChange={e => setCh({ ...ch, inventory: ch.inventory.map((s,i)=> i===idx ? { ...s, lines: e.target.value } : s) })} />
-                {/* Parsed preview */}
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 4 }}>
-                  {(invParsed[sec.key] || []).map((it, i) => (
-                    <li key={i} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 6 }}>
-                      <span>{it.name}</span>
-                      <span className="dim">{it.count>1 ? `x${it.count}` : ''}</span>
-                    </li>
-                  ))}
-                </ul>
+                <button className="mini" onClick={()=>{ setAddingItem(v=>!v); }}>{addingItem? 'Close' : 'Add'}</button>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
-
-  {/* Trainer Traits */}
-  <section style={{ border: '1px solid var(--accent)', borderRadius: 6, padding: 8 }}>
-        <h3 style={{ marginTop: 0 }}>Trainer Traits</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {/* Catalog */}
-          <div className="panel" style={{ padding: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <strong>Trait Catalog</strong>
-              <span className="dim" style={{ fontSize: '0.9em' }}>Locked until requirements met</span>
-            </div>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 6 }}>
-              {traitCatalog.map(t => {
-                const owned = hasTrait(t.name);
-                const eligible = canTake(t);
-                return (
-                  <li key={t.name} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, alignItems: 'center' }}>
-                    <div>
-                      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                        <button className="secondary" onClick={() => setSelectedTrait(ch.traits.findIndex(tt => tt.name.toLowerCase()===t.name.toLowerCase()))} disabled={!owned}>{t.name}</button>
-                        {t.reqText && <span className="chip dim">{t.reqText}</span>}
-                      </div>
-                      <div className="dim" style={{ fontSize:'0.9em' }}>{t.desc}</div>
-                    </div>
-                    <button onClick={() => {
-                      if (owned) return;
-                      if (!eligible) return;
-                      setCh({ ...ch, traits: [...ch.traits, { name: t.name, description: t.desc }] });
-                      setSelectedTrait(ch.traits.length);
-                    }} disabled={owned || !eligible}>
-                      {owned ? 'Added' : eligible ? 'Add' : 'Locked'}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          {/* Owned traits */}
-          <div className="panel" style={{ padding: 8 }}>
-            <strong>My Traits</strong>
-            {ch.traits.length === 0 && <div className="dim">No traits yet. Unlock from the catalog.</div>}
-            <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: 12, marginTop: 8 }}>
-              <div style={{ display: 'grid', gap: 6 }}>
-                {ch.traits.map((t, i) => (
-                  <button key={i} className={selectedTrait===i ? 'active' : 'secondary'} onClick={() => setSelectedTrait(i)}>{t.name || '(unnamed)'}</button>
-                ))}
+            {addingItem && (
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 90px auto', gap:6, marginTop:8 }}>
+                <input placeholder="Item name" value={newItemName} onChange={e=> setNewItemName(e.target.value)} />
+                <input type="number" min={1} value={newItemCount} onChange={e=> setNewItemCount(Math.max(1, Number(e.target.value)||1))} />
+                <button onClick={()=>{ addItemToSection(activeInvTab, newItemName, newItemCount); setNewItemName(''); setNewItemCount(1); setAddingItem(false); }}>Save</button>
               </div>
-              <div>
-                {selectedTrait==null ? (
-                  <div className="dim">Click a trait to view its description.</div>
-                ) : (
-                  <div className="panel" style={{ padding: 8, display: 'grid', gap: 8 }}>
-                    <div className="label"><strong>{ch.traits[selectedTrait]?.name || ''}</strong></div>
-                    <div className="dim" style={{ whiteSpace:'pre-wrap' }}>{ch.traits[selectedTrait]?.description || ''}</div>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <button className="secondary" onClick={() => setSelectedTrait(null)}>Close</button>
-                      <button className="mini" onClick={() => {
-                        if (selectedTrait == null) return;
-                        if (!confirm('Remove this trait?')) return;
-                        const list = ch.traits.filter((_t,i)=> i!==selectedTrait);
-                        setCh({ ...ch, traits: list }); setSelectedTrait(null);
-                      }}>Remove</button>
-                    </div>
+            )}
+            <div style={{ maxHeight:220, overflowY:'auto', marginTop:8, display:'grid', gap:6 }}>
+              {(invParsed[activeInvTab] || []).map((it, i) => (
+                <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr auto auto', gap:8, alignItems:'center', border:'1px solid var(--accent)', borderRadius:4, padding:'4px 6px' }}>
+                  <div className="dim" style={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{it.name}</div>
+                  <div className="chip">x{it.count}</div>
+                  <div style={{ display:'flex', gap:4 }}>
+                    <button className="mini" onClick={()=> setItemCount(activeInvTab, i, it.count-1)}>-1</button>
+                    <button className="mini" onClick={()=> setItemCount(activeInvTab, i, it.count+1)}>+1</button>
                   </div>
-                )}
-              </div>
+                </div>
+              ))}
+              {(invParsed[activeInvTab] || []).length===0 && (
+                <div className="dim" style={{textAlign:'center', padding:'8px 0'}}>No items yet.</div>
+              )}
             </div>
+          </section>
+
+          {/* Personality */}
+          <label>
+            <div className="label"><strong>Personality</strong></div>
+            <textarea rows={2} value={ch.personality} onChange={e => setCh({ ...ch, personality: e.target.value })} />
+          </label>
+        </div>
+
+        {/* Right: Trainer Traits (skinny, scrollable) */}
+        <div style={{ border:'1px solid var(--accent)', borderRadius:6, padding:8, display:'grid', gap:8, alignContent:'start', maxHeight:560, overflowY:'auto' }}>
+          <h3 style={{marginTop:0}}>Trainer Traits</h3>
+          {ch.traits.length === 0 && <div className="dim">No traits yet.</div>}
+          <div style={{ display:'grid', gap:8 }}>
+            {ch.traits.map((t,i)=> (
+              <div key={i} style={{ border:'1px solid var(--accent)', borderRadius:4, padding:6 }}>
+                <strong>{t.name}</strong>
+                <div className="dim" style={{ whiteSpace:'pre-wrap' }}>{t.description}</div>
+                <div style={{ display:'flex', gap:6, marginTop:6 }}>
+                  <button className="mini" onClick={()=> setSelectedTrait(i)}>View</button>
+                  <button className="mini" onClick={()=>{
+                    if (!confirm('Remove this trait?')) return;
+                    setCh({ ...ch, traits: ch.traits.filter((_x,idx)=> idx!==i) });
+                    if (selectedTrait===i) setSelectedTrait(null);
+                  }}>Remove</button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
-
-  {/* Badge Case */}
-  <section style={{ border: '1px solid var(--accent)', borderRadius: 6, padding: 8 }}>
-        <h3 style={{ marginTop: 0 }}>Badge Case</h3>
-        <div className="dim" style={{ marginBottom: 6 }}>Click a badge to toggle a check mark. You can name them below.</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 8, marginBottom: 8 }}>
-          {ch.badges.map((b, i) => (
-            <button
-              key={i}
-              className={`badge-btn ${b.earned ? 'earned' : ''}`}
-              onClick={() => setCh({ ...ch, badges: ch.badges.map((x, idx)=> idx===i ? { ...x, earned: !x.earned } : x) })}
-            >
-              {b.earned ? '✓' : '\u00A0'}
-            </button>
-          ))}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 8 }}>
-          {ch.badges.map((b, i) => (
-            <input key={i} placeholder={`Badge ${i+1}`} value={b.name} onChange={e => setCh({ ...ch, badges: ch.badges.map((x, idx)=> idx===i ? { ...x, name: e.target.value } : x) })} />
-          ))}
-        </div>
-      </section>
+      </div>
     </section>
   );
 }
