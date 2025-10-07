@@ -25,9 +25,13 @@ export default defineConfig({
     name: 'mount-showdown-static',
     configureServer(server) {
       const distShowdown = path.resolve(__dirname, 'dist', 'vendor', 'showdown');
-      const showdownRoot = existsSync(distShowdown)
-        ? distShowdown
-        : path.resolve(__dirname, '../pokemon-showdown-client/play.pokemonshowdown.com');
+      const publicShowdown = path.resolve(__dirname, 'public', 'vendor', 'showdown');
+      let showdownRoot = publicShowdown;
+      if (!existsSync(showdownRoot)) {
+        showdownRoot = existsSync(distShowdown)
+          ? distShowdown
+          : path.resolve(__dirname, '../pokemon-showdown-client/play.pokemonshowdown.com');
+      }
       const staticHandler = (serveStatic as any)(showdownRoot);
       server.middlewares.use('/showdown', (req, res, next) => staticHandler(req, res, next));
     },

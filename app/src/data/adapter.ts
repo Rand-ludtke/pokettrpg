@@ -39,16 +39,29 @@ export function normalizeName(id: string) {
 }
 
 export async function loadShowdownDex(options?: { base?: string }) {
-  // Use the stable /showdown mount for packaged and dev
-  const base = options?.base ?? '/showdown/data';
-  // prefer JSON if present for faster parse
+  // Prefer the stable /showdown mount; fall back to the legacy /vendor path during dev
+  const bases = options?.base ? [options.base] : ['/showdown/data', '/vendor/showdown/data'];
+  async function tryJson(path: string, opt?: { optional?: boolean }) {
+    for (const b of bases) {
+      try {
+        const r = await fetch(`${b}/${path}`);
+        if (!r.ok) throw new Error(String(r.status));
+        return await r.json();
+      } catch (e) {
+        // continue to next base
+      }
+    }
+    if (opt?.optional) return {};
+    // Last resort: empty
+    return {};
+  }
   const [pokedex, moves, abilities, items, learnsets, aliases] = await Promise.all([
-    fetch(`${base}/pokedex.json`).then(r => r.json()),
-    fetch(`${base}/moves.json`).then(r => r.json()),
-    fetch(`${base}/abilities.json`).then(r => r.json()).catch(() => ({})),
-    fetch(`${base}/items.json`).then(r => r.json()).catch(() => ({})),
-    fetch(`${base}/learnsets.json`).then(r => r.json()).catch(() => ({})),
-    fetch(`${base}/aliases.json`).then(r => r.json()).catch(() => ({})),
+    tryJson('pokedex.json'),
+    tryJson('moves.json'),
+    tryJson('abilities.json', { optional: true }),
+    tryJson('items.json', { optional: true }),
+    tryJson('learnsets.json', { optional: true }),
+    tryJson('aliases.json', { optional: true }),
   ]);
   // Merge custom overlays from local storage (local-only additions)
   const customDex = getCustomDex();
