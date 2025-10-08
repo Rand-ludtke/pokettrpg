@@ -5,71 +5,31 @@
 			"label": "Build app for verification",
 			"type": "shell",
 			"command": "npm run build",
-			"args": [],
-			"isBackground": false,
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
+			"group": "build",
 			"problemMatcher": [
-				"$tsc",
-				"$eslint - stylish"
-			],
-			"group": "build"
+				"$tsc"
+			]
 		},
 		{
 			"label": "Make Windows build",
 			"type": "shell",
-			"command": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"cd 'C:\\Users\\Rand L\\Documents\\GitHub\\pokettrpg\\app'; npm run electron:make\"",
-			"isBackground": false,
-			"problemMatcher": [],
+			"command": "npm run electron:make",
+			"options": {
+				"cwd": "${workspaceFolder}/app"
+			},
 			"group": "build"
 		},
 		{
 			"label": "Build app for verification",
 			"type": "shell",
-			"command": "npm run build"
-		},
-		{
-			"label": "Build app for verification",
-			"type": "shell",
 			"command": "npm run build",
-			"args": [],
 			"isBackground": false,
 			"problemMatcher": [
-				"$eslint-stylish"
+				"$tsc"
 			],
-			"group": "build"
-		},
-		{
-			"label": "Build app for verification",
-			"type": "shell",
-			"command": "npm run build",
-			"args": [],
-			"isBackground": false,
-			"problemMatcher": [
-				"$eslint-stylish"
-			],
-			"group": "build"
-		},
-		{
-			"label": "Make Windows build",
-			"type": "shell",
-			"command": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"cd 'C:\\Users\\Rand L\\Documents\\GitHub\\pokettrpg\\app'; npm run electron:make\"",
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Build app for verification",
-			"type": "shell",
-			"command": "npm run build",
-			"args": [],
-			"isBackground": false,
-			"problemMatcher": [
-				"$eslint-stylish"
-			],
-			"group": "build"
-		},
-		{
-			"label": "Build app for verification",
-			"type": "shell",
-			"command": "npm run build",
 			"group": "build"
 		}
 	]

@@ -35,7 +35,9 @@ jobs:
       - name: Build and publish Windows artifacts to GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder -c electron-builder.yml -w --publish always
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: 'true'
+          POKETTRPG_DISABLE_UPDATER: ${{ env.POKETTRPG_DISABLE_UPDATER }}
+        run: npx electron-builder -w --publish always
 
       - name: Upload artifacts (optional)
         if: always()
