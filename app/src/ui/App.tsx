@@ -18,8 +18,6 @@ type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'help' | { kind:'psbat
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
-  const [updateStatus, setUpdateStatus] = useState<string | null>(null);
-  const [updateDownloaded, setUpdateDownloaded] = useState<boolean>(false);
   const [extraTabs, setExtraTabs] = useState<Array<{ kind:'psbattle'; id:string; title:string }>>([]);
   // Keep battle iframes mounted even when not active to avoid tearing down connections
   const [mountedBattles, setMountedBattles] = useState<Record<string,{id:string; title:string}>>({});
@@ -56,25 +54,6 @@ export function App() {
     };
     window.addEventListener('pokettrpg-room-start', onWsRoomStart as any);
     return () => { off && off(); window.removeEventListener('pokettrpg-room-start', onWsRoomStart as any); };
-  }, []);
-
-  // Listen for updater events on Windows to surface install option (v1.0.5 behavior)
-  useEffect(() => {
-    const w: any = window as any;
-    if (!w.updates || !w.updates.on) return;
-    const offAvail = w.updates.on('available', (_info: any) => {
-      setUpdateStatus('update found');
-      setTimeout(()=> setUpdateStatus(null), 3000);
-    });
-    const offDl = w.updates.on('downloaded', (_info: any) => {
-      setUpdateDownloaded(true);
-      setUpdateStatus('ready to install');
-    });
-    const offErr = w.updates.on('error', (_err: any) => {
-      setUpdateStatus('update error');
-      setTimeout(()=> setUpdateStatus(null), 4000);
-    });
-    return () => { offAvail && offAvail(); offDl && offDl(); offErr && offErr(); };
   }, []);
 
   // Rehydrate on tab activation (non-host): whenever tab changes to lobby or a battle tab
@@ -267,38 +246,19 @@ export function App() {
           ))}
         </nav>
         <div style={{marginLeft:'auto', display:'flex', alignItems:'center', gap:6}}>
-          {/* Windows-only manual updater button (v1.0.5 behavior) */}
-          {typeof (window as any).env !== 'undefined' && (window as any).env.platform === 'win32' && (
-            <>
-              <button
-                title="Check for updates"
-                onClick={async ()=>{
-                  try {
-                    setUpdateStatus('checking…');
-                    const r = await (window as any).updates?.check?.();
-                    if (r && r.ok) {
-                      setUpdateStatus('up to date');
-                    } else {
-                      setUpdateStatus('no updates');
-                    }
-                  } catch (e) {
-                    setUpdateStatus('error');
-                  } finally {
-                    setTimeout(()=> setUpdateStatus(null), 3000);
-                  }
-                }}
-              >Check Updates</button>
-              {updateDownloaded && (
-                <button
-                  title="Install downloaded update and restart"
-                  onClick={async ()=>{
-                    try { await (window as any).updates?.install?.(); } catch {}
-                  }}
-                >Install and Restart</button>
-              )}
-              {updateStatus && <span className="dim" style={{marginLeft:6}}>{updateStatus}</span>}
-            </>
-          )}
+          <button className="mini" onClick={async ()=>{
+            try {
+              const r = await (window as any).updater?.check();
+              if (!r || !r.ok) { alert('Update check failed.'); return; }
+              if (!r.available) { alert('You are on the latest version.'); return; }
+              const goDl = confirm(`Update ${r.info?.version || ''} is available. Download and restart now?`);
+              if (!goDl) return;
+              const d = await (window as any).updater?.download();
+              if (!d || !d.ok) { alert('Failed to download update.'); return; }
+              const go = confirm('Update downloaded. Restart now to install?');
+              if (go) await (window as any).updater?.install();
+            } catch (e) { alert('Update error: '+String(e)); }
+          }}>Update</button>
           <label className="dim" htmlFor="spriteSet">Sprites:</label>
           <select id="spriteSet" defaultValue={getSpriteSettings().set} onChange={(e)=> setSpriteSettings({ set: e.target.value as SpriteSet })}>
             <option value="gen5">Gen 5</option>

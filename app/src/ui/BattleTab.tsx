@@ -462,7 +462,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                 <img
                   key={t}
                   className="pixel"
-                  src={`/showdown/sprites/types/${titleCase(t)}.png`}
+                  src={`/vendor/showdown/sprites/types/${titleCase(t)}.png`}
                   alt={titleCase(t)}
                   style={{height:18}}
                 />
@@ -512,7 +512,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                   <img
                     key={t}
                     className="pixel"
-                    src={`/showdown/sprites/types/${titleCase(t)}.png`}
+                    src={`/vendor/showdown/sprites/types/${titleCase(t)}.png`}
                     alt={titleCase(t)}
                     style={{height:18}}
                   />

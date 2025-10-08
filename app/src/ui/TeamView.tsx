@@ -12,7 +12,7 @@ export function TeamView({ team, onRemove, onMove }: {
       <h2>Active Team</h2>
       {team.length === 0 && <p>No Pokémon yet. Add from PC.</p>}
       <ul className="team">
-  {team.map((p, idx) => {
+        {team.map((p, idx) => {
           const onDragStart = (e: React.DragEvent) => {
             e.dataTransfer.setData('text/plain', String(idx));
             e.dataTransfer.effectAllowed = 'move';
@@ -24,9 +24,8 @@ export function TeamView({ team, onRemove, onMove }: {
             const from = fromStr ? parseInt(fromStr, 10) : NaN;
             if (onMove && Number.isFinite(from) && from !== idx) onMove(from, idx);
           };
-          const key = `${p.name || p.species || 'Mon'}-${p.level || 0}-${idx}`;
           return (
-            <li key={key}
+            <li key={p.name}
                 draggable={!!onMove}
                 onDragStart={onDragStart}
                 onDragOver={onDragOver}

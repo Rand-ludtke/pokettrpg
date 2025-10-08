@@ -39,29 +39,15 @@ export function normalizeName(id: string) {
 }
 
 export async function loadShowdownDex(options?: { base?: string }) {
-  // Prefer the stable /showdown mount; fall back to the legacy /vendor path during dev
-  const bases = options?.base ? [options.base] : ['/showdown/data', '/vendor/showdown/data'];
-  async function tryJson(path: string, opt?: { optional?: boolean }) {
-    for (const b of bases) {
-      try {
-        const r = await fetch(`${b}/${path}`);
-        if (!r.ok) throw new Error(String(r.status));
-        return await r.json();
-      } catch (e) {
-        // continue to next base
-      }
-    }
-    if (opt?.optional) return {};
-    // Last resort: empty
-    return {};
-  }
+  const base = options?.base ?? '/vendor/showdown/data';
+  // prefer JSON if present for faster parse
   const [pokedex, moves, abilities, items, learnsets, aliases] = await Promise.all([
-    tryJson('pokedex.json'),
-    tryJson('moves.json'),
-    tryJson('abilities.json', { optional: true }),
-    tryJson('items.json', { optional: true }),
-    tryJson('learnsets.json', { optional: true }),
-    tryJson('aliases.json', { optional: true }),
+    fetch(`${base}/pokedex.json`).then(r => r.json()),
+    fetch(`${base}/moves.json`).then(r => r.json()),
+    fetch(`${base}/abilities.json`).then(r => r.json()).catch(() => ({})),
+    fetch(`${base}/items.json`).then(r => r.json()).catch(() => ({})),
+    fetch(`${base}/learnsets.json`).then(r => r.json()).catch(() => ({})),
+    fetch(`${base}/aliases.json`).then(r => r.json()).catch(() => ({})),
   ]);
   // Merge custom overlays from local storage (local-only additions)
   const customDex = getCustomDex();
@@ -284,34 +270,27 @@ export function spriteUrl(speciesId: string, shiny = false, options?: { base?: s
     return shiny ? 'home-shiny' : 'home';
   })();
   const ext = 'png';
-  const ids = toSpriteIdCandidates(speciesId, options?.cosmetic);
+  const id = toSpriteId(speciesId, options?.cosmetic);
   // Prefer locally stored custom sprite data URL if present
   const slot: SpriteSlot = options?.back ? (shiny ? 'back-shiny' : 'back') : (shiny ? 'shiny' : 'front');
-  const local = ids.map(id => getCustomSprite(id, slot) || getCustomSprite(id, shiny ? 'shiny' : 'front')).find(Boolean);
+  const local = getCustomSprite(id, slot) || getCustomSprite(id, shiny ? 'shiny' : 'front');
   if (local) return local;
-  return `${base}/${folder}/${ids[0]}.${ext}`;
+  return `${base}/${folder}/${id}.${ext}`;
 }
 
-// Generate multiple candidate sprite filenames to match on-disk Showdown names.
-function toSpriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
-  const out: string[] = [];
-  const raw = toAscii(String(speciesName || ''));
-  // Nidoran gender specials
-  if (/♀/.test(speciesName)) return ['nidoranf'];
-  if (/♂/.test(speciesName)) return ['nidoranm'];
-  const lower = raw.toLowerCase();
-  const hyphenPreserved = lower.replace(/[^a-z0-9\-]+/g, ''); // keep hyphens
-  const collapsed = lower.replace(/[^a-z0-9]+/g, ''); // remove all non-alnum
-  const bases = Array.from(new Set([hyphenPreserved, collapsed].filter(Boolean)));
-  const cos = cosmetic ? toAscii(String(cosmetic)).toLowerCase().replace(/[^a-z0-9\-]+/g, '') : '';
-  for (const b of bases) {
-    out.push(b);
-    if (cos && !b.endsWith(cos)) {
-      out.push(`${b}-${cos}`);
-      out.push(`${b}${cos}`);
-    }
+function toSpriteId(speciesName: string, cosmetic?: string): string {
+  // Convert to ASCII (strip accents), then collapse punctuation and spaces
+  const raw = toAscii(speciesName);
+  const base = normalizeName(raw);
+  // Handle Nidoran gender symbol cases explicitly if symbol present in original
+  if (/♀/.test(speciesName)) return 'nidoranf';
+  if (/♂/.test(speciesName)) return 'nidoranm';
+  // If cosmetic given and not already part of the ID, append it (without hyphen)
+  if (cosmetic) {
+    const cos = normalizeName(toAscii(cosmetic));
+    if (cos && !base.endsWith(cos)) return `${base}${cos}`;
   }
-  return Array.from(new Set(out.filter(Boolean)));
+  return base;
 }
 
 export function speciesFormesInfo(name: string, dex: DexIndex) {
@@ -343,7 +322,7 @@ export function spriteUrlWithFallback(
   const shiny = !!options?.shiny;
   const back = !!options?.back;
   const chosen = options?.setOverride ?? getSpriteSettings().set;
-  const ids = toSpriteIdCandidates(speciesId, options?.cosmetic);
+  const id = toSpriteId(speciesId, options?.cosmetic);
 
   // Candidate folders by priority
   const folders: string[] = [];
@@ -359,15 +338,13 @@ export function spriteUrlWithFallback(
 
   // Insert custom sprite data URL at the front if available
   const slot: SpriteSlot = back ? (shiny ? 'back-shiny' : 'back') : (shiny ? 'shiny' : 'front');
+  const custom = getCustomSprite(id, slot) || getCustomSprite(id, shiny ? 'shiny' : 'front');
   const candidates: string[] = [];
-  for (const id of ids) {
-    const custom = getCustomSprite(id, slot) || getCustomSprite(id, shiny ? 'shiny' : 'front');
-    if (custom && !candidates.includes(custom)) candidates.push(custom);
-  }
-  for (const f of folders) for (const id of ids) candidates.push(`${base}/${f}/${id}.png`);
+  if (custom) candidates.push(custom);
+  for (const f of folders) candidates.push(`${base}/${f}/${id}.png`);
 
   let idx = 0;
-  const placeholder = placeholderSpriteDataURL((ids[0] || 'POKEMON').slice(0, 8).toUpperCase());
+  const placeholder = placeholderSpriteDataURL(id.slice(0, 8).toUpperCase());
   const first = candidates[0] || placeholder;
   return {
     src: first,

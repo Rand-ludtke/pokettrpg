@@ -73,7 +73,7 @@ export function ShowdownBattleTab({ id, title }: { id: string; title: string }) 
   useEffect(() => {
     try {
       const set = getSpriteSettings().set;
-  const dir = set === 'home' ? '/showdown/sprites/home' : '/showdown/sprites/gen5';
+      const dir = set === 'home' ? '/vendor/showdown/sprites/home' : '/vendor/showdown/sprites/gen5';
       iframeRef.current?.contentWindow?.postMessage({ type:'mb:setSpritesDir', url: dir }, '*');
     } catch {}
     try {

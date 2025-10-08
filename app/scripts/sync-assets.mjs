@@ -1,5 +1,4 @@
 import { cp, mkdir, writeFile, readFile, access, rm } from 'node:fs/promises';
-import { constants as fsConstants } from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 
@@ -13,23 +12,6 @@ const vendorSrc = path.join(process.cwd(), 'vendor-src', 'pokemonshowdown');
 async function main() {
   await mkdir(target, { recursive: true });
   await mkdir(vendorSrc, { recursive: true });
-  // Ensure app icon exists for electron-builder
-  try {
-    const buildDir = path.join(process.cwd(), 'build');
-    const iconDest = path.join(buildDir, 'icon.ico');
-    await mkdir(buildDir, { recursive: true });
-    try {
-      await access(iconDest, fsConstants.F_OK);
-    } catch {
-      const iconSrc = path.join(root, 'pokemon-showdown-client', 'graphics-src', 'showdown.ico');
-      try {
-        await cp(iconSrc, iconDest);
-        console.log('Copied default icon.ico to build/');
-      } catch (e) {
-        console.warn('Warning: could not copy default icon.ico:', e?.message || e);
-      }
-    }
-  } catch {}
   // Copy the entire Showdown client so all JS/CSS/assets are available offline
   try {
     await cp(showdown, target, { recursive: true });

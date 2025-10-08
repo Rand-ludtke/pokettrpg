@@ -38,25 +38,9 @@ contextBridge.exposeInMainWorld('lan', {
     }
 });
 
-// Expose a minimal updates API for Windows manual checks (v1.0.5 compatibility)
-contextBridge.exposeInMainWorld('updates', {
-  check: async () => ipcRenderer.invoke('update:check'),
-  install: async () => ipcRenderer.invoke('update:install'),
-  on: (event, listener) => {
-    const handler = (_e, data) => listener(data);
-    ipcRenderer.on(`update:${event}`, handler);
-    return () => ipcRenderer.off(`update:${event}`, handler);
-  }
-});
-
-// Keep newer updater API as well (no-op wrappers to old channels for now)
+// Expose updater controls
 contextBridge.exposeInMainWorld('updater', {
-  check: async () => ipcRenderer.invoke('update:check'),
-  download: async () => ({ ok: true }), // autoDownload is enabled in main; download is implicit
-  install: async () => ipcRenderer.invoke('update:install'),
-});
-
-// Expose environment hints
-contextBridge.exposeInMainWorld('env', {
-  platform: process.platform,
+  check: async () => ipcRenderer.invoke('updater:check'),
+  download: async () => ipcRenderer.invoke('updater:download'),
+  install: async () => ipcRenderer.invoke('updater:install'),
 });

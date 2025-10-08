@@ -121,21 +121,16 @@ async function createWindow() {
   await win.loadURL(`http://127.0.0.1:${port}/`);
   mainWindow = win;
 
-  // Configure auto-updates (v1.0.5 behavior)
+  // Configure autoUpdater only when packaged
   if (app.isPackaged) {
     try {
-      const disableUpdater = process.env.POKETTRPG_DISABLE_UPDATER === '1' || process.env.POKETTRPG_DISABLE_UPDATER === 'true';
-      if (process.platform !== 'darwin' && !disableUpdater) {
-        autoUpdater.autoDownload = true;
-        autoUpdater.autoInstallOnAppQuit = true;
-        autoUpdater.checkForUpdatesAndNotify().catch(()=>{});
-        setInterval(() => {
-          autoUpdater.checkForUpdates().catch(()=>{});
-        }, 1000 * 60 * 30);
-        autoUpdater.on('update-available', (info) => { if (mainWindow) mainWindow.webContents.send('update:available', info); });
-        autoUpdater.on('update-downloaded', (info) => { if (mainWindow) mainWindow.webContents.send('update:downloaded', info); });
-        autoUpdater.on('error', (err) => { if (mainWindow) mainWindow.webContents.send('update:error', String(err)); });
-      }
+      autoUpdater.autoDownload = false;
+      autoUpdater.autoInstallOnAppQuit = true;
+      autoUpdater.on('error', (e) => console.warn('autoUpdater error:', e));
+      autoUpdater.on('update-available', (info) => { try { win.webContents.send('lan:update', { t:'available', info }); } catch {} });
+      autoUpdater.on('update-not-available', (info) => { try { win.webContents.send('lan:update', { t:'none', info }); } catch {} });
+      autoUpdater.on('download-progress', (p) => { try { win.webContents.send('lan:update', { t:'progress', progress: p }); } catch {} });
+      autoUpdater.on('update-downloaded', (info) => { try { win.webContents.send('lan:update', { t:'downloaded', info }); } catch {} });
     } catch {}
   }
 }
@@ -815,34 +810,14 @@ ipcMain.handle('lan:discover:stop', async () => {
   return { ok: true };
 });
 
-// Manual update checks from renderer (Windows only by default, v1.0.5 behavior)
-ipcMain.handle('update:check', async () => {
-  try {
-    const disableUpdater = process.env.POKETTRPG_DISABLE_UPDATER === '1' || process.env.POKETTRPG_DISABLE_UPDATER === 'true';
-    if (!app.isPackaged || process.platform === 'darwin' || disableUpdater) {
-      return { ok: false, error: 'updates-disabled' };
-    }
-    const result = await autoUpdater.checkForUpdates();
-    return { ok: true, result: result && result.updateInfo ? result.updateInfo : null };
-  } catch (e) {
-    return { ok: false, error: String(e) };
-  }
-});
-
-ipcMain.handle('update:install', async () => {
-  try {
-    if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
-    setImmediate(() => autoUpdater.quitAndInstall());
-    return { ok: true };
-  } catch(e){ return { ok:false, error:String(e) }; }
-});
-
 // --- Updater IPC ---
 ipcMain.handle('updater:check', async () => {
   try {
     if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
     const r = await autoUpdater.checkForUpdates();
-    return { ok: true, info: r && r.updateInfo };
+    const info = r && r.updateInfo;
+    const available = !!(r && r.updateInfo && r.updateInfo.version && r.updateInfo.version !== app.getVersion());
+    return { ok: true, info, available };
   } catch (e) { return { ok: false, error: String(e) }; }
 });
 ipcMain.handle('updater:download', async () => {

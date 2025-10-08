@@ -447,7 +447,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
         {(() => {
           const te = computeTypeEffectiveness(selected.types);
           const icon = (t: string) => (
-            <img key={t} className="pixel" src={`/showdown/sprites/types/${titleCase(t)}.png`} alt={titleCase(t)} style={{height:18}} />
+            <img key={t} className="pixel" src={`/vendor/showdown/sprites/types/${titleCase(t)}.png`} alt={titleCase(t)} style={{height:18}} />
           );
           const renderIcons = (arr: string[], emptyText: string) => (
             arr.length ? (

@@ -11,31 +11,28 @@
     "sync": "node scripts/sync-assets.mjs",
     "build": "npm run sync && tsc -b && vite build",
     "preview": "vite preview",
-    "custom:add": "node scripts/add-custom-pokemon.mjs",
+  "custom:add": "node scripts/add-custom-pokemon.mjs",
     "electron:dev": "npm run build && electron .",
     "electron:pack": "npm run build && electron-builder --dir",
     "electron:make": "npm run build && electron-builder -w",
-    "electron:make:out": "npm run build && cross-env ELECTRON_BUILDER_OUT_DIR=${BUILD_OUTPUT_DIR:-release} electron-builder -w",
-    "electron:make:portable": "npm run build && electron-builder -w --portable",
-    "electron:make:dir": "npm run build && node scripts/make-with-output.mjs"
+    "electron:make:portable": "npm run build && electron-builder -w --portable"
   },
   "dependencies": {
-    "@pkmn/sim": "^0.8.9",
-    "electron-updater": "^6.3.9",
-    "finalhandler": "^1.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "ws": "^8.18.0",
     "serve-static": "^2.2.0",
-    "ws": "^8.18.0"
+    "finalhandler": "^1.2.0",
+    "@pkmn/sim": "^0.8.9",
+    "electron-updater": "^6.3.9"
   },
   "devDependencies": {
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
-    "cross-env": "^7.0.3",
-    "electron": "^31.6.0",
-    "electron-builder": "^24.13.3",
     "typescript": "^5.7.3",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "electron": "^31.6.0",
+    "electron-builder": "^24.13.3"
   },
   "build": {
     "appId": "com.rand.pokettrpg",
@@ -52,30 +49,13 @@
     ],
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "x64"
-          ]
-        }
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "zip", "arch": ["x64"] }
       ]
     },
     "publish": [
-      {
-        "provider": "github",
-        "owner": "Rand-ludtke",
-        "repo": "pokettrpg"
-      }
+      { "provider": "github", "owner": "Rand-ludtke", "repo": "pokettrpg" }
     ],
-    "directories": {
-      "buildResources": "build",
-      "output": "release"
-    }
+    "directories": { "buildResources": "build", "output": "release" }
   }
 }
