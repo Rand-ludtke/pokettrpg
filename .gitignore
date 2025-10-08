@@ -1,41 +1,37 @@
-# OS junk
-.DS_Store
-Thumbs.db
-
-# Node
+# Dependencies
 node_modules/
 **/node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+release/
+app/dist/
+app/release/
+code/ps-mini-battle/output/
+app/public/vendor/showdown/
+app/vendor-src/
+app/public/mini-battle/
+pokemon-showdown-client/
+
+# Logs
+*.log
 npm-debug.log*
+yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# OS/Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Env files
+.env
+.env.*
+
 # TypeScript build info
 *.tsbuildinfo
-
-# Editor
-.idea/
-.vscode/*
-!.vscode/tasks.json
-
-# App build outputs
-app/dist/
-app/release/
-app/out/
-
-# Generated vendor assets (rebuilt by scripts/sync-assets.mjs)
-app/public/vendor/
-app/vendor-src/
-
-# Mini battle outputs
-code/ps-mini-battle/output/
-
-# Do not commit embedded PS client; fetch locally or via submodule
-pokemon-showdown-client/
-
-# Local dev code playground (unversioned)
-code/
-
-# Temp files
-*.log
-*.tmp
-~$*
+app/tsconfig.app.tsbuildinfo

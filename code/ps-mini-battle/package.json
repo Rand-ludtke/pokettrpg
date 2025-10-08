@@ -1,0 +1,15 @@
+{
+  "name": "ps-mini-battle",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone battle simulation and minimal replay UI for Pokémon Showdown battles.",
+  "scripts": {
+    "build": "",
+    "test-battle": "node scripts/run-battle.js",
+    "serve": "node scripts/serve.js"
+  },
+  "dependencies": {
+    "pokemon-showdown": "^0.11.10"
+  }
+}

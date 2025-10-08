@@ -14,7 +14,7 @@ import { ShowdownBattleTab } from './ShowdownBattleTab';
 import { SimpleBattleTab } from './SimpleBattleTab';
 import { CharacterSheet } from './CharacterSheet';
 
-type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'character' | 'help' | { kind:'psbattle'; id:string; title:string };
+type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'help' | { kind:'psbattle'; id:string; title:string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -58,7 +58,7 @@ export function App() {
     return () => { off && off(); window.removeEventListener('pokettrpg-room-start', onWsRoomStart as any); };
   }, []);
 
-  // Listen for updater events on Windows to surface install option
+  // Listen for updater events on Windows to surface install option (v1.0.5 behavior)
   useEffect(() => {
     const w: any = window as any;
     if (!w.updates || !w.updates.on) return;
@@ -253,7 +253,7 @@ export function App() {
           <button className={tab==='team'? 'active':''} onClick={() => setTab('team')}>Team</button>
           <button className={tab==='battle'? 'active':''} onClick={() => setTab('battle')}>Battle</button>
           <button className={tab==='lobby'? 'active':''} onClick={() => setTab('lobby')}>Lobby</button>
-          <button className={tab==='character'? 'active':''} onClick={() => setTab('character')}>Character</button>
+          <button className={tab==='sheet'? 'active':''} onClick={() => setTab('sheet')}>Character</button>
           <button className={tab==='help'? 'active':''} onClick={() => setTab('help')}>Help</button>
           {extraTabs.map(t => (
             <span key={t.id} style={{display:'inline-flex', alignItems:'center'}}>
@@ -267,12 +267,7 @@ export function App() {
           ))}
         </nav>
         <div style={{marginLeft:'auto', display:'flex', alignItems:'center', gap:6}}>
-          <label className="dim" htmlFor="spriteSet">Sprites:</label>
-          <select id="spriteSet" defaultValue={getSpriteSettings().set} onChange={(e)=> setSpriteSettings({ set: e.target.value as SpriteSet })}>
-            <option value="gen5">Gen 5</option>
-            <option value="home">HOME</option>
-          </select>
-          {/* Windows-only manual updater button */}
+          {/* Windows-only manual updater button (v1.0.5 behavior) */}
           {typeof (window as any).env !== 'undefined' && (window as any).env.platform === 'win32' && (
             <>
               <button
@@ -304,6 +299,11 @@ export function App() {
               {updateStatus && <span className="dim" style={{marginLeft:6}}>{updateStatus}</span>}
             </>
           )}
+          <label className="dim" htmlFor="spriteSet">Sprites:</label>
+          <select id="spriteSet" defaultValue={getSpriteSettings().set} onChange={(e)=> setSpriteSettings({ set: e.target.value as SpriteSet })}>
+            <option value="gen5">Gen 5</option>
+            <option value="home">HOME</option>
+          </select>
         </div>
       </header>
 
@@ -476,15 +476,15 @@ export function App() {
         </div>
       )}
 
-      {tab === 'character' && (
-        <CharacterSheet />
-      )}
-
     {tab === 'battle' && (
       <BattleTab friendly={team[0] ?? null} enemy={selected} team={team} onReplaceTeam={replaceTeamAt} />
     )}
     {tab === 'lobby' && (
       <LobbyTab />
+    )}
+
+    {tab === 'sheet' && (
+      <CharacterSheet />
     )}
 
     {/* Keep all created battles mounted; hide those not active */}

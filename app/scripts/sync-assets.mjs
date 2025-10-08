@@ -20,14 +20,8 @@ async function main() {
   const dataSrc = path.join(showdown, 'data');
   const dataDest = path.join(target, 'data');
   await mkdir(dataDest, { recursive: true });
-  try {
-    for (const f of ['pokedex.json', 'moves.json']) {
-      await cp(path.join(dataSrc, f), path.join(dataDest, f), { recursive: false });
-    }
-  } catch (e) {
-    console.warn('Showdown data JSON not found; continuing without pokedex/moves.', e?.message || e);
-    try { await writeFile(path.join(dataDest, 'pokedex.json'), '{}', 'utf8'); } catch {}
-    try { await writeFile(path.join(dataDest, 'moves.json'), '{}', 'utf8'); } catch {}
+  for (const f of ['pokedex.json', 'moves.json']) {
+    await cp(path.join(dataSrc, f), path.join(dataDest, f), { recursive: false });
   }
 
   // Build abilities.json, items.json, and learnsets.json from Showdown JS tables if JSON isn't present
@@ -42,10 +36,8 @@ async function main() {
     const obj = result?.BattleAbilities || result?.BattleItems || result?.BattleLearnsets || result || {};
     await writeFile(path.join(dataDest, outName), JSON.stringify(obj, null, 2), 'utf8');
   }
-  try { await buildJson('abilities.js', 'BattleAbilities', 'abilities.json'); }
-  catch (e) { console.warn('abilities.js missing; writing empty abilities.json'); try { await writeFile(path.join(dataDest, 'abilities.json'), '{}', 'utf8'); } catch {} }
-  try { await buildJson('items.js', 'BattleItems', 'items.json'); }
-  catch (e) { console.warn('items.js missing; writing empty items.json'); try { await writeFile(path.join(dataDest, 'items.json'), '{}', 'utf8'); } catch {} }
+  await buildJson('abilities.js', 'BattleAbilities', 'abilities.json');
+  await buildJson('items.js', 'BattleItems', 'items.json');
   // learnsets may not exist in play site; fall back to vendor-src TS
   const learnsetsJs = path.join(dataSrc, 'learnsets.js');
   try {
@@ -70,7 +62,6 @@ async function main() {
       console.log('Built learnsets.json from TS');
     } catch (e) {
       console.warn('Could not build learnsets.json; move legality will be disabled.', e?.message || e);
-      try { await writeFile(path.join(dataDest, 'learnsets.json'), '{}', 'utf8'); } catch {}
     }
   }
 
@@ -92,7 +83,7 @@ async function main() {
   const argv = process.argv.slice(2);
   const copyAll = argv.includes('--all');
   const setsArg = argv.find(a => a.startsWith('--sets='));
-  const sets = copyAll ? ['__ALL__'] : (setsArg ? setsArg.replace(/^--sets=/, '').split(',') : ['gen5','gen5-shiny','gen5-back','gen5-back-shiny','gen5icons','types','home','trainers']);
+  const sets = copyAll ? ['__ALL__'] : (setsArg ? setsArg.replace(/^--sets=/, '').split(',') : ['gen5','gen5-shiny','gen5icons','types','home','trainers']);
   if (sets.includes('__ALL__')) {
     await cp(spritesSrc, spritesDest, { recursive: true });
   } else {
