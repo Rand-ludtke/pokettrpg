@@ -21,3 +21,4 @@ publish:
   provider: github
   owner: Rand-ludtke
   repo: pokettrpg
+  overwrite: true

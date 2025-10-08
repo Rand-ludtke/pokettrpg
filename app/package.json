@@ -70,7 +70,8 @@
       {
         "provider": "github",
         "owner": "Rand-ludtke",
-        "repo": "pokettrpg"
+        "repo": "pokettrpg",
+        "overwrite": true
       }
     ],
     "directories": {
