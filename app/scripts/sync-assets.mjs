@@ -141,6 +141,19 @@ async function main() {
   } catch (e) {
     console.warn('Mini-battler assets missing or failed to copy:', e?.message || e);
   }
+
+  // Ensure an app icon exists for electron-builder in CI
+  try {
+    const buildDir = path.join(process.cwd(), 'build');
+    await mkdir(buildDir, { recursive: true });
+    const icoSrc = path.join(root, 'pokemon-showdown-client', 'graphics-src', 'showdown.ico');
+    const icoDest = path.join(buildDir, 'icon.ico');
+    // Only copy if missing to allow custom icons
+    try { await access(icoDest); }
+    catch { await cp(icoSrc, icoDest); console.log('Copied default icon.ico to build/icon.ico'); }
+  } catch (e) {
+    console.warn('Could not ensure icon.ico:', e?.message || e);
+  }
 }
 
 main().catch(err => {
