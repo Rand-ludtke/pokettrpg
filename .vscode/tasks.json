@@ -92,6 +92,45 @@
 				"$tsc"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Build app for verification",
+			"type": "shell",
+			"command": "npm --prefix app run build",
+			"group": "build"
+		},
+		{
+			"label": "Build app for verification",
+			"type": "shell",
+			"command": "npm --prefix app run build",
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build app for verification",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Build app for verification",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Build app for verification",
+			"type": "shell",
+			"command": "npm run build",
+			"args": [],
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

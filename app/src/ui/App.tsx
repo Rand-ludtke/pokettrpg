@@ -246,19 +246,6 @@ export function App() {
           ))}
         </nav>
         <div style={{marginLeft:'auto', display:'flex', alignItems:'center', gap:6}}>
-          <button className="mini" onClick={async ()=>{
-            try {
-              const r = await (window as any).updater?.check();
-              if (!r || !r.ok) { alert('Update check failed.'); return; }
-              if (!r.available) { alert('You are on the latest version.'); return; }
-              const goDl = confirm(`Update ${r.info?.version || ''} is available. Download and restart now?`);
-              if (!goDl) return;
-              const d = await (window as any).updater?.download();
-              if (!d || !d.ok) { alert('Failed to download update.'); return; }
-              const go = confirm('Update downloaded. Restart now to install?');
-              if (go) await (window as any).updater?.install();
-            } catch (e) { alert('Update error: '+String(e)); }
-          }}>Update</button>
           <label className="dim" htmlFor="spriteSet">Sprites:</label>
           <select id="spriteSet" defaultValue={getSpriteSettings().set} onChange={(e)=> setSpriteSettings({ set: e.target.value as SpriteSet })}>
             <option value="gen5">Gen 5</option>

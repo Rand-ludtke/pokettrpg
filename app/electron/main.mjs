@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import updaterPkg from 'electron-updater';
 const { autoUpdater } = updaterPkg;
 import path from 'node:path';
@@ -84,6 +84,59 @@ function createStaticServer(root, preferredPort = 17645) {
 }
 
 let mainWindow = null;
+
+// Check for updates before starting the full app UI; prompt user to download/install
+async function maybeUpdateBeforeStart() {
+  if (!app.isPackaged) return; // only check when packaged
+  try {
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = true;
+    const r = await autoUpdater.checkForUpdates();
+    const info = r && r.updateInfo;
+    const available = !!(info && info.version && info.version !== app.getVersion());
+    if (!available) return;
+
+    const msg = `Version ${info.version} is available.`;
+    const detail = 'Download now and restart to install, or skip to continue without updating.';
+    const res = await dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Download and Install', 'Skip'],
+      defaultId: 0,
+      cancelId: 1,
+      title: 'Update available',
+      message: msg,
+      detail,
+      noLink: true,
+    });
+    if (res.response !== 0) return;
+
+    // Download update; this may take time. If it fails, continue startup.
+    try {
+      await autoUpdater.downloadUpdate();
+    } catch (e) {
+      console.warn('Update download failed:', e);
+      return;
+    }
+
+    const ready = await dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Restart Now', 'Later'],
+      defaultId: 0,
+      cancelId: 1,
+      title: 'Update ready',
+      message: 'Update downloaded',
+      detail: 'Restart now to install the update. If you choose Later, it will install on the next app launch.',
+      noLink: true,
+    });
+    if (ready.response === 0) {
+      setImmediate(() => autoUpdater.quitAndInstall());
+      // prevent continuing to create the window since we are quitting
+      await new Promise(() => {});
+    }
+  } catch (e) {
+    console.warn('Startup update check failed:', e);
+  }
+}
 async function createWindow() {
   // Resolve dist folder both in dev and when packaged in asar
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -121,21 +174,13 @@ async function createWindow() {
   await win.loadURL(`http://127.0.0.1:${port}/`);
   mainWindow = win;
 
-  // Configure autoUpdater only when packaged
-  if (app.isPackaged) {
-    try {
-      autoUpdater.autoDownload = false;
-      autoUpdater.autoInstallOnAppQuit = true;
-      autoUpdater.on('error', (e) => console.warn('autoUpdater error:', e));
-      autoUpdater.on('update-available', (info) => { try { win.webContents.send('lan:update', { t:'available', info }); } catch {} });
-      autoUpdater.on('update-not-available', (info) => { try { win.webContents.send('lan:update', { t:'none', info }); } catch {} });
-      autoUpdater.on('download-progress', (p) => { try { win.webContents.send('lan:update', { t:'progress', progress: p }); } catch {} });
-      autoUpdater.on('update-downloaded', (info) => { try { win.webContents.send('lan:update', { t:'downloaded', info }); } catch {} });
-    } catch {}
-  }
+  // Note: updater temporarily disabled while we rework update flow
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+  await maybeUpdateBeforeStart();
+  await createWindow();
+});
 
 app.on('second-instance', () => {
   const wins = BrowserWindow.getAllWindows();
@@ -810,30 +855,7 @@ ipcMain.handle('lan:discover:stop', async () => {
   return { ok: true };
 });
 
-// --- Updater IPC ---
-ipcMain.handle('updater:check', async () => {
-  try {
-    if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
-    const r = await autoUpdater.checkForUpdates();
-    const info = r && r.updateInfo;
-    const available = !!(r && r.updateInfo && r.updateInfo.version && r.updateInfo.version !== app.getVersion());
-    return { ok: true, info, available };
-  } catch (e) { return { ok: false, error: String(e) }; }
-});
-ipcMain.handle('updater:download', async () => {
-  try {
-    if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
-    await autoUpdater.downloadUpdate();
-    return { ok: true };
-  } catch (e) { return { ok: false, error: String(e) }; }
-});
-ipcMain.handle('updater:install', async () => {
-  try {
-    if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
-    setImmediate(() => autoUpdater.quitAndInstall());
-    return { ok: true };
-  } catch (e) { return { ok: false, error: String(e) }; }
-});
+// (updater IPC removed)
 
 ipcMain.handle('lan:discover:ping', async () => {
   try {

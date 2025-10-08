@@ -39,8 +39,4 @@ contextBridge.exposeInMainWorld('lan', {
 });
 
 // Expose updater controls
-contextBridge.exposeInMainWorld('updater', {
-  check: async () => ipcRenderer.invoke('updater:check'),
-  download: async () => ipcRenderer.invoke('updater:download'),
-  install: async () => ipcRenderer.invoke('updater:install'),
-});
+// Note: updater API temporarily removed while we rework update flow
