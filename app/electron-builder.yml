@@ -17,6 +17,8 @@ win:
     - target: portable
       arch: [x64]
 icon: build/icon.ico
+mac:
+  icon: build/icon.png
 publish:
   provider: github
   owner: Rand-ludtke

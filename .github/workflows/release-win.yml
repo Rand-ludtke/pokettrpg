@@ -22,10 +22,8 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Install Git LFS
-        uses: actions/setup-git@v1
-        with:
-          lfs: true
+      - name: Enable Git LFS
+        run: git lfs install
 
       - name: Pull LFS files
         run: git lfs pull

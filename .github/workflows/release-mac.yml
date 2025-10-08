@@ -41,6 +41,25 @@ jobs:
       - name: Build app (Vite + TS)
         run: npm run build
 
+      - name: Ensure 512x512 app icon for mac
+        run: |
+          set -e
+          mkdir -p build
+          # If we only have ICO, convert to PNG 512 using sips (will scale up if smaller)
+          if [ -f build/icon.png ]; then
+            echo "icon.png present"
+          elif [ -f build/icon.ico ]; then
+            # extract first frame via sips (mac has sips; ico may not be readable, so fallback to a generated square)
+            echo "ICO present; generating PNG"
+            /usr/bin/sips -s format png build/icon.ico --out build/icon.png || /usr/bin/sips -s format png /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarAdvanced.icns --out build/icon.png
+          else
+            # generate a placeholder if neither exists
+            echo "No icon found; generating placeholder"
+            /usr/bin/sips -s format png /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarAdvanced.icns --out build/icon.png
+          fi
+          # Resize to 512x512 minimum
+          /usr/bin/sips -Z 512 build/icon.png
+
       - name: Build macOS artifacts (unsigned)
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'

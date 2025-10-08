@@ -38,6 +38,7 @@
     "appId": "com.rand.pokettrpg",
     "productName": "Pokettrpg",
     "icon": "build/icon.ico",
+    "mac": { "icon": "build/icon.png" },
     "files": [
       "dist/**",
       "electron/**",
