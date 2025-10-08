@@ -1,4 +1,4 @@
-import { cp, mkdir, writeFile, readFile, access, rm } from 'node:fs/promises';
+import { cp, mkdir, writeFile, readFile, access, rm, stat } from 'node:fs/promises';
 import path from 'node:path';
 import vm from 'node:vm';
 
@@ -12,22 +12,33 @@ const vendorSrc = path.join(process.cwd(), 'vendor-src', 'pokemonshowdown');
 async function main() {
   await mkdir(target, { recursive: true });
   await mkdir(vendorSrc, { recursive: true });
-  // Copy the entire Showdown client so all JS/CSS/assets are available offline
-  try {
-    await cp(showdown, target, { recursive: true });
-  } catch {}
+  // Copy the entire Showdown client so all JS/CSS/assets are available offline, if present
+  let showdownPresent = false;
+  try { const s = await stat(showdown); showdownPresent = !!s && s.isDirectory(); } catch {}
+  if (showdownPresent) {
+    try { await cp(showdown, target, { recursive: true }); } catch {}
+  } else {
+    console.warn('Showdown client folder missing – skipping copy. Ensure Git LFS pulled assets in CI.');
+  }
   // Copy JSON data
   const dataSrc = path.join(showdown, 'data');
   const dataDest = path.join(target, 'data');
   await mkdir(dataDest, { recursive: true });
   for (const f of ['pokedex.json', 'moves.json']) {
-    await cp(path.join(dataSrc, f), path.join(dataDest, f), { recursive: false });
+    try { await cp(path.join(dataSrc, f), path.join(dataDest, f), { recursive: false }); }
+    catch (e) { console.warn('Missing base data file', f, '- will rely on previous cache if available'); }
   }
 
   // Build abilities.json, items.json, and learnsets.json from Showdown JS tables if JSON isn't present
   async function buildJson(jsFile, exportVar, outName) {
     const full = path.join(dataSrc, jsFile);
-    const code = await readFile(full, 'utf8');
+    let code;
+    try {
+      code = await readFile(full, 'utf8');
+    } catch {
+      console.warn('Missing', jsFile, '– skipping build for', outName);
+      return;
+    }
     const context = { exports: {}, module: { exports: {} } };
     vm.createContext(context);
     // abilities.js uses exports.BattleAbilities = {...}
@@ -67,9 +78,7 @@ async function main() {
 
   // Keep a copy of original TS cache sources for future full PS integration
   const cachesTs = path.join(root, 'pokemon-showdown-client', 'caches', 'pokemon-showdown', 'data');
-  try {
-    await cp(cachesTs, path.join(vendorSrc, 'data'), { recursive: true });
-  } catch {}
+  try { await cp(cachesTs, path.join(vendorSrc, 'data'), { recursive: true }); } catch {}
 
   // Copy sprite folders. Default to a minimal set to keep package size small.
   // Use CLI flags to control:
@@ -84,19 +93,18 @@ async function main() {
   const copyAll = argv.includes('--all');
   const setsArg = argv.find(a => a.startsWith('--sets='));
   const sets = copyAll ? ['__ALL__'] : (setsArg ? setsArg.replace(/^--sets=/, '').split(',') : ['gen5','gen5-shiny','gen5icons','types','home','trainers']);
-  if (sets.includes('__ALL__')) {
-    await cp(spritesSrc, spritesDest, { recursive: true });
-  } else {
-    for (const sub of sets) {
-      const from = path.join(spritesSrc, sub);
-      const to = path.join(spritesDest, sub);
-      try {
-        await mkdir(path.dirname(to), { recursive: true });
-        await cp(from, to, { recursive: true });
-      } catch (e) {
-        // ignore missing optional sets
+  if (showdownPresent) {
+    if (sets.includes('__ALL__')) {
+      try { await cp(spritesSrc, spritesDest, { recursive: true }); } catch {}
+    } else {
+      for (const sub of sets) {
+        const from = path.join(spritesSrc, sub);
+        const to = path.join(spritesDest, sub);
+        try { await mkdir(path.dirname(to), { recursive: true }); await cp(from, to, { recursive: true }); } catch {}
       }
     }
+  } else {
+    console.warn('Sprites source missing – leaving existing sprites as-is.');
   }
   // Removed duplicate exposure under /ps to reduce app size
   console.log('Synced showdown assets to', target, 'and cached TS sources to', vendorSrc);

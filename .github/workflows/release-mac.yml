@@ -16,8 +16,17 @@ jobs:
       run:
         working-directory: app
     steps:
-      - name: Checkout
+      - name: Checkout (full history)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Install Git LFS
+        run: brew install git-lfs && git lfs install
+
+      - name: Pull LFS files
+        run: git lfs pull
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
