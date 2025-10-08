@@ -1,4 +1,5 @@
 import { cp, mkdir, writeFile, readFile, access, rm } from 'node:fs/promises';
+import { constants as fsConstants } from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 
@@ -12,6 +13,23 @@ const vendorSrc = path.join(process.cwd(), 'vendor-src', 'pokemonshowdown');
 async function main() {
   await mkdir(target, { recursive: true });
   await mkdir(vendorSrc, { recursive: true });
+  // Ensure app icon exists for electron-builder
+  try {
+    const buildDir = path.join(process.cwd(), 'build');
+    const iconDest = path.join(buildDir, 'icon.ico');
+    await mkdir(buildDir, { recursive: true });
+    try {
+      await access(iconDest, fsConstants.F_OK);
+    } catch {
+      const iconSrc = path.join(root, 'pokemon-showdown-client', 'graphics-src', 'showdown.ico');
+      try {
+        await cp(iconSrc, iconDest);
+        console.log('Copied default icon.ico to build/');
+      } catch (e) {
+        console.warn('Warning: could not copy default icon.ico:', e?.message || e);
+      }
+    }
+  } catch {}
   // Copy the entire Showdown client so all JS/CSS/assets are available offline
   try {
     await cp(showdown, target, { recursive: true });
@@ -140,38 +158,6 @@ async function main() {
     console.log('Copied mini-battler to', miniDest);
   } catch (e) {
     console.warn('Mini-battler assets missing or failed to copy:', e?.message || e);
-  }
-
-  // Ensure Windows build icon exists for electron-builder. If app/build/icon.ico is
-  // missing (common in CI), copy a default from pokemon-showdown-client assets.
-  try {
-    const buildDir = path.join(process.cwd(), 'build');
-    await mkdir(buildDir, { recursive: true });
-    const iconPath = path.join(buildDir, 'icon.ico');
-    try {
-      await access(iconPath);
-      // icon already present; nothing to do
-    } catch {
-      // Try common icon locations in the repo
-      const candidates = [
-        path.join(root, 'pokemon-showdown-client', 'graphics-src', 'showdown.ico'),
-      ];
-      let copied = false;
-      for (const cand of candidates) {
-        try {
-          await access(cand);
-          await cp(cand, iconPath);
-          console.log('Copied default icon to', iconPath);
-          copied = true;
-          break;
-        } catch {}
-      }
-      if (!copied) {
-        console.warn('Warning: build/icon.ico not found and no default icon available. Windows build may fail or use a generic icon.');
-      }
-    }
-  } catch (e) {
-    console.warn('Failed to ensure Windows icon:', e?.message || e);
   }
 }
 

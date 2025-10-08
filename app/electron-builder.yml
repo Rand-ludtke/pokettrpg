@@ -8,17 +8,27 @@ files:
   - electron/**
   - node_modules/**
   - package.json
+asar: true
 asarUnpack:
   - dist/vendor/showdown/**
+  - node_modules/**
 win:
   target:
     - target: nsis
       arch: [x64]
-    - target: zip
+    - target: portable
       arch: [x64]
 icon: build/icon.ico
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.games
+  hardenedRuntime: false
+  identity: null
+  notarize: false
 publish:
   provider: github
   owner: Rand-ludtke
   repo: pokettrpg
-  overwrite: true
+  releaseType: release
