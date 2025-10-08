@@ -89,12 +89,42 @@ let mainWindow = null;
 async function maybeUpdateBeforeStart() {
   if (!app.isPackaged) return; // only check when packaged
   try {
+    // Load persisted preferences (to allow suppressing the up-to-date dialog)
+    const settingsFile = path.join(app.getPath('userData'), 'settings.json');
+    let prefs = {};
+    try {
+      const txt = await fs.readFile(settingsFile, 'utf8');
+      try { prefs = JSON.parse(txt) || {}; } catch {}
+    } catch {}
+
     autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = true;
     const r = await autoUpdater.checkForUpdates();
     const info = r && r.updateInfo;
     const available = !!(info && info.version && info.version !== app.getVersion());
-    if (!available) return;
+    if (!available) {
+      // Show an up-to-date notice unless the user opted out previously
+      if (!prefs?.suppressUpToDateDialog) {
+        try {
+          const res = await dialog.showMessageBox({
+            type: 'info',
+            buttons: ['OK'],
+            defaultId: 0,
+            title: 'Up to date',
+            message: 'You are on the latest version',
+            detail: `Current version: v${app.getVersion()}`,
+            noLink: true,
+            checkboxLabel: "Don't show again",
+            checkboxChecked: false,
+          });
+          if (res.checkboxChecked) {
+            prefs.suppressUpToDateDialog = true;
+            try { await fs.writeFile(settingsFile, JSON.stringify(prefs, null, 2), 'utf8'); } catch {}
+          }
+        } catch {}
+      }
+      return;
+    }
 
     const msg = `Version ${info.version} is available.`;
     const detail = 'Download now and restart to install, or skip to continue without updating.';

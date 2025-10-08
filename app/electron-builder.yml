@@ -19,6 +19,9 @@ win:
 icon: build/icon.ico
 mac:
   icon: build/icon.png
+  target:
+    - dmg
+    - zip
 publish:
   provider: github
   owner: Rand-ludtke
