@@ -45,14 +45,19 @@ jobs:
         run: npx electron-builder -c electron-builder.yml -w --publish never
 
       - name: Upload Windows artifacts to GitHub Release (clobber)
-        shell: bash
+        shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -e
-          TAG="${GITHUB_REF_NAME:-${GITHUB_REF##*/}}"
-          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" -t "$TAG" -n ""
-          gh release upload "$TAG" release/* --clobber
+          $ErrorActionPreference = 'Stop'
+          $tag = "$env:GITHUB_REF_NAME"
+          if (-not $tag -and $env:GITHUB_REF) { $tag = $env:GITHUB_REF -replace '^refs/tags/', '' }
+          if (-not $tag) { throw "Cannot determine tag name" }
+          gh release view $tag 2>$null | Out-Null
+          if ($LASTEXITCODE -ne 0) { gh release create $tag -t $tag -n "" }
+          Get-ChildItem -LiteralPath "release" -File | ForEach-Object {
+            gh release upload $tag $_.FullName --clobber
+          }
 
       - name: Upload artifacts (optional)
         if: always()
