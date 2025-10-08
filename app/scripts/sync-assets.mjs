@@ -141,6 +141,38 @@ async function main() {
   } catch (e) {
     console.warn('Mini-battler assets missing or failed to copy:', e?.message || e);
   }
+
+  // Ensure Windows build icon exists for electron-builder. If app/build/icon.ico is
+  // missing (common in CI), copy a default from pokemon-showdown-client assets.
+  try {
+    const buildDir = path.join(process.cwd(), 'build');
+    await mkdir(buildDir, { recursive: true });
+    const iconPath = path.join(buildDir, 'icon.ico');
+    try {
+      await access(iconPath);
+      // icon already present; nothing to do
+    } catch {
+      // Try common icon locations in the repo
+      const candidates = [
+        path.join(root, 'pokemon-showdown-client', 'graphics-src', 'showdown.ico'),
+      ];
+      let copied = false;
+      for (const cand of candidates) {
+        try {
+          await access(cand);
+          await cp(cand, iconPath);
+          console.log('Copied default icon to', iconPath);
+          copied = true;
+          break;
+        } catch {}
+      }
+      if (!copied) {
+        console.warn('Warning: build/icon.ico not found and no default icon available. Windows build may fail or use a generic icon.');
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to ensure Windows icon:', e?.message || e);
+  }
 }
 
 main().catch(err => {
