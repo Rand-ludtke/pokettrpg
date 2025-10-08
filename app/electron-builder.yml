@@ -32,3 +32,4 @@ publish:
   owner: Rand-ludtke
   repo: pokettrpg
   releaseType: release
+  overwrite: true
