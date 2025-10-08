@@ -11,7 +11,7 @@
     "sync": "node scripts/sync-assets.mjs",
     "build": "npm run sync && tsc -b && vite build",
     "preview": "vite preview",
-  "custom:add": "node scripts/add-custom-pokemon.mjs",
+    "custom:add": "node scripts/add-custom-pokemon.mjs",
     "electron:dev": "npm run build && electron .",
     "electron:pack": "npm run build && electron-builder --dir",
     "electron:make": "npm run build && electron-builder -w",
@@ -52,13 +52,30 @@
     ],
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "zip", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "publish": [
-      { "provider": "github", "owner": "Rand-ludtke", "repo": "pokettrpg" }
+      {
+        "provider": "github",
+        "owner": "Rand-ludtke",
+        "repo": "pokettrpg"
+      }
     ],
-    "directories": { "buildResources": "build", "output": "release" }
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    }
   }
 }
