@@ -1,0 +1,6 @@
+{
+  "format": "gen9randombattle",
+  "p1": {"name": "Ash"},
+  "p2": {"name": "Gary"},
+  "seed": [1,2,3,4]
+}

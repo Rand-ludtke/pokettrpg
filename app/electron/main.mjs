@@ -1,6 +1,6 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
-import updater from 'electron-updater';
-const { autoUpdater } = updater;
+import updaterPkg from 'electron-updater';
+const { autoUpdater } = updaterPkg;
 import path from 'node:path';
 import { createServer } from 'node:http';
 import serveStatic from 'serve-static';
@@ -23,10 +23,17 @@ if (!app.requestSingleInstanceLock()) {
  */
 function resolveShowdownRoot(distRoot) {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  // Prefer built assets in dist/public vendor
+  // In packaged app, prefer unpacked resources to avoid any asar quirks and large file perf issues
+  if (app.isPackaged) {
+    try {
+      const unpacked = path.join(process.resourcesPath, 'app.asar.unpacked', 'dist', 'vendor', 'showdown');
+      if (existsSync(unpacked)) return unpacked;
+    } catch {}
+  }
+  // Prefer built assets in dist/public vendor (works in dev and also from asar)
   const distShowdown = path.join(distRoot, 'vendor', 'showdown');
   if (existsSync(distShowdown)) return distShowdown;
-  // Fallback to repo location at project root
+  // Fallback to repo location at project root (dev convenience)
   const repoShowdown = path.join(__dirname, '..', '..', 'pokemon-showdown-client', 'play.pokemonshowdown.com');
   if (existsSync(repoShowdown)) return repoShowdown;
   // Last resort: old relative path
@@ -113,43 +120,27 @@ async function createWindow() {
 
   await win.loadURL(`http://127.0.0.1:${port}/`);
   mainWindow = win;
+
+  // Configure auto-updates (v1.0.5 behavior)
+  if (app.isPackaged) {
+    try {
+      const disableUpdater = process.env.POKETTRPG_DISABLE_UPDATER === '1' || process.env.POKETTRPG_DISABLE_UPDATER === 'true';
+      if (process.platform !== 'darwin' && !disableUpdater) {
+        autoUpdater.autoDownload = true;
+        autoUpdater.autoInstallOnAppQuit = true;
+        autoUpdater.checkForUpdatesAndNotify().catch(()=>{});
+        setInterval(() => {
+          autoUpdater.checkForUpdates().catch(()=>{});
+        }, 1000 * 60 * 30);
+        autoUpdater.on('update-available', (info) => { if (mainWindow) mainWindow.webContents.send('update:available', info); });
+        autoUpdater.on('update-downloaded', (info) => { if (mainWindow) mainWindow.webContents.send('update:downloaded', info); });
+        autoUpdater.on('error', (err) => { if (mainWindow) mainWindow.webContents.send('update:error', String(err)); });
+      }
+    } catch {}
+  }
 }
 
 app.whenReady().then(createWindow);
-
-// Auto-updates: check on ready and periodically when packaged
-app.whenReady().then(() => {
-  try {
-    const disableUpdater = process.env.POKETTRPG_DISABLE_UPDATER === '1' || process.env.POKETTRPG_DISABLE_UPDATER === 'true';
-    // Skip auto-updates on macOS by default, or if disabled via env
-    if (app.isPackaged && process.platform !== 'darwin' && !disableUpdater) {
-      autoUpdater.autoDownload = true;
-      autoUpdater.autoInstallOnAppQuit = true;
-      autoUpdater.checkForUpdatesAndNotify().catch(()=>{});
-      setInterval(() => {
-        autoUpdater.checkForUpdates().catch(()=>{});
-      }, 1000 * 60 * 30); // every 30m
-      autoUpdater.on('update-available', (info) => { if (mainWindow) mainWindow.webContents.send('update:available', info); });
-      autoUpdater.on('update-downloaded', (info) => { if (mainWindow) mainWindow.webContents.send('update:downloaded', info); });
-      autoUpdater.on('error', (err) => { if (mainWindow) mainWindow.webContents.send('update:error', String(err)); });
-      ipcMain.handle('update:install', async () => { try { setImmediate(() => autoUpdater.quitAndInstall()); return { ok: true }; } catch(e){ return { ok:false, error:String(e) }; } });
-    }
-  } catch {}
-});
-
-// Manual update checks from renderer (Windows only by default)
-ipcMain.handle('update:check', async () => {
-  try {
-    const disableUpdater = process.env.POKETTRPG_DISABLE_UPDATER === '1' || process.env.POKETTRPG_DISABLE_UPDATER === 'true';
-    if (!app.isPackaged || process.platform === 'darwin' || disableUpdater) {
-      return { ok: false, error: 'updates-disabled' };
-    }
-    const result = await autoUpdater.checkForUpdates();
-    return { ok: true, result: result && result.updateInfo ? result.updateInfo : null };
-  } catch (e) {
-    return { ok: false, error: String(e) };
-  }
-});
 
 app.on('second-instance', () => {
   const wins = BrowserWindow.getAllWindows();
@@ -822,6 +813,51 @@ ipcMain.handle('lan:discover:start', async () => {
 ipcMain.handle('lan:discover:stop', async () => {
   if (udpDiscover) { try { udpDiscover.close(); } catch {} udpDiscover = null; }
   return { ok: true };
+});
+
+// Manual update checks from renderer (Windows only by default, v1.0.5 behavior)
+ipcMain.handle('update:check', async () => {
+  try {
+    const disableUpdater = process.env.POKETTRPG_DISABLE_UPDATER === '1' || process.env.POKETTRPG_DISABLE_UPDATER === 'true';
+    if (!app.isPackaged || process.platform === 'darwin' || disableUpdater) {
+      return { ok: false, error: 'updates-disabled' };
+    }
+    const result = await autoUpdater.checkForUpdates();
+    return { ok: true, result: result && result.updateInfo ? result.updateInfo : null };
+  } catch (e) {
+    return { ok: false, error: String(e) };
+  }
+});
+
+ipcMain.handle('update:install', async () => {
+  try {
+    if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
+    setImmediate(() => autoUpdater.quitAndInstall());
+    return { ok: true };
+  } catch(e){ return { ok:false, error:String(e) }; }
+});
+
+// --- Updater IPC ---
+ipcMain.handle('updater:check', async () => {
+  try {
+    if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
+    const r = await autoUpdater.checkForUpdates();
+    return { ok: true, info: r && r.updateInfo };
+  } catch (e) { return { ok: false, error: String(e) }; }
+});
+ipcMain.handle('updater:download', async () => {
+  try {
+    if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
+    await autoUpdater.downloadUpdate();
+    return { ok: true };
+  } catch (e) { return { ok: false, error: String(e) }; }
+});
+ipcMain.handle('updater:install', async () => {
+  try {
+    if (!app.isPackaged) return { ok: false, error: 'not-packaged' };
+    setImmediate(() => autoUpdater.quitAndInstall());
+    return { ok: true };
+  } catch (e) { return { ok: false, error: String(e) }; }
 });
 
 ipcMain.handle('lan:discover:ping', async () => {

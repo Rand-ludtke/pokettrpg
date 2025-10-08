@@ -17,7 +17,6 @@ export function LobbyTab() {
   const [acceptTeams, setAcceptTeams] = useState<Record<string,string>>({});
   const [hosts, setHosts] = useState<Array<{ip:string; port:number; name:string}>>([]);
   const [status, setStatus] = useState<string>('');
-  const [manualJoinUrl, setManualJoinUrl] = useState<string>('');
   const [syncing, setSyncing] = useState<boolean>(false);
   const [username, setUsername] = useState<string>(()=> localStorage.getItem('ttrpg.username') || ('Trainer-'+Math.random().toString(36).slice(2,6)));
   useEffect(()=>{ try { localStorage.setItem('ttrpg.username', username); } catch {} }, [username]);
@@ -304,14 +303,6 @@ export function LobbyTab() {
           <span className="dim">Username</span>
           <input value={username} onChange={e=> setUsername(e.target.value)} style={{width:160}} />
         </label>
-      </div>
-      {/* Manual join URL entry */}
-      <div className="panel" style={{padding:8, marginBottom:8}}>
-        <div style={{display:'grid', gridTemplateColumns:'1fr auto', gap:6, alignItems:'center'}}>
-          <input placeholder="ws://host-or-ip:17646" value={manualJoinUrl} onChange={e=> setManualJoinUrl(e.target.value)} onKeyDown={(e)=>{ if (e.key==='Enter') { const u = manualJoinUrl.trim(); if (u) joinServer(u); } }} />
-          <button onClick={()=>{ const u = manualJoinUrl.trim(); if (u) joinServer(u); }}>&gt; Join via Link</button>
-        </div>
-        <div className="dim" style={{marginTop:6}}>Paste a ws:// join URL from the host if auto-discovery doesn't work.</div>
       </div>
       {hosting && joinLinks.length>0 && (
         <div className="panel" style={{padding:8, marginBottom:8}}>

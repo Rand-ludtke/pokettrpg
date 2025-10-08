@@ -694,29 +694,3 @@ try {
   p1cimg?.addEventListener('click', () => clickTarget('p1c'));
   p2aimg?.addEventListener('click', () => clickTarget('p2a'));
 } catch(e){}
-
-
-// --- Injected by sync-assets: streaming bridge ---
-try {
-  window.MB = {
-    setSpritesDir: (url) => { try { spritesDir = String(url||''); var el = document.getElementById('sprites'); if (el) el.value = spritesDir; } catch(e){} },
-    setMode: (mode) => { try { if (typeof setMode === 'function') setMode(mode); } catch(e){} },
-    reset: () => { try { logLines = []; i = 0; playing = false; if (logElem) logElem.textContent = ''; setHP('p1', 100); setHP('p2', 100); if (p1img) p1img.removeAttribute('src'); if (p2img) p2img.removeAttribute('src'); } catch(e){} },
-    appendLine: (line) => { try { if (typeof line === 'string' && line) { appendLog(line); processLine(line); } } catch(e){} },
-    appendLines: (lines) => { try { (Array.isArray(lines)? lines: []).forEach(l => { if (typeof l === 'string' && l) { appendLog(l); processLine(l); } }); } catch(e){} },
-    play: () => { try { play(); } catch(e){} },
-    step: () => { try { step(); } catch(e){} },
-  };
-  window.addEventListener('message', function(ev){
-    var d = ev && ev.data; if (!d || typeof d !== 'object') return;
-    try {
-      if (d.type === 'mb:setSpritesDir') { window.MB.setSpritesDir(d.url || d.dir || ''); return; }
-      if (d.type === 'mb:mode') { window.MB.setMode(d.mode||''); return; }
-      if (d.type === 'mb:reset') { window.MB.reset(); return; }
-      if (d.type === 'mb:appendLine') { window.MB.appendLine(String(d.line||'')); return; }
-      if (d.type === 'mb:appendLines') { window.MB.appendLines(Array.isArray(d.lines)? d.lines: []); return; }
-      if (d.type === 'mb:play') { window.MB.play(); return; }
-      if (d.type === 'mb:step') { window.MB.step(); return; }
-    } catch(e){}
-  });
-} catch(e) { console.warn('Mini battler bridge error', e); }
