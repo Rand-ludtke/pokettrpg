@@ -41,10 +41,29 @@ jobs:
       - name: Build app (Vite + TS)
         run: npm run build
 
-      - name: Build and publish Windows artifacts to GitHub Releases
+      - name: Package Windows artifacts (no publish)
+        run: npx electron-builder -c electron-builder.yml -w
+
+      - name: Upload Windows artifacts to GitHub Release (clobber)
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder -c electron-builder.yml -w --publish always
+        run: |
+          set -e
+          TAG="${GITHUB_REF_NAME:-${GITHUB_REF##*/}}"
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" -t "$TAG" -n ""
+          gh release upload "$TAG" release/* --clobber
+
+      - name: Publish GitHub Release (ensure not draft)
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          TAG="${GITHUB_REF_NAME:-${GITHUB_REF##*/}}"
+          # Make sure the release is published (not draft/prerelease)
+          gh release edit "$TAG" --draft=false --prerelease=false --title "$TAG"
 
       - name: Upload artifacts (optional)
         if: always()

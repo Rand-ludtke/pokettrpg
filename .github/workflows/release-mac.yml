@@ -66,6 +66,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx electron-builder -c electron-builder.yml -m --publish always
 
+      - name: Publish GitHub Release (ensure not draft)
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          TAG="${GITHUB_REF_NAME:-${GITHUB_REF##*/}}"
+          gh release edit "$TAG" --draft=false --prerelease=false --title "$TAG"
+
       - name: Upload artifacts (optional)
         if: always()
         uses: actions/upload-artifact@v4
