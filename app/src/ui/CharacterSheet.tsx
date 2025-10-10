@@ -129,6 +129,8 @@ export function CharacterSheet() {
 		try { return localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer'; } catch { return 'Ace Trainer'; }
 	});
 	const [trainerOptions, setTrainerOptions] = useState<string[]>([]);
+	// Local search filter for trainer sprite picker
+	const [trainerFilter, setTrainerFilter] = useState<string>('');
 	const [trainerImage, setTrainerImage] = useState<string>(() => {
 		try { return localStorage.getItem('ttrpg.trainerImage') || ''; } catch { return ''; }
 	});
@@ -147,6 +149,13 @@ export function CharacterSheet() {
 		const t = setTimeout(load, 2000);
 		return ()=>{ cancelled=true; clearTimeout(t); };
 	}, []);
+
+	// Filtered list based on search query
+	const filteredTrainerOptions = useMemo(() => {
+		const q = (trainerFilter || '').trim().toLowerCase();
+		if (!q) return trainerOptions;
+		return trainerOptions.filter(name => name.toLowerCase().includes(q));
+	}, [trainerOptions, trainerFilter]);
 
 	const invParsed = useMemo(() => {
 		const map: Record<string, Array<{ name: string; count: number }>> = {};
@@ -495,13 +504,28 @@ export function CharacterSheet() {
 					{trainerOptions.length===0 ? (
 						<div className="dim">No sprites available yet.</div>
 					) : (
-						<div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(64px, 1fr))', gap:8 }}>
-							{trainerOptions.map((name)=> (
-								<button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=>{ setTrainerSprite(name); setShowSpritePicker(false); }} style={{width:64, height:64, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center'}}>
-									<img src={`/showdown/sprites/trainers/${name}.png`} alt={name} style={{ width:48, height:48, imageRendering:'pixelated', background:'transparent' }} />
-								</button>
-							))}
-						</div>
+						<>
+							<div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:8 }}>
+								<input
+									value={trainerFilter}
+									onChange={e=> setTrainerFilter(e.target.value)}
+									placeholder="Search sprites by name…"
+									style={{ flex:1 }}
+								/>
+								{trainerFilter && <button className="secondary" onClick={()=> setTrainerFilter('')}>Clear</button>}
+							</div>
+							{filteredTrainerOptions.length===0 ? (
+								<div className="dim">No matches for “{trainerFilter}”.</div>
+							) : (
+								<div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(64px, 1fr))', gap:8 }}>
+									{filteredTrainerOptions.map((name)=> (
+										<button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=>{ setTrainerSprite(name); setShowSpritePicker(false); }} style={{width:64, height:64, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center'}}>
+											<img src={`/showdown/sprites/trainers/${name}.png`} alt={name} style={{ width:48, height:48, imageRendering:'pixelated', background:'transparent' }} />
+										</button>
+									))}
+								</div>
+							)}
+						</>
 					)}
 					<div style={{ display:'flex', justifyContent:'flex-end', marginTop:12 }}>
 						<button onClick={()=> setShowSpritePicker(false)}>Close</button>
