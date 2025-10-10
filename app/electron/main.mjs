@@ -131,6 +131,9 @@ async function maybeUpdateBeforeStart() {
   try {
     // Load persisted preferences (to allow suppressing the up-to-date dialog)
     const settingsFile = path.join(app.getPath('userData'), 'settings.json');
+    const logFile = path.join(app.getPath('userData'), 'updater.log');
+    const log = async (s) => { try { await fs.appendFile(logFile, `[${new Date().toISOString()}] ${s}\n`); } catch {} };
+    await log(`maybeUpdateBeforeStart: begin; version=${app.getVersion()}`);
     let prefs = {};
     try {
       const txt = await fs.readFile(settingsFile, 'utf8');
@@ -141,9 +144,18 @@ async function maybeUpdateBeforeStart() {
   autoUpdater.allowPrerelease = true;
   autoUpdater.autoDownload = true; // download immediately when user agrees
   autoUpdater.autoInstallOnAppQuit = true;
+    try {
+      autoUpdater.removeAllListeners();
+    } catch {}
+    autoUpdater.on('error', (e) => { log(`autoUpdater error: ${e && e.stack || e}`); });
+    autoUpdater.on('update-available', (info) => { log(`update-available: ${info?.version}`); });
+    autoUpdater.on('update-not-available', () => { log(`update-not-available; current=${app.getVersion()}`); });
+    autoUpdater.on('download-progress', (p) => { try { log(`download-progress: ${(p && p.percent != null) ? p.percent.toFixed(1) : ''}%`); } catch {} });
+    autoUpdater.on('update-downloaded', (info) => { log(`update-downloaded: ${info?.version}`); });
     const r = await autoUpdater.checkForUpdates();
     const info = r && r.updateInfo;
     const available = !!(info && info.version && info.version !== app.getVersion());
+    await log(`checkForUpdates done; available=${available} next=${info && info.version}`);
     if (!available) {
       // Show an up-to-date notice unless the user opted out previously
       if (!prefs?.suppressUpToDateDialog) {
@@ -165,6 +177,7 @@ async function maybeUpdateBeforeStart() {
           }
         } catch {}
       }
+      await log('no update available; returning to startup');
       return;
     }
 
@@ -180,19 +193,24 @@ async function maybeUpdateBeforeStart() {
       detail,
       noLink: true,
     });
-    if (res.response !== 0) return;
+    if (res.response !== 0) { await log('user skipped update'); return; }
     try {
+      await log('starting downloadUpdate');
       await autoUpdater.downloadUpdate();
+      await log('downloadUpdate resolved');
     } catch (e) {
       console.warn('Update download failed:', e);
+      await log(`download error: ${e && e.stack || e}`);
       return;
     }
     // Install immediately to avoid loading the app and potentially conflicting with assets
+    await log('quitAndInstall now');
     setImmediate(() => autoUpdater.quitAndInstall(false, true));
     // prevent continuing to create the window since we are quitting
     await new Promise(() => {});
   } catch (e) {
     console.warn('Startup update check failed:', e);
+    try { const lf = path.join(app.getPath('userData'), 'updater.log'); await fs.appendFile(lf, `[${new Date().toISOString()}] exception: ${e && e.stack || e}\n`); } catch {}
   }
 }
 async function createWindow() {
