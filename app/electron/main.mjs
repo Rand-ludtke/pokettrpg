@@ -53,7 +53,47 @@ function createStaticServer(root, preferredPort = 17645) {
     if (isShowdown) {
       // Strip /showdown prefix for static serving
       const origUrl = req.url;
-      req.url = req.url.replace('/showdown', '') || '/index.html';
+      let pathPart = req.url.replace('/showdown', '') || '/index.html';
+      // Minimal sprite fallback: if a requested gen5/gen5icons asset is missing, try HOME (or gen5 front) equivalents
+      // without changing renderer code.
+      const tryPaths = [pathPart];
+      try {
+        // Build fallback candidates only for sprite requests
+        if (/^\/sprites\//.test(pathPart)) {
+          // Normalize to forward slashes
+          const p = pathPart;
+          const restFrom = (prefix) => p.startsWith(prefix) ? p.slice(prefix.length) : '';
+          if (p.startsWith('/sprites/gen5icons/')) {
+            const rest = restFrom('/sprites/gen5icons/');
+            tryPaths.push(`/sprites/gen5/${rest}`);
+            tryPaths.push(`/sprites/home/${rest}`);
+          } else if (p.startsWith('/sprites/gen5-back-shiny/')) {
+            const rest = restFrom('/sprites/gen5-back-shiny/');
+            tryPaths.push(`/sprites/gen5/${rest}`);
+            tryPaths.push(`/sprites/home-shiny/${rest}`);
+          } else if (p.startsWith('/sprites/gen5-back/')) {
+            const rest = restFrom('/sprites/gen5-back/');
+            tryPaths.push(`/sprites/gen5/${rest}`);
+            tryPaths.push(`/sprites/home/${rest}`);
+          } else if (p.startsWith('/sprites/gen5-shiny/')) {
+            const rest = restFrom('/sprites/gen5-shiny/');
+            tryPaths.push(`/sprites/home-shiny/${rest}`);
+          } else if (p.startsWith('/sprites/gen5/')) {
+            const rest = restFrom('/sprites/gen5/');
+            tryPaths.push(`/sprites/home/${rest}`);
+          }
+        }
+      } catch {}
+      // Pick the first existing candidate
+      let picked = pathPart;
+      for (const cand of tryPaths) {
+        try {
+          // Avoid path traversal; join on known root
+          const disk = path.join(showdownRoot, cand);
+          if (existsSync(disk)) { picked = cand; break; }
+        } catch {}
+      }
+      req.url = picked;
       serveShowdown(req, res, () => finalhandler(req, res));
       req.url = origUrl;
       return;
