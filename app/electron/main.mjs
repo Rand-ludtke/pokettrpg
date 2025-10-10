@@ -97,8 +97,10 @@ async function maybeUpdateBeforeStart() {
       try { prefs = JSON.parse(txt) || {}; } catch {}
     } catch {}
 
-    autoUpdater.autoDownload = false;
-    autoUpdater.autoInstallOnAppQuit = true;
+  // For this stable build, allow pre-release versions so we can test 1.1.1-test
+  autoUpdater.allowPrerelease = true;
+  autoUpdater.autoDownload = true; // download immediately when user agrees
+  autoUpdater.autoInstallOnAppQuit = true;
     const r = await autoUpdater.checkForUpdates();
     const info = r && r.updateInfo;
     const available = !!(info && info.version && info.version !== app.getVersion());
@@ -126,11 +128,11 @@ async function maybeUpdateBeforeStart() {
       return;
     }
 
-    const msg = `Version ${info.version} is available.`;
-    const detail = 'Download now and restart to install, or skip to continue without updating.';
+  const msg = `Version ${info.version} is available.`;
+  const detail = 'The app will download the update and restart to install before launching.';
     const res = await dialog.showMessageBox({
       type: 'question',
-      buttons: ['Download and Install', 'Skip'],
+      buttons: ['Update Now', 'Skip'],
       defaultId: 0,
       cancelId: 1,
       title: 'Update available',
@@ -139,30 +141,16 @@ async function maybeUpdateBeforeStart() {
       noLink: true,
     });
     if (res.response !== 0) return;
-
-    // Download update; this may take time. If it fails, continue startup.
     try {
       await autoUpdater.downloadUpdate();
     } catch (e) {
       console.warn('Update download failed:', e);
       return;
     }
-
-    const ready = await dialog.showMessageBox({
-      type: 'question',
-      buttons: ['Restart Now', 'Later'],
-      defaultId: 0,
-      cancelId: 1,
-      title: 'Update ready',
-      message: 'Update downloaded',
-      detail: 'Restart now to install the update. If you choose Later, it will install on the next app launch.',
-      noLink: true,
-    });
-    if (ready.response === 0) {
-      setImmediate(() => autoUpdater.quitAndInstall());
-      // prevent continuing to create the window since we are quitting
-      await new Promise(() => {});
-    }
+    // Install immediately to avoid loading the app and potentially conflicting with assets
+    setImmediate(() => autoUpdater.quitAndInstall(false, true));
+    // prevent continuing to create the window since we are quitting
+    await new Promise(() => {});
   } catch (e) {
     console.warn('Startup update check failed:', e);
   }
