@@ -14,7 +14,8 @@
 }
 *{box-sizing:border-box}
 html,body,#root{height:100%}
-body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue));color:var(--fg);font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+/* 1.1.1 visual indicator */
+body{margin:0;background:#ff2a2a;color:var(--fg);font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
 .app{display:flex;flex-direction:column;gap:12px; padding:12px}
 .topbar{display:flex;align-items:center;justify-content:space-between;border:2px solid var(--accent);padding:10px 12px;background:var(--panel-bg);border-radius:10px}
 .brand{font-weight:700}
