@@ -97,7 +97,9 @@ async function maybeUpdateBeforeStart() {
       try { prefs = JSON.parse(txt) || {}; } catch {}
     } catch {}
 
-    autoUpdater.autoDownload = false;
+  // Allow pre-release tags (e.g., 1.0.10-test) during our update validation
+  autoUpdater.allowPrerelease = true;
+  autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = true;
     const r = await autoUpdater.checkForUpdates();
     const info = r && r.updateInfo;
