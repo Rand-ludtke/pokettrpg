@@ -148,7 +148,8 @@ async function maybeUpdateBeforeStart() {
       autoUpdater.removeAllListeners();
     } catch {}
     autoUpdater.on('error', (e) => { log(`autoUpdater error: ${e && e.stack || e}`); });
-    autoUpdater.on('update-available', (info) => { log(`update-available: ${info?.version}`); });
+  autoUpdater.on('checking-for-update', () => { log('checking-for-update'); });
+  autoUpdater.on('update-available', (info) => { log(`update-available: ${info?.version}`); });
     autoUpdater.on('update-not-available', () => { log(`update-not-available; current=${app.getVersion()}`); });
     autoUpdater.on('download-progress', (p) => { try { log(`download-progress: ${(p && p.percent != null) ? p.percent.toFixed(1) : ''}%`); } catch {} });
     autoUpdater.on('update-downloaded', (info) => { log(`update-downloaded: ${info?.version}`); });
