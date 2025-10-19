@@ -12,7 +12,16 @@ type BadgeState = {
 
 const defaultState: BadgeState = {
   color: '#ff0000',
-  badges: Array.from({ length: 8 }, () => ({ earned: false })),
+  badges: [
+    { earned:false, name:'Boulder' },
+    { earned:false, name:'Cascade' },
+    { earned:false, name:'Thunder' },
+    { earned:false, name:'Rainbow' },
+    { earned:false, name:'Soul' },
+    { earned:false, name:'Marsh' },
+    { earned:false, name:'Volcano' },
+    { earned:false, name:'Earth' },
+  ],
 };
 
 export function BadgeCase() {
@@ -34,6 +43,9 @@ export function BadgeCase() {
   }
   function setImage(i: number, dataUrl?: string) {
     setState(prev => ({ ...prev, badges: prev.badges.map((b, idx) => idx === i ? { ...b, image: dataUrl } : b) }));
+  }
+  function setName(i: number, name?: string) {
+    setState(prev => ({ ...prev, badges: prev.badges.map((b, idx) => idx === i ? { ...b, name } : b) }));
   }
 
   function onUpload(i: number) {
@@ -70,11 +82,25 @@ export function BadgeCase() {
         <input type="color" value={state.color} onChange={e=> setColor((e.target as HTMLInputElement).value)} />
       </div>
       <div style={lidStyle}>
-        <div style={{ position:'absolute', top:10, right:10, width:60, height:60, borderRadius:'50%', border:'3px solid #000', background:'radial-gradient(circle at 30% 30%, white 35%, black 36%, black 39%, red 39%, red 75%, black 76%)' }} />
-        <div style={{ color:'#fff', fontWeight:600, textAlign:'center', fontSize:12, marginTop:80 }}>
-          <p>Boulder • Cascade • Thunder • Rainbow</p>
-          <p>Soul • Marsh • Volcano • Earth</p>
+        {/* Poké Ball icon (SVG) inspired by provided reference */}
+        <div style={{ position:'absolute', top:10, right:10 }} aria-hidden>
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            {/* outer circle */}
+            <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="#000" strokeWidth="4" />
+            {/* top half red */}
+            <path d="M2,32 A30,30 0 0,1 62,32 L2,32 Z" fill="#e53935" stroke="#000" strokeWidth="0" />
+            {/* middle black band */}
+            <rect x="2" y="30" width="60" height="4" fill="#000" />
+            {/* center ring */}
+            <circle cx="32" cy="32" r="10" fill="#fff" stroke="#000" strokeWidth="4" />
+            <circle cx="32" cy="32" r="4" fill="#fff" stroke="#000" strokeWidth="3" />
+          </svg>
         </div>
+        {/* Editable badge names */}
+        <EditableNames
+          names={state.badges.map(b => b.name || '')}
+          onChange={(idx, val) => setName(idx, val)}
+        />
       </div>
       <div style={baseStyle}>
         {state.badges.map((b, i) => (
@@ -95,6 +121,66 @@ export function BadgeCase() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+type EditableNamesProps = { names: string[]; onChange: (index:number, value:string) => void };
+
+function EditableNames({ names, onChange }: EditableNamesProps) {
+  // Inline editing state
+  const [editing, setEditing] = useState<number | null>(null);
+  const [value, setValue] = useState('');
+
+  useEffect(() => {
+    if (editing != null) setValue(names[editing] || '');
+  }, [editing]);
+
+  function startEdit(index:number) {
+    setEditing(index);
+  }
+  function commit() {
+    if (editing == null) return;
+    onChange(editing, value.trim());
+    setEditing(null);
+  }
+  function cancel() { setEditing(null); }
+
+  const labelStyle: React.CSSProperties = { color:'#fff', fontWeight:600, textAlign:'center', fontSize:12, marginTop:80, lineHeight:1.8 };
+  const pillStyle: React.CSSProperties = { padding:'2px 6px', borderRadius:6, background:'rgba(0,0,0,0.2)', cursor:'pointer', display:'inline-block' };
+  const inputStyle: React.CSSProperties = { width:90, fontSize:12, padding:'2px 4px', borderRadius:4, border:'1px solid #888' };
+
+  const firstRow = [0,1,2,3];
+  const secondRow = [4,5,6,7];
+
+  const renderRow = (idxs:number[]) => (
+    <p>
+      {idxs.map((i, j) => (
+        <span key={i} style={{ display:'inline-flex', alignItems:'center' }}>
+          {editing === i ? (
+            <input
+              autoFocus
+              value={value}
+              onChange={e=> setValue((e.target as HTMLInputElement).value)}
+              onBlur={commit}
+              onKeyDown={e=> { if (e.key==='Enter') commit(); if (e.key==='Escape') cancel(); }}
+              style={inputStyle}
+            />
+          ) : (
+            <span style={pillStyle} onClick={() => startEdit(i)} title="Click to rename badge">
+              {names[i] || `Badge ${i+1}`}
+            </span>
+          )}
+          {j < idxs.length - 1 ? <span> &nbsp;•&nbsp; </span> : null}
+        </span>
+      ))}
+    </p>
+  );
+
+  return (
+    <div style={labelStyle}>
+      {renderRow(firstRow)}
+      {renderRow(secondRow)}
     </div>
   );
 }
