@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getCustomDex, getCustomLearnsets, loadShowdownDex, normalizeName } from '../data/adapter';
+import { getCustomDex, getCustomLearnsets, loadShowdownDex, normalizeName, saveCustomDex, saveCustomLearnset } from '../data/adapter';
 
 export function CustomsImportExport() {
   const [error, setError] = useState<string | null>(null);
@@ -7,6 +7,8 @@ export function CustomsImportExport() {
   const [serverUrl, setServerUrl] = useState<string>(() => {
     try { return localStorage.getItem('ttrpg.backendUrl') || 'http://raspberrypi:3000'; } catch { return 'http://raspberrypi:3000'; }
   });
+  const [syncing, setSyncing] = useState(false);
+  const [diff, setDiff] = useState<null | { missingOnClient: { species: Record<string, any>, moves: Record<string, any> }, missingOnServer: { species: Record<string, any>, moves: Record<string, any> } }>(null);
 
   useEffect(() => {
     try { localStorage.setItem('ttrpg.backendUrl', serverUrl); } catch {}
@@ -100,15 +102,97 @@ export function CustomsImportExport() {
     if (!base) { setError('Enter server URL'); return; }
     try {
       const external = await buildExternalDex();
-      const res = await fetch(`${base}/api/custom-dex`, {
+      // Upload entire dataset; server will add only new IDs (no overwrite)
+      const res = await fetch(`${base}/api/customdex/upload`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(external),
       });
       if (!res.ok) throw new Error(`Server responded ${res.status}`);
-      setOk('Uploaded external dex to server');
+      const j = await res.json().catch(()=>({}));
+      const addedS = Number(j?.added?.species ?? 0);
+      const addedM = Number(j?.added?.moves ?? 0);
+      setOk(`Uploaded to server. Added ${addedS} species, ${addedM} moves.`);
     } catch (e:any) {
       setError(e?.message || 'Failed to upload to server');
+    }
+  }
+
+  async function syncWithServer() {
+    setError(null); setOk(null); setSyncing(true); setDiff(null);
+    const base = (serverUrl || '').trim().replace(/\/$/, '');
+    if (!base) { setError('Enter server URL'); setSyncing(false); return; }
+    try {
+      const external = await buildExternalDex();
+      const res = await fetch(`${base}/api/customdex/sync`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(external)
+      });
+      if (!res.ok) throw new Error(`Server responded ${res.status}`);
+      const data = await res.json();
+      const missingOnClient = data?.missingOnClient || { species: {}, moves: {} };
+      const missingOnServer = data?.missingOnServer || { species: {}, moves: {} };
+      setDiff({ missingOnClient, missingOnServer });
+      const c1 = Object.keys(missingOnClient.species || {}).length;
+      const m1 = Object.keys(missingOnClient.moves || {}).length;
+      const c2 = Object.keys(missingOnServer.species || {}).length;
+      const m2 = Object.keys(missingOnServer.moves || {}).length;
+      setOk(`Sync complete. Server → You: ${c1} species, ${m1} moves. You → Server: ${c2} species, ${m2} moves.`);
+    } catch (e:any) {
+      setError(e?.message || 'Sync failed');
+    } finally { setSyncing(false); }
+  }
+
+  function mergeIntoLocal(missing: { species: Record<string, any>; moves: Record<string, any> }) {
+    try {
+      const species = missing?.species || {};
+      let added = 0;
+      for (const id of Object.keys(species)) {
+        const s = species[id];
+        if (!s) continue;
+        // Save species entry
+        saveCustomDex(id, {
+          name: s.name || id,
+          types: s.types || [],
+          baseStats: s.baseStats || { hp:1, atk:1, def:1, spa:1, spd:1, spe:1 },
+        } as any);
+        // Synthesize learnset from provided move list
+        const ls: Record<string, any> = {};
+        for (const mv of (s.moves || [])) ls[normalizeName(String(mv))] = ["9L1"];
+        if (Object.keys(ls).length) saveCustomLearnset(id, ls);
+        added++;
+      }
+      try { localStorage.setItem('ttrpg.customsReloadPending', '1'); } catch {}
+      setOk(`Imported ${added} species from server. Reload banner will appear to apply.`);
+    } catch (e:any) {
+      setError(e?.message || 'Failed merging into local');
+    }
+  }
+
+  async function importMissingFromServer() {
+    if (!diff) { setError('Run Sync first'); return; }
+    mergeIntoLocal(diff.missingOnClient || { species:{}, moves:{} });
+  }
+
+  async function uploadMissingToServer() {
+    setError(null); setOk(null);
+    const base = (serverUrl || '').trim().replace(/\/$/, '');
+    if (!base) { setError('Enter server URL'); return; }
+    if (!diff) { setError('Run Sync first'); return; }
+    try {
+      const payload = {
+        species: diff.missingOnServer?.species || {},
+        moves: diff.missingOnServer?.moves || {},
+      };
+      const res = await fetch(`${base}/api/customdex/upload`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+      const j = await res.json().catch(()=>({}));
+      const addedS = Number(j?.added?.species ?? Object.keys(payload.species).length);
+      const addedM = Number(j?.added?.moves ?? Object.keys(payload.moves).length);
+      setOk(`Uploaded to server: ${addedS} species, ${addedM} moves.`);
+    } catch (e:any) {
+      setError(e?.message || 'Upload failed');
     }
   }
 
@@ -128,11 +212,26 @@ export function CustomsImportExport() {
       <div style={{marginTop:10, display:'grid', gap:8}}>
         <div style={{display:'flex', alignItems:'center', gap:8, flexWrap:'wrap'}}>
           <label>Server URL <input value={serverUrl} onChange={e=> setServerUrl(e.target.value)} style={{minWidth:320}} placeholder="http://raspberrypi:3000" /></label>
-          <button onClick={exportExternalDexToServer}>&gt; Export to Server</button>
+          <button onClick={syncWithServer} disabled={syncing}>&gt; Sync with Server</button>
+          <button onClick={importMissingFromServer} disabled={!diff}>&gt; Import Missing from Server</button>
+          <button onClick={uploadMissingToServer} disabled={!diff}>&gt; Upload Missing to Server</button>
+          <button onClick={exportExternalDexToServer}>&gt; Upload All (add-only)</button>
         </div>
-        <div className="dim" style={{fontSize:'0.9em'}}>
-          POST {`{ species, moves }`} to <code>/api/custom-dex</code>. Species come from your local customs; moves include only those referenced in the custom learnsets.
-        </div>
+        {diff && (
+          <div className="dim" style={{fontSize:'0.9em'}}>
+            <div>
+              Server → You: {Object.keys(diff.missingOnClient?.species||{}).length} species, {Object.keys(diff.missingOnClient?.moves||{}).length} moves.
+            </div>
+            <div>
+              You → Server: {Object.keys(diff.missingOnServer?.species||{}).length} species, {Object.keys(diff.missingOnServer?.moves||{}).length} moves.
+            </div>
+          </div>
+        )}
+        {!diff && (
+          <div className="dim" style={{fontSize:'0.9em'}}>
+            Flow: Sync → Import Missing from Server → Upload Missing to Server. Upload All sends your full set to <code>/api/customdex/upload</code> (add-only).
+          </div>
+        )}
       </div>
     </section>
   );
