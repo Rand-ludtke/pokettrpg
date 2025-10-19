@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { CustomsImportExport } from './CustomsImportExport';
 import { loadTeams, teamToShowdownText } from '../data/adapter';
 
 export function LobbyTab() {
@@ -6,6 +7,14 @@ export function LobbyTab() {
   const [hosting, setHosting] = useState<{port:number}|null>(null);
   // Keep a singleton WebSocket on window to avoid duplicate connects across tab switches/remounts
   const [ws, setWs] = useState<WebSocket|null>(() => (window as any).__pokettrpgWS || null);
+  // WebSocket server URL (persisted). Default to raspberry pi host.
+  const [wsUrl, setWsUrl] = useState<string>(() => localStorage.getItem('ttrpg.lobbyWsUrl') || 'ws://raspberrypi:17646');
+  const [autoJoin, setAutoJoin] = useState<boolean>(() => {
+    const raw = localStorage.getItem('ttrpg.lobbyAutoJoin');
+    return raw == null ? true : raw === '1';
+  });
+  useEffect(()=>{ try { localStorage.setItem('ttrpg.lobbyWsUrl', wsUrl); } catch {} }, [wsUrl]);
+  useEffect(()=>{ try { localStorage.setItem('ttrpg.lobbyAutoJoin', autoJoin ? '1' : '0'); } catch {} }, [autoJoin]);
   const [chat, setChat] = useState<Array<{from:string; text:string; at:number}>>([]);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const [trainerSprite, setTrainerSprite] = useState<string>(() => localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer');
@@ -26,6 +35,10 @@ export function LobbyTab() {
   const [activeRoomId, setActiveRoomId] = useState<string>('');
   const [myReady, setMyReady] = useState<boolean>(false);
   const clientIdRef = useRef<string>('');
+  const lastUrlRef = useRef<string>('');
+  const reconnectAttemptsRef = useRef<number>(0);
+  const reconnectTimerRef = useRef<any>(null);
+  const connectingRef = useRef<boolean>(false);
   if (!clientIdRef.current) {
     const saved = localStorage.getItem('ttrpg.clientId');
     if (saved) clientIdRef.current = saved;
@@ -160,6 +173,8 @@ export function LobbyTab() {
     // Reuse existing open socket if available
     const existing: WebSocket | null = (window as any).__pokettrpgWS || null;
     if (existing && existing.readyState === 1) { attachFanout(existing); setWs(existing); setStatus('Connected'); return; }
+    if (connectingRef.current) return; // prevent concurrent connects
+    connectingRef.current = true;
     try {
   const s = new WebSocket(url);
   s.onopen = ()=> { pushChat('system','Connected'); setStatus('Connected'); try { s.send(JSON.stringify({ t:'hello', d:{ clientId: clientIdRef.current, username, avatar: trainerSpriteToAvatar(trainerSprite) } })); } catch {}; try { setSyncing(true); s.send(JSON.stringify({ t:'state-request' })); } catch {} };
@@ -205,14 +220,27 @@ export function LobbyTab() {
       };
       s.onerror = ()=> setStatus('Connect error');
       s.onclose = ()=> {
+        connectingRef.current = false;
         pushChat('system','Disconnected'); setStatus('Disconnected');
-        // Try to reconnect after a short delay
-        setTimeout(()=>{
-          if (!ws || ws.readyState !== 1) joinServer(url);
-        }, 1500);
+        // Try to reconnect with backoff
+        const attempt = (reconnectAttemptsRef.current = reconnectAttemptsRef.current + 1);
+        const delay = Math.min(1500 * attempt, 8000);
+        if (reconnectTimerRef.current) { try { clearTimeout(reconnectTimerRef.current); } catch {} }
+        reconnectTimerRef.current = setTimeout(()=>{
+          let target = lastUrlRef.current || url;
+          // Fallback: if first reconnect attempt after failing raspberrypi host, try localhost once
+          if (attempt === 1 && /raspberrypi/i.test(target)) {
+            target = target.replace(/^[a-z]+:\/\/[^:]+/i, 'ws://127.0.0.1');
+          }
+          if (!target) return;
+          if (!(window as any).__pokettrpgWS || ((window as any).__pokettrpgWS as WebSocket).readyState !== 1) joinServer(target);
+        }, delay);
       };
   // Persist globally and in state
   (window as any).__pokettrpgWS = s;
+  lastUrlRef.current = url;
+  reconnectAttemptsRef.current = 0;
+  connectingRef.current = false;
   attachFanout(s);
   setWs(s);
       // hello already sent in onopen above
@@ -285,6 +313,24 @@ export function LobbyTab() {
 
   const teamOptions = teamsState.teams;
 
+  // Auto-join on mount if enabled and not already connected
+  useEffect(() => {
+    if (autoJoin) {
+      const existing: WebSocket | null = (window as any).__pokettrpgWS || null;
+      if (!existing || existing.readyState !== 1) joinServer(wsUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // If auto-join is enabled and URL changes, reconnect to the new URL
+  useEffect(() => {
+    if (autoJoin) {
+      try { if ((window as any).__pokettrpgWS) { ((window as any).__pokettrpgWS as WebSocket).close(); (window as any).__pokettrpgWS = null; } } catch {}
+      joinServer(wsUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wsUrl]);
+
   return (
     <section className="panel battle">
       <h2>Lobby</h2>
@@ -296,8 +342,16 @@ export function LobbyTab() {
           <button className="secondary" onClick={stopServer}>Stop</button>
           <button className="secondary" onClick={refreshJoinLinks}>Copy Join Links</button>
         </>}
-        {!ws && <button onClick={()=> joinServer('ws://127.0.0.1:17646')}>&gt; Join localhost</button>}
+        <label style={{display:'inline-flex', alignItems:'center', gap:6}}>
+          <span className="dim">Server</span>
+          <input value={wsUrl} onChange={e=> setWsUrl(e.target.value)} style={{width:220}} placeholder="ws://raspberrypi:17646" />
+        </label>
+        {!ws && <button onClick={()=> joinServer(wsUrl)}>&gt; Join</button>}
         {ws && <button className="secondary" onClick={leaveServer}>Leave</button>}
+        <label style={{display:'inline-flex', alignItems:'center', gap:6}} title="Auto-connect to this server on startup and reconnect if disconnected">
+          <input type="checkbox" checked={autoJoin} onChange={e=> setAutoJoin(e.target.checked)} />
+          <span className="dim">Auto-join</span>
+        </label>
         {status && <span className="dim">{status}</span>}
         <label style={{marginLeft:'auto', display:'inline-flex', alignItems:'center', gap:6}}>
           <span className="dim">Username</span>
@@ -533,6 +587,10 @@ export function LobbyTab() {
             </div>
           )}
         </aside>
+      </div>
+      {/* Custom Dex Sync: moved here per request */}
+      <div style={{marginTop:12}}>
+        <CustomsImportExport />
       </div>
     </section>
   );

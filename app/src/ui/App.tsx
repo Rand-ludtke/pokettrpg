@@ -273,7 +273,7 @@ export function App() {
               exportLabel="Export Current Box"
             />
             <CustomDexBuilder onAddToPC={(mons)=> addAcrossBoxes(mons)} />
-            <CustomsImportExport />
+            {/* CustomsImportExport moved into Lobby tab per request */}
             <CustomsFileImporter />
           </div>
           <SidePanel
@@ -434,9 +434,10 @@ export function App() {
     {tab === 'battle' && (
       <BattleTab friendly={team[0] ?? null} enemy={selected} team={team} onReplaceTeam={replaceTeamAt} />
     )}
-    {tab === 'lobby' && (
+    {/* Keep Lobby mounted so connections/state persist; toggle visibility */}
+    <div style={{ display: tab==='lobby' ? 'block' : 'none' }}>
       <LobbyTab />
-    )}
+    </div>
 
     {tab === 'sheet' && (
       <CharacterSheet />

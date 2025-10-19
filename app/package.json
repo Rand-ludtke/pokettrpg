@@ -1,7 +1,7 @@
 {
   "name": "pokettrpg-app",
   "private": true,
-  "version": "1.1.6",
+  "version": "1.1.7",
   "type": "module",
   "main": "electron/main.mjs",
   "description": "Offline retro Pokémon TTRPG PC, team manager, and battle helper.",
@@ -12,6 +12,8 @@
     "build": "npm run sync && tsc -b && vite build",
     "preview": "vite preview",
   "custom:add": "node scripts/add-custom-pokemon.mjs",
+    "mock:lobby": "node scripts/mock-lobby-server.mjs",
+  "test:ws": "node scripts/ws-protocol-smoke.mjs",
     "electron:dev": "npm run build && electron .",
     "electron:pack": "npm run build && electron-builder --dir",
     "electron:make": "npm run build && electron-builder -w",

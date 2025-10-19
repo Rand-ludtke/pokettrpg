@@ -410,56 +410,7 @@ export function CharacterSheet() {
 				</div>
 			</div>
 
-			{/* Badge Case */}
-			<div style={{ marginTop:12, border:'1px solid var(--accent)', borderRadius:6, padding:8 }}>
-				<div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-					<h3 style={{ margin:0 }}>Badge Case</h3>
-					<span className="dim">Mark earned badges and label them</span>
-				</div>
-				<div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:8, marginTop:8 }}>
-								{ch.badges.map((b, i) => (
-									<div key={i} style={{ border:'1px solid var(--accent)', borderRadius:6, padding:6, display:'grid', gap:8, alignItems:'center', justifyItems:'center' }}>
-										{/* Big clickable box: toggles earned; shows image if present else a big check if earned or empty */}
-										<div
-											onClick={()=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, earned: !x.earned } : x) })}
-											title={b.earned ? 'Click to uncheck' : 'Click to check'}
-											style={{
-												width:'100%', height:100, border:'1px solid var(--accent)', borderRadius:8,
-												display:'flex', alignItems:'center', justifyContent:'center', background:'#102', cursor:'pointer', overflow:'hidden'
-											}}
-										>
-											{b.image ? (
-												<img src={b.image} alt="Badge" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
-											) : (
-												<span style={{ fontSize:48, lineHeight:1, color:b.earned? 'var(--accent)' : '#345' }}>
-													{b.earned ? '✓' : ''}
-												</span>
-											)}
-										</div>
-										<div style={{ display:'flex', gap:6 }}>
-											<button className="mini" onClick={() => {
-												const input = document.createElement('input');
-												input.type = 'file';
-												input.accept = 'image/*';
-												input.onchange = () => {
-													const f = input.files && input.files[0];
-													if (!f) return;
-													const reader = new FileReader();
-													reader.onload = () => {
-														const dataUrl = String(reader.result || '');
-														setCh(prev => ({ ...prev, badges: prev.badges.map((x,idx)=> idx===i ? { ...x, image: dataUrl } : x) }));
-													};
-													reader.readAsDataURL(f);
-												};
-												input.click();
-											}}>Add Image</button>
-											{b.image && <button className="mini" onClick={()=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, image: undefined } : x) })}>Clear</button>}
-										</div>
-										<input value={b.name} onChange={e=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, name: e.target.value } : x) })} placeholder={`Badge ${i+1}`} style={{ width:'100%', textAlign:'center' }} />
-									</div>
-								))}
-				</div>
-			</div>
+			{/* Badge Case removed from Character Sheet per request. Use the dedicated Badges tab. */}
 
 			{/* Trait Catalog Dialog */}
 			{selectedTrait===-1 && (
