@@ -131,6 +131,14 @@
 			"args": [],
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "Typecheck TS (vite build dry)",
+			"type": "shell",
+			"command": "node -e \"console.log('noop')\"",
+			"args": [],
+			"problemMatcher": [],
+			"group": "build"
 		}
 	]
 }

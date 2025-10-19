@@ -13,8 +13,9 @@ import { CustomsFileImporter } from './CustomsFileImporter';
 import { ShowdownBattleTab } from './ShowdownBattleTab';
 import { SimpleBattleTab } from './SimpleBattleTab';
 import { CharacterSheet } from './CharacterSheet';
+import { BadgeCase } from './BadgeCase';
 
-type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'help' | { kind:'psbattle'; id:string; title:string };
+type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | 'help' | { kind:'psbattle'; id:string; title:string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -233,6 +234,7 @@ export function App() {
           <button className={tab==='battle'? 'active':''} onClick={() => setTab('battle')}>Battle</button>
           <button className={tab==='lobby'? 'active':''} onClick={() => setTab('lobby')}>Lobby</button>
           <button className={tab==='sheet'? 'active':''} onClick={() => setTab('sheet')}>Character</button>
+          <button className={tab==='badges'? 'active':''} onClick={() => setTab('badges')}>Badges</button>
           <button className={tab==='help'? 'active':''} onClick={() => setTab('help')}>Help</button>
           {extraTabs.map(t => (
             <span key={t.id} style={{display:'inline-flex', alignItems:'center'}}>
@@ -324,6 +326,12 @@ export function App() {
             }}
           />
         </div>
+      )}
+
+      {tab === 'badges' && (
+        <section className="panel">
+          <BadgeCase />
+        </section>
       )}
 
       {tab === 'team' && (

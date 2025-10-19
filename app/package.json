@@ -1,7 +1,7 @@
 {
   "name": "pokettrpg-app",
   "private": true,
-  "version": "1.1.4",
+  "version": "1.1.5",
   "type": "module",
   "main": "electron/main.mjs",
   "description": "Offline retro Pokémon TTRPG PC, team manager, and battle helper.",
@@ -48,6 +48,9 @@
     "asarUnpack": [
       "dist/vendor/showdown/**"
     ],
+    "nsis": {
+      "artifactName": "Pokettrpg-Setup-${version}.${ext}"
+    },
     "win": {
       "target": [
         { "target": "nsis", "arch": ["x64"] },

@@ -226,13 +226,13 @@ export function CharacterSheet() {
 		const list = (invParsed[key] || []).slice();
 		if (index < 0 || index >= list.length) return;
 		if (nextCount <= 0) { list.splice(index, 1); } else { list[index] = { ...list[index], count: nextCount }; }
-		const text = list.map(it => `${it.name}${it.count>1?` + " x${it.count}" + `:''}`).join('\n');
+		const text = list.map(it => `${it.name}${it.count > 1 ? ` x${it.count}` : ''}`).join('\n');
 		setSectionLinesByKey(key, text);
 	}
 	function addItemToSection(key: string, name: string, count: number) {
 		name = name.trim(); if (!name) return;
 		const cur = ch.inventory.find(s => s.key === key)?.lines || '';
-		const next = (cur ? (cur.trim() + '\n') : '') + `${name}${count>1?` + " x${count}" + `:''}`;
+		const next = (cur ? (cur.trim() + '\n') : '') + `${name}${count > 1 ? ` x${count}` : ''}`;
 		setSectionLinesByKey(key, next);
 	}
 
