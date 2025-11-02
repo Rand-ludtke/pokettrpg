@@ -2,16 +2,20 @@ import React from 'react';
 import { BattlePokemon } from '../types';
 import { spriteUrl, placeholderSpriteDataURL } from '../data/adapter';
 
-export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNextBox }: {
+export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNextBox, selectMode, selectedIndices, onToggleSelect }: {
   pokes: Array<BattlePokemon | null>;
   onSelect: (p: BattlePokemon | null, index: number) => void;
   boxIndex: number;
   boxCount: number;
   onPrevBox: () => void;
   onNextBox: () => void;
+  selectMode?: boolean;
+  selectedIndices?: number[];
+  onToggleSelect?: (index: number) => void;
 }) {
   const cols = 6, rows = 5; const size = cols * rows;
   const slots = Array.from({ length: size }, (_, i) => pokes[i]);
+  const selectedSet = new Set<number>(selectedIndices || []);
   return (
     <section className="panel box-grid">
       <div className="box-header">
@@ -25,7 +29,16 @@ export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNext
       </div>
       <div className="grid" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
         {slots.map((p, i) => (
-          <button key={i} className="slot large" onClick={() => onSelect(p ?? null, i)} title={p ? `${(p.types||[]).join('/') } • Lv${p.level} • HP ${p.currentHp}/${p.maxHp}` : 'Empty slot - click to add'}>
+          <button
+            key={i}
+            className={`slot large${selectedSet.has(i) ? ' selected' : ''}`}
+            onClick={() => {
+              if (selectMode && p && onToggleSelect) { onToggleSelect(i); return; }
+              onSelect(p ?? null, i);
+            }}
+            title={p ? `${(p.types||[]).join('/') } • Lv${p.level} • HP ${p.currentHp}/${p.maxHp}` : 'Empty slot - click to add'}
+            style={selectedSet.has(i) ? { outline: '2px solid var(--acc)', outlineOffset: -2, background: 'rgba(0,255,128,0.08)' } : undefined}
+          >
             {p ? (
               <>
                 <div className="slot-sprite-wrap">

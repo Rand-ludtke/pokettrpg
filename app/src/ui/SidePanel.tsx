@@ -2,6 +2,21 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { BattlePokemon } from '../types';
 import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL } from '../data/adapter';
 
+// Helper: Extract cosmetic suffix when a user-entered species name equals a cosmetic forme (e.g., "Alcremie-Ruby Cream" -> "Ruby Cream")
+function extractCosmeticSuffixFromName(fullName: string, dexObj: any): string | null {
+  try {
+    if (!dexObj) return null;
+    const info = speciesFormesInfo(fullName, dexObj.pokedex);
+    const base = info.base || '';
+    const list = info.cosmeticFormes || [];
+    const match = list.find((n:string)=> normalizeName(n) === normalizeName(fullName));
+    if (!match) return null;
+    const prefix = base && match.toLowerCase().startsWith(base.toLowerCase() + '-') ? (base + '-') : '';
+    const suffix = prefix ? match.slice(prefix.length) : match;
+    return suffix || null;
+  } catch { return null; }
+}
+
 export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected }: {
   selected: BattlePokemon | null;
   onAdd: (p: BattlePokemon, teamId?: string) => void;
@@ -35,6 +50,8 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   const [importText, setImportText] = useState<string>('');
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
+
+  // (module-level helper used)
 
   useEffect(() => {
     let mounted = true;
@@ -267,7 +284,24 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                   <div className="label"><strong>Species</strong></div>
                   <input list="species" value={speciesInput} onChange={e=>setSpeciesInput(e.target.value)} placeholder="e.g., Pikachu" />
                   <datalist id="species">
-                    {dex && Object.values(dex.pokedex).filter((s:any)=> !s.baseSpecies || normalizeName(s.baseSpecies)===normalizeName(s.name)).map((s:any)=> <option key={s.name} value={s.name} />)}
+                    {dex && (()=>{
+                      const seen = new Set<string>();
+                      const opts: string[] = [];
+                      for (const s of Object.values(dex.pokedex) as any[]) {
+                        // Include base species and any named formes directly in the dex
+                        const name = String((s as any).name || '');
+                        const id = normalizeName(name);
+                        if (name && !seen.has(id)) { seen.add(id); opts.push(name); }
+                        // Include otherFormes and cosmeticFormes if present
+                        const of = Array.isArray((s as any).otherFormes) ? (s as any).otherFormes : [];
+                        const cf = Array.isArray((s as any).cosmeticFormes) ? (s as any).cosmeticFormes : [];
+                        for (const f of [...of, ...cf]) {
+                          const fid = normalizeName(String(f));
+                          if (f && !seen.has(fid)) { seen.add(fid); opts.push(String(f)); }
+                        }
+                      }
+                      return opts.sort((a,b)=> a.localeCompare(b)).map(n=> <option key={n} value={n} />);
+                    })()}
                   </datalist>
                 </label>
                 <label>
@@ -394,6 +428,8 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                     p.species = p.species || s.species;
                     p.ability = s.ability || abilitySel;
                     (p as any).item = s.item || (selected as any).item;
+                    const cos = extractCosmeticSuffixFromName(s.species, dex);
+                    if (cos) (p as any).cosmeticForm = cos;
                     p.moves = mapMoves(s.moves || [], dex.moves);
                     const bp = prepareBattle(p);
                     onReplaceSelected && onReplaceSelected(bp);
@@ -424,6 +460,8 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                   p0.ability = abilitySel || p0.ability;
                   p0.item = itemSel || undefined;
                   p0.shiny = shinySel;
+                  const cos = extractCosmeticSuffixFromName(speciesInput, dex);
+                  if (cos) (p0 as any).cosmeticForm = cos;
                   // Persist mechanics edits
                   p0.gender = (selected as any).gender as any;
                   p0.nature = (selected as any).nature;
@@ -524,6 +562,8 @@ function AddNewPanel({ onAdd }: { onAdd?: (p: BattlePokemon) => void }) {
     p.ability = ability || p.ability;
     p.item = item || undefined;
     p.shiny = shiny;
+  const cos = extractCosmeticSuffixFromName(species, dex);
+    if (cos) (p as any).cosmeticForm = cos;
     p.moves = mapMoves(moves.filter(Boolean), dex.moves);
     const bp = prepareBattle(p);
     onAdd && onAdd(bp);
@@ -537,7 +577,22 @@ function AddNewPanel({ onAdd }: { onAdd?: (p: BattlePokemon) => void }) {
             <div className="label"><strong>Species</strong></div>
             <input list="add-species" value={species} onChange={e=>setSpecies(e.target.value)} placeholder="e.g., Pikachu" />
             <datalist id="add-species">
-              {dex && Object.values(dex.pokedex).filter((s:any)=> !s.baseSpecies || normalizeName(s.baseSpecies)===normalizeName(s.name)).map((s:any)=> <option key={s.name} value={s.name} />)}
+              {dex && (()=>{
+                const seen = new Set<string>();
+                const opts: string[] = [];
+                for (const s of Object.values(dex.pokedex) as any[]) {
+                  const name = String((s as any).name || '');
+                  const id = normalizeName(name);
+                  if (name && !seen.has(id)) { seen.add(id); opts.push(name); }
+                  const of = Array.isArray((s as any).otherFormes) ? (s as any).otherFormes : [];
+                  const cf = Array.isArray((s as any).cosmeticFormes) ? (s as any).cosmeticFormes : [];
+                  for (const f of [...of, ...cf]) {
+                    const fid = normalizeName(String(f));
+                    if (f && !seen.has(fid)) { seen.add(fid); opts.push(String(f)); }
+                  }
+                }
+                return opts.sort((a,b)=> a.localeCompare(b)).map(n=> <option key={n} value={n} />);
+              })()}
             </datalist>
           </label>
           <label>

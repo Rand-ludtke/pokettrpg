@@ -13,8 +13,9 @@ import { CustomsFileImporter } from './CustomsFileImporter';
 import { ShowdownBattleTab } from './ShowdownBattleTab';
 import { SimpleBattleTab } from './SimpleBattleTab';
 import { CharacterSheet } from './CharacterSheet';
+import { BadgeCase } from './BadgeCase';
 
-type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'help' | { kind:'psbattle'; id:string; title:string };
+type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | { kind:'psbattle'; id:string; title:string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -103,6 +104,55 @@ export function App() {
   const [teams, setTeams] = useState(() => loadTeams());
   const activeTeam = useMemo(() => teams.teams.find(t => t.id === teams.activeId) || teams.teams[0] || null, [teams]);
   const team = activeTeam?.members || [];
+  // Multi-delete state for PC box
+  const [multiDelete, setMultiDelete] = useState<{ enabled: boolean; indices: number[] }>({ enabled: false, indices: [] });
+  const toggleMultiPick = (idx: number) => {
+    setMultiDelete(prev => {
+      const has = prev.indices.includes(idx);
+      const indices = has ? prev.indices.filter(i => i !== idx) : [...prev.indices, idx];
+      return { ...prev, indices };
+    });
+  };
+  const doConfirmMultiDelete = () => {
+    const toDel = multiDelete.indices.slice().sort((a,b)=> b-a); // reverse to avoid shifting concerns (not needed with direct index access)
+    if (toDel.length === 0) return;
+    // Capture names to also remove from teams
+    const names: string[] = [];
+    const box = currentBox();
+    for (const i of toDel) {
+      const p = box[i]; if (p && p.name) names.push(p.name);
+    }
+    // Clear from current box
+    setBoxes(prev => prev.map((b, i) => {
+      if (i !== boxIndex) return b;
+      const nb = b.slice();
+      for (const idx of toDel) { if (idx >= 0 && idx < nb.length) nb[idx] = null; }
+      return nb;
+    }));
+    // Remove from any team by nickname match
+    if (names.length) {
+      setTeams(prev => {
+        const updated = prev.teams.map(t => ({ ...t, members: t.members.filter(m => !names.includes(m.name)) }));
+        const state = { teams: updated, activeId: prev.activeId };
+        saveTeams(updated, prev.activeId);
+        return state;
+      });
+    }
+    // Clear selection context
+    setSelected(null); setSelectedIndex(null);
+    setMultiDelete({ enabled: false, indices: [] });
+  };
+  const selectAllInBox = () => {
+    const box = currentBox();
+    const indices = box.map((p, i) => (p ? i : -1)).filter(i => i >= 0);
+    setMultiDelete(prev => ({ ...prev, enabled: true, indices }));
+  };
+  const invertSelectionInBox = () => {
+    const box = currentBox();
+    const cur = new Set(multiDelete.indices);
+    const indices = box.map((p, i) => (p ? i : -1)).filter(i => i >= 0).filter(i => !cur.has(i));
+    setMultiDelete(prev => ({ ...prev, enabled: true, indices }));
+  };
 
   // Show a one-time banner after importing customs
   const [showReloadBanner, setShowReloadBanner] = useState<boolean>(() => {
@@ -233,7 +283,8 @@ export function App() {
           <button className={tab==='battle'? 'active':''} onClick={() => setTab('battle')}>Battle</button>
           <button className={tab==='lobby'? 'active':''} onClick={() => setTab('lobby')}>Lobby</button>
           <button className={tab==='sheet'? 'active':''} onClick={() => setTab('sheet')}>Character</button>
-          <button className={tab==='help'? 'active':''} onClick={() => setTab('help')}>Help</button>
+          <button className={tab==='badges'? 'active':''} onClick={() => setTab('badges')}>Badges</button>
+          {/* Help tab removed */}
           {extraTabs.map(t => (
             <span key={t.id} style={{display:'inline-flex', alignItems:'center'}}>
               <button className={(typeof tab==='object' && (tab as any).id===t.id)? 'active':''} onClick={() => setTab(t)}>{t.title}</button>
@@ -259,19 +310,47 @@ export function App() {
           <div style={{display:'flex', flexDirection:'column', gap:12}}>
             <BoxGrid
               pokes={currentBox()}
-              onSelect={handleSelect}
+              onSelect={(p, idx)=>{
+                if (multiDelete.enabled) { toggleMultiPick(idx); return; }
+                handleSelect(p, idx);
+              }}
               boxIndex={boxIndex}
               boxCount={boxes.length}
               onPrevBox={prevBox}
               onNextBox={nextBox}
+              selectMode={multiDelete.enabled}
+              selectedIndices={multiDelete.indices}
+              onToggleSelect={toggleMultiPick}
             />
             <ImportExport
               onImport={(t) => addAcrossBoxes(t)}
               exportList={currentBox().filter((x): x is BattlePokemon => !!x)}
               exportLabel="Export Current Box"
             />
+            <section className="panel" style={{display:'grid', gap:8}}>
+              <h3>Bulk Actions</h3>
+              {!multiDelete.enabled ? (
+                <button className="danger" onClick={()=> setMultiDelete({ enabled: true, indices: [] })}>&gt; Multi Delete…</button>
+              ) : (
+                <div style={{display:'grid', gap:8}}>
+                  <div className="dim">{multiDelete.indices.length} selected</div>
+                  <div style={{display:'flex', gap:8}}>
+                    <button className="danger" disabled={multiDelete.indices.length===0} onClick={doConfirmMultiDelete}>
+                      Yes, delete
+                    </button>
+                    <button className="secondary" onClick={()=> setMultiDelete({ enabled:false, indices: [] })}>Cancel</button>
+                  </div>
+                  <div style={{display:'flex', gap:8}}>
+                    <button className="secondary" onClick={selectAllInBox}>Select All</button>
+                    <button className="secondary" onClick={invertSelectionInBox}>Invert Selection</button>
+                    <button className="secondary" onClick={()=> setMultiDelete(prev => ({ ...prev, indices: [] }))}>Clear</button>
+                  </div>
+                  <div className="dim" style={{fontSize:'0.9em'}}>Click Pokémon in the PC box to toggle selection.</div>
+                </div>
+              )}
+            </section>
             <CustomDexBuilder onAddToPC={(mons)=> addAcrossBoxes(mons)} />
-            <CustomsImportExport />
+            {/* CustomsImportExport moved into Lobby tab per request */}
             <CustomsFileImporter />
           </div>
           <SidePanel
@@ -324,6 +403,12 @@ export function App() {
             }}
           />
         </div>
+      )}
+
+      {tab === 'badges' && (
+        <section className="panel">
+          <BadgeCase />
+        </section>
       )}
 
       {tab === 'team' && (
@@ -426,9 +511,10 @@ export function App() {
     {tab === 'battle' && (
       <BattleTab friendly={team[0] ?? null} enemy={selected} team={team} onReplaceTeam={replaceTeamAt} />
     )}
-    {tab === 'lobby' && (
+    {/* Keep Lobby mounted so connections/state persist; toggle visibility */}
+    <div style={{ display: tab==='lobby' ? 'block' : 'none' }}>
       <LobbyTab />
-    )}
+    </div>
 
     {tab === 'sheet' && (
       <CharacterSheet />
@@ -441,12 +527,7 @@ export function App() {
       </div>
     ))}
 
-      {tab === 'help' && (
-        <section className="panel">
-          <h2>Help</h2>
-          <p>Arrow keys to navigate; Enter to open; Space to add to team. Retro green/black theme.</p>
-        </section>
-      )}
+      {/* Help content removed */}
     </div>
   );
 }

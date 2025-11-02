@@ -53,7 +53,47 @@ function createStaticServer(root, preferredPort = 17645) {
     if (isShowdown) {
       // Strip /showdown prefix for static serving
       const origUrl = req.url;
-      req.url = req.url.replace('/showdown', '') || '/index.html';
+      let pathPart = req.url.replace('/showdown', '') || '/index.html';
+      // Minimal sprite fallback: if a requested gen5/gen5icons asset is missing, try HOME (or gen5 front) equivalents
+      // without changing renderer code.
+      const tryPaths = [pathPart];
+      try {
+        // Build fallback candidates only for sprite requests
+        if (/^\/sprites\//.test(pathPart)) {
+          // Normalize to forward slashes
+          const p = pathPart;
+          const restFrom = (prefix) => p.startsWith(prefix) ? p.slice(prefix.length) : '';
+          if (p.startsWith('/sprites/gen5icons/')) {
+            const rest = restFrom('/sprites/gen5icons/');
+            tryPaths.push(`/sprites/gen5/${rest}`);
+            tryPaths.push(`/sprites/home/${rest}`);
+          } else if (p.startsWith('/sprites/gen5-back-shiny/')) {
+            const rest = restFrom('/sprites/gen5-back-shiny/');
+            tryPaths.push(`/sprites/gen5/${rest}`);
+            tryPaths.push(`/sprites/home-shiny/${rest}`);
+          } else if (p.startsWith('/sprites/gen5-back/')) {
+            const rest = restFrom('/sprites/gen5-back/');
+            tryPaths.push(`/sprites/gen5/${rest}`);
+            tryPaths.push(`/sprites/home/${rest}`);
+          } else if (p.startsWith('/sprites/gen5-shiny/')) {
+            const rest = restFrom('/sprites/gen5-shiny/');
+            tryPaths.push(`/sprites/home-shiny/${rest}`);
+          } else if (p.startsWith('/sprites/gen5/')) {
+            const rest = restFrom('/sprites/gen5/');
+            tryPaths.push(`/sprites/home/${rest}`);
+          }
+        }
+      } catch {}
+      // Pick the first existing candidate
+      let picked = pathPart;
+      for (const cand of tryPaths) {
+        try {
+          // Avoid path traversal; join on known root
+          const disk = path.join(showdownRoot, cand);
+          if (existsSync(disk)) { picked = cand; break; }
+        } catch {}
+      }
+      req.url = picked;
       serveShowdown(req, res, () => finalhandler(req, res));
       req.url = origUrl;
       return;
@@ -91,17 +131,43 @@ async function maybeUpdateBeforeStart() {
   try {
     // Load persisted preferences (to allow suppressing the up-to-date dialog)
     const settingsFile = path.join(app.getPath('userData'), 'settings.json');
+    const logFile = path.join(app.getPath('userData'), 'updater.log');
+    const log = async (s) => { try { await fs.appendFile(logFile, `[${new Date().toISOString()}] ${s}\n`); } catch {} };
+    await log(`maybeUpdateBeforeStart: begin; version=${app.getVersion()}`);
     let prefs = {};
     try {
       const txt = await fs.readFile(settingsFile, 'utf8');
       try { prefs = JSON.parse(txt) || {}; } catch {}
     } catch {}
 
-    autoUpdater.autoDownload = false;
-    autoUpdater.autoInstallOnAppQuit = true;
+  // Allow pre-release channels only when explicitly desired (default off for stability)
+  autoUpdater.allowPrerelease = false;
+  // Never downgrade
+  autoUpdater.allowDowngrade = false;
+  autoUpdater.autoDownload = true; // download immediately when user agrees
+  autoUpdater.autoInstallOnAppQuit = true;
+    try {
+      autoUpdater.removeAllListeners();
+    } catch {}
+    autoUpdater.on('error', (e) => { log(`autoUpdater error: ${e && e.stack || e}`); });
+  autoUpdater.on('checking-for-update', () => { log('checking-for-update'); });
+  autoUpdater.on('update-available', (info) => { log(`update-available: ${info?.version}`); });
+    autoUpdater.on('update-not-available', () => { log(`update-not-available; current=${app.getVersion()}`); });
+    autoUpdater.on('download-progress', (p) => { try { log(`download-progress: ${(p && p.percent != null) ? p.percent.toFixed(1) : ''}%`); } catch {} });
+    autoUpdater.on('update-downloaded', (info) => { log(`update-downloaded: ${info?.version}`); });
     const r = await autoUpdater.checkForUpdates();
     const info = r && r.updateInfo;
-    const available = !!(info && info.version && info.version !== app.getVersion());
+    const cmpVer = (a, b) => {
+      try {
+        const pa = String(a||'0').split('.').map(n=>parseInt(n,10));
+        const pb = String(b||'0').split('.').map(n=>parseInt(n,10));
+        const len = Math.max(pa.length, pb.length);
+        for (let i=0;i<len;i++){ const va = pa[i]||0, vb = pb[i]||0; if (va>vb) return 1; if (va<vb) return -1; }
+        return 0;
+      } catch { return 0; }
+    };
+    const available = !!(info && info.version && cmpVer(info.version, app.getVersion()) > 0);
+    await log(`checkForUpdates done; available=${available} next=${info && info.version}`);
     if (!available) {
       // Show an up-to-date notice unless the user opted out previously
       if (!prefs?.suppressUpToDateDialog) {
@@ -123,14 +189,15 @@ async function maybeUpdateBeforeStart() {
           }
         } catch {}
       }
+      await log('no update available; returning to startup');
       return;
     }
 
-    const msg = `Version ${info.version} is available.`;
-    const detail = 'Download now and restart to install, or skip to continue without updating.';
+  const msg = `Version ${info.version} is available.`;
+  const detail = 'The app will download the update and restart to install before launching.';
     const res = await dialog.showMessageBox({
       type: 'question',
-      buttons: ['Download and Install', 'Skip'],
+      buttons: ['Update Now', 'Skip'],
       defaultId: 0,
       cancelId: 1,
       title: 'Update available',
@@ -138,33 +205,24 @@ async function maybeUpdateBeforeStart() {
       detail,
       noLink: true,
     });
-    if (res.response !== 0) return;
-
-    // Download update; this may take time. If it fails, continue startup.
+    if (res.response !== 0) { await log('user skipped update'); return; }
     try {
+      await log('starting downloadUpdate');
       await autoUpdater.downloadUpdate();
+      await log('downloadUpdate resolved');
     } catch (e) {
       console.warn('Update download failed:', e);
+      await log(`download error: ${e && e.stack || e}`);
       return;
     }
-
-    const ready = await dialog.showMessageBox({
-      type: 'question',
-      buttons: ['Restart Now', 'Later'],
-      defaultId: 0,
-      cancelId: 1,
-      title: 'Update ready',
-      message: 'Update downloaded',
-      detail: 'Restart now to install the update. If you choose Later, it will install on the next app launch.',
-      noLink: true,
-    });
-    if (ready.response === 0) {
-      setImmediate(() => autoUpdater.quitAndInstall());
-      // prevent continuing to create the window since we are quitting
-      await new Promise(() => {});
-    }
+    // Install immediately to avoid loading the app and potentially conflicting with assets
+    await log('quitAndInstall now');
+    setImmediate(() => autoUpdater.quitAndInstall(false, true));
+    // prevent continuing to create the window since we are quitting
+    await new Promise(() => {});
   } catch (e) {
     console.warn('Startup update check failed:', e);
+    try { const lf = path.join(app.getPath('userData'), 'updater.log'); await fs.appendFile(lf, `[${new Date().toISOString()}] exception: ${e && e.stack || e}\n`); } catch {}
   }
 }
 async function createWindow() {

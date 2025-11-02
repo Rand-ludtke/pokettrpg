@@ -1,7 +1,7 @@
 {
   "name": "pokettrpg-app",
   "private": true,
-  "version": "1.0.9",
+  "version": "1.2.2",
   "type": "module",
   "main": "electron/main.mjs",
   "description": "Offline retro Pokémon TTRPG PC, team manager, and battle helper.",
@@ -11,15 +11,22 @@
     "sync": "node scripts/sync-assets.mjs",
     "build": "npm run sync && tsc -b && vite build",
     "preview": "vite preview",
-  "custom:add": "node scripts/add-custom-pokemon.mjs",
+    "custom:add": "node scripts/add-custom-pokemon.mjs",
+    "mock:lobby": "node scripts/mock-lobby-server.mjs",
+    "test:ws": "node scripts/ws-protocol-smoke.mjs",
+    "test:ws:check": "node scripts/ws-connect-check.mjs",
     "electron:dev": "npm run build && electron .",
     "electron:pack": "npm run build && electron-builder --dir",
     "electron:make": "npm run build && electron-builder -w",
-    "electron:make:portable": "npm run build && electron-builder -w --portable"
+    "electron:make:portable": "npm run build && electron-builder -w --portable",
+    "electron:make:maczip": "npm run build && electron-builder -m zip",
+    "release:upload-mac": "gh release upload v%npm_package_version% release/Pokettrpg-*.zip --clobber",
+    "release": "pwsh -File ../release.ps1"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "socket.io-client": "^4.7.5",
     "ws": "^8.18.0",
     "serve-static": "^2.2.0",
     "finalhandler": "^1.2.0",
@@ -38,7 +45,9 @@
     "appId": "com.rand.pokettrpg",
     "productName": "Pokettrpg",
     "icon": "build/icon.ico",
-    "mac": { "icon": "build/icon.png" },
+    "mac": {
+      "icon": "build/icon.png"
+    },
     "files": [
       "dist/**",
       "electron/**",
@@ -48,15 +57,35 @@
     "asarUnpack": [
       "dist/vendor/showdown/**"
     ],
+    "nsis": {
+      "artifactName": "Pokettrpg-Setup-${version}.${ext}"
+    },
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "zip", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "publish": [
-      { "provider": "github", "owner": "Rand-ludtke", "repo": "pokettrpg" }
+      {
+        "provider": "github",
+        "owner": "Rand-ludtke",
+        "repo": "pokettrpg"
+      }
     ],
-    "directories": { "buildResources": "build", "output": "release" }
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    }
   }
 }

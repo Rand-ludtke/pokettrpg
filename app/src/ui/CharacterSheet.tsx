@@ -129,6 +129,8 @@ export function CharacterSheet() {
 		try { return localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer'; } catch { return 'Ace Trainer'; }
 	});
 	const [trainerOptions, setTrainerOptions] = useState<string[]>([]);
+	// Local search filter for trainer sprite picker
+	const [trainerFilter, setTrainerFilter] = useState<string>('');
 	const [trainerImage, setTrainerImage] = useState<string>(() => {
 		try { return localStorage.getItem('ttrpg.trainerImage') || ''; } catch { return ''; }
 	});
@@ -147,6 +149,13 @@ export function CharacterSheet() {
 		const t = setTimeout(load, 2000);
 		return ()=>{ cancelled=true; clearTimeout(t); };
 	}, []);
+
+	// Filtered list based on search query
+	const filteredTrainerOptions = useMemo(() => {
+		const q = (trainerFilter || '').trim().toLowerCase();
+		if (!q) return trainerOptions;
+		return trainerOptions.filter(name => name.toLowerCase().includes(q));
+	}, [trainerOptions, trainerFilter]);
 
 	const invParsed = useMemo(() => {
 		const map: Record<string, Array<{ name: string; count: number }>> = {};
@@ -217,13 +226,13 @@ export function CharacterSheet() {
 		const list = (invParsed[key] || []).slice();
 		if (index < 0 || index >= list.length) return;
 		if (nextCount <= 0) { list.splice(index, 1); } else { list[index] = { ...list[index], count: nextCount }; }
-		const text = list.map(it => `${it.name}${it.count>1?` + " x${it.count}" + `:''}`).join('\n');
+		const text = list.map(it => `${it.name}${it.count > 1 ? ` x${it.count}` : ''}`).join('\n');
 		setSectionLinesByKey(key, text);
 	}
 	function addItemToSection(key: string, name: string, count: number) {
 		name = name.trim(); if (!name) return;
 		const cur = ch.inventory.find(s => s.key === key)?.lines || '';
-		const next = (cur ? (cur.trim() + '\n') : '') + `${name}${count>1?` + " x${count}" + `:''}`;
+		const next = (cur ? (cur.trim() + '\n') : '') + `${name}${count > 1 ? ` x${count}` : ''}`;
 		setSectionLinesByKey(key, next);
 	}
 
@@ -240,15 +249,21 @@ export function CharacterSheet() {
 						['intelligence','Intelligence'],
 						['speech','Speech'],
 						['fortitude','Fortitude'],
-					] as const).map(([k,label]) => (
-						<div key={k} style={{ display:'grid', gridTemplateColumns:'1fr auto', alignItems:'center', gap:6 }}>
-							<span className="dim" style={{fontSize:'0.9em'}}>{label}</span>
-							<input type="number" value={(ch.stats as any)[k] || 0} onChange={e => setCh({ ...ch, stats: { ...ch.stats, [k]: Number(e.target.value)||0 } })} style={{ width:60, textAlign:'center' }} />
-						</div>
-					))}
-					<div style={{ marginTop:4 }}>
-						<span className="dim">LUCK:</span>
-						<input type="number" value={ch.stats.luck||0} onChange={(e)=> setCh({ ...ch, stats: { ...ch.stats, luck: Number(e.target.value)||0 }})} style={{ width:60, marginLeft:6, textAlign:'center' }} />
+					] as const).map(([k,label]) => {
+						const val = Number((ch.stats as any)[k] || 0);
+						const bonus = Math.ceil(val / 2);
+						return (
+								<div key={k} style={{ display:'grid', gridTemplateColumns:'1fr 40px max-content', alignItems:'center', columnGap:6 }}>
+								<span className="dim" style={{fontSize:'0.9em'}}>{label}</span>
+									<input type="number" value={val} onChange={e => setCh({ ...ch, stats: { ...ch.stats, [k]: Number(e.target.value)||0 } })} style={{ width:40, textAlign:'center' }} />
+								<span className="chip dim" style={{whiteSpace:'nowrap'}} title="Bonus = ceil(stat/2)">+{bonus}</span>
+							</div>
+						);
+					})}
+						<div style={{ display:'grid', gridTemplateColumns:'1fr 40px max-content', alignItems:'center', columnGap:6, marginTop:4 }}>
+						<span className="dim" style={{fontSize:'0.9em'}}>Luck</span>
+							<input type="number" value={ch.stats.luck||0} onChange={(e)=> setCh({ ...ch, stats: { ...ch.stats, luck: Number(e.target.value)||0 }})} style={{ width:40, textAlign:'center' }} />
+						<span className="chip dim" style={{whiteSpace:'nowrap'}} title="Bonus = ceil(stat/2)">+{Math.ceil((ch.stats.luck||0)/2)}</span>
 					</div>
 				</div>
 
@@ -286,7 +301,12 @@ export function CharacterSheet() {
 					<section style={{ border:'1px solid var(--accent)', borderRadius:6, padding:8 }}>
 						<div style={{ display:'flex', gap:6, flexWrap:'wrap', alignItems:'center' }}>
 							{ch.inventory.map(sec => (
-								<button key={sec.key} className={activeInvTab===sec.key? 'active tab-btn':'secondary tab-btn'} onClick={()=> setActiveInvTab(sec.key)}>{sec.label}</button>
+								<button
+									key={sec.key}
+									className={activeInvTab===sec.key? 'active tab-btn':'secondary tab-btn'}
+									onClick={()=> setActiveInvTab(sec.key)}
+									style={activeInvTab===sec.key ? { border:'2px solid var(--acc)', background:'rgba(0,255,128,0.08)' } : undefined}
+								>{sec.label}</button>
 							))}
 							<div style={{ marginLeft:'auto', display:'flex', gap:6, alignItems:'center' }}>
 								<div className="chip dim" title="Money" style={{ display:'flex', alignItems:'center', gap:6 }}>
@@ -349,7 +369,7 @@ export function CharacterSheet() {
 								{trainerImage ? (
 									<img src={trainerImage} alt="Trainer" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
 								) : (
-									<img src={`/showdown/sprites/trainers/${trainerSprite}.png`} alt="Sprite" style={{ imageRendering:'pixelated', width:'80%', height:'80%', objectFit:'contain', background:'transparent' }} />
+									<img src={`/vendor/showdown/sprites/trainers/${trainerSprite}.png`} alt="Sprite" style={{ imageRendering:'pixelated', width:'80%', height:'80%', objectFit:'contain', background:'transparent' }} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/showdown/sprites/trainers/${trainerSprite}.png`; }} />
 								)}
 							</div>
 							<div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
@@ -401,56 +421,7 @@ export function CharacterSheet() {
 				</div>
 			</div>
 
-			{/* Badge Case */}
-			<div style={{ marginTop:12, border:'1px solid var(--accent)', borderRadius:6, padding:8 }}>
-				<div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-					<h3 style={{ margin:0 }}>Badge Case</h3>
-					<span className="dim">Mark earned badges and label them</span>
-				</div>
-				<div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:8, marginTop:8 }}>
-								{ch.badges.map((b, i) => (
-									<div key={i} style={{ border:'1px solid var(--accent)', borderRadius:6, padding:6, display:'grid', gap:8, alignItems:'center', justifyItems:'center' }}>
-										{/* Big clickable box: toggles earned; shows image if present else a big check if earned or empty */}
-										<div
-											onClick={()=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, earned: !x.earned } : x) })}
-											title={b.earned ? 'Click to uncheck' : 'Click to check'}
-											style={{
-												width:'100%', height:100, border:'1px solid var(--accent)', borderRadius:8,
-												display:'flex', alignItems:'center', justifyContent:'center', background:'#102', cursor:'pointer', overflow:'hidden'
-											}}
-										>
-											{b.image ? (
-												<img src={b.image} alt="Badge" style={{ width:'100%', height:'100%', objectFit:'contain' }} />
-											) : (
-												<span style={{ fontSize:48, lineHeight:1, color:b.earned? 'var(--accent)' : '#345' }}>
-													{b.earned ? '✓' : ''}
-												</span>
-											)}
-										</div>
-										<div style={{ display:'flex', gap:6 }}>
-											<button className="mini" onClick={() => {
-												const input = document.createElement('input');
-												input.type = 'file';
-												input.accept = 'image/*';
-												input.onchange = () => {
-													const f = input.files && input.files[0];
-													if (!f) return;
-													const reader = new FileReader();
-													reader.onload = () => {
-														const dataUrl = String(reader.result || '');
-														setCh(prev => ({ ...prev, badges: prev.badges.map((x,idx)=> idx===i ? { ...x, image: dataUrl } : x) }));
-													};
-													reader.readAsDataURL(f);
-												};
-												input.click();
-											}}>Add Image</button>
-											{b.image && <button className="mini" onClick={()=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, image: undefined } : x) })}>Clear</button>}
-										</div>
-										<input value={b.name} onChange={e=> setCh({ ...ch, badges: ch.badges.map((x,idx)=> idx===i? { ...x, name: e.target.value } : x) })} placeholder={`Badge ${i+1}`} style={{ width:'100%', textAlign:'center' }} />
-									</div>
-								))}
-				</div>
-			</div>
+			{/* Badge Case removed from Character Sheet per request. Use the dedicated Badges tab. */}
 
 			{/* Trait Catalog Dialog */}
 			{selectedTrait===-1 && (
@@ -495,13 +466,28 @@ export function CharacterSheet() {
 					{trainerOptions.length===0 ? (
 						<div className="dim">No sprites available yet.</div>
 					) : (
-						<div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(64px, 1fr))', gap:8 }}>
-							{trainerOptions.map((name)=> (
-								<button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=>{ setTrainerSprite(name); setShowSpritePicker(false); }} style={{width:64, height:64, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center'}}>
-									<img src={`/showdown/sprites/trainers/${name}.png`} alt={name} style={{ width:48, height:48, imageRendering:'pixelated', background:'transparent' }} />
-								</button>
-							))}
-						</div>
+						<>
+							<div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:8 }}>
+								<input
+									value={trainerFilter}
+									onChange={e=> setTrainerFilter(e.target.value)}
+									placeholder="Search sprites by name…"
+									style={{ flex:1 }}
+								/>
+								{trainerFilter && <button className="secondary" onClick={()=> setTrainerFilter('')}>Clear</button>}
+							</div>
+							{filteredTrainerOptions.length===0 ? (
+								<div className="dim">No matches for “{trainerFilter}”.</div>
+							) : (
+								<div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(64px, 1fr))', gap:8 }}>
+									{filteredTrainerOptions.map((name)=> (
+										<button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=>{ setTrainerSprite(name); setShowSpritePicker(false); }} style={{width:64, height:64, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center'}}>
+											<img src={`/showdown/sprites/trainers/${name}.png`} alt={name} style={{ width:48, height:48, imageRendering:'pixelated', background:'transparent' }} />
+										</button>
+									))}
+								</div>
+							)}
+						</>
 					)}
 					<div style={{ display:'flex', justifyContent:'flex-end', marginTop:12 }}>
 						<button onClick={()=> setShowSpritePicker(false)}>Close</button>

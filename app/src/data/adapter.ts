@@ -270,27 +270,56 @@ export function spriteUrl(speciesId: string, shiny = false, options?: { base?: s
     return shiny ? 'home-shiny' : 'home';
   })();
   const ext = 'png';
-  const id = toSpriteId(speciesId, options?.cosmetic);
+  const ids = spriteIdCandidates(speciesId, options?.cosmetic);
   // Prefer locally stored custom sprite data URL if present
   const slot: SpriteSlot = options?.back ? (shiny ? 'back-shiny' : 'back') : (shiny ? 'shiny' : 'front');
-  const local = getCustomSprite(id, slot) || getCustomSprite(id, shiny ? 'shiny' : 'front');
-  if (local) return local;
-  return `${base}/${folder}/${id}.${ext}`;
+  // Try a local custom sprite first across candidate IDs
+  for (const id of ids) {
+    const local = getCustomSprite(id, slot) || getCustomSprite(id, shiny ? 'shiny' : 'front');
+    if (local) return local;
+  }
+  // Fall back to the first candidate file path
+  return `${base}/${folder}/${ids[0]}.${ext}`;
 }
 
 function toSpriteId(speciesName: string, cosmetic?: string): string {
-  // Convert to ASCII (strip accents), then collapse punctuation and spaces
+  // Primary preferred ID pattern: lowercased base + optional '-' + lowercased forme/cosmetic
+  // Convert to ASCII (strip accents) but keep original for symbol checks
   const raw = toAscii(speciesName);
-  const base = normalizeName(raw);
   // Handle Nidoran gender symbol cases explicitly if symbol present in original
   if (/♀/.test(speciesName)) return 'nidoranf';
   if (/♂/.test(speciesName)) return 'nidoranm';
-  // If cosmetic given and not already part of the ID, append it (without hyphen)
+  // Split once on the first hyphen to infer base vs forme suffix; this also works for base names like 'Porygon-Z' producing 'porygon-z'
+  const firstDash = raw.indexOf('-');
+  let basePart = raw, suffixPart = '';
+  if (firstDash > 0) { basePart = raw.slice(0, firstDash); suffixPart = raw.slice(firstDash + 1); }
+  const baseNorm = normalizeName(basePart);
+  let suffixNorm = normalizeName(suffixPart);
+  // Normalize common multi-word forme suffixes that have shorter file ids
+  if (suffixNorm === 'icerider') suffixNorm = 'ice';
+  if (suffixNorm === 'shadowrider') suffixNorm = 'shadow';
+  // Append cosmetic form if provided and not already present
   if (cosmetic) {
     const cos = normalizeName(toAscii(cosmetic));
-    if (cos && !base.endsWith(cos)) return `${base}${cos}`;
+    if (cos && (!suffixNorm || !suffixNorm.endsWith(cos))) suffixNorm = suffixNorm ? `${suffixNorm}${cos}` : cos;
   }
-  return base;
+  return suffixNorm ? `${baseNorm}-${suffixNorm}` : baseNorm;
+}
+
+// Generate multiple plausible sprite id variants for robust fallback across naming quirks
+function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
+  const ids: string[] = [];
+  const preferred = toSpriteId(speciesName, cosmetic);
+  ids.push(preferred);
+  // Legacy pattern without hyphen (older code path); keep as a fallback
+  const rawNorm = normalizeName(toAscii(speciesName));
+  if (!ids.includes(rawNorm)) ids.push(rawNorm);
+  // For Calyrex rider forms, ensure short variant is present explicitly
+  if (/calyrex/i.test(speciesName)) {
+    if (/ice/i.test(speciesName) && !ids.includes('calyrex-ice')) ids.push('calyrex-ice');
+    if (/shadow/i.test(speciesName) && !ids.includes('calyrex-shadow')) ids.push('calyrex-shadow');
+  }
+  return ids;
 }
 
 export function speciesFormesInfo(name: string, dex: DexIndex) {
@@ -322,7 +351,7 @@ export function spriteUrlWithFallback(
   const shiny = !!options?.shiny;
   const back = !!options?.back;
   const chosen = options?.setOverride ?? getSpriteSettings().set;
-  const id = toSpriteId(speciesId, options?.cosmetic);
+  const idList = spriteIdCandidates(speciesId, options?.cosmetic);
 
   // Candidate folders by priority
   const folders: string[] = [];
@@ -336,15 +365,21 @@ export function spriteUrlWithFallback(
     folders.push(back ? (shiny ? 'gen5-back-shiny' : 'gen5-back') : (shiny ? 'gen5-shiny' : 'gen5'));
   }
 
-  // Insert custom sprite data URL at the front if available
+  // Insert custom sprite data URL at the front if available (try every candidate id)
   const slot: SpriteSlot = back ? (shiny ? 'back-shiny' : 'back') : (shiny ? 'shiny' : 'front');
-  const custom = getCustomSprite(id, slot) || getCustomSprite(id, shiny ? 'shiny' : 'front');
   const candidates: string[] = [];
-  if (custom) candidates.push(custom);
-  for (const f of folders) candidates.push(`${base}/${f}/${id}.png`);
+  for (const id of idList) {
+    const custom = getCustomSprite(id, slot) || getCustomSprite(id, shiny ? 'shiny' : 'front');
+    if (custom) candidates.push(custom);
+  }
+  // Then add file paths for each folder × id combination
+  for (const f of folders) {
+    for (const id of idList) candidates.push(`${base}/${f}/${id}.png`);
+  }
 
   let idx = 0;
-  const placeholder = placeholderSpriteDataURL(id.slice(0, 8).toUpperCase());
+  const phLabel = (idList[0] || normalizeName(speciesId)).slice(0, 8).toUpperCase();
+  const placeholder = placeholderSpriteDataURL(phLabel);
   const first = candidates[0] || placeholder;
   return {
     src: first,

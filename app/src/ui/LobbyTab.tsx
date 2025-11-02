@@ -1,11 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { CustomsImportExport } from './CustomsImportExport';
 import { loadTeams, teamToShowdownText } from '../data/adapter';
 
 export function LobbyTab() {
   const teamsState = loadTeams();
   const [hosting, setHosting] = useState<{port:number}|null>(null);
-  // Keep a singleton WebSocket on window to avoid duplicate connects across tab switches/remounts
-  const [ws, setWs] = useState<WebSocket|null>(() => (window as any).__pokettrpgWS || null);
+  // Keep a singleton Socket.IO connection on window to avoid duplicate connects across tab switches/remounts
+  const [sock, setSock] = useState<Socket | null>(() => (window as any).__pokettrpgIO || null);
+  // WebSocket server URL (persisted). Default to given IP; dev default port 3000.
+  const [wsUrl, setWsUrl] = useState<string>(() => localStorage.getItem('ttrpg.lobbyWsUrl') || 'wss://pokettrpg.duckdns.org');
+  const [autoJoin, setAutoJoin] = useState<boolean>(() => {
+    const raw = localStorage.getItem('ttrpg.lobbyAutoJoin');
+    return raw == null ? true : raw === '1';
+  });
+  useEffect(()=>{ try { localStorage.setItem('ttrpg.lobbyWsUrl', wsUrl); } catch {} }, [wsUrl]);
+  useEffect(()=>{ try { localStorage.setItem('ttrpg.lobbyAutoJoin', autoJoin ? '1' : '0'); } catch {} }, [autoJoin]);
   const [chat, setChat] = useState<Array<{from:string; text:string; at:number}>>([]);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const [trainerSprite, setTrainerSprite] = useState<string>(() => localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer');
@@ -26,6 +36,8 @@ export function LobbyTab() {
   const [activeRoomId, setActiveRoomId] = useState<string>('');
   const [myReady, setMyReady] = useState<boolean>(false);
   const clientIdRef = useRef<string>('');
+  const lastUrlRef = useRef<string>('');
+  const connectingRef = useRef<boolean>(false);
   if (!clientIdRef.current) {
     const saved = localStorage.getItem('ttrpg.clientId');
     if (saved) clientIdRef.current = saved;
@@ -45,29 +57,37 @@ export function LobbyTab() {
     try { (window as any).lan = (window as any).lan || {}; (window as any).lan.rooms = Array.isArray(list) ? list : []; } catch {}
   }
   // Ensure WS -> CustomEvent fan-out is attached once per socket, persists across unmounts
-  function attachFanout(s: WebSocket) {
+  function attachHandlers(s: Socket) {
     const anyS: any = s as any;
-    if (anyS.__fanoutAttached) return;
-    const onMsg = (ev: MessageEvent) => {
-      let msg: any; try { msg = JSON.parse(String((ev as any).data)); } catch { return; }
+    if (anyS.__handlersAttached) return;
+    // Core snapshots
+    s.on('state', (snap: any) => {
+      const rlist = Array.isArray(snap?.rooms) ? snap.rooms : [];
+      const rstr = Array.isArray(snap?.roster) ? snap.roster : [];
+      const chall = Array.isArray(snap?.challenges) ? snap.challenges : [];
+      const chatHist = Array.isArray(snap?.chat) ? snap.chat : [];
+      setSyncing(false);
+      setLanRooms(rlist); setRooms(rlist); setRoster(rstr); setRemoteChallenges(chall); setChat(chatHist);
+      dispatchLan('rooms', rlist); dispatchLan('roster', rstr); dispatchLan('challenge-sync', { list: chall });
+      for (const line of chatHist) dispatchLan('chat', line);
+    });
+    s.on('rooms', (list: any[]) => { setLanRooms(list || []); setRooms(list || []); setSyncing(false); });
+    s.on('roster', (list: any[]) => setRoster(list || []));
+    s.on('chat', (line: any) => pushChat(line?.from ?? 'peer', line?.text ?? ''));
+    s.on('challenge-sync', (d: any) => setRemoteChallenges((d && d.list) || []));
+    s.on('room-start', (d: any) => {
+      setStatus('Battle started');
+      try { window.dispatchEvent(new CustomEvent('pokettrpg-room-start', { detail: d })); } catch {}
+      try { const rid = d?.roomId; if (rid && s.connected) s.emit('room-join', { roomId: rid }); } catch {}
+    });
+    // Generic message envelope fallback
+    s.on('message', (msg: any) => {
       if (!msg || !msg.t) return;
-      // Forward all relevant LAN events as page-level CustomEvents
-      // Special-case 'state' to fan out its parts and set lan.rooms
-      if (msg.t === 'state') {
-        const snap = msg.d || {};
-        setSyncing(false);
-        if (Array.isArray(snap.rooms)) { setLanRooms(snap.rooms); dispatchLan('rooms', snap.rooms); }
-        if (Array.isArray(snap.roster)) dispatchLan('roster', snap.roster);
-        if (Array.isArray(snap.challenges)) dispatchLan('challenge-sync', { list: snap.challenges });
-        if (Array.isArray(snap.chat)) for (const line of snap.chat) dispatchLan('chat', line);
-        return;
-      }
-  if (msg.t === 'rooms') { setLanRooms(msg.d || []); setSyncing(false); }
-      // Pass-through for everything else
+      if (msg.t === 'state') { (s as any).emit('state-ack'); return; }
+      if (msg.t === 'rooms') { setLanRooms(msg.d || []); setSyncing(false); }
       dispatchLan(msg.t, msg.d);
-    };
-    try { (s as any).addEventListener('message', onMsg); } catch { /* older TS dom types */ }
-    anyS.__fanoutAttached = true;
+    });
+    anyS.__handlersAttached = true;
   }
   useEffect(()=>{
     const api = (window as any).lan?.assets;
@@ -85,69 +105,9 @@ export function LobbyTab() {
     return ()=>{ cancelled=true; clearTimeout(t); };
   }, []);
 
-  useEffect(() => {
-    const lan = (window as any).lan;
-    if (!lan) return;
-    // Hydrate from main snapshot so remounts don't show empty UI
-    (async () => {
-      try {
-        const snap = await lan.state?.();
-        if (snap?.ok) {
-          const rlist = Array.isArray(snap.rooms) ? snap.rooms : [];
-          setRooms(rlist);
-          setRoster(Array.isArray(snap.roster) ? snap.roster : []);
-          const chall = Array.isArray(snap.challenges) ? snap.challenges : [];
-          setRemoteChallenges(chall);
-          const chatHist = Array.isArray(snap.chat) ? snap.chat : [];
-          setChat(chatHist);
-          // Also fan these out for other tabs and set lan.rooms for viewer inference
-          setLanRooms(rlist);
-          dispatchLan('rooms', rlist);
-          dispatchLan('roster', Array.isArray(snap.roster) ? snap.roster : []);
-          dispatchLan('challenge-sync', { list: chall });
-          for (const line of chatHist) dispatchLan('chat', line);
-          setStatus('Connected');
-        }
-      } catch {}
-    })();
-    const offRoster = lan.on('roster', (list:any) => setRoster(list || []));
-    const offChat = lan.on('chat', (d:any) => pushChat(d?.from ?? 'peer', d?.text ?? ''));
-    const offChallengeSync = lan.on('challenge-sync', (d:any) => setRemoteChallenges((d && d.list) || []));
-  const offRooms = lan.on('rooms', (list:any) => { setLanRooms(list || []); setRooms(list || []); });
-    const offHostFound = lan.on('host-found', (h:any) => {
-      setHosts(prev => {
-        const next = prev.slice();
-        if (!next.find(x => x.ip===h.ip && x.port===h.port)) next.push(h);
-        return next;
-      });
-    });
-    const offRoomStart = lan.on('room-start', (_d:any) => {
-      setStatus('Battle started');
-    });
-    const offRoomDebug = lan.on('room-debug', (d:any) => {
-      if (!d || !d.roomId) return;
-      // Show last few debug lines inline for visibility
-      setStatus(`[${d.where}] ${d.msg}`);
-    });
-  lan.discover?.start?.();
-  lan.discover?.ping?.();
-  if (!hosting) setStatus('Scanning for hosts…');
-    const scanTimer = setInterval(()=> lan.discover?.ping?.(), 5000);
-    // Auto-resume hosting if previously set
-    try { if (localStorage.getItem('ttrpg.hosting') === '1') hostServer(); } catch {}
-    return () => { offRoster && offRoster(); offChat && offChat(); offChallengeSync && offChallengeSync(); offRooms && offRooms(); offHostFound && offHostFound(); offRoomStart && offRoomStart(); offRoomDebug && offRoomDebug(); clearInterval(scanTimer); lan.discover?.stop?.(); };
-  }, []);
+  // Removed LAN hosting/discovery hydration; Lobby operates only via WS URL
 
-  function hostServer() {
-    const lan = (window as any).lan;
-    if (!lan) { setStatus('Hosting is only available in the desktop app.'); return; }
-    setStatus('Starting host…');
-    lan.host({ port: 17646 }).then((r:any)=>{
-      if (r?.ok) { setHosting({ port: r.port }); setStatus(`Hosting on port ${r.port}`); try { localStorage.setItem('ttrpg.hosting','1'); } catch {} }
-      else { setStatus('Failed to start host.'); }
-    }).catch(()=> setStatus('Failed to start host.'));
-  }
-  function stopServer() { const lan = (window as any).lan; if (!lan) return; lan.stop().then(()=> { setHosting(null); setStatus('Stopped hosting'); try { localStorage.removeItem('ttrpg.hosting'); } catch {} }); }
+  // Hosting removed
   function pushChat(from: string, text: string) {
     setChat(prev => {
       const last = prev[prev.length-1];
@@ -156,74 +116,67 @@ export function LobbyTab() {
     });
   }
 
+  function normalizeWsUrl(input: string): string {
+    let u = (input || '').trim();
+    if (!u) return '';
+    // Map http(s) to ws(s)
+    if (/^https:\/\//i.test(u)) u = 'wss://' + u.replace(/^https:\/\//i, '');
+    else if (/^http:\/\//i.test(u)) u = 'ws://' + u.replace(/^http:\/\//i, '');
+    // Ensure ws(s) scheme exists
+    if (!/^wss?:\/\//i.test(u)) u = 'ws://' + u;
+    // Only add a default port when connecting to localhost in dev.
+    // For production (wss) and any non-local host, do not append a port.
+    const isSecure = /^wss:\/\//i.test(u);
+    const hostMatch = u.match(/^wss?:\/\/([^/:]+)(:\d+)?(\/.*)?$/i);
+    const host = hostMatch ? hostMatch[1] : '';
+    const hasPort = /^wss?:\/\/[^/:]+:\d+/i.test(u);
+    const isLocalhost = /^(localhost|127\.0\.0\.1|\[?::1\]?)$/i.test(host);
+    if (!hasPort && !isSecure && isLocalhost) {
+      // Default dev server port
+      u = u.replace(/^(ws:\/\/[^/]+)(.*)$/i, `$1:3000$2`);
+    }
+    return u;
+  }
+
   function joinServer(url: string) {
     // Reuse existing open socket if available
-    const existing: WebSocket | null = (window as any).__pokettrpgWS || null;
-    if (existing && existing.readyState === 1) { attachFanout(existing); setWs(existing); setStatus('Connected'); return; }
+    const existing: Socket | null = (window as any).__pokettrpgIO || null;
+    if (existing && existing.connected) { attachHandlers(existing); setSock(existing); setStatus('Connected'); return; }
+    // Don’t try while offline
+    if (typeof navigator !== 'undefined' && 'onLine' in navigator && !navigator.onLine) {
+      setStatus('Offline – will retry when back online');
+      return;
+    }
+    if (connectingRef.current) return; // prevent concurrent connects
+    connectingRef.current = true;
     try {
-  const s = new WebSocket(url);
-  s.onopen = ()=> { pushChat('system','Connected'); setStatus('Connected'); try { s.send(JSON.stringify({ t:'hello', d:{ clientId: clientIdRef.current, username, avatar: trainerSpriteToAvatar(trainerSprite) } })); } catch {}; try { setSyncing(true); s.send(JSON.stringify({ t:'state-request' })); } catch {} };
-      s.onmessage = (ev)=>{
-        let msg; try { msg = JSON.parse(String(ev.data)); } catch { return; }
-        if (!msg || !msg.t) return;
-        if (msg.t === 'roster') setRoster(msg.d || []);
-        else if (msg.t === 'chat') pushChat(msg.d?.from ?? 'peer', msg.d?.text ?? '');
-        else if (msg.t === 'challenge-sync') setRemoteChallenges((msg.d && msg.d.list) || []);
-        else if (msg.t === 'rooms') { setLanRooms(msg.d || []); setRooms(msg.d || []); setSyncing(false); }
-        else if (msg.t === 'state') {
-          const snap = msg.d || {};
-          setSyncing(false);
-          const rlist = Array.isArray(snap.rooms) ? snap.rooms : [];
-          const rstr = Array.isArray(snap.roster) ? snap.roster : [];
-          const chall = Array.isArray(snap.challenges) ? snap.challenges : [];
-          const chatHist = Array.isArray(snap.chat) ? snap.chat : [];
-          setLanRooms(rlist);
-          setRooms(rlist);
-          setRoster(rstr);
-          setRemoteChallenges(chall);
-          setChat(chatHist);
-          // Also fan-out for other tabs immediately
-          dispatchLan('rooms', rlist);
-          dispatchLan('roster', rstr);
-          dispatchLan('challenge-sync', { list: chall });
-          for (const line of chatHist) dispatchLan('chat', line);
-        }
-  else if (msg.t === 'room-start') {
-    setStatus('Battle started');
-    try {
-      // Non-host clients: emit a window event so App can open a PS battle tab too
-      const evt = new CustomEvent('pokettrpg-room-start', { detail: msg.d });
-      window.dispatchEvent(evt);
-    } catch {}
-    try {
-      // Auto-join the room to register presence with the host
-      const rid = msg?.d?.roomId;
-      if (rid && s.readyState === 1) s.send(JSON.stringify({ t:'room-join', d:{ roomId: rid } }));
+      const target = normalizeWsUrl(url);
+      if (!target) { setStatus('Enter a server URL'); connectingRef.current = false; return; }
+      setStatus(`Connecting to ${target}…`);
+      const s = io(target, { transports: ['websocket'], path: '/socket.io' });
+      s.on('connect', () => {
+        pushChat('system', 'Connected'); setStatus('Connected');
+        try { s.emit('hello', { clientId: clientIdRef.current, username, avatar: trainerSpriteToAvatar(trainerSprite) }); } catch {}
+        try { setSyncing(true); s.emit('state-request'); } catch {}
+      });
+      s.on('disconnect', () => { pushChat('system','Disconnected'); setStatus('Disconnected'); });
+      s.on('connect_error', () => setStatus('Connect error'));
+      attachHandlers(s);
+      // Persist globally and in state
+      (window as any).__pokettrpgIO = s;
+      lastUrlRef.current = target;
+      connectingRef.current = false;
+      setSock(s);
     } catch {}
   }
-        // Note: room-log/request/end/room-buffer/room-chat are fanned out by attachFanout()
-      };
-      s.onerror = ()=> setStatus('Connect error');
-      s.onclose = ()=> {
-        pushChat('system','Disconnected'); setStatus('Disconnected');
-        // Try to reconnect after a short delay
-        setTimeout(()=>{
-          if (!ws || ws.readyState !== 1) joinServer(url);
-        }, 1500);
-      };
-  // Persist globally and in state
-  (window as any).__pokettrpgWS = s;
-  attachFanout(s);
-  setWs(s);
-      // hello already sent in onopen above
-    } catch {}
-  }
-  function leaveServer(){ if (ws) { try { ws.onclose = null as any; } catch {} ws.close(); (window as any).__pokettrpgWS = null; setWs(null); } }
+  function leaveServer(){ const s: Socket | null = sock; if (s) { try { s.removeAllListeners(); } catch {} s.disconnect(); (window as any).__pokettrpgIO = null; setSock(null); } }
   function sendChat(text: string) {
     const msg = { t:'chat', d:{ text } };
-    if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+    const s = sock;
+    if (s && s.connected) s.emit('chat', msg.d);
     if ((window as any).lan && hosting) (window as any).lan.send('chat', { text });
-    // No local echo; rely on loopback
+    // Local echo for immediate feedback; server echo will be deduped by pushChat
+    pushChat(username || 'me', text);
   }
   function sendChatLine() {
     const text = (chatInputRef.current?.value || '').trim(); if (!text) return;
@@ -240,8 +193,9 @@ export function LobbyTab() {
     const d:any = { id, format, teamName, teamText };
     if (challengeToId) d.toId = challengeToId;
     const msg = { t:'challenge-create', d };
-    if (ws && ws.readyState === 1) {
-      ws.send(JSON.stringify(msg));
+    const s = sock;
+    if (s && s.connected) {
+      s.emit('challenge-create', d);
       setStatus('Challenge created');
     } else if ((window as any).lan && hosting) {
       (window as any).lan.send('challenge-create', d);
@@ -251,8 +205,8 @@ export function LobbyTab() {
     }
   }
   function cancelChallenge(id: string) {
-    const msg = { t:'challenge-cancel', d:{ id } };
-    if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+    const s = sock; const d = { id };
+    if (s && s.connected) s.emit('challenge-cancel', d);
     if ((window as any).lan && hosting) (window as any).lan.send('challenge-cancel', { id });
   }
   function acceptChallenge(id: string) {
@@ -261,75 +215,89 @@ export function LobbyTab() {
     const chosen = teamsState.teams.find(t => t.id === pickedId) || null;
     const active = chosen || teamsState.teams.find(t => t.id === teamsState.activeId) || teamsState.teams[0] || null;
     const teamText = active ? teamToShowdownText(active.members as any) : '';
-    const msg = { t:'challenge-accept', d:{ id, teamText } };
-    if (ws && ws.readyState === 1) {
-      ws.send(JSON.stringify(msg));
+    const s = sock; const d = { id, teamText };
+    if (s && s.connected) {
+      s.emit('challenge-accept', d);
     } else if ((window as any).lan && hosting) {
-      (window as any).lan.send('challenge-accept', { id, teamText });
+      (window as any).lan.send('challenge-accept', d);
     }
   }
 
-  async function refreshJoinLinks() {
-    const lan = (window as any).lan;
-    if (!lan) return;
-    try {
-      const info = (lan.info ? await lan.info() : (lan.discover?.info ? await lan.discover.info() : null)) as any;
-      const port = info?.port || hosting?.port || 17646;
-      const addrs: string[] = info?.addresses || [];
-      const links = addrs.map(ip => `ws://${ip}:${port}`);
-      // Always include localhost as a fallback
-      links.unshift(`ws://127.0.0.1:${port}`);
-      setJoinLinks(Array.from(new Set(links)));
-    } catch { /* ignore */ }
-  }
+  // LAN share links removed
 
   const teamOptions = teamsState.teams;
+
+  // Auto-join on mount if enabled and not already connected (deferred to avoid blocking initial UI)
+  useEffect(() => {
+    if (autoJoin) {
+      const existing: Socket | null = (window as any).__pokettrpgIO || null;
+      if (!existing || !existing.connected) {
+        const t = setTimeout(() => joinServer(wsUrl), 300);
+        return () => { clearTimeout(t); };
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Pause reconnects while offline; resume when back online
+  useEffect(() => {
+    function handleOnline() {
+      setStatus('Back online');
+      const existing: Socket | null = (window as any).__pokettrpgIO || null;
+      if (autoJoin && (!existing || !existing.connected)) {
+        const next = lastUrlRef.current || wsUrl;
+        if (next) joinServer(next);
+      }
+    }
+    function handleOffline() {
+      setStatus('Offline');
+    }
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      // Socket.IO handles reconnection automatically
+    };
+  }, [autoJoin, wsUrl]);
+
+  // If auto-join is enabled and URL changes, reconnect to the new URL
+  useEffect(() => {
+    if (autoJoin) {
+  try { if ((window as any).__pokettrpgIO) { ((window as any).__pokettrpgIO as Socket).disconnect(); (window as any).__pokettrpgIO = null; } } catch {}
+      joinServer(wsUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wsUrl]);
 
   return (
     <section className="panel battle">
       <h2>Lobby</h2>
       {syncing && <div className="dim" style={{margin:'-6px 0 6px 0'}}>Syncing…</div>}
       <div style={{display:'flex', gap:8, marginBottom:8, alignItems:'center', flexWrap:'wrap'}}>
-        {!hosting && <button onClick={hostServer}>&gt; Host (LAN)</button>}
-        {hosting && <>
-          <span className="dim">Hosting on port {hosting.port}</span>
-          <button className="secondary" onClick={stopServer}>Stop</button>
-          <button className="secondary" onClick={refreshJoinLinks}>Copy Join Links</button>
-        </>}
-        {!ws && <button onClick={()=> joinServer('ws://127.0.0.1:17646')}>&gt; Join localhost</button>}
-        {ws && <button className="secondary" onClick={leaveServer}>Leave</button>}
-        {status && <span className="dim">{status}</span>}
+        <label style={{display:'inline-flex', alignItems:'center', gap:6}}>
+          <span className="dim">Server</span>
+          <input value={wsUrl} onChange={e=> setWsUrl(e.target.value)} style={{width:320}} placeholder="wss://pokettrpg.duckdns.org (or your wss:// host)" />
+        </label>
+  {!sock && <button onClick={()=> joinServer(wsUrl)}>&gt; Join</button>}
+  {sock && <button className="secondary" onClick={leaveServer}>Leave</button>}
+        <label style={{display:'inline-flex', alignItems:'center', gap:6}} title="Auto-connect to this server on startup and reconnect if disconnected">
+          <input type="checkbox" checked={autoJoin} onChange={e=> setAutoJoin(e.target.checked)} />
+          <span className="dim">Auto-join</span>
+        </label>
+  {status && <span className="dim">{status}</span>}
+  <span className="dim" style={{fontSize:'0.9em'}} title="No port is added automatically except ws://localhost, which uses :3000 for dev.">No default port (except localhost→3000)</span>
         <label style={{marginLeft:'auto', display:'inline-flex', alignItems:'center', gap:6}}>
           <span className="dim">Username</span>
           <input value={username} onChange={e=> setUsername(e.target.value)} style={{width:160}} />
         </label>
       </div>
-      {hosting && joinLinks.length>0 && (
-        <div className="panel" style={{padding:8, marginBottom:8}}>
-          <div><strong>Shareable Join Links</strong> <span className="dim">(click to copy)</span></div>
-          <ul style={{listStyle:'none', padding:0, margin:0, display:'grid', gap:6}}>
-            {joinLinks.map(link => (
-              <li key={link} style={{display:'grid', gridTemplateColumns:'1fr auto', gap:6, alignItems:'center'}}>
-                <code>{link}</code>
-                <button className="mini" onClick={async()=>{ try { await navigator.clipboard.writeText(link); setStatus('Copied join link'); } catch { setStatus('Copy failed'); } }}>Copy</button>
-              </li>
-            ))}
-          </ul>
+      {(/timed out|Offline|Connect error|Disconnected/i.test(status)) && (
+        <div className="dim" style={{marginTop:-4, marginBottom:8}}>
+          Having trouble connecting on your home network? Your router may not support NAT loopback. Try a Windows hosts override or a dev tunnel. See Help: <a href="/docs/lan-networking.html" target="_blank" rel="noreferrer">LAN networking</a>.
         </div>
       )}
-      {hosts.length>0 && (
-        <div className="panel" style={{padding:8, marginBottom:8}}>
-          <div><strong>Discovered Hosts</strong></div>
-          <ul style={{listStyle:'none', padding:0, margin:0, display:'grid', gap:6}}>
-            {hosts.map((h,i)=> (
-              <li key={`${h.ip}:${h.port}:${i}`} style={{display:'grid', gridTemplateColumns:'1fr auto', gap:6, alignItems:'center'}}>
-                <div>{h.name || 'Host'} <span className="dim">{h.ip}:{h.port}</span></div>
-                <button onClick={()=> joinServer(`ws://${h.ip}:${h.port}`)}>&gt; Join</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* LAN hosting and discovery removed */}
       <div style={{display:'grid', gridTemplateColumns:'520px 1fr 280px', gap:12}}>
         <aside className="panel" style={{padding:8, display:'grid', gap:8}}>
           <h3>Challenge</h3>
@@ -413,7 +381,7 @@ export function LobbyTab() {
                       <div className="dim" style={{fontSize:'0.9em', display:'flex', alignItems:'center', gap:6}}>
                         {(b.players||[]).map((p:any) => (
                           <span key={p.id} style={{display:'inline-flex', alignItems:'center', gap:4}}>
-                            {p.avatar && <img src={`/showdown/sprites/trainers/${p.avatar}.png`} alt="" style={{width:16, height:16, imageRendering:'pixelated'}} />}
+                            {p.avatar && <img src={`/showdown/sprites/trainers/${p.avatar}.png`} alt="" style={{width:16, height:16, imageRendering:'pixelated'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/vendor/showdown/sprites/trainers/${p.avatar}.png`; }} />}
                             {p.name}
                           </span>
                         ))}
@@ -422,18 +390,16 @@ export function LobbyTab() {
                     </div>
                     <button className="secondary" disabled={amPlayer} onClick={()=>{
                       const msg = { t:'room-spectate', d:{ roomId: b.id } };
-                      if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+                      if (sock && sock.connected) (sock as Socket).emit('room-spectate', { roomId: b.id });
                       if ((window as any).lan && hosting) (window as any).lan.send('room-spectate', { roomId: b.id });
                     }}>Spectate</button>
                     <button disabled={amPlayer} onClick={()=>{
-                      const msg = { t:'room-join', d:{ roomId: b.id } };
-                      if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+                      if (sock && sock.connected) (sock as Socket).emit('room-join', { roomId: b.id });
                       if ((window as any).lan && hosting) (window as any).lan.send('room-join', { roomId: b.id });
                       setActiveRoomId(b.id);
                     }}>Join</button>
                     <button className="mini" disabled={!amPlayer && !amSpectator} onClick={()=>{
-                      const msg = { t:'room-leave', d:{ roomId: b.id } };
-                      if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+                      if (sock && sock.connected) (sock as Socket).emit('room-leave', { roomId: b.id });
                       if ((window as any).lan && hosting) (window as any).lan.send('room-leave', { roomId: b.id });
                       if (activeRoomId === b.id) setActiveRoomId('');
                     }}>Leave</button>
@@ -445,7 +411,7 @@ export function LobbyTab() {
         </aside>
         <section className="panel" style={{padding:8, display:'grid', gridTemplateRows:'1fr auto', gap:8}}>
           <div style={{overflow:'auto', border:'1px solid #444', borderRadius:6, padding:8, background:'var(--section-bg)'}}>
-            {chat.length===0 && <div className="dim">Welcome to the LAN lobby. Host or Join to start chatting.</div>}
+            {chat.length===0 && <div className="dim">Welcome to the lobby. Join your server to start chatting.</div>}
             {chat.map((m,i)=> (
               <div key={`${m.at || i}-${i}`}><strong>{m.from}:</strong> {m.text}</div>
             ))}
@@ -463,14 +429,14 @@ export function LobbyTab() {
               {trainerOptions.length===0 && <div className="dim">Loading trainer sprites…</div>}
               {trainerOptions.map(name => (
                 <button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=> setTrainerSprite(name)} style={{width:48, height:48, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent'}}>
-                  <img src={`/showdown/sprites/trainers/${name}.png`} alt={name} style={{width:44, height:44, imageRendering:'pixelated'}} />
+                  <img src={`/vendor/showdown/sprites/trainers/${name}.png`} alt={name} style={{width:44, height:44, imageRendering:'pixelated'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/showdown/sprites/trainers/${name}.png`; }} />
                 </button>
               ))}
             </div>
           </div>
           <div style={{display:'flex', alignItems:'center', gap:8}}>
             <div className="dim">Current:</div>
-            <img src={`/showdown/sprites/trainers/${trainerSprite}.png`} alt="avatar" style={{width:28, height:28, imageRendering:'pixelated', background:'transparent'}} />
+            <img src={`/vendor/showdown/sprites/trainers/${trainerSprite}.png`} alt="avatar" style={{width:28, height:28, imageRendering:'pixelated', background:'transparent'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/showdown/sprites/trainers/${trainerSprite}.png`; }} />
             <span>{trainerSprite}</span>
           </div>
           <div className="dim">LAN lobby: host broadcasts on port 17646. Other devices on the same network can join via discovery or ws://host-ip:17646</div>
@@ -509,7 +475,7 @@ export function LobbyTab() {
                         <ul style={{margin:0}}>
                           {(r as any).spectators.map((s:any) => (
                             <li key={s.id} style={{display:'flex', alignItems:'center', gap:6}}>
-                              {s.avatar && <img src={`/showdown/sprites/trainers/${s.avatar}.png`} alt="" style={{width:16, height:16, imageRendering:'pixelated'}} />}
+                              {s.avatar && <img src={`/showdown/sprites/trainers/${s.avatar}.png`} alt="" style={{width:16, height:16, imageRendering:'pixelated'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/vendor/showdown/sprites/trainers/${s.avatar}.png`; }} />}
                               {s.name}
                             </li>
                           ))}
@@ -522,8 +488,7 @@ export function LobbyTab() {
                         const active = teamsState.teams.find(t => t.id===teamsState.activeId) || teamsState.teams[0] || null;
                         const teamText = active ? teamToShowdownText(active.members as any) : '';
                         const payload = { roomId: r.id, ready: next, team: teamText, avatar: trainerSpriteToAvatar(trainerSprite), username } as any;
-                        const msg = { t:'room-ready', d: payload };
-                        if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
+                        if (sock && sock.connected) (sock as Socket).emit('room-ready', payload);
                         if ((window as any).lan && hosting) (window as any).lan.send('room-ready', payload);
                       }}>{myReadyValue ? 'Unready' : 'Ready'}</button>
                     )}
@@ -533,6 +498,10 @@ export function LobbyTab() {
             </div>
           )}
         </aside>
+      </div>
+      {/* Custom Dex Sync: moved here per request */}
+      <div style={{marginTop:12}}>
+        <CustomsImportExport />
       </div>
     </section>
   );

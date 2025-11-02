@@ -10,6 +10,15 @@ Retro terminal + Pokédex-style UI for managing PC Boxes, a Team, and a simple B
 - Team view (remove, shows HP bar)
 - Battle tab (single Pokémon statblock vs selected target)
 - Team persistence in localStorage
+## Connecting from your home network
+
+If your server is reachable from the internet but your Windows machine on the same LAN times out when hitting your public hostname, your router may not support NAT loopback (hairpin NAT). See docs/lan-networking.md for quick fixes:
+
+- Windows hosts override to map your hostname to the Pi's LAN IP (keeps TLS working)
+- Or use a dev tunnel (Cloudflare/Ngrok)
+
+Using wss:// with your public hostname is required when going through a reverse proxy with TLS (e.g., Caddy).
+
 
 ## Run
 1. Dev server

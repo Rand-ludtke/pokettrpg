@@ -1,0 +1,47 @@
+###############################
+# General
+###############################
+.DS_Store
+Thumbs.db
+*.log
+
+###############################
+# Editors/IDE
+###############################
+.vscode/
+*.code-workspace
+
+###############################
+# Node / TypeScript
+###############################
+node_modules/
+**/node_modules/
+
+# Build outputs
+app/dist/
+app/.vite/
+app/out/
+
+###############################
+# Electron/electron-builder artifacts
+###############################
+# Do not commit packaged binaries or unpacked app contents
+app/release/
+app/release*/
+app/**/win-unpacked/
+app/**/app.asar
+app/**/app.asar.unpacked/
+app/**/latest*.yml
+app/**/builder-debug.yml
+
+###############################
+# Local packaging artifacts (mac/win)
+###############################
+mac-artifacts-*/
+
+###############################
+# Misc
+###############################
+*.zip
+*.exe
+*.dmg
