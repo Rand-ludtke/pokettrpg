@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
 import { loadTeams, teamToShowdownText } from '../data/adapter';
 
 export function LobbyTab() {
@@ -6,6 +7,8 @@ export function LobbyTab() {
   const [hosting, setHosting] = useState<{port:number}|null>(null);
   // Keep a singleton WebSocket on window to avoid duplicate connects across tab switches/remounts
   const [ws, setWs] = useState<WebSocket|null>(() => (window as any).__pokettrpgWS || null);
+  // Optional Socket.IO connection for internet server
+  const [ioSock, setIoSock] = useState<Socket|null>(() => (window as any).__pokettrpgIOSocket || null);
   const [chat, setChat] = useState<Array<{from:string; text:string; at:number}>>([]);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const [trainerSprite, setTrainerSprite] = useState<string>(() => localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer');
@@ -24,6 +27,7 @@ export function LobbyTab() {
   const [remoteChallenges, setRemoteChallenges] = useState<Array<any>>([]);
   const [joinLinks, setJoinLinks] = useState<string[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<string>('');
+  const [useInternetServer, setUseInternetServer] = useState<boolean>(false);
   const [myReady, setMyReady] = useState<boolean>(false);
   const clientIdRef = useRef<string>('');
   if (!clientIdRef.current) {
@@ -218,12 +222,67 @@ export function LobbyTab() {
       // hello already sent in onopen above
     } catch {}
   }
+
+  // Internet server (Socket.IO) flow
+  function joinInternetServer() {
+    // Reuse existing Socket.IO connection if available
+    const existing: Socket | null = (window as any).__pokettrpgIOSocket || null;
+    if (existing && existing.connected) { setIoSock(existing); setUseInternetServer(true); setStatus('Connected'); return; }
+    try {
+      const s = io('wss://pokettrpg.duckdns.org', { transports: ['websocket'], path: '/socket.io' });
+      s.on('connect', () => {
+        setStatus('Connected');
+        // Identify with username
+        try { s.emit('identify', { username }); } catch {}
+      });
+      s.on('identified', (_me:any) => {
+        // Create a room and join immediately so chat works
+        try { s.emit('createRoom', { name: 'Lobby' }); } catch {}
+      });
+      s.on('roomCreated', ({ id }: any) => {
+        setActiveRoomId(id);
+        try { s.emit('joinRoom', { roomId: id, role: 'player' }); } catch {}
+      });
+      s.on('roomUpdate', (room: any) => {
+        // Normalize into our rooms shape
+        setRooms((prev) => {
+          const next = prev.slice();
+          const idx = next.findIndex(r => r.id === room.id);
+          const normalized = {
+            id: room.id,
+            name: room.name || 'Room',
+            format: 'Singles',
+            players: (room.players || []).map((p:any) => ({ id: p.id, name: p.username || p.name || 'Player' })),
+            status: room.battleStarted ? 'started' as const : 'open' as const,
+          };
+          if (idx >= 0) next[idx] = normalized as any; else next.push(normalized as any);
+          return next;
+        });
+      });
+      s.on('chatMessage', (m:any) => {
+        pushChat(m?.user || 'peer', String(m?.text ?? ''));
+      });
+      s.on('error', (e:any) => { setStatus(`Error: ${String(e?.message || e)}`); });
+      s.on('disconnect', () => { setStatus('Disconnected'); });
+
+      (window as any).__pokettrpgIOSocket = s;
+      setIoSock(s);
+      setUseInternetServer(true);
+    } catch {}
+  }
+  function leaveInternetServer(){ const s: Socket | null = (window as any).__pokettrpgIOSocket || null; if (s) { try { s.removeAllListeners(); s.disconnect(); } catch {} } (window as any).__pokettrpgIOSocket = null; setIoSock(null); setUseInternetServer(false); setActiveRoomId(''); }
   function leaveServer(){ if (ws) { try { ws.onclose = null as any; } catch {} ws.close(); (window as any).__pokettrpgWS = null; setWs(null); } }
   function sendChat(text: string) {
+    // Internet server path requires a roomId
+    if (useInternetServer && ioSock) {
+      if (!activeRoomId) { setStatus('Join or create a room to chat'); return; }
+      ioSock.emit('sendChat', { roomId: activeRoomId, text });
+      return;
+    }
+    // LAN path
     const msg = { t:'chat', d:{ text } };
     if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
     if ((window as any).lan && hosting) (window as any).lan.send('chat', { text });
-    // No local echo; rely on loopback
   }
   function sendChatLine() {
     const text = (chatInputRef.current?.value || '').trim(); if (!text) return;
@@ -296,8 +355,10 @@ export function LobbyTab() {
           <button className="secondary" onClick={stopServer}>Stop</button>
           <button className="secondary" onClick={refreshJoinLinks}>Copy Join Links</button>
         </>}
-        {!ws && <button onClick={()=> joinServer('ws://127.0.0.1:17646')}>&gt; Join localhost</button>}
-        {ws && <button className="secondary" onClick={leaveServer}>Leave</button>}
+  {!useInternetServer && !ws && <button onClick={()=> joinServer('ws://127.0.0.1:17646')}>&gt; Join localhost</button>}
+  {ws && !useInternetServer && <button className="secondary" onClick={leaveServer}>Leave</button>}
+  {!useInternetServer && <button onClick={joinInternetServer}>&gt; Join Internet Server</button>}
+  {useInternetServer && <button className="secondary" onClick={leaveInternetServer}>Leave Internet</button>}
         {status && <span className="dim">{status}</span>}
         <label style={{marginLeft:'auto', display:'inline-flex', alignItems:'center', gap:6}}>
           <span className="dim">Username</span>
