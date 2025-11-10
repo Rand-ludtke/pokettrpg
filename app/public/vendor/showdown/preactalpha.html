@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!--
+                      ,///////,
+      +#########+     ///////,
+   +###############+  ///////
+  +#################+,//////,
+ +###################,/////,
+ ########+   +########////
+                     ////,  PokemonShowdown.com
+ ########+   +########///
+ +###################+//
+  +#################+
+   +###############+
+      +#########+///////,
+                ///////,
+
+Viewing source? We're open source! Check us out on GitHub!
+https://github.com/smogon/pokemon-showdown
+https://github.com/smogon/pokemon-showdown-client (you are here)
+
+Also visit us in the Dev chatroom:
+https://psim.us/dev
+
+-->
+<html><head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0" />
+	<title>Showdown!</title>
+	<link rel="shortcut icon" href="favicon.ico" id="dynamic-favicon" />
+	<link rel="stylesheet" href="/style/battle.css?0.25263219943109927" />
+	<link rel="stylesheet" href="/style/client2.css?0.4737271341122601" />
+	<link rel="stylesheet" href="/style/teambuilder.css?0.3350996282600017" />
+	<meta name="robots" content="noindex" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+	<!--[if lte IE 8]><script>
+		window.Config = {"oldie": true};
+	</script><![endif]-->
+</head><body>
+	<div id="ps-frame">
+		<div id="header" class="header">
+			<div class="maintabbarbottom"></div>
+			<img class="logo" src="https://server.pokemondnd.xyz/favicon-256.png" alt="Pokémon Showdown! (beta)" width="50" height="50">
+		</div>
+		<div class="ps-room scrollable" id="room-">
+			<div class="mainmenu-mini-windows">
+				<div class="mini-window" data-roomid="news">
+					<h3 class="mini-window-header"><button class="closebutton" tabindex="-1" aria-label="Close"><i class="fa fa-times-circle"></i></button>News</h3>
+					<div id="room-news" class="mini-window-contents ps-room-light scrollable" style="height: auto;">
+						<div class="readable-bg">
+							<div class="newsentry"><h4>New updates</h4><p>The Preact alpha test client is very far along!</p><p>Other than the teambuilder, everything else should be ready.</p><p>&mdash;<strong>Zarel</strong> <small class="date">on Apr 9, 2025</small></p></div>
+							<div class="newsentry"><h4>Preact alpha</h4><p>Welcome to the Preact alpha test client!</p><p>Many parts are unimplemented and there may be bugs; we're using this page to test it.</p><p>&mdash;<strong>Zarel</strong> <small class="date">on Oct 16, 2018</small></p></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mainmenu">
+				<div id="loading-message" class="mainmessage">Loading... <noscript>FAILED<br /><br />Pok&eacute;mon Showdown requires JavaScript.</noscript></div>
+			</div>
+			<div class="mainmenufooter">
+				<small><a href="//server.pokemondnd.xyz/" target="_blank"><strong>Pok&eacute;mon Showdown</strong></a> | <a href="http://smogon.com/" target="_blank"><strong>Smogon</strong></a><br><a href="//server.pokemondnd.xyz/dex/" target="_blank">Pokédex</a> | <a href="//server.pokemondnd.xyz/replay/" target="_blank">Replays</a> | <a href="//server.pokemondnd.xyz/rules" target="_blank">Rules</a></small> | <small><a href="//server.pokemondnd.xyz/forums/" target="_blank">Forum</a></small>
+			</div>
+		</div>
+	</div>
+	<script>
+		function linkStyle(url) {
+			var linkEl = document.createElement('link');
+			linkEl.rel = 'stylesheet';
+			linkEl.href = url;
+			document.head.appendChild(linkEl);
+		}
+		linkStyle("/style/sim-types.css");
+		linkStyle("/style/utilichart.css?0.23676491532307054");
+		linkStyle("/style/battle-search.css?0.7676913355588298");
+		linkStyle("/style/font-awesome.css");
+	</script>
+	<script nomodule defer src="/js/lib/ps-polyfill.js"></script>
+	<script defer src="/config/config.js?11138778"></script>
+	<script defer src="/js/client-core.js?0.3719844180078359"></script>
+	<!-- At this point, background and dark mode are loaded -->
+
+	<script defer src="/js/battle-dex-data.js?0.3917282625132419"></script>
+	<script defer src="/js/battle-dex.js?0.1364796280438072"></script>
+	<script defer src="/js/battle-teams.js?0.3201788772403581"></script>
+	<script defer src="/js/battle-text-parser.js?0.027123029327152715"></script>
+	<script defer src="/js/client-main.js?0.28197683354892056"></script>
+	<script nomodule defer src="/js/lib/sockjs-1.4.0-nwjsfix.min.js?0.636794558658909"></script>
+	<script defer src="/js/client-connection.js?0.16190227975549376"></script>
+
+	<script defer src="/js/lib/preact.min.js?0.9538306586198471"></script>
+	<script defer src="/js/panels.js?0.5101421325317782"></script>
+	<script defer src="/js/panel-mainmenu.js?0.3571244691741766"></script>
+	<script defer src="/js/panel-rooms.js?0.9812952441905644"></script>
+	<script defer src="/js/panel-topbar.js?0.1484029915432431"></script>
+	<!-- at this point, the main view is loaded and usable -->
+
+	<script defer src="/js/lib/html-css-sanitizer-minified.js?0.9520441505352613"></script>
+	<script defer src="/src/battle-log-misc.js?0.04759011902594046"></script>
+	<script defer src="/js/server/chat-formatter.js?0.16327534167045266"></script>
+	<script defer src="/js/battle-log.js?0.6177684943044538"></script>
+
+	<script defer src="/js/miniedit.js?0.24984676024146846"></script>
+	<script defer src="/js/panel-chat-tournament.js?0.26828824239282256"></script>
+	<script defer src="/js/panel-chat.js?0.20486656537357795"></script>
+	<!-- at this point, chatrooms are usable -->
+
+	<script defer src="/js/panel-popups.js?0.39369619827963553"></script>
+	<script defer src="/js/panel-page.js?0.3945759785012981"></script>
+	<script defer src="/js/panel-ladder.js?0.5087879318530619"></script>
+	<script defer src="/js/panel-resources.js?0.6064929349785058"></script>
+
+	<script defer src="/js/battle-sound.js"></script>
+	<script defer src="/js/lib/jquery-2.2.4.min.js"></script>
+	<script defer src="/data/graphics.js?0.4821919659372158"></script>
+	<script defer src="/data/text.js?0.665720735849708"></script>
+	<script defer src="/data/text-afd.js?0.3797072992462459"></script>
+	<script defer src="/js/battle-tooltips.js?0.6236467757260507"></script>
+	<script defer src="/js/battle.js?0.892946255414135"></script>
+	<script defer src="/js/battle-choices.js?0.7090197572199247"></script>
+	<script defer src="/js/panel-battle.js?0.9480207728541096"></script>
+
+	<script defer src="/data/pokedex.js?0.7188267704150952"></script>
+	<script defer src="/data/moves.js?0.08901409641475377"></script>
+	<script defer src="/data/items.js?0.8988873105582421"></script>
+	<script defer src="/data/abilities.js?0.8352073603391843"></script>
+	<script defer src="/data/search-index.js?0.6210487695357778"></script>
+	<script defer src="/data/teambuilder-tables.js?0.8334853194869937"></script>
+	<script defer src="/js/panel-teamdropdown.js?0.5098976833592421"></script>
+	<script defer src="/js/panel-teambuilder.js?0.8929526448760896"></script>
+	<script defer src="/js/battle-dex-search.js?0.5282969331281607"></script>
+	<script defer src="/js/battle-searchresults.js?0.48317636181263446"></script>
+	<script defer src="/js/battle-team-editor.js?0.869711414987392"></script>
+	<script defer src="/js/panel-teambuilder-team.js?0.24999971451271097"></script>
+
+	<script defer src="/data/pokedex-mini.js?0.8261761902152479"></script>
+	<script defer src="/data/pokedex-mini-bw.js?0.5577623111717543"></script>
+	<script defer src="/data/typechart.js?0.522410493790329"></script>
+	<script defer src="/data/aliases.js?0.5532651575485934"></script>
+	<script defer src="/js/lib/d3.v3.min.js"></script>
+	<script defer src="/js/lib/color-thief.min.js"></script>
+	<script defer src="/data/commands.js?0.9099109028203949"></script>
+
+	<script defer src="/js/client-endload.js?0.7162219072183827"></script>
+
+</body></html>

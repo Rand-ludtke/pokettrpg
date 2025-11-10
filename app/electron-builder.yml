@@ -1,0 +1,28 @@
+appId: com.rand.pokettrpg
+productName: Pokettrpg
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**
+  - electron/**
+  - node_modules/**
+  - package.json
+asarUnpack:
+  - dist/vendor/showdown/**
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+icon: build/icon.ico
+mac:
+  icon: build/icon.png
+  target:
+    - dmg
+    - zip
+publish:
+  provider: github
+  owner: Rand-ludtke
+  repo: pokettrpg
