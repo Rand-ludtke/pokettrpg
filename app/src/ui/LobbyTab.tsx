@@ -1,640 +1,879 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { loadTeams, teamToShowdownText } from '../data/adapter';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { loadTeams, normalizeName } from '../data/adapter';
+import { BattlePokemon } from '../types';
+import { ChatMessage, ChallengeParticipant, ChallengeSummary, ClientStatus, getClient, PlayerPayload, RoomSummary } from '../net/pokettrpgClient';
+import { CustomsImportExport } from './CustomsImportExport';
+
+type RoomRole = 'player' | 'spectator';
+
+const ACTIVE_CHALLENGE_STATUS_SET = new Set<ChallengeSummary['status']>(['open', 'pending', 'launching']);
+
+function isChallengeActionable(status: ChallengeSummary['status']): boolean {
+  return ACTIVE_CHALLENGE_STATUS_SET.has(status);
+}
+
+function describeChallengeStatus(status: ChallengeSummary['status']): string {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+type NamedEntity = { id?: string; username?: string; name?: string | null } | ChallengeParticipant | null | undefined;
+
+function formatName(entity: NamedEntity, fallback = 'Trainer'): string {
+  if (!entity) return fallback;
+  const source = entity as { id?: string; username?: string; name?: string | null };
+  return source.username || source.name || source.id || fallback;
+}
+
+function useTeams() {
+  const [version, setVersion] = useState(0);
+  useEffect(() => {
+    const handler = () => setVersion(v => v + 1);
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
+  return useMemo(() => loadTeams(), [version]);
+}
+
+function buildPlayerPayload(username: string, playerId: string | undefined, team: BattlePokemon[], trainerSprite?: string | null): PlayerPayload {
+  const sanitizedName = username.trim() || 'Trainer';
+  const payloadTeam = team.map((mon, index) => {
+    const moves = Array.isArray(mon.moves) ? mon.moves : [];
+    const rawSpecies = typeof mon.species === 'string' && mon.species.trim() ? mon.species.trim() : mon.name;
+    const speciesName = rawSpecies || mon.name || `Slot ${index + 1}`;
+    const hasNickname = Boolean(mon.species && mon.name && mon.name.trim() && mon.species.trim() && mon.name.trim().toLowerCase() !== mon.species.trim().toLowerCase());
+    const nickname = hasNickname ? mon.name.trim() : '';
+    const idSource = nickname || speciesName;
+    const normalizedId = normalizeName(idSource);
+    const fallbackBase = `slot${index + 1}`;
+    const baseId = normalizedId || (idSource ? idSource.replace(/\s+/g, '-').toLowerCase() : '');
+    const payloadId = hasNickname
+      ? (baseId || fallbackBase)
+      : (baseId ? `${baseId}-${index + 1}` : fallbackBase);
+    const finalId = payloadId || fallbackBase;
+    return {
+      id: finalId,
+      name: speciesName,
+      species: speciesName,
+      nickname: nickname || undefined,
+      originalName: mon.name,
+      level: mon.level,
+      types: mon.types,
+      baseStats: {
+        hp: mon.baseStats.hp,
+        atk: mon.baseStats.atk,
+        def: mon.baseStats.def,
+        spa: mon.baseStats.spAtk,
+        spd: mon.baseStats.spDef,
+        spe: mon.baseStats.speed,
+      },
+      currentHP: mon.currentHp ?? mon.maxHp,
+      maxHP: mon.maxHp,
+      stages: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0, acc: 0, eva: 0 },
+      status: 'none',
+      volatile: {},
+      ability: mon.ability,
+      item: mon.item,
+      moves: moves.map((move, moveIndex) => ({
+        id: normalizeName(move.name || '') || `move-${moveIndex}`,
+        name: move.name,
+        type: move.type,
+        category: move.category,
+        power: move.power,
+        accuracy: typeof move.accuracy === 'number' ? move.accuracy : undefined,
+        priority: undefined,
+      })),
+    };
+  });
+
+  return {
+    id: playerId || `player-${Math.random().toString(36).slice(2, 8)}`,
+    name: sanitizedName,
+    activeIndex: 0,
+    team: payloadTeam,
+      ...(trainerSprite ? { trainerSprite, avatar: trainerSprite } : {}),
+  };
+}
+
+const DEFAULT_ROOM = 'global-lobby';
 
 export function LobbyTab() {
-  const teamsState = loadTeams();
-  const [hosting, setHosting] = useState<{port:number}|null>(null);
-  // Keep a singleton WebSocket on window to avoid duplicate connects across tab switches/remounts
-  const [ws, setWs] = useState<WebSocket|null>(() => (window as any).__pokettrpgWS || null);
-  // Optional Socket.IO connection for internet server
-  const [ioSock, setIoSock] = useState<Socket|null>(() => (window as any).__pokettrpgIOSocket || null);
-  // Internet server URL and auto-join (match 1.2.1/1.2.2 UI)
-  const [wsUrl, setWsUrl] = useState<string>(() => localStorage.getItem('ttrpg.lobbyWsUrl') || 'wss://pokettrpg.duckdns.org');
-  const [autoJoin, setAutoJoin] = useState<boolean>(() => {
-    const raw = localStorage.getItem('ttrpg.lobbyAutoJoin');
-    return raw == null ? true : raw === '1';
+  const client = useMemo(() => getClient(), []);
+  const [status, setStatus] = useState<ClientStatus>(client.getStatus());
+  const [serverUrl, setServerUrl] = useState<string>(client.getServerEndpoint());
+  const [serverUrlDraft, setServerUrlDraft] = useState<string>(client.getServerEndpoint());
+  const defaultServerUrl = useMemo(() => client.getDefaultServerEndpoint(), [client]);
+  const [username, setUsername] = useState(() => {
+    const stored = localStorage.getItem('ttrpg.username');
+    if (stored) return stored;
+    const generated = `Trainer-${Math.random().toString(36).slice(2, 6)}`;
+    try { localStorage.setItem('ttrpg.username', generated); } catch {}
+    return generated;
   });
-  useEffect(()=>{ try { localStorage.setItem('ttrpg.lobbyWsUrl', wsUrl); } catch {} }, [wsUrl]);
-  useEffect(()=>{ try { localStorage.setItem('ttrpg.lobbyAutoJoin', autoJoin ? '1' : '0'); } catch {} }, [autoJoin]);
-  const [chat, setChat] = useState<Array<{from:string; text:string; at:number}>>([]);
-  const chatInputRef = useRef<HTMLInputElement>(null);
-  const [trainerSprite, setTrainerSprite] = useState<string>(() => localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer');
-  const [trainerOptions, setTrainerOptions] = useState<string[]>([]);
-  const [rooms, setRooms] = useState<Array<{id:string; name:string; format:string; players:Array<{id:string; name:string}>; status:'open'|'active'|'started'}>>([]);
+  const [rooms, setRooms] = useState<RoomSummary[]>(client.getRooms());
+  const [activeRoomId, setActiveRoomId] = useState<string>(DEFAULT_ROOM);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(client.getChat(DEFAULT_ROOM));
+  const [newRoomName, setNewRoomName] = useState('');
+  const [messageText, setMessageText] = useState('');
+  const [lastError, setLastError] = useState<string>('');
+  const [activeRole, setActiveRole] = useState<Record<string, RoomRole>>({ [DEFAULT_ROOM]: 'player' });
+  const [challengeBusy, setChallengeBusy] = useState<boolean>(false);
+  const [challengesByRoom, setChallengesByRoom] = useState<Record<string, ChallengeSummary[]>>({});
+  const [challengeNotice, setChallengeNotice] = useState<string>('');
   const [challengeFormat, setChallengeFormat] = useState<string>('Singles');
-  const [challengeTeamId, setChallengeTeamId] = useState<string>('');
-  const [challengeToId, setChallengeToId] = useState<string>('');
-  const [acceptTeams, setAcceptTeams] = useState<Record<string,string>>({});
-  const [hosts, setHosts] = useState<Array<{ip:string; port:number; name:string}>>([]);
-  const [status, setStatus] = useState<string>('');
-  const [syncing, setSyncing] = useState<boolean>(false);
-  const [username, setUsername] = useState<string>(()=> localStorage.getItem('ttrpg.username') || ('Trainer-'+Math.random().toString(36).slice(2,6)));
-  useEffect(()=>{ try { localStorage.setItem('ttrpg.username', username); } catch {} }, [username]);
-  const [roster, setRoster] = useState<Array<{id:string; name:string}>>([]);
-  const [remoteChallenges, setRemoteChallenges] = useState<Array<any>>([]);
-  const [joinLinks, setJoinLinks] = useState<string[]>([]);
-  const [activeRoomId, setActiveRoomId] = useState<string>('');
-  const [useInternetServer, setUseInternetServer] = useState<boolean>(false);
-  const [myReady, setMyReady] = useState<boolean>(false);
-  const clientIdRef = useRef<string>('');
-  if (!clientIdRef.current) {
-    const saved = localStorage.getItem('ttrpg.clientId');
-    if (saved) clientIdRef.current = saved;
-    else {
-      const id = 'c_'+Math.random().toString(36).slice(2,10);
-      clientIdRef.current = id;
-      try { localStorage.setItem('ttrpg.clientId', id); } catch {}
-    }
-  }
-
-  useEffect(()=>{ try { localStorage.setItem('ttrpg.trainerSprite', trainerSprite); } catch {} }, [trainerSprite]);
-  // Utility: dispatch a page-level CustomEvent so any tab can listen via lan.on(event, ...)
-  function dispatchLan(event: string, detail: any) {
-    try { window.dispatchEvent(new CustomEvent(`lan:${event}`, { detail })); } catch {}
-  }
-  function setLanRooms(list: any[]) {
-    try { (window as any).lan = (window as any).lan || {}; (window as any).lan.rooms = Array.isArray(list) ? list : []; } catch {}
-  }
-  // Ensure WS -> CustomEvent fan-out is attached once per socket, persists across unmounts
-  function attachFanout(s: WebSocket) {
-    const anyS: any = s as any;
-    if (anyS.__fanoutAttached) return;
-    const onMsg = (ev: MessageEvent) => {
-      let msg: any; try { msg = JSON.parse(String((ev as any).data)); } catch { return; }
-      if (!msg || !msg.t) return;
-      // Forward all relevant LAN events as page-level CustomEvents
-      // Special-case 'state' to fan out its parts and set lan.rooms
-      if (msg.t === 'state') {
-        const snap = msg.d || {};
-        setSyncing(false);
-        if (Array.isArray(snap.rooms)) { setLanRooms(snap.rooms); dispatchLan('rooms', snap.rooms); }
-        if (Array.isArray(snap.roster)) dispatchLan('roster', snap.roster);
-        if (Array.isArray(snap.challenges)) dispatchLan('challenge-sync', { list: snap.challenges });
-        if (Array.isArray(snap.chat)) for (const line of snap.chat) dispatchLan('chat', line);
-        return;
-      }
-  if (msg.t === 'rooms') { setLanRooms(msg.d || []); setSyncing(false); }
-      // Pass-through for everything else
-      dispatchLan(msg.t, msg.d);
-    };
-    try { (s as any).addEventListener('message', onMsg); } catch { /* older TS dom types */ }
-    anyS.__fanoutAttached = true;
-  }
-  useEffect(()=>{
-    const api = (window as any).lan?.assets;
-    if (!api?.listTrainers) return;
-    let cancelled=false;
-    function load(){
-      api.listTrainers().then((r:any)=>{
-        if(cancelled) return;
-        if (r?.ok && Array.isArray(r.list)) setTrainerOptions(r.list);
-        else setTrainerOptions([]);
-      }).catch(()=>{ if(!cancelled) setTrainerOptions([]); });
-    }
-    load();
-    const t = setTimeout(load, 2000); // one retry in case filesystem not ready yet
-    return ()=>{ cancelled=true; clearTimeout(t); };
-  }, []);
+  const [challengeRules, setChallengeRules] = useState<string>('');
+  const [challengeTargetId, setChallengeTargetId] = useState<string>('');
+  const teamsState = useTeams();
+  const [selectedTeamId, setSelectedTeamId] = useState<string>(() => teamsState.activeId || teamsState.teams[0]?.id || '');
+  const chatRef = useRef<HTMLDivElement>(null);
+  const activeRoomRef = useRef(activeRoomId);
 
   useEffect(() => {
-    const lan = (window as any).lan;
-    if (!lan) return;
-    // Hydrate from main snapshot so remounts don't show empty UI
-    (async () => {
-      try {
-        const snap = await lan.state?.();
-        if (snap?.ok) {
-          const rlist = Array.isArray(snap.rooms) ? snap.rooms : [];
-          setRooms(rlist);
-          setRoster(Array.isArray(snap.roster) ? snap.roster : []);
-          const chall = Array.isArray(snap.challenges) ? snap.challenges : [];
-          setRemoteChallenges(chall);
-          const chatHist = Array.isArray(snap.chat) ? snap.chat : [];
-          setChat(chatHist);
-          // Also fan these out for other tabs and set lan.rooms for viewer inference
-          setLanRooms(rlist);
-          dispatchLan('rooms', rlist);
-          dispatchLan('roster', Array.isArray(snap.roster) ? snap.roster : []);
-          dispatchLan('challenge-sync', { list: chall });
-          for (const line of chatHist) dispatchLan('chat', line);
-          setStatus('Connected');
-        }
-      } catch {}
-    })();
-    const offRoster = lan.on('roster', (list:any) => setRoster(list || []));
-    const offChat = lan.on('chat', (d:any) => pushChat(d?.from ?? 'peer', d?.text ?? ''));
-    const offChallengeSync = lan.on('challenge-sync', (d:any) => setRemoteChallenges((d && d.list) || []));
-  const offRooms = lan.on('rooms', (list:any) => { setLanRooms(list || []); setRooms(list || []); });
-    const offHostFound = lan.on('host-found', (h:any) => {
-      setHosts(prev => {
-        const next = prev.slice();
-        if (!next.find(x => x.ip===h.ip && x.port===h.port)) next.push(h);
-        return next;
-      });
-    });
-    const offRoomStart = lan.on('room-start', (_d:any) => {
-      setStatus('Battle started');
-    });
-    const offRoomDebug = lan.on('room-debug', (d:any) => {
-      if (!d || !d.roomId) return;
-      // Show last few debug lines inline for visibility
-      setStatus(`[${d.where}] ${d.msg}`);
-    });
-  lan.discover?.start?.();
-  lan.discover?.ping?.();
-  if (!hosting) setStatus('Scanning for hosts…');
-    const scanTimer = setInterval(()=> lan.discover?.ping?.(), 5000);
-    // Auto-resume hosting if previously set
-    try { if (localStorage.getItem('ttrpg.hosting') === '1') hostServer(); } catch {}
-    return () => { offRoster && offRoster(); offChat && offChat(); offChallengeSync && offChallengeSync(); offRooms && offRooms(); offHostFound && offHostFound(); offRoomStart && offRoomStart(); offRoomDebug && offRoomDebug(); clearInterval(scanTimer); lan.discover?.stop?.(); };
-  }, []);
+    const current = client.getServerEndpoint();
+    setServerUrl(current);
+    setServerUrlDraft(current);
+  }, [client]);
 
-  function hostServer() {
-    const lan = (window as any).lan;
-    if (!lan) { setStatus('Hosting is only available in the desktop app.'); return; }
-    setStatus('Starting host…');
-    lan.host({ port: 17646 }).then((r:any)=>{
-      if (r?.ok) { setHosting({ port: r.port }); setStatus(`Hosting on port ${r.port}`); try { localStorage.setItem('ttrpg.hosting','1'); } catch {} }
-      else { setStatus('Failed to start host.'); }
-    }).catch(()=> setStatus('Failed to start host.'));
-  }
-  function stopServer() { const lan = (window as any).lan; if (!lan) return; lan.stop().then(()=> { setHosting(null); setStatus('Stopped hosting'); try { localStorage.removeItem('ttrpg.hosting'); } catch {} }); }
-  function pushChat(from: string, text: string) {
-    setChat(prev => {
-      const last = prev[prev.length-1];
-      if (last && last.from === from && last.text === text && Date.now() - last.at < 500) return prev;
-      return [...prev, { from, text, at: Date.now() }];
-    });
-  }
-
-  function joinServer(url: string) {
-    // Reuse existing open socket if available
-    const existing: WebSocket | null = (window as any).__pokettrpgWS || null;
-    if (existing && existing.readyState === 1) { attachFanout(existing); setWs(existing); setStatus('Connected'); return; }
-    try {
-  const s = new WebSocket(url);
-  s.onopen = ()=> { pushChat('system','Connected'); setStatus('Connected'); try { s.send(JSON.stringify({ t:'hello', d:{ clientId: clientIdRef.current, username, avatar: trainerSpriteToAvatar(trainerSprite) } })); } catch {}; try { setSyncing(true); s.send(JSON.stringify({ t:'state-request' })); } catch {} };
-      s.onmessage = (ev)=>{
-        let msg; try { msg = JSON.parse(String(ev.data)); } catch { return; }
-        if (!msg || !msg.t) return;
-        if (msg.t === 'roster') setRoster(msg.d || []);
-        else if (msg.t === 'chat') pushChat(msg.d?.from ?? 'peer', msg.d?.text ?? '');
-        else if (msg.t === 'challenge-sync') setRemoteChallenges((msg.d && msg.d.list) || []);
-        else if (msg.t === 'rooms') { setLanRooms(msg.d || []); setRooms(msg.d || []); setSyncing(false); }
-        else if (msg.t === 'state') {
-          const snap = msg.d || {};
-          setSyncing(false);
-          const rlist = Array.isArray(snap.rooms) ? snap.rooms : [];
-          const rstr = Array.isArray(snap.roster) ? snap.roster : [];
-          const chall = Array.isArray(snap.challenges) ? snap.challenges : [];
-          const chatHist = Array.isArray(snap.chat) ? snap.chat : [];
-          setLanRooms(rlist);
-          setRooms(rlist);
-          setRoster(rstr);
-          setRemoteChallenges(chall);
-          setChat(chatHist);
-          // Also fan-out for other tabs immediately
-          dispatchLan('rooms', rlist);
-          dispatchLan('roster', rstr);
-          dispatchLan('challenge-sync', { list: chall });
-          for (const line of chatHist) dispatchLan('chat', line);
-        }
-  else if (msg.t === 'room-start') {
-    setStatus('Battle started');
-    try {
-      // Non-host clients: emit a window event so App can open a PS battle tab too
-      const evt = new CustomEvent('pokettrpg-room-start', { detail: msg.d });
-      window.dispatchEvent(evt);
-    } catch {}
-    try {
-      // Auto-join the room to register presence with the host
-      const rid = msg?.d?.roomId;
-      if (rid && s.readyState === 1) s.send(JSON.stringify({ t:'room-join', d:{ roomId: rid } }));
-    } catch {}
-  }
-        // Note: room-log/request/end/room-buffer/room-chat are fanned out by attachFanout()
-      };
-      s.onerror = ()=> setStatus('Connect error');
-      s.onclose = ()=> {
-        pushChat('system','Disconnected'); setStatus('Disconnected');
-        // Try to reconnect after a short delay
-        setTimeout(()=>{
-          if (!ws || ws.readyState !== 1) joinServer(url);
-        }, 1500);
-      };
-  // Persist globally and in state
-  (window as any).__pokettrpgWS = s;
-  attachFanout(s);
-  setWs(s);
-      // hello already sent in onopen above
-    } catch {}
-  }
-
-  // Internet server (Socket.IO) flow
-  function joinInternetServer(targetUrl?: string) {
-    // Reuse existing Socket.IO connection if available
-    const existing: Socket | null = (window as any).__pokettrpgIOSocket || null;
-    if (existing && existing.connected) { setIoSock(existing); setUseInternetServer(true); setStatus('Connected'); return; }
-    try {
-      const base = (targetUrl || wsUrl || '').trim() || 'wss://pokettrpg.duckdns.org';
-      const s = io(base, { transports: ['websocket'], path: '/socket.io' });
-      s.on('connect', () => {
-        setStatus('Connected');
-        // Identify with username
-        try { s.emit('identify', { username }); } catch {}
-      });
-      s.on('identified', (_me:any) => {
-        // Create a room and join immediately so chat works
-        try { s.emit('createRoom', { name: 'Lobby' }); } catch {}
-      });
-      s.on('roomCreated', ({ id }: any) => {
-        setActiveRoomId(id);
-        try { s.emit('joinRoom', { roomId: id, role: 'player' }); } catch {}
-      });
-      s.on('roomUpdate', (room: any) => {
-        // Normalize into our rooms shape
-        setRooms((prev) => {
-          const next = prev.slice();
-          const idx = next.findIndex(r => r.id === room.id);
-          const normalized = {
-            id: room.id,
-            name: room.name || 'Room',
-            format: 'Singles',
-            players: (room.players || []).map((p:any) => ({ id: p.id, name: p.username || p.name || 'Player' })),
-            status: room.battleStarted ? 'started' as const : 'open' as const,
-          };
-          if (idx >= 0) next[idx] = normalized as any; else next.push(normalized as any);
-          return next;
-        });
-      });
-      s.on('chatMessage', (m:any) => {
-        pushChat(m?.user || 'peer', String(m?.text ?? ''));
-      });
-      s.on('error', (e:any) => { setStatus(`Error: ${String(e?.message || e)}`); });
-      s.on('disconnect', () => { setStatus('Disconnected'); });
-
-      (window as any).__pokettrpgIOSocket = s;
-      setIoSock(s);
-      setUseInternetServer(true);
-    } catch {}
-  }
-  function leaveInternetServer(){ const s: Socket | null = (window as any).__pokettrpgIOSocket || null; if (s) { try { s.removeAllListeners(); s.disconnect(); } catch {} } (window as any).__pokettrpgIOSocket = null; setIoSock(null); setUseInternetServer(false); setActiveRoomId(''); }
-  function leaveServer(){ if (ws) { try { ws.onclose = null as any; } catch {} ws.close(); (window as any).__pokettrpgWS = null; setWs(null); } }
-  function sendChat(text: string) {
-    // Internet server path requires a roomId
-    if (useInternetServer && ioSock) {
-      if (!activeRoomId) { setStatus('Join or create a room to chat'); return; }
-      ioSock.emit('sendChat', { roomId: activeRoomId, text });
+  useEffect(() => {
+    if (!teamsState.teams.length) {
+      if (selectedTeamId !== '') setSelectedTeamId('');
       return;
     }
-    // LAN path
-    const msg = { t:'chat', d:{ text } };
-    if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
-    if ((window as any).lan && hosting) (window as any).lan.send('chat', { text });
-  }
-  function sendChatLine() {
-    const text = (chatInputRef.current?.value || '').trim(); if (!text) return;
-    sendChat(text);
-    if (chatInputRef.current) chatInputRef.current.value = '';
-  }
-  function createChallenge(format: string) {
-    const id = `b_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,6)}`;
-    const chosen = teamsState.teams.find(t => t.id === challengeTeamId) || null;
-    const fallback = teamsState.teams.find(t => t.id === teamsState.activeId) || teamsState.teams[0] || null;
-    const team = chosen || fallback;
-    const teamName = team?.name || 'Random';
-    const teamText = team ? teamToShowdownText(team.members as any) : '';
-    const d:any = { id, format, teamName, teamText };
-    if (challengeToId) d.toId = challengeToId;
-    const msg = { t:'challenge-create', d };
-    if (ws && ws.readyState === 1) {
-      ws.send(JSON.stringify(msg));
-      setStatus('Challenge created');
-    } else if ((window as any).lan && hosting) {
-      (window as any).lan.send('challenge-create', d);
-      setStatus('Challenge created (local)');
-    } else {
-      setStatus('Not connected');
+    if (!teamsState.teams.some(team => team.id === selectedTeamId)) {
+      const fallback = teamsState.activeId || teamsState.teams[0]?.id || '';
+      setSelectedTeamId(fallback);
     }
-  }
-  function cancelChallenge(id: string) {
-    const msg = { t:'challenge-cancel', d:{ id } };
-    if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
-    if ((window as any).lan && hosting) (window as any).lan.send('challenge-cancel', { id });
-  }
-  function acceptChallenge(id: string) {
-    // Use explicitly chosen team if provided; else fall back to active team
-    const pickedId = acceptTeams[id] || challengeTeamId || '';
-    const chosen = teamsState.teams.find(t => t.id === pickedId) || null;
-    const active = chosen || teamsState.teams.find(t => t.id === teamsState.activeId) || teamsState.teams[0] || null;
-    const teamText = active ? teamToShowdownText(active.members as any) : '';
-    const msg = { t:'challenge-accept', d:{ id, teamText } };
-    if (ws && ws.readyState === 1) {
-      ws.send(JSON.stringify(msg));
-    } else if ((window as any).lan && hosting) {
-      (window as any).lan.send('challenge-accept', { id, teamText });
-    }
-  }
+  }, [teamsState, selectedTeamId]);
 
-  async function refreshJoinLinks() {
-    const lan = (window as any).lan;
-    if (!lan) return;
-    try {
-      const info = (lan.info ? await lan.info() : (lan.discover?.info ? await lan.discover.info() : null)) as any;
-      const port = info?.port || hosting?.port || 17646;
-      const addrs: string[] = info?.addresses || [];
-      const links = addrs.map(ip => `ws://${ip}:${port}`);
-      // Always include localhost as a fallback
-      links.unshift(`ws://127.0.0.1:${port}`);
-      setJoinLinks(Array.from(new Set(links)));
-    } catch { /* ignore */ }
-  }
-
-  const teamOptions = teamsState.teams;
-
-  // Auto-join internet server on mount if enabled
+  // Persist username changes
   useEffect(() => {
-    if (autoJoin) {
-      const existing: Socket | null = (window as any).__pokettrpgIOSocket || null;
-      if (!existing || !existing.connected) {
-        const t = setTimeout(() => joinInternetServer(wsUrl), 300);
-        return () => { clearTimeout(t); };
+    try { localStorage.setItem('ttrpg.username', username); } catch {}
+  }, [username]);
+
+  // Connect once on mount
+  useEffect(() => {
+    client.connect(username);
+    const unsubStatus = client.on('status', setStatus);
+    const unsubRoomsSnapshot = client.on('roomsSnapshot', snapshot => {
+      const sorted = snapshot.slice().sort((a, b) => a.name.localeCompare(b.name));
+      setRooms(sorted);
+      setActiveRoomId(prev => {
+        if (snapshot.some(r => r.id === prev)) return prev;
+        if (!snapshot.length) return DEFAULT_ROOM;
+        const lobby = snapshot.find(r => r.id === DEFAULT_ROOM) || snapshot[0];
+        return lobby.id;
+      });
+    });
+    const unsubRoomUpdate = client.on('roomUpdate', room => {
+      setRooms(prev => {
+        const map = new Map(prev.map(r => [r.id, r] as const));
+        map.set(room.id, room);
+        return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+      });
+    });
+    const unsubRoomRemove = client.on('roomRemove', roomId => {
+      setRooms(prev => prev.filter(r => r.id !== roomId));
+      setActiveRoomId(prev => (prev === roomId ? DEFAULT_ROOM : prev));
+    });
+    const unsubChat = client.on('chatMessage', msg => {
+      const currentRoomId = activeRoomRef.current;
+      if (msg.roomId === currentRoomId) {
+        setChatMessages([...client.getChat(currentRoomId)]);
       }
+    });
+    const unsubError = client.on('error', err => setLastError(err.message));
+    const applyChallengeUpdate = (roomId: string, challenge: ChallengeSummary) => {
+      setChallengesByRoom(prev => {
+        const list = prev[roomId] ?? [];
+        const idx = list.findIndex(c => c.id === challenge.id);
+        const next = idx === -1 ? [...list, challenge] : list.map(c => (c.id === challenge.id ? challenge : c));
+        next.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+        return { ...prev, [roomId]: next };
+      });
+    };
+    const updateChallengeCount = (roomId: string, count: number) => {
+      setRooms(prev => {
+        const map = new Map(prev.map(r => [r.id, r] as const));
+        const room = map.get(roomId);
+        if (room) {
+          map.set(roomId, { ...room, challengeCount: count });
+        }
+        return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+      });
+    };
+    const unsubChallengeSync = client.on('challengeSync', ({ roomId, challenges }) => {
+      setChallengesByRoom(prev => ({ ...prev, [roomId]: challenges.slice() }));
+      updateChallengeCount(roomId, challenges.length);
+    });
+    const unsubChallengeCreated = client.on('challengeCreated', ({ roomId, challenge }) => {
+      applyChallengeUpdate(roomId, challenge);
+      const count = client.getChallenges(roomId).length;
+      updateChallengeCount(roomId, count);
+    });
+    const unsubChallengeUpdated = client.on('challengeUpdated', ({ roomId, challenge }) => {
+      applyChallengeUpdate(roomId, challenge);
+      const count = client.getChallenges(roomId).length;
+      updateChallengeCount(roomId, count);
+    });
+    const unsubChallengeRemoved = client.on('challengeRemoved', ({ roomId, challengeId, reason }) => {
+      let removedChallenge: ChallengeSummary | undefined;
+      setChallengesByRoom(prev => {
+        const list = prev[roomId] ?? [];
+        removedChallenge = list.find(c => c.id === challengeId);
+        const next = list.filter(c => c.id !== challengeId);
+        const updated = { ...prev } as Record<string, ChallengeSummary[]>;
+        if (next.length) updated[roomId] = next;
+        else delete updated[roomId];
+        return updated;
+      });
+      const count = client.getChallenges(roomId).length;
+      updateChallengeCount(roomId, count);
+      if (removedChallenge) {
+        const ownerName = removedChallenge.owner?.username || removedChallenge.owner?.id || 'Owner';
+        const targetName = removedChallenge.target?.username || removedChallenge.target?.id || '';
+        const label = targetName ? `${ownerName} vs ${targetName}` : `${ownerName} challenge`;
+        const reasonText = reason ? reason.replace(/-/g, ' ') : 'removed';
+        setChallengeNotice(`${label} ${reasonText}`);
+      }
+    });
+    return () => {
+      unsubStatus();
+      unsubRoomsSnapshot();
+      unsubRoomUpdate();
+      unsubRoomRemove();
+      unsubChat();
+      unsubError();
+      unsubChallengeSync();
+      unsubChallengeCreated();
+      unsubChallengeUpdated();
+      unsubChallengeRemoved();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client]);
+
+  // Re-identify when username changes
+  useEffect(() => {
+    client.setUsername(username);
+  }, [client, username]);
+
+  // Update chat when active room changes
+  useEffect(() => {
+    activeRoomRef.current = activeRoomId;
+    setChatMessages([...client.getChat(activeRoomId)]);
+  }, [client, activeRoomId, rooms.length]);
+
+  // Scroll chat to bottom on updates
+  useEffect(() => {
+    if (!chatRef.current) return;
+    chatRef.current.scrollTop = chatRef.current.scrollHeight;
+  }, [chatMessages]);
+
+  useEffect(() => {
+    if (!challengeNotice) return;
+    const timer = window.setTimeout(() => setChallengeNotice(''), 5000);
+    return () => window.clearTimeout(timer);
+  }, [challengeNotice]);
+
+  const myId = client.user?.id;
+  const currentRoom = rooms.find(r => r.id === activeRoomId) || null;
+  const iAmPlayer = !!currentRoom?.players?.some(p => p.id === myId);
+  const uniquePlayers = useMemo(() => {
+    if (!currentRoom?.players) return [] as Array<{ id: string; username?: string; name?: string }>;
+    const map = new Map<string, { id: string; username?: string; name?: string }>();
+    for (const player of currentRoom.players) {
+      if (player?.id && !map.has(player.id)) map.set(player.id, player);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return Array.from(map.values());
+  }, [currentRoom?.id, currentRoom?.players]);
+  const eligibleOpponents = uniquePlayers.filter(p => p.id !== myId);
+  const roomChallenges = challengesByRoom[activeRoomId] ?? [];
+  const actionableChallenges = useMemo(() => roomChallenges.filter(ch => isChallengeActionable(ch.status)), [roomChallenges]);
+  const myActionableChallenges = useMemo(
+    () => actionableChallenges.filter(ch => ch.owner?.id === myId || ch.target?.id === myId),
+    [actionableChallenges, myId],
+  );
+  const myPendingChallenges = useMemo(
+    () => actionableChallenges.filter(ch => ch.owner?.id === myId),
+    [actionableChallenges, myId],
+  );
+  const hasPendingChallengeForSelection = useMemo(() => {
+    if (!myPendingChallenges.length) return false;
+    const normalizedSelection = challengeTargetId || '__open__';
+    return myPendingChallenges.some(ch => (ch.target?.id || '__open__') === normalizedSelection);
+  }, [myPendingChallenges, challengeTargetId]);
+  const challengedOpponentIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const entry of myPendingChallenges) {
+      if (entry.target?.id) ids.add(entry.target.id);
+    }
+    return ids;
+  }, [myPendingChallenges]);
+  const playersChallengingMeIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const entry of actionableChallenges) {
+      if (entry.owner?.id && entry.target?.id === myId) ids.add(entry.owner.id);
+    }
+    return ids;
+  }, [actionableChallenges, myId]);
+  const sortedRoomChallenges = useMemo(() => {
+    const list = roomChallenges.slice();
+    list.sort((a, b) => {
+      const timeA = a.updatedAt ?? a.createdAt ?? 0;
+      const timeB = b.updatedAt ?? b.createdAt ?? 0;
+      return timeA - timeB;
+    });
+    return list;
+  }, [roomChallenges]);
+  const activeChallenge = useMemo(() => {
+    if (!myActionableChallenges.length) return null;
+    const list = myActionableChallenges.slice();
+    list.sort((a, b) => {
+      const timeA = a.updatedAt ?? a.createdAt ?? 0;
+      const timeB = b.updatedAt ?? b.createdAt ?? 0;
+      return timeA - timeB;
+    });
+    return list[0] ?? null;
+  }, [myActionableChallenges]);
+  const challengeAwaitingMyDecision = useMemo(() => {
+    for (const challenge of myActionableChallenges) {
+      const isOwner = challenge.owner?.id === myId;
+      if (isOwner && !challenge.owner?.accepted) return challenge;
+      const targetId = challenge.target?.id;
+      if (targetId && targetId !== myId) continue;
+      const targetAccepted = challenge.target?.accepted ?? false;
+      if (!targetAccepted) return challenge;
+    }
+    return null;
+  }, [myActionableChallenges, myId]);
+  const primaryChallenge = challengeAwaitingMyDecision || activeChallenge;
+  const selectedTeam = useMemo(() => {
+    const list = teamsState.teams || [];
+    if (!list.length) return null as (typeof teamsState.teams[number]) | null;
+    if (selectedTeamId) {
+      const exact = list.find(team => team.id === selectedTeamId);
+      if (exact) return exact;
+    }
+    if (teamsState.activeId) {
+      const active = list.find(team => team.id === teamsState.activeId);
+      if (active) return active;
+    }
+    return list[0] ?? null;
+  }, [teamsState, selectedTeamId]);
+  const hasValidTeam = !!selectedTeam && Array.isArray((selectedTeam as any).members) && (selectedTeam as any).members.length > 0;
+
+  useEffect(() => {
+    if (!challengeTargetId) return;
+    if (!eligibleOpponents.some(p => p.id === challengeTargetId)) {
+      setChallengeTargetId('');
+    }
+  }, [challengeTargetId, eligibleOpponents]);
+
+  function applyServerUrl(nextUrl?: string) {
+    const draft = typeof nextUrl === 'string' ? nextUrl : serverUrlDraft;
+    if (!draft.trim()) return;
+    const applied = client.setServerEndpoint(draft);
+    const changed = applied !== serverUrl;
+    setServerUrl(applied);
+    setServerUrlDraft(applied);
+    setLastError('');
+    if (changed) {
+      setRooms([]);
+      setActiveRoomId(DEFAULT_ROOM);
+      setActiveRole({ [DEFAULT_ROOM]: 'player' });
+      setChatMessages([]);
+      activeRoomRef.current = DEFAULT_ROOM;
+      setChallengeBusy(false);
+      setMessageText('');
+      setChallengesByRoom({});
+      setChallengeTargetId('');
+      setChallengeNotice('');
+    }
+  }
+
+  function handleApplyServerUrl() {
+    applyServerUrl();
+  }
+
+  function handleResetServerUrl() {
+    applyServerUrl(defaultServerUrl);
+  }
+
+  function handleCreateRoom() {
+    const name = newRoomName.trim();
+    if (!name) return;
+    let unsubscribe: (() => void) | null = null;
+    const handler = (room: RoomSummary) => {
+      if (room.name === name) {
+        handleJoin(room.id, 'player');
+        setActiveRoomId(room.id);
+        if (unsubscribe) unsubscribe();
+      }
+    };
+    unsubscribe = client.on('roomCreated', handler);
+    client.createRoom(name);
+    window.setTimeout(() => {
+      if (unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+      }
+    }, 5000);
+    setNewRoomName('');
+  }
+
+  function handleJoin(roomId: string, role: RoomRole) {
+    const currentRole = activeRole[roomId];
+    if (currentRole === role) {
+      setActiveRoomId(roomId);
+      return;
+    }
+    if (currentRole && currentRole !== role) {
+      client.leaveRoom(roomId);
+    }
+    client.joinRoom(roomId, role);
+    setActiveRoomId(roomId);
+    setActiveRole(prev => ({ ...prev, [roomId]: role }));
+    setChatMessages([...client.getChat(roomId)]);
+  }
+
+  function handleLeave(roomId: string) {
+    client.leaveRoom(roomId);
+    if (activeRoomId === roomId) setActiveRoomId(DEFAULT_ROOM);
+    setActiveRole(prev => {
+      const next = { ...prev };
+      delete next[roomId];
+      return next;
+    });
+    setChallengesByRoom(prev => {
+      if (!(roomId in prev)) return prev;
+      const next = { ...prev } as Record<string, ChallengeSummary[]>;
+      delete next[roomId];
+      return next;
+    });
+    if (challengeTargetId && activeRoomId === roomId) {
+      setChallengeTargetId('');
+    }
+  }
+
+  function handleSendMessage() {
+    const text = messageText.trim();
+    if (!text || !activeRoomId) return;
+    client.sendChat(activeRoomId, text);
+    setChatMessages([...client.getChat(activeRoomId)]);
+    setMessageText('');
+  }
+
+  function getSelectedTeamMembers(): BattlePokemon[] | null {
+    if (!selectedTeam || !Array.isArray((selectedTeam as any).members) || !(selectedTeam as any).members.length) {
+      setLastError('Select a team with Pokémon before submitting a challenge.');
+      return null;
+    }
+    return (selectedTeam as any).members as BattlePokemon[];
+  }
+
+  function buildChallengePlayerPayload(): PlayerPayload | null {
+    if (!myId) {
+      setLastError('Identify with the server before submitting a challenge.');
+      return null;
+    }
+    const members = getSelectedTeamMembers();
+    if (!members) return null;
+    setLastError('');
+    const trainerSprite = client.getTrainerSprite();
+    return buildPlayerPayload(username, myId, members, trainerSprite);
+  }
+
+  function handleCreateChallenge() {
+    if (!currentRoom) return;
+    if (!iAmPlayer) {
+      setLastError('Join the room as a player before creating a challenge.');
+      return;
+    }
+    if (hasPendingChallengeForSelection) {
+      setLastError('You already have a pending challenge for that opponent.');
+      return;
+    }
+    const payload = buildChallengePlayerPayload();
+    if (!payload) return;
+    setChallengeBusy(true);
+    try {
+      client.createChallenge({
+        roomId: currentRoom.id,
+        player: payload,
+        format: challengeFormat.trim() || undefined,
+        rules: challengeRules.trim() || undefined,
+        toPlayerId: challengeTargetId || undefined,
+      });
+      setChallengeNotice('Challenge created.');
+    } finally {
+      setChallengeBusy(false);
+    }
+  }
+
+  function handleCancelChallenge(challengeId: string) {
+    if (!currentRoom) return;
+    client.cancelChallenge({ roomId: currentRoom.id, challengeId });
+    setChallengeNotice('Challenge cancelled.');
+  }
+
+  function handleDeclineChallenge(challengeId: string) {
+    if (!currentRoom) return;
+    if (!iAmPlayer) {
+      setLastError('Join the room as a player before responding to challenges.');
+      return;
+    }
+    client.respondChallenge({ roomId: currentRoom.id, challengeId, accepted: false });
+    setChallengeNotice('Challenge declined.');
+  }
+
+  function handleSubmitChallengeLoadout(challenge: ChallengeSummary, notice: string) {
+    if (!currentRoom) return;
+    if (!iAmPlayer) {
+      setLastError('Join the room as a player before submitting a team.');
+      return;
+    }
+    const payload = buildChallengePlayerPayload();
+    if (!payload) return;
+    setChallengeBusy(true);
+    try {
+      client.respondChallenge({ roomId: currentRoom.id, challengeId: challenge.id, accepted: true, player: payload });
+      setChallengeNotice(notice);
+    } finally {
+      setChallengeBusy(false);
+    }
+  }
+
+  function handleAcceptChallenge(challenge: ChallengeSummary) {
+    handleSubmitChallengeLoadout(challenge, 'Challenge accepted.');
+  }
+
+  function handleUpdateChallengeLoadout(challenge: ChallengeSummary) {
+    handleSubmitChallengeLoadout(challenge, 'Loadout updated.');
+  }
+
+  function handleStartBattle() {
+    if (!primaryChallenge) {
+      setLastError('Create or accept a challenge before submitting a team.');
+      return;
+    }
+    handleUpdateChallengeLoadout(primaryChallenge);
+  }
+
+  function roomStatus(room: RoomSummary): string {
+    const players = Array.isArray(room.players)
+      ? Array.from(new Map(room.players.map(p => [p.id, p])).values())
+      : [];
+    const playerNames = players.length
+      ? players.map(p => p.username || (p as any).name || 'Player').join(', ')
+      : '—';
+    const spectators = room.spectCount ?? 0;
+    const challengeCount = room.challengeCount ?? (challengesByRoom[room.id]?.length ?? 0);
+    const challengeText = challengeCount > 0 ? ` • ${challengeCount} challenge${challengeCount === 1 ? '' : 's'}` : '';
+    const spectatorLabel = ` ${spectators} spectator${spectators === 1 ? '' : 's'}`;
+    return `${playerNames} • ${room.battleStarted ? 'Battle active' : 'Waiting'} •${spectatorLabel}${challengeText}`;
+  }
 
   return (
     <section className="panel battle">
       <h2>Lobby</h2>
-      {syncing && <div className="dim" style={{margin:'-6px 0 6px 0'}}>Syncing…</div>}
-      <div style={{display:'flex', gap:8, marginBottom:8, alignItems:'center', flexWrap:'wrap'}}>
-        <label style={{display:'inline-flex', alignItems:'center', gap:6}}>
-          <span className="dim">Server</span>
-          <input value={wsUrl} onChange={e=> setWsUrl(e.target.value)} style={{width:320}} placeholder="wss://pokettrpg.duckdns.org (or your wss:// host)" />
+      {challengeNotice && (
+        <div style={{ marginBottom: 12, padding: '8px 12px', borderRadius: 6, border: '1px solid var(--accent)', background: 'rgba(0, 128, 128, 0.1)' }}>
+          {challengeNotice}
+        </div>
+      )}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 12, alignItems: 'center' }}>
+        <div className="dim">Status:</div>
+        <span>{status}</span>
+        {lastError && <span className="dim" style={{ color: '#f66' }}>• {lastError}</span>}
+        <label style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+          <span className="dim">Server URL</span>
+          <input
+            value={serverUrlDraft}
+            onChange={e => setServerUrlDraft(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleApplyServerUrl(); }}
+            style={{ width: 220 }}
+            placeholder={defaultServerUrl}
+            title={`Current: ${serverUrl}`}
+          />
         </label>
-        {!useInternetServer && <button onClick={()=> joinInternetServer(wsUrl)}>&gt; Join</button>}
-        {useInternetServer && <button className="secondary" onClick={leaveInternetServer}>Leave</button>}
-        <label style={{display:'inline-flex', alignItems:'center', gap:6}} title="Auto-connect to this server on startup and reconnect if disconnected">
-          <input type="checkbox" checked={autoJoin} onChange={e=> setAutoJoin(e.target.checked)} />
-          <span className="dim">Auto-join</span>
-        </label>
-        {status && <span className="dim">{status}</span>}
-        <label style={{marginLeft:'auto', display:'inline-flex', alignItems:'center', gap:6}}>
+        <button className="mini" onClick={handleApplyServerUrl} disabled={!serverUrlDraft.trim()}>Apply</button>
+        <button className="mini secondary" onClick={handleResetServerUrl} disabled={serverUrl === defaultServerUrl}>Default</button>
+        <label style={{ marginLeft: 'auto', display: 'inline-flex', gap: 8, alignItems: 'center' }}>
           <span className="dim">Username</span>
-          <input value={username} onChange={e=> setUsername(e.target.value)} style={{width:160}} />
+          <input
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            style={{ width: 180 }}
+            placeholder="Trainer name"
+          />
         </label>
       </div>
-      {hosting && joinLinks.length>0 && (
-        <div className="panel" style={{padding:8, marginBottom:8}}>
-          <div><strong>Shareable Join Links</strong> <span className="dim">(click to copy)</span></div>
-          <ul style={{listStyle:'none', padding:0, margin:0, display:'grid', gap:6}}>
-            {joinLinks.map(link => (
-              <li key={link} style={{display:'grid', gridTemplateColumns:'1fr auto', gap:6, alignItems:'center'}}>
-                <code>{link}</code>
-                <button className="mini" onClick={async()=>{ try { await navigator.clipboard.writeText(link); setStatus('Copied join link'); } catch { setStatus('Copy failed'); } }}>Copy</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {hosts.length>0 && (
-        <div className="panel" style={{padding:8, marginBottom:8}}>
-          <div><strong>Discovered Hosts</strong></div>
-          <ul style={{listStyle:'none', padding:0, margin:0, display:'grid', gap:6}}>
-            {hosts.map((h,i)=> (
-              <li key={`${h.ip}:${h.port}:${i}`} style={{display:'grid', gridTemplateColumns:'1fr auto', gap:6, alignItems:'center'}}>
-                <div>{h.name || 'Host'} <span className="dim">{h.ip}:{h.port}</span></div>
-                <button onClick={()=> joinServer(`ws://${h.ip}:${h.port}`)}>&gt; Join</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <div style={{display:'grid', gridTemplateColumns:'520px 1fr 280px', gap:12}}>
-        <aside className="panel" style={{padding:8, display:'grid', gap:8}}>
-          <h3>Challenge</h3>
-          <label>
-            <div className="label"><strong>Format</strong></div>
-            <select value={challengeFormat} onChange={e=> setChallengeFormat(e.target.value)}>
-              {['Singles','Doubles','Random Singles','Boss: 3v1','2v2'].map(f=> <option key={f} value={f}>{f}</option>)}
-            </select>
-            {/^Boss:/i.test(challengeFormat) && (
-              <div className="dim" style={{fontSize:'0.9em'}}>Challenger is the Boss (single active); opponent controls the 3.</div>
-            )}
-          </label>
-          <label>
-            <div className="label"><strong>Team</strong></div>
-            <select value={challengeTeamId} onChange={e=> setChallengeTeamId(e.target.value)}>
-              <option value="">Random</option>
-              {teamOptions.map(t => <option key={t.id} value={t.id}>{t.name} ({t.members.length}/6)</option>)}
-            </select>
-          </label>
-          <label>
-            <div className="label"><strong>Opponent</strong> <span className="dim">(optional)</span></div>
-            <select value={challengeToId} onChange={e=> setChallengeToId(e.target.value)}>
-              <option value="">Anyone</option>
-              {roster.map(p => <option key={p.id} value={p.id}>{p.name} ({p.id})</option>)}
-            </select>
-          </label>
-          <button onClick={()=> createChallenge(challengeFormat)}>&gt; Create Challenge</button>
-          <div style={{marginTop:8}}>
-            <h4 style={{marginTop:0}}>Open Challenges</h4>
-            {remoteChallenges.length===0 && <div className="dim">None</div>}
-            <ul style={{listStyle:'none', padding:0, margin:0, display:'grid', gap:6}}>
-              {remoteChallenges.map(ch => (
-                <li key={ch.id} style={{display:'grid', gridTemplateColumns:'1fr auto auto', gap:6, alignItems:'center'}}>
-                  <div>
-                    <div><strong>{ch.format}</strong> • {ch.teamName}</div>
-                    <div className="dim" style={{fontSize:'0.9em'}}>from {ch.from}</div>
-                    {/boss/i.test(String(ch.format||'')) && (
-                      <div className="dim" style={{fontSize:'0.85em'}}>Fighters: {Array.isArray(ch.fighters) ? ch.fighters.length : 0}/3</div>
-                    )}
-                  </div>
-                  <div style={{display:'flex', alignItems:'center', gap:6}}>
-                    <select value={acceptTeams[ch.id] || ''} onChange={e=> setAcceptTeams(prev => ({ ...prev, [ch.id]: e.target.value }))}>
-                      <option value="">Use Active Team</option>
-                      {teamsState.teams.map(t => <option key={t.id} value={t.id}>{t.name} ({t.members.length}/6)</option>)}
-                    </select>
-                    {(() => {
-                      const myId = clientIdRef.current;
-                      const isBoss = /boss/i.test(String(ch.format||''));
-                      const fighters = Array.isArray(ch.fighters) ? ch.fighters : [];
-                      const alreadyJoined = !!fighters.find((f:any)=> f?.id === myId);
-                      const full = isBoss && fighters.length >= 3;
-                      const targeted = ch.toId && ch.toId.length;
-                      const notTargetedToMe = targeted && ch.toId !== myId;
-                      const disabled = alreadyJoined || full || notTargetedToMe;
-                      return (
-                        <button className="secondary" disabled={disabled} onClick={()=> acceptChallenge(ch.id)}>
-                          {alreadyJoined ? 'Joined' : full ? 'Full' : notTargetedToMe ? 'Locked' : 'Accept'}
-                        </button>
-                      );
-                    })()}
-                  </div>
-                  <button className="mini" onClick={()=> cancelChallenge(ch.id)}>Cancel</button>
-                </li>
-              ))}
-            </ul>
-          </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 320px) 1fr 280px', gap: 12 }}>
+        <aside className="panel" style={{ padding: 12, display: 'grid', gap: 12 }}>
           <div>
-            <h4 style={{marginTop:12}}>Active Battles</h4>
-            {rooms.length===0 && <div className="dim">None yet</div>}
-            <ul style={{listStyle:'none', padding:0, margin:0, display:'grid', gap:6}}>
-              {rooms.map(b => {
-                const playerNames = (b.players||[]).map(p=>p.name).join(', ');
-                const spectatorCount = (b as any).spectators ? (b as any).spectators.length : 0;
-                const myId = clientIdRef.current;
-                const amPlayer = !!(b.players||[]).find((p:any)=> p.id===myId);
-                const amSpectator = !!((b as any).spectators||[]).find((s:any)=> s.id===myId);
+            <h3 style={{ marginTop: 0 }}>Rooms</h3>
+            <div style={{ display: 'grid', gap: 8 }}>
+              {rooms.length === 0 && <div className="dim">Fetching rooms…</div>}
+              {rooms.map(room => {
+                const role = activeRole[room.id];
+                const isActive = activeRoomId === room.id;
+                const challengeCount = room.challengeCount ?? (challengesByRoom[room.id]?.length ?? 0);
                 return (
-                  <li key={b.id} style={{display:'grid',gridTemplateColumns:'1fr auto auto auto', gap:6, alignItems:'center'}}>
-                    <div>
-                      <div><strong>{b.name}</strong></div>
-                      <div className="dim" style={{fontSize:'0.9em', display:'flex', alignItems:'center', gap:6}}>
-                        {(b.players||[]).map((p:any) => (
-                          <span key={p.id} style={{display:'inline-flex', alignItems:'center', gap:4}}>
-                            {p.avatar && <img src={`/showdown/sprites/trainers/${p.avatar}.png`} alt="" style={{width:16, height:16, imageRendering:'pixelated'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/vendor/showdown/sprites/trainers/${p.avatar}.png`; }} />}
-                            {p.name}
-                          </span>
-                        ))}
-                        <span>• {b.status} {spectatorCount>0 ? `• ${spectatorCount} spec` : ''}</span>
-                      </div>
+                  <div key={room.id} style={{ border: '1px solid #444', borderRadius: 6, padding: 8, background: isActive ? 'rgba(0,128,128,0.15)' : 'transparent' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <strong>{room.name}</strong>
+                      <span className="dim" style={{ fontSize: '0.85em' }}>({room.id})</span>
+                      {challengeCount > 0 && (
+                        <span className="chip" style={{ marginLeft: 'auto' }}>{challengeCount} challenge{challengeCount === 1 ? '' : 's'}</span>
+                      )}
                     </div>
-                    <button className="secondary" disabled={amPlayer} onClick={()=>{
-                      if (useInternetServer && ioSock) {
-                        try { ioSock.emit('joinRoom', { roomId: b.id, role: 'spectator' }); } catch {}
-                      } else {
-                        const msg = { t:'room-spectate', d:{ roomId: b.id } };
-                        if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
-                        if ((window as any).lan && hosting) (window as any).lan.send('room-spectate', { roomId: b.id });
-                      }
-                    }}>Spectate</button>
-                    <button disabled={amPlayer} onClick={()=>{
-                      if (useInternetServer && ioSock) {
-                        try { ioSock.emit('joinRoom', { roomId: b.id, role: 'player' }); setActiveRoomId(b.id); } catch {}
-                      } else {
-                        const msg = { t:'room-join', d:{ roomId: b.id } };
-                        if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
-                        if ((window as any).lan && hosting) (window as any).lan.send('room-join', { roomId: b.id });
-                        setActiveRoomId(b.id);
-                      }
-                    }}>Join</button>
-                    <button className="mini" disabled={!amPlayer && !amSpectator} onClick={()=>{
-                      if (useInternetServer && ioSock) {
-                        // Internet server: no leaveRoom in spec; just clear local selection
-                        if (activeRoomId === b.id) setActiveRoomId('');
-                      } else {
-                        const msg = { t:'room-leave', d:{ roomId: b.id } };
-                        if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
-                        if ((window as any).lan && hosting) (window as any).lan.send('room-leave', { roomId: b.id });
-                        if (activeRoomId === b.id) setActiveRoomId('');
-                      }
-                    }}>Leave</button>
-                  </li>
+                    <div className="dim" style={{ fontSize: '0.9em', margin: '4px 0 8px 0' }}>{roomStatus(room)}</div>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <button
+                        className={role === 'player' ? 'secondary' : ''}
+                        onClick={() => handleJoin(room.id, 'player')}
+                        disabled={role === 'player'}
+                      >
+                        {role === 'player' ? 'Rejoin' : 'Join as Player'}
+                      </button>
+                      <button
+                        className={role === 'spectator' ? 'secondary' : ''}
+                        onClick={() => handleJoin(room.id, 'spectator')}
+                        disabled={role === 'spectator'}
+                      >
+                        Spectate
+                      </button>
+                      <button className="mini" onClick={() => handleLeave(room.id)} disabled={!role}>Leave</button>
+                    </div>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
+          </div>
+
+          <div style={{ borderTop: '1px solid #333', paddingTop: 12 }}>
+            <h4 style={{ margin: '0 0 8px 0' }}>Create Room</h4>
+            <div style={{ display: 'grid', gap: 6 }}>
+              <input
+                value={newRoomName}
+                onChange={e => setNewRoomName(e.target.value)}
+                placeholder="Room name"
+              />
+              <button onClick={handleCreateRoom}>Create</button>
+            </div>
           </div>
         </aside>
-        <section className="panel" style={{padding:8, display:'grid', gridTemplateRows:'1fr auto', gap:8}}>
-          <div style={{overflow:'auto', border:'1px solid #444', borderRadius:6, padding:8, background:'var(--section-bg)'}}>
-            {chat.length===0 && <div className="dim">Welcome to the lobby. Join your server to start chatting.</div>}
-            {chat.map((m,i)=> (
-              <div key={`${m.at || i}-${i}`}><strong>{m.from}:</strong> {m.text}</div>
+
+        <section className="panel" style={{ padding: 12, display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 12 }}>
+          <header>
+            <h3 style={{ margin: '0 0 6px 0' }}>{currentRoom?.name || 'Room'}</h3>
+            <div className="dim" style={{ fontSize: '0.9em' }}>{currentRoom ? roomStatus(currentRoom) : 'Select a room to view details.'}</div>
+          </header>
+
+          <div ref={chatRef} style={{ overflowY: 'auto', border: '1px solid #444', borderRadius: 6, padding: 10, background: 'var(--section-bg)' }}>
+            {chatMessages.length === 0 && <div className="dim">No messages yet. Say hi!</div>}
+            {chatMessages.map((msg, idx) => (
+              <div key={`${msg.time}-${idx}`} style={{ marginBottom: 4 }}>
+                <strong>{msg.user}:</strong> {msg.text}
+                <span className="dim" style={{ marginLeft: 6, fontSize: '0.8em' }}>{new Date(msg.time).toLocaleTimeString()}</span>
+              </div>
             ))}
           </div>
-          <div style={{display:'grid', gridTemplateColumns:'1fr auto', gap:6}}>
-            <input ref={chatInputRef} onKeyDown={(e)=>{ if (e.key==='Enter') sendChatLine(); }} placeholder="Type a message..." />
-            <button onClick={sendChatLine}>Send</button>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
+            <input
+              value={messageText}
+              onChange={e => setMessageText(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSendMessage(); }}
+              placeholder="Type a message…"
+            />
+            <button onClick={handleSendMessage}>Send</button>
           </div>
         </section>
-        <aside className="panel" style={{padding:8, display:'grid', gap:8}}>
-          <h3>Trainer</h3>
+
+        <aside className="panel" style={{ padding: 12, display: 'grid', gap: 12 }}>
           <div>
-            <div className="label"><strong>Sprite</strong></div>
-            <div style={{maxHeight:220, overflow:'auto', border:'1px solid #444', borderRadius:6, padding:6, display:'grid', gridTemplateColumns:'repeat(auto-fill, 48px)', gap:8}}>
-              {trainerOptions.length===0 && <div className="dim">Loading trainer sprites…</div>}
-              {trainerOptions.map(name => (
-                <button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=> setTrainerSprite(name)} style={{width:48, height:48, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent'}}>
-                  <img src={`/vendor/showdown/sprites/trainers/${name}.png`} alt={name} style={{width:44, height:44, imageRendering:'pixelated'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/showdown/sprites/trainers/${name}.png`; }} />
-                </button>
-              ))}
-            </div>
-          </div>
-          <div style={{display:'flex', alignItems:'center', gap:8}}>
-            <div className="dim">Current:</div>
-            <img src={`/vendor/showdown/sprites/trainers/${trainerSprite}.png`} alt="avatar" style={{width:28, height:28, imageRendering:'pixelated', background:'transparent'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/showdown/sprites/trainers/${trainerSprite}.png`; }} />
-            <span>{trainerSprite}</span>
-          </div>
-          <div className="dim">LAN lobby: host broadcasts on port 17646. Other devices on the same network can join via discovery or ws://host-ip:17646</div>
-          <div>
-            <h4>Peers</h4>
-            <ul>
-              {roster.map(p => <li key={p.id}>{p.name} <span className="dim">({p.id})</span></li>)}
-              {roster.length===0 && <li className="dim">No peers</li>}
+            <h3 style={{ marginTop: 0 }}>Players</h3>
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+              {currentRoom?.players?.length ? (
+                uniquePlayers.map(player => {
+                  const displayName = player.username || (player as any).name || 'Player';
+                  const challengedByMe = player.id ? challengedOpponentIds.has(player.id) : false;
+                  const challengingMe = player.id ? playersChallengingMeIds.has(player.id) : false;
+                  return (
+                    <li key={player.id}>
+                      {displayName}
+                      {challengedByMe && (
+                        <span style={{ marginLeft: 6, fontSize: '0.75em', padding: '1px 6px', borderRadius: 12, border: '1px solid rgba(0,128,128,0.6)', background: 'rgba(0,128,128,0.12)', textTransform: 'uppercase' }}>
+                          challenged
+                        </span>
+                      )}
+                      {challengingMe && (
+                        <span style={{ marginLeft: 6, fontSize: '0.75em', padding: '1px 6px', borderRadius: 12, border: '1px solid rgba(192,128,0,0.6)', background: 'rgba(192,128,0,0.15)', textTransform: 'uppercase' }}>
+                          incoming
+                        </span>
+                      )}
+                    </li>
+                  );
+                })
+              ) : (
+                <li className="dim">No players yet</li>
+              )}
             </ul>
           </div>
-          {activeRoomId && (
-            <div>
-              <h4>Room</h4>
-              {rooms.filter(r=> r.id===activeRoomId).map(r => {
-                const myId = clientIdRef.current;
-                const amPlayer = !!(r.players||[]).find(p=>p.id===myId);
-                const readyMap = (r as any).ready || {} as Record<string,boolean>;
-                const myReadyValue = !!readyMap[myId];
+
+          <div style={{ borderTop: '1px solid #333', paddingTop: 12, display: 'grid', gap: 8 }}>
+            <h4 style={{ margin: '0 0 4px 0' }}>Challenges</h4>
+            {primaryChallenge ? (
+              <div className="dim" style={{ fontSize: '0.85em' }}>
+                Active: {formatName(primaryChallenge.owner)} vs {formatName(primaryChallenge.target, 'Anyone')} • {describeChallengeStatus(primaryChallenge.status)}
+              </div>
+            ) : (
+              <div className="dim" style={{ fontSize: '0.85em' }}>No active challenge yet.</div>
+            )}
+            <label className="dim" style={{ display: 'grid', gap: 6 }}>
+              Format
+              <input
+                value={challengeFormat}
+                onChange={e => setChallengeFormat(e.target.value)}
+                placeholder="Singles, Doubles, etc."
+              />
+            </label>
+            <label className="dim" style={{ display: 'grid', gap: 6 }}>
+              Rules
+              <textarea
+                value={challengeRules}
+                onChange={e => setChallengeRules(e.target.value)}
+                rows={3}
+                placeholder="Optional notes or clauses"
+                style={{ resize: 'vertical', minHeight: 60 }}
+              />
+            </label>
+            <label className="dim" style={{ display: 'grid', gap: 6 }}>
+              Opponent
+              <select value={challengeTargetId} onChange={e => setChallengeTargetId(e.target.value)}>
+                <option value="">Open challenge (any opponent)</option>
+                {eligibleOpponents.map(player => (
+                  <option key={player.id} value={player.id}>
+                    {formatName(player)}{challengedOpponentIds.has(player.id) ? ' (pending)' : ''}{playersChallengingMeIds.has(player.id) ? ' (incoming)' : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {!hasValidTeam && (
+              <div className="dim" style={{ fontSize: '0.8em' }}>Save a team with Pokémon to create a challenge.</div>
+            )}
+            {hasPendingChallengeForSelection && (
+              <div className="dim" style={{ fontSize: '0.8em', color: '#f88' }}>You already have a pending challenge targeting that selection.</div>
+            )}
+            <button
+              onClick={handleCreateChallenge}
+              disabled={challengeBusy || !iAmPlayer || !currentRoom || !hasValidTeam || hasPendingChallengeForSelection}
+            >
+              Create Challenge
+            </button>
+            <div style={{ border: '1px solid #444', borderRadius: 6, padding: 8, display: 'grid', gap: 8, maxHeight: 260, overflowY: 'auto' }}>
+              {sortedRoomChallenges.length === 0 && <div className="dim">No challenges in this room.</div>}
+              {sortedRoomChallenges.map(challenge => {
+                const isOwner = challenge.owner?.id === myId;
+                const targetId = challenge.target?.id;
+                const isTarget = targetId === myId;
+                const isMine = isOwner || isTarget;
+                const actionable = isChallengeActionable(challenge.status);
+                const awaitingMyResponse = challengeAwaitingMyDecision?.id === challenge.id;
+                const ownerReady = !!challenge.owner?.accepted;
+                const targetReady = !!challenge.target?.accepted;
+                const canAccept = actionable && !isOwner && (!targetId || targetId === myId) && iAmPlayer && hasValidTeam;
+                const canDecline = actionable && isTarget && targetId === myId && iAmPlayer;
+                const canCancel = actionable && isOwner;
+                const canUpdate = actionable && isMine && iAmPlayer && hasValidTeam;
+                const label = `${formatName(challenge.owner)} vs ${formatName(challenge.target, 'Anyone')}`;
+                const statusLabel = describeChallengeStatus(challenge.status);
+                const ownerLabel = `${formatName(challenge.owner)} ${ownerReady ? '(ready)' : '(waiting)'}`;
+                const targetLabel = challenge.target
+                  ? `${formatName(challenge.target)} ${targetReady ? '(ready)' : '(waiting)'}`
+                  : 'Awaiting opponent';
                 return (
-                  <div key={r.id} style={{display:'grid', gap:6}}>
-                    <div><strong>{r.name}</strong> <span className="dim">• {r.status}</span></div>
-                    <div>
-                      <div className="dim">Players</div>
-                      <ul style={{margin:0}}>
-                        {(r.players||[]).map((p:any) => (
-                          <li key={p.id} style={{display:'flex', alignItems:'center', gap:6}}>
-                            {p.avatar && <img src={`/showdown/sprites/trainers/${p.avatar}.png`} alt="" style={{width:18, height:18, imageRendering:'pixelated'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/vendor/showdown/sprites/trainers/${p.avatar}.png`; }} />}
-                            {p.name} {readyMap[p.id] ? '✓' : ''}
-                          </li>
-                        ))}
-                      </ul>
+                  <div
+                    key={challenge.id}
+                    style={{
+                      border: '1px solid #555',
+                      borderRadius: 6,
+                      padding: 8,
+                      background: primaryChallenge?.id === challenge.id ? 'rgba(0,128,192,0.12)' : 'rgba(0,0,0,0.1)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                      <strong>{label}</strong>
+                      <span className="dim" style={{ fontSize: '0.8em' }}>• {statusLabel}</span>
+                      {awaitingMyResponse && <span style={{ marginLeft: 'auto', fontSize: '0.75em', textTransform: 'uppercase' }}>Your response needed</span>}
                     </div>
-                    {(r as any).spectators && (r as any).spectators.length>0 && (
-                      <div>
-                        <div className="dim">Spectators</div>
-                        <ul style={{margin:0}}>
-                          {(r as any).spectators.map((s:any) => (
-                            <li key={s.id} style={{display:'flex', alignItems:'center', gap:6}}>
-                              {s.avatar && <img src={`/showdown/sprites/trainers/${s.avatar}.png`} alt="" style={{width:16, height:16, imageRendering:'pixelated'}} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/vendor/showdown/sprites/trainers/${s.avatar}.png`; }} />}
-                              {s.name}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {amPlayer && (
-                      <button disabled={useInternetServer} onClick={()=>{
-                        const next = !myReadyValue; setMyReady(next);
-                        const active = teamsState.teams.find(t => t.id===teamsState.activeId) || teamsState.teams[0] || null;
-                        const teamText = active ? teamToShowdownText(active.members as any) : '';
-                        const payload = { roomId: r.id, ready: next, team: teamText, avatar: trainerSpriteToAvatar(trainerSprite), username } as any;
-                        const msg = { t:'room-ready', d: payload };
-                        if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg));
-                        if ((window as any).lan && hosting) (window as any).lan.send('room-ready', payload);
-                      }}>{myReadyValue ? 'Unready' : 'Ready'}</button>
-                    )}
+                    <div className="dim" style={{ fontSize: '0.85em', marginBottom: 6 }}>
+                      {ownerLabel} • {targetLabel}
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {canAccept && (
+                        <button className="mini" onClick={() => handleAcceptChallenge(challenge)} disabled={challengeBusy}>
+                          Accept
+                        </button>
+                      )}
+                      {canDecline && (
+                        <button className="mini secondary" onClick={() => handleDeclineChallenge(challenge.id)} disabled={challengeBusy}>
+                          Decline
+                        </button>
+                      )}
+                      {canCancel && (
+                        <button className="mini secondary" onClick={() => handleCancelChallenge(challenge.id)} disabled={challengeBusy}>
+                          Cancel
+                        </button>
+                      )}
+                      {canUpdate && (
+                        <button className="mini" onClick={() => handleUpdateChallengeLoadout(challenge)} disabled={challengeBusy}>
+                          Update Team
+                        </button>
+                      )}
+                      {!canAccept && !canDecline && !canCancel && !canUpdate && (
+                        <span className="dim" style={{ fontSize: '0.8em' }}>No actions available.</span>
+                      )}
+                    </div>
                   </div>
                 );
               })}
             </div>
-          )}
+          </div>
+
+          <div style={{ borderTop: '1px solid #333', paddingTop: 12 }}>
+            <h4 style={{ margin: '0 0 8px 0' }}>Battle Setup</h4>
+            <div className="dim" style={{ fontSize: '0.85em', marginBottom: 8 }}>
+              Select a team and submit it to your active challenge. Both players must send their payload before the battle begins.
+            </div>
+            {!primaryChallenge && (
+              <div className="dim" style={{ fontSize: '0.8em', marginBottom: 8 }}>
+                Create or accept a challenge to enable team submission.
+              </div>
+            )}
+            <label className="dim" style={{ display: 'grid', gap: 6 }}>
+              Team
+              <select value={selectedTeamId} onChange={e => setSelectedTeamId(e.target.value)}>
+                {teamsState.teams.map(team => (
+                  <option key={team.id} value={team.id}>
+                    {team.name} ({team.members.length}/6)
+                  </option>
+                ))}
+                {teamsState.teams.length === 0 && <option value="">No teams saved</option>}
+              </select>
+            </label>
+            <button
+              onClick={handleStartBattle}
+              disabled={!iAmPlayer || challengeBusy || !currentRoom || !primaryChallenge || !hasValidTeam || !isChallengeActionable(primaryChallenge.status)}
+            >
+              Submit Team
+            </button>
+          </div>
         </aside>
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <CustomsImportExport />
       </div>
     </section>
   );
-}
-
-function trainerSpriteToAvatar(name: string): string {
-  // The Showdown client references avatars by basename (without .png)
-  // Our selector provides the basename directly, so pass through.
-  return name;
 }

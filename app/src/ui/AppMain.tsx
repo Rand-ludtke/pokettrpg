@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BoxGrid } from './BoxGrid.tsx';
 import { SidePanel } from './SidePanel.tsx';
 import { TeamView } from './TeamView.tsx';
@@ -12,6 +12,7 @@ import { CustomsFileImporter } from './CustomsFileImporter';
 import { SimpleBattleTab } from './SimpleBattleTab';
 import { CharacterSheet } from './CharacterSheet';
 import { BadgeCase } from './BadgeCase';
+import { getClient, RoomSummary } from '../net/pokettrpgClient';
 
 type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | { kind: 'psbattle'; id: string; title: string };
 
@@ -19,62 +20,107 @@ export function App() {
   const [tab, setTab] = useState<Tab>('pc');
   const [extraTabs, setExtraTabs] = useState<Array<{ kind: 'psbattle'; id: string; title: string }>>([]);
   const [mountedBattles, setMountedBattles] = useState<Record<string, { id: string; title: string }>>({});
+  const dismissedBattlesRef = useRef<Set<string>>(new Set());
+  const client = useMemo(() => getClient(), []);
 
   useEffect(() => {
-    try {
-      const s: WebSocket | null = (window as any).__pokettrpgWS || null;
-      if (s && s.readyState === 1) {
-        s.send(JSON.stringify({ t: 'state-request' }));
-        try { window.dispatchEvent(new CustomEvent('lan:state-request')); } catch {}
-      }
-    } catch {}
-    const w: any = window as any;
-    if (!w.lan || !w.lan.on) return;
-    const off = w.lan.on('room-start', (d: any) => {
-      const id = d?.roomId || ('r_' + Math.random().toString(36).slice(2, 8));
-      const title = d?.name || 'Battle';
-      setExtraTabs(prev => (prev.find(t => t.id === id) ? prev : [...prev, { kind: 'psbattle', id, title }]));
-      setMountedBattles(prev => ({ ...prev, [id]: { id, title } }));
-      setTab({ kind: 'psbattle', id, title });
-    });
-    const onWsRoomStart = (ev: any) => {
-      try {
-        const d = (ev && ev.detail) || ev; if (!d) return;
-        const id = d?.roomId || ('r_' + Math.random().toString(36).slice(2, 8));
-        const title = d?.name || 'Battle';
-        setExtraTabs(prev => (prev.find(t => t.id === id) ? prev : [...prev, { kind: 'psbattle', id, title }]));
-        setMountedBattles(prev => ({ ...prev, [id]: { id, title } }));
-        setTab({ kind: 'psbattle', id, title });
-      } catch {}
+    const updateBattleTabTitle = (roomId: string, titleOrUpdater: string | ((prevTitle?: string) => string)) => {
+      let computed = '';
+      setMountedBattles(prev => {
+        const prevTitle = prev[roomId]?.title;
+        computed = typeof titleOrUpdater === 'function' ? titleOrUpdater(prevTitle) : titleOrUpdater;
+        return { ...prev, [roomId]: { id: roomId, title: computed } };
+      });
+      setExtraTabs(prev => {
+        const idx = prev.findIndex(t => t.id === roomId);
+        if (idx === -1) return [...prev, { kind: 'psbattle', id: roomId, title: computed }];
+        const next = prev.slice();
+        next[idx] = { ...next[idx], title: computed };
+        return next;
+      });
+      return computed;
     };
-    window.addEventListener('pokettrpg-room-start', onWsRoomStart as any);
-    return () => { off && off(); window.removeEventListener('pokettrpg-room-start', onWsRoomStart as any); };
-  }, []);
 
-  useEffect(() => {
-    try {
-      const s: WebSocket | null = (window as any).__pokettrpgWS || null;
-      if (!s || s.readyState !== 1) return;
-      if (tab === 'lobby' || (typeof tab === 'object' && (tab as any).kind === 'psbattle')) {
-        s.send(JSON.stringify({ t: 'state-request' }));
-        try { window.dispatchEvent(new CustomEvent('lan:state-request')); } catch {}
+    const ensureBattleTab = (roomId: string, title: string) => {
+      if (dismissedBattlesRef.current.has(roomId)) return;
+      const computedTitle = updateBattleTabTitle(roomId, title);
+      setTab({ kind: 'psbattle', id: roomId, title: computedTitle });
+    };
+
+    const participatesInSummary = (summary: RoomSummary) => {
+      if (!summary?.players || !Array.isArray(summary.players) || !client.user) return false;
+      const myId = (client.user.id || '').toLowerCase();
+      const myName = (client.user.username || '').toLowerCase();
+      return summary.players.some(player => {
+        if (!player) return false;
+        const playerAny = player as any;
+        const id = (player.id || playerAny.userid || playerAny.userId || '').toLowerCase();
+        if (id && myId && id === myId) return true;
+        const uname = (player.username || player.name || playerAny.user?.username || playerAny.user?.name || '').toLowerCase();
+        return !!myName && uname === myName;
+      });
+    };
+
+    const ensureTabFromSummary = (summary: RoomSummary) => {
+      if (!summary?.battleStarted) return;
+      if (!participatesInSummary(summary)) return;
+      if (dismissedBattlesRef.current.has(summary.id)) return;
+      const state = client.getBattleState(summary.id);
+      const title = deriveTitle(state, summary.id) || summary.name || `Battle ${summary.id}`;
+      ensureBattleTab(summary.id, title);
+    };
+
+    const deriveTitle = (state: any, roomId: string) => {
+      if (!state) return `Battle ${roomId}`;
+      if (state?.players && Array.isArray(state.players)) {
+        const names = state.players.map((p: any) => p?.name || p?.username).filter(Boolean);
+        if (names.length >= 2) return `${names[0]} vs ${names[1]}`;
+        if (names.length === 1) return `${names[0]} Battle`;
       }
-    } catch {}
-  }, [tab]);
+      return state?.name || `Battle ${roomId}`;
+    };
 
-  useEffect(() => {
-    function onFocus() {
-      try {
-        const s: WebSocket | null = (window as any).__pokettrpgWS || null;
-        if (s && s.readyState === 1) {
-          s.send(JSON.stringify({ t: 'state-request' }));
-          try { window.dispatchEvent(new CustomEvent('lan:state-request')); } catch {}
-        }
-      } catch {}
-    }
-    window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
-  }, []);
+    const offStart = client.on('battleStarted', ({ roomId, state }) => {
+      const title = deriveTitle(state, roomId);
+      dismissedBattlesRef.current.delete(roomId);
+      ensureBattleTab(roomId, title);
+    });
+    const offSpectate = client.on('spectateStart', ({ roomId, state }) => {
+      const title = deriveTitle(state, roomId);
+      dismissedBattlesRef.current.delete(roomId);
+      ensureBattleTab(roomId, title);
+    });
+    const offUpdate = client.on('battleUpdate', ({ roomId, update }) => {
+      const title = deriveTitle(update?.state, roomId);
+      if (!title) return;
+      updateBattleTabTitle(roomId, title);
+    });
+    const offEnd = client.on('battleEnd', ({ roomId, payload }) => {
+      const winner = payload?.result?.winner || payload?.winner;
+      if (!winner) return;
+      updateBattleTabTitle(roomId, prevTitle => {
+        const base = prevTitle || `Battle ${roomId}`;
+        return `${base} • ${winner} wins`;
+      });
+      dismissedBattlesRef.current.delete(roomId);
+    });
+    const offRoomsSnapshot = client.on('roomsSnapshot', rooms => {
+      rooms.forEach(ensureTabFromSummary);
+    });
+    const offRoomSummaryUpdate = client.on('roomUpdate', ensureTabFromSummary);
+    const offIdentified = client.on('identified', () => {
+      client.getRooms().forEach(ensureTabFromSummary);
+    });
+    return () => {
+      offStart();
+      offSpectate();
+      offUpdate();
+      offEnd();
+      offRoomsSnapshot();
+      offRoomSummaryUpdate();
+      offIdentified();
+    };
+  }, [client]);
 
   const [selected, setSelected] = useState<BattlePokemon | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -264,6 +310,7 @@ export function App() {
             <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
               <button className={(typeof tab === 'object' && (tab as any).id === t.id) ? 'active' : ''} onClick={() => setTab(t)}>{t.title}</button>
               <button className="mini" onClick={() => {
+                dismissedBattlesRef.current.add(t.id);
                 setExtraTabs(prev => prev.filter(x => x.id !== t.id));
                 setMountedBattles(prev => { const n = { ...prev }; delete n[t.id]; return n; });
                 if (typeof tab === 'object' && (tab as any).id === t.id) setTab('lobby');
@@ -496,7 +543,7 @@ export function App() {
 
       {Object.values(mountedBattles).map(b => (
         <div key={b.id} style={{ display: (typeof tab === 'object' && (tab as any).id === b.id) ? 'block' : 'none' }}>
-          <SimpleBattleTab id={b.id} title={b.title} />
+          <SimpleBattleTab roomId={b.id} title={b.title} />
         </div>
       ))}
     </div>

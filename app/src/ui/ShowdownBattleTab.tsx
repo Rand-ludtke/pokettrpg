@@ -1,6 +1,36 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { getSpriteSettings } from '../data/adapter';
 
+const DEFAULT_TRAINER_SPRITE = 'acetrainer';
+
+function sanitizeTrainerSpriteId(raw: unknown): string {
+  if (raw === null || raw === undefined) return '';
+  const value = typeof raw === 'number' && Number.isFinite(raw)
+    ? String(Math.trunc(raw))
+    : typeof raw === 'string'
+      ? raw
+      : '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  const withoutFragment = trimmed.split('#')[0];
+  const withoutQuery = withoutFragment.split('?')[0];
+  const segments = withoutQuery.replace(/\\/g, '/').split('/').filter(Boolean);
+  let candidate = (segments.length ? segments[segments.length - 1] : withoutQuery).replace(/\.png$/i, '').trim();
+  if (!candidate) return '';
+  candidate = candidate
+    .replace(/[\s_]+/g, '-')
+    .replace(/[^a-z0-9-]/gi, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase();
+  if (!candidate) return '';
+  if (candidate.includes('ace-trainer')) {
+    candidate = candidate.replace(/ace-trainer/g, 'acetrainer');
+  }
+  if (candidate === 'pending' || candidate === 'random' || candidate === 'default' || candidate === 'unknown') return '';
+  return candidate;
+}
+
 export function ShowdownBattleTab({ id, title }: { id: string; title: string }) {
   const [log, setLog] = useState<string[]>([]);
   const [requests, setRequests] = useState<{p1?: any; p2?: any}>({});
@@ -11,7 +41,12 @@ export function ShowdownBattleTab({ id, title }: { id: string; title: string }) 
     try { return localStorage.getItem('ttrpg.username') || 'Player'; } catch { return 'Player'; }
   });
   const [myAvatar, setMyAvatar] = useState<string>(() => {
-    try { return localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer'; } catch { return 'Ace Trainer'; }
+    try {
+      const stored = sanitizeTrainerSpriteId(localStorage.getItem('ttrpg.trainerSprite'));
+      return stored || DEFAULT_TRAINER_SPRITE;
+    } catch {
+      return DEFAULT_TRAINER_SPRITE;
+    }
   });
   // Per-side move options (target + special flags)
   const [moveOpts, setMoveOpts] = useState<Record<'p1'|'p2', { target?: string; z?: boolean; mega?: boolean; dynamax?: boolean; tera?: boolean }>>({
@@ -69,6 +104,9 @@ export function ShowdownBattleTab({ id, title }: { id: string; title: string }) 
     window.addEventListener('message', onMsg);
     return () => window.removeEventListener('message', onMsg);
   }, []);
+  useEffect(() => {
+    try { localStorage.setItem('ttrpg.trainerSprite', myAvatar); } catch {}
+  }, [myAvatar]);
   // Wire mini viewer: sprites dir, boss mode, and room streams
   useEffect(() => {
     try {

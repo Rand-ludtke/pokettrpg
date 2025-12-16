@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { spriteUrl } from '../data/adapter';
+import { getClient } from '../net/pokettrpgClient';
 
 type Stats = {
 	strength: number;
@@ -47,6 +48,36 @@ const DEFAULT_SECTIONS: InventorySection[] = [
 	{ key: 'battle', label: 'Battle Items', lines: '' },
 	{ key: 'other', label: 'Other', lines: '' },
 ];
+
+const DEFAULT_TRAINER_SPRITE = 'acetrainer';
+
+function sanitizeTrainerSpriteId(raw: unknown): string {
+	if (raw === null || raw === undefined) return '';
+	const value = typeof raw === 'number' && Number.isFinite(raw)
+		? String(Math.trunc(raw))
+		: typeof raw === 'string'
+			? raw
+			: '';
+	const trimmed = value.trim();
+	if (!trimmed) return '';
+	const withoutFragment = trimmed.split('#')[0];
+	const withoutQuery = withoutFragment.split('?')[0];
+	const segments = withoutQuery.replace(/\\/g, '/').split('/').filter(Boolean);
+	let candidate = (segments.length ? segments[segments.length - 1] : withoutQuery).replace(/\.png$/i, '').trim();
+	if (!candidate) return '';
+	candidate = candidate
+		.replace(/[\s_]+/g, '-')
+		.replace(/[^a-z0-9-]/gi, '')
+		.replace(/-+/g, '-')
+		.replace(/^-|-$/g, '')
+		.toLowerCase();
+	if (!candidate) return '';
+	if (candidate.includes('ace-trainer')) {
+		candidate = candidate.replace(/ace-trainer/g, 'acetrainer');
+	}
+	if (candidate === 'pending' || candidate === 'random' || candidate === 'default' || candidate === 'unknown') return '';
+	return candidate;
+}
 
 function migrate(raw: any): Character {
 	// Handle legacy stub structure
@@ -132,8 +163,13 @@ export function CharacterSheet() {
 	const [newItemName, setNewItemName] = useState<string>('');
 	const [newItemCount, setNewItemCount] = useState<number>(1);
 	// Trainer visual state (shared sprite with Lobby via localStorage; optional custom image for sheet)
-	const [trainerSprite, setTrainerSprite] = useState<string>(() => {
-		try { return localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer'; } catch { return 'Ace Trainer'; }
+	const [trainerSprite, setTrainerSpriteId] = useState<string>(() => {
+		try {
+			const stored = sanitizeTrainerSpriteId(localStorage.getItem('ttrpg.trainerSprite'));
+			return stored || DEFAULT_TRAINER_SPRITE;
+		} catch {
+			return DEFAULT_TRAINER_SPRITE;
+		}
 	});
 	const [trainerOptions, setTrainerOptions] = useState<string[]>([]);
 	const [trainerImage, setTrainerImage] = useState<string>(() => {
@@ -142,12 +178,18 @@ export function CharacterSheet() {
 	const [showSpritePicker, setShowSpritePicker] = useState<boolean>(false);
     const [spriteSearch, setSpriteSearch] = useState<string>('');
 	const [editingBg, setEditingBg] = useState(false);
+	const client = useMemo(() => getClient(), []);
+	const applyTrainerSprite = (value: string) => {
+		const sanitized = sanitizeTrainerSpriteId(value) || DEFAULT_TRAINER_SPRITE;
+		setTrainerSpriteId(sanitized);
+	};
 	// Item data (for icons + descriptions)
 	const [itemData, setItemData] = useState<Record<string, any>>({});
 	const [itemSuggest, setItemSuggest] = useState<string[]>([]);
 	const [selectedInvItem, setSelectedInvItem] = useState<{ key: string; index: number } | null>(null);
 	useEffect(() => { try { localStorage.setItem(LS_KEY, JSON.stringify(ch)); } catch {} }, [ch]);
 	useEffect(()=>{ try { localStorage.setItem('ttrpg.trainerSprite', trainerSprite); } catch {} }, [trainerSprite]);
+	useEffect(() => { client.setTrainerSprite(trainerSprite); }, [client, trainerSprite]);
 	useEffect(()=>{ try { if (trainerImage) localStorage.setItem('ttrpg.trainerImage', trainerImage); else localStorage.removeItem('ttrpg.trainerImage'); } catch {} }, [trainerImage]);
 	// Fetch items.json for inventory enhancements
 	useEffect(()=>{
@@ -635,7 +677,7 @@ export function CharacterSheet() {
 									{trainerOptions
 										.filter(name => { const q = spriteSearch.toLowerCase().trim(); return !q || name.toLowerCase().includes(q); })
 										.map((name)=> (
-											<button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=>{ setTrainerSprite(name); setShowSpritePicker(false); }} style={{width:64, height:64, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center'}}>
+											<button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=>{ applyTrainerSprite(name); setShowSpritePicker(false); }} style={{width:64, height:64, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center'}}>
 												<img src={`/vendor/showdown/sprites/trainers/${name}.png`} alt={name} style={{ width:48, height:48, imageRendering:'pixelated', background:'transparent' }} onError={(e)=>{ const img=e.currentTarget as HTMLImageElement; img.onerror=null; img.src=`/showdown/sprites/trainers/${name}.png`; }} />
 											</button>
 										))}

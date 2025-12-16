@@ -2,6 +2,36 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BattlePokemon } from '../types';
 import { spriteUrl, loadShowdownDex, normalizeName, speciesFormesInfo, eligibleMegaFormForItem, prepareBattle, toPokemon, loadTeams } from '../data/adapter';
 
+const DEFAULT_TRAINER_SPRITE = 'acetrainer';
+
+function sanitizeTrainerSpriteId(raw: unknown): string {
+  if (raw === null || raw === undefined) return '';
+  const value = typeof raw === 'number' && Number.isFinite(raw)
+    ? String(Math.trunc(raw))
+    : typeof raw === 'string'
+      ? raw
+      : '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  const withoutFragment = trimmed.split('#')[0];
+  const withoutQuery = withoutFragment.split('?')[0];
+  const segments = withoutQuery.replace(/\\/g, '/').split('/').filter(Boolean);
+  let candidate = (segments.length ? segments[segments.length - 1] : withoutQuery).replace(/\.png$/i, '').trim();
+  if (!candidate) return '';
+  candidate = candidate
+    .replace(/[\s_]+/g, '-')
+    .replace(/[^a-z0-9-]/gi, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase();
+  if (!candidate) return '';
+  if (candidate.includes('ace-trainer')) {
+    candidate = candidate.replace(/ace-trainer/g, 'acetrainer');
+  }
+  if (candidate === 'pending' || candidate === 'random' || candidate === 'default' || candidate === 'unknown') return '';
+  return candidate;
+}
+
 type PrimaryStatus = 'par'|'slp'|'brn'|'frz'|'psn'|'tox'|null;
 type Volatile = 'confusion'|string;
 
@@ -18,7 +48,14 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
   const [peers, setPeers] = useState<string[]>([]);
   const [chat, setChat] = useState<Array<{from:string; text:string; at:number}>>([]);
   const chatInputRef = useRef<HTMLInputElement>(null);
-  const [trainerSprite, setTrainerSprite] = useState<string>(() => localStorage.getItem('ttrpg.trainerSprite') || 'Ace Trainer');
+  const [trainerSprite, setTrainerSprite] = useState<string>(() => {
+    try {
+      const stored = sanitizeTrainerSpriteId(localStorage.getItem('ttrpg.trainerSprite'));
+      return stored || DEFAULT_TRAINER_SPRITE;
+    } catch {
+      return DEFAULT_TRAINER_SPRITE;
+    }
+  });
   const [battles, setBattles] = useState<Array<{id:string; name:string; format:string; players:string[]; status:'open'|'active'}>>([]);
   const [challengeFormat, setChallengeFormat] = useState<string>('Singles');
   const [challengeTeamId, setChallengeTeamId] = useState<string>('');
