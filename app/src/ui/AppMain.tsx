@@ -5,14 +5,18 @@ import { TeamView } from './TeamView.tsx';
 import { BattleTab } from './BattleTab.tsx';
 import { LobbyTab } from './LobbyTab';
 import { BattlePokemon } from '../types.ts';
-import { getSpriteSettings, setSpriteSettings, SpriteSet, loadTeams, saveTeams, createTeam, cloneForTeam } from '../data/adapter.ts';
+import { getSpriteSettings, setSpriteSettings, SpriteSet, loadTeams, saveTeams, createTeam, cloneForTeam, getTeamMaxSize, isTeamFull } from '../data/adapter.ts';
 import { ImportExport } from './ImportExport';
 import { CustomDexBuilder } from './CustomDexBuilder';
 import { CustomsFileImporter } from './CustomsFileImporter';
 import { SimpleBattleTab } from './SimpleBattleTab';
+import { PSBattlePanel } from '../ps';
 import { CharacterSheet } from './CharacterSheet';
 import { BadgeCase } from './BadgeCase';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
+
+// Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
+const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
 type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | { kind: 'psbattle'; id: string; title: string };
 
@@ -85,6 +89,12 @@ export function App() {
       dismissedBattlesRef.current.delete(roomId);
       ensureBattleTab(roomId, title);
     });
+    const offTeamPreview = client.on('teamPreviewStarted', ({ roomId }) => {
+      const room = client.getRooms().find(r => r.id === roomId);
+      const title = room?.name || `Battle ${roomId}`;
+      dismissedBattlesRef.current.delete(roomId);
+      ensureBattleTab(roomId, title);
+    });
     const offSpectate = client.on('spectateStart', ({ roomId, state }) => {
       const title = deriveTitle(state, roomId);
       dismissedBattlesRef.current.delete(roomId);
@@ -113,6 +123,7 @@ export function App() {
     });
     return () => {
       offStart();
+      offTeamPreview();
       offSpectate();
       offUpdate();
       offEnd();
@@ -152,6 +163,8 @@ export function App() {
 
   // Multi-delete state for PC box
   const [pcMulti, setPcMulti] = useState<{ enabled: boolean; indices: number[] }>({ enabled: false, indices: [] });
+  // Team selector for bulk add
+  const [bulkAddTeamId, setBulkAddTeamId] = useState<string>('');
   const togglePcPick = (idx: number) => {
     setPcMulti(prev => {
       const has = prev.indices.includes(idx);
@@ -245,7 +258,12 @@ export function App() {
       newTeams.push(t);
       targetId = t.id;
     }
-    newTeams = newTeams.map(t => (t.id === targetId ? { ...t, members: t.members.length >= 6 ? t.members : [...t.members, cloneForTeam(p)] } : t));
+    newTeams = newTeams.map(t => {
+      if (t.id !== targetId) return t;
+      // Use isTeamFull to respect both standard and TTRPG team limits
+      if (isTeamFull(t)) return t;
+      return { ...t, members: [...t.members, cloneForTeam(p)] };
+    });
     const state = { teams: newTeams, activeId: targetId };
     setTeams(state);
     saveTeams(newTeams, targetId);
@@ -268,6 +286,13 @@ export function App() {
   useEffect(() => { saveTeams(teams.teams, teams.activeId); }, [teams]);
   useEffect(() => { try { localStorage.setItem('ttrpg.boxes', JSON.stringify(boxes)); } catch {} }, [boxes]);
   useEffect(() => { try { localStorage.setItem('ttrpg.boxIndex', String(boxIndex)); } catch {} }, [boxIndex]);
+
+  // Listen for navigateToLobby events from battle tab
+  useEffect(() => {
+    const handler = () => setTab('lobby');
+    window.addEventListener('navigateToLobby', handler);
+    return () => window.removeEventListener('navigateToLobby', handler);
+  }, []);
 
   function changeSelectedAbility(nextAbility: string) {
     if (selected == null || selectedIndex == null) return;
@@ -394,25 +419,49 @@ export function App() {
             />
             <section className="panel" style={{ display: 'grid', gap: 8 }}>
               <h3>Bulk Actions</h3>
-              {!pcMulti.enabled ? (
-                <button className="danger" onClick={() => setPcMulti({ enabled: true, indices: [] })}>&gt; Multi Delete…</button>
-              ) : (
-                <div style={{ display: 'grid', gap: 8 }}>
-                  <div className="dim">{pcMulti.indices.length} selected</div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="danger" disabled={pcMulti.indices.length === 0} onClick={confirmPcMultiDelete}>
-                      Yes, delete
-                    </button>
-                    <button className="secondary" onClick={() => setPcMulti({ enabled: false, indices: [] })}>Cancel</button>
-                  </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="secondary" onClick={selectAllInPcBox}>Select All</button>
-                    <button className="secondary" onClick={invertSelectionInPcBox}>Invert Selection</button>
-                    <button className="secondary" onClick={() => setPcMulti(prev => ({ ...prev, indices: [] }))}>Clear</button>
-                  </div>
-                  <div className="dim" style={{ fontSize: '0.9em' }}>Click Pokémon in the PC box to toggle selection.</div>
+              <div className="dim" style={{ fontSize: '0.85em', marginBottom: 4 }}>
+                Shift-click Pokémon in the PC box to select multiple.
+                {pcMulti.indices.length > 0 && ` (${pcMulti.indices.length} selected)`}
+              </div>
+              <div style={{ display: 'grid', gap: 8 }}>
+                <label className="dim" style={{ display: 'grid', gap: 4 }}>
+                  Target Team
+                  <select 
+                    value={bulkAddTeamId || teams.activeId || ''} 
+                    onChange={e => setBulkAddTeamId(e.target.value)}
+                    style={{ padding: '6px 10px', borderRadius: 6 }}
+                  >
+                    {teams.teams.map(t => (
+                      <option key={t.id} value={t.id}>
+                        {t.name} ({t.members.length} Pokémon){t.type === 'ttrpg' ? ' [TTRPG]' : ''}
+                      </option>
+                    ))}
+                    {teams.teams.length === 0 && <option value="">No teams - will create new</option>}
+                  </select>
+                </label>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <button 
+                    disabled={pcMulti.indices.length === 0} 
+                    onClick={() => {
+                      const box = currentBox();
+                      const toAdd = pcMulti.indices.map(i => box[i]).filter((x): x is BattlePokemon => !!x);
+                      const targetId = bulkAddTeamId || teams.activeId || teams.teams[0]?.id;
+                      for (const p of toAdd) addToTeam(p, targetId);
+                      setPcMulti({ enabled: false, indices: [] });
+                    }}
+                  >
+                    + Add {pcMulti.indices.length || ''} to Team
+                  </button>
+                  <button className="danger" disabled={pcMulti.indices.length === 0} onClick={confirmPcMultiDelete}>
+                    🗑️ Delete {pcMulti.indices.length || ''}
+                  </button>
                 </div>
-              )}
+              </div>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button className="secondary mini" onClick={selectAllInPcBox}>Select All</button>
+                <button className="secondary mini" onClick={invertSelectionInPcBox}>Invert</button>
+                <button className="secondary mini" onClick={() => setPcMulti(prev => ({ ...prev, indices: [] }))} disabled={pcMulti.indices.length === 0}>Clear Selection</button>
+              </div>
             </section>
             <CustomDexBuilder onAddToPC={(mons) => addAcrossBoxes(mons)} />
             <CustomsFileImporter />
@@ -481,11 +530,20 @@ export function App() {
             <h2>Teams</h2>
             {teams.teams.length === 0 && <div className="dim">No teams yet.</div>}
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 6 }}>
-              {teams.teams.map(t => (
+              {teams.teams.map(t => {
+                const maxSize = getTeamMaxSize(t);
+                const typeLabel = t.type === 'ttrpg' ? 'Custom' : 'Standard';
+                const sizeLabel = maxSize === Infinity ? '∞' : maxSize;
+                return (
                 <li key={t.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gridTemplateRows: 'auto auto', gap: 8, alignItems: 'center' }}>
                   <div style={{ gridColumn: '1 / 2', gridRow: '1' }}>
                     <strong>{t.name}</strong> {teams.activeId === t.id && <span className="dim">(active)</span>}
-                    <div className="dim" style={{ fontSize: '0.9em' }}>{t.members.length} / 6</div>
+                    <div className="dim" style={{ fontSize: '0.9em' }}>
+                      {t.members.length} / {sizeLabel} 
+                      <span style={{ marginLeft: 6, fontSize: '0.85em', padding: '1px 5px', borderRadius: 4, background: t.type === 'ttrpg' ? 'rgba(180,100,255,0.2)' : 'rgba(100,200,100,0.2)', border: t.type === 'ttrpg' ? '1px solid rgba(180,100,255,0.4)' : '1px solid rgba(100,200,100,0.4)' }}>
+                        {typeLabel}
+                      </span>
+                    </div>
                   </div>
                   <button className="mini" style={{ gridColumn: '2', gridRow: '1' }} onClick={() => {
                     const nn = prompt('Rename team', t.name);
@@ -518,18 +576,46 @@ export function App() {
                     });
                   }} disabled={teams.activeId === t.id} style={{ gridColumn: '1 / -1', gridRow: '2' }}>Set Active</button>
                 </li>
-              ))}
+              );})}
             </ul>
-            <div style={{ marginTop: 8, display: 'grid', gridTemplateColumns: '1fr auto', gap: 6, alignItems: 'center' }}>
-              <input id="newTeamName" placeholder={`Team ${teams.teams.length + 1}`} />
-              <button onClick={() => {
-                const el = document.getElementById('newTeamName') as HTMLInputElement | null;
-                const nameRaw = (el?.value || '').trim() || `Team ${teams.teams.length + 1}`;
-                const t = createTeam(nameRaw);
-                const newTeams = [...teams.teams, t];
-                setTeams({ teams: newTeams, activeId: t.id }); saveTeams(newTeams, t.id);
-                if (el) el.value = '';
-              }}>+ Create</button>
+            <div style={{ marginTop: 12, padding: 10, border: '1px solid #444', borderRadius: 6, background: 'rgba(0,0,0,0.2)' }}>
+              <div style={{ marginBottom: 8, fontWeight: 600, fontSize: '0.9em', color: '#aaa' }}>Create New Team</div>
+              <div style={{ display: 'grid', gap: 8 }}>
+                <input id="newTeamName" placeholder={`Team ${teams.teams.length + 1}`} style={{ padding: '6px 8px' }} />
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.85em', cursor: 'pointer' }}>
+                    <input type="radio" name="teamType" id="teamTypeStandard" defaultChecked style={{ cursor: 'pointer' }} />
+                    <span>Standard (6 max)</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.85em', cursor: 'pointer' }}>
+                    <input type="radio" name="teamType" id="teamTypeCustom" style={{ cursor: 'pointer' }} />
+                    <span>Custom</span>
+                  </label>
+                  <input 
+                    type="number" 
+                    id="customTeamSize" 
+                    placeholder="Size" 
+                    min={1} 
+                    max={100} 
+                    defaultValue={12}
+                    style={{ width: 60, padding: '4px 6px', fontSize: '0.85em' }} 
+                    title="Max Pokemon for custom team"
+                  />
+                </div>
+                <button onClick={() => {
+                  const nameEl = document.getElementById('newTeamName') as HTMLInputElement | null;
+                  const customRadio = document.getElementById('teamTypeCustom') as HTMLInputElement | null;
+                  const sizeEl = document.getElementById('customTeamSize') as HTMLInputElement | null;
+                  const nameRaw = (nameEl?.value || '').trim() || `Team ${teams.teams.length + 1}`;
+                  const isCustom = customRadio?.checked || false;
+                  const customSize = Math.min(100, Math.max(1, parseInt(sizeEl?.value || '12', 10) || 12));
+                  const t = createTeam(nameRaw, isCustom ? { type: 'ttrpg', maxSize: customSize } : { type: 'standard' });
+                  const newTeams = [...teams.teams, t];
+                  setTeams({ teams: newTeams, activeId: t.id }); 
+                  saveTeams(newTeams, t.id);
+                  if (nameEl) nameEl.value = '';
+                }}>+ Create Team</button>
+              </div>
             </div>
           </section>
           <ImportExport onImport={(t) => { const active = activeTeam; if (!active) return; const newTeams = teams.teams.map(x => x.id === active.id ? { ...x, members: t.slice(0, 6) } : x); setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id); }} maxCount={6} exportList={team} exportLabel="Export Team" />
@@ -537,13 +623,33 @@ export function App() {
       )}
 
       {tab === 'battle' && (<BattleTab friendly={team[0] ?? null} enemy={selected} team={team} onReplaceTeam={replaceTeamAt} />)}
-      {tab === 'lobby' && (<LobbyTab />)}
+      <div style={{ display: tab === 'lobby' ? 'block' : 'none' }}>
+        <LobbyTab />
+      </div>
       {tab === "sheet" && (<CharacterSheet />)}
       {tab === 'badges' && (<BadgeCase />)}
 
       {Object.values(mountedBattles).map(b => (
-        <div key={b.id} style={{ display: (typeof tab === 'object' && (tab as any).id === b.id) ? 'block' : 'none' }}>
-          <SimpleBattleTab roomId={b.id} title={b.title} />
+        <div key={b.id} style={{ display: (typeof tab === 'object' && (tab as any).id === b.id) ? 'block' : 'none', height: '100%' }}>
+          {BATTLE_UI_MODE === 'ps' ? (
+            <PSBattlePanel 
+              roomId={b.id} 
+              client={client}
+              myPlayerId={client.user?.id}
+              onClose={() => {
+                dismissedBattlesRef.current.add(b.id);
+                setMountedBattles(prev => {
+                  const next = { ...prev };
+                  delete next[b.id];
+                  return next;
+                });
+                setExtraTabs(prev => prev.filter(t => t.id !== b.id));
+                setTab('lobby');
+              }}
+            />
+          ) : (
+            <SimpleBattleTab roomId={b.id} title={b.title} />
+          )}
         </div>
       ))}
     </div>

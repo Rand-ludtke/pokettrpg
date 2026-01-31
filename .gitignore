@@ -25,6 +25,7 @@ Thumbs.db
 # Env
 .env
 .env.*
+!.env.tauri
 
 # Editor
 .vscode/

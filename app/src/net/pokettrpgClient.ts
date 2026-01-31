@@ -130,6 +130,7 @@ export type ClientEvents = {
   roomRemove: string;
   chatMessage: ChatMessage;
   battleStarted: { roomId: string; state: any };
+  teamPreviewStarted: { roomId: string };
   battleUpdate: { roomId: string; update: BattleStatePayload };
   phase: { roomId: string; payload: PhasePayload };
   promptAction: PromptActionPayload;
@@ -170,7 +171,7 @@ function sanitizeTrainerSpriteId(raw: unknown): string {
   if (candidate.includes('ace-trainer')) {
     candidate = candidate.replace(/ace-trainer/g, 'acetrainer');
   }
-  if (candidate === 'pending' || candidate === 'random' || candidate === 'default' || candidate === 'unknown') return '';
+  if (candidate === 'pending' || candidate === 'random' || candidate === 'default' || candidate === 'unknown' || candidate === 'none') return '';
   return candidate;
 }
 
@@ -398,6 +399,7 @@ export class PoketTRPGClient {
   private applyTrainerSprite(next: string | null, options: { persist?: boolean; notify?: boolean; triggerIdentify?: boolean; force?: boolean } = {}) {
     const { persist = true, notify = true, triggerIdentify = false, force = false } = options;
     const normalized = next && next.trim() ? next : null;
+    // Only block server updates if we have a locked sprite from character sheet
     if (!force && this.trainerSpriteLocked && this.trainerSprite && normalized && normalized !== this.trainerSprite) return;
     if (normalized === (this.trainerSprite || null)) return;
     this.trainerSprite = normalized;
@@ -415,9 +417,10 @@ export class PoketTRPGClient {
 
   private syncTrainerSpriteFromServer(value: unknown) {
     const sanitized = sanitizeTrainerSpriteId(value);
+    // Don't sync from server if user has set their own sprite in character sheet
     if (this.trainerSpriteLocked && this.trainerSprite) return;
     if (!sanitized) return;
-    this.applyTrainerSprite(sanitized, { persist: true, notify: true, triggerIdentify: false });
+    this.applyTrainerSprite(sanitized, { persist: false, notify: false, triggerIdentify: false });
   }
 
   getRooms(): RoomSummary[] {
@@ -593,6 +596,11 @@ export class PoketTRPGClient {
       this.finalizeBattleStart(roomId, state, data);
     });
 
+    socket.on('teamPreviewStarted', ({ roomId }: { roomId: string }) => {
+      if (!roomId) return;
+      this.emitter.emit('teamPreviewStarted', { roomId });
+    });
+
     socket.on('battleUpdate', (update: any) => {
       const state = this.extractBattleState(update);
       this.applyRoomsPatch(update?.rooms);
@@ -606,7 +614,7 @@ export class PoketTRPGClient {
       this.ensureBattleRoomPresence(roomId, mergedState ?? state, update);
       if (update?.phase) this.battlePhases.set(roomId, { phase: update.phase, deadline: update?.deadline });
       if (update?.needsSwitch !== undefined) this.updateNeedsSwitch(roomId, update.needsSwitch);
-      this.appendBattleLog(roomId, this.pullLogEntries(update?.log, update?.messages, update?.result?.log, update?.result));
+      this.appendBattleLog(roomId, this.pullLogEntries(update?.log, update?.messages, update?.result?.log, update?.result?.state?.log, update?.result));
       this.ensureAutoJoinForBattle(roomId, state || update, true);
       this.emitter.emit('battleUpdate', { roomId, update });
     });
@@ -621,6 +629,12 @@ export class PoketTRPGClient {
       if (payload?.roomId) {
         this.battlePrompts.set(payload.roomId, payload);
         if ((payload as any).needsSwitch !== undefined) this.updateNeedsSwitch(payload.roomId, (payload as any).needsSwitch);
+        // Extract and record battle state from prompt payload (contains players, teams, etc.)
+        const state = this.extractBattleState(payload);
+        if (state) {
+          const mergedState = this.mergeBattleState(payload.roomId, state, payload);
+          this.recordBattleState(payload.roomId, mergedState);
+        }
       }
       this.emitter.emit('promptAction', payload);
     });

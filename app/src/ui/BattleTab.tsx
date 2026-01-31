@@ -28,7 +28,7 @@ function sanitizeTrainerSpriteId(raw: unknown): string {
   if (candidate.includes('ace-trainer')) {
     candidate = candidate.replace(/ace-trainer/g, 'acetrainer');
   }
-  if (candidate === 'pending' || candidate === 'random' || candidate === 'default' || candidate === 'unknown') return '';
+  if (candidate === 'pending' || candidate === 'random' || candidate === 'default' || candidate === 'unknown' || candidate === 'none') return '';
   return candidate;
 }
 
@@ -85,10 +85,24 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
   const [infoTab, setInfoTab] = useState<'type'|'rules'|'conditions'|'terrain'|'hazards'>('type');
   const [typePick1, setTypePick1] = useState<string>('');
   const [typePick2, setTypePick2] = useState<string>('');
+  const [initiativeRoll, setInitiativeRoll] = useState<{ friendly: number | null; enemy: number | null; winner: 'friendly' | 'enemy' | 'tie' | null; rolledAt: number | null }>({ friendly: null, enemy: null, winner: null, rolledAt: null });
 
   // Dex data for ability/item descriptions and mega logic
   const [dex, setDex] = useState<any | null>(null);
   useEffect(() => { (async () => { const d = await loadShowdownDex(); setDex(d); })(); }, []);
+
+  const friendlyLabel = friendly?.name || friendly?.species || 'You';
+  const enemyLabel = enemy?.name || enemy?.species || 'Opponent';
+
+  const rollInitiative = () => {
+    const rollD20 = () => Math.floor(Math.random() * 20) + 1;
+    const friendlyValue = rollD20();
+    const enemyValue = rollD20();
+    let winner: 'friendly' | 'enemy' | 'tie' = 'tie';
+    if (friendlyValue > enemyValue) winner = 'friendly';
+    else if (enemyValue > friendlyValue) winner = 'enemy';
+    setInitiativeRoll({ friendly: friendlyValue, enemy: enemyValue, winner, rolledAt: Date.now() });
+  };
 
   // Mega eligibility derived from dex + held item
 
@@ -182,11 +196,13 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
   }, [dex, active]);
 
   const isMegaNow = useMemo(() => {
-    if (!active) return false;
-    const id = normalizeName(active.species || active.name);
-    const baseId = normalizeName(baseSpeciesName || id);
-    return id !== baseId;
-  }, [active, baseSpeciesName]);
+    if (!dex || !active) return false;
+    const speciesId = active.species || active.name;
+    const nowEntry = dex.pokedex[normalizeName(speciesId)] || {};
+    // Check if the dex entry has isMega flag, or if the name contains "mega"
+    const nameLooksMega = /(^|[-_\s])mega(\b|[-_\s])/i.test(String(speciesId));
+    return !!nowEntry.isMega || nameLooksMega;
+  }, [dex, active]);
 
   const doMegaToggle = async () => {
     if (!dex || !active) return;
@@ -439,6 +455,40 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                   style={{background: weather===opt.key? opt.bg : 'transparent', borderColor: opt.color, color: weather===opt.key? (opt as any).fg : undefined}}
                 >{opt.label}</button>
               ))}
+            </div>
+          </section>
+
+          {/* Initiative roll helper */}
+          <section style={{border:'1px solid #444', borderRadius:6, padding:8, marginBottom:8, background:'var(--section-bg)'}}>
+            <h4 style={{marginTop:0}}>Speed / Initiative (TTRPG)</h4>
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:12, marginBottom:8}}>
+              <div style={{border:'1px solid #555', borderRadius:8, padding:8}}>
+                <div className="dim">{friendlyLabel}</div>
+                <div style={{fontSize:'1.8rem', fontWeight:700}}>{initiativeRoll.friendly ?? '—'}</div>
+              </div>
+              <div style={{border:'1px solid #555', borderRadius:8, padding:8}}>
+                <div className="dim">{enemyLabel}</div>
+                <div style={{fontSize:'1.8rem', fontWeight:700}}>{initiativeRoll.enemy ?? '—'}</div>
+              </div>
+              <div style={{border:'1px solid #555', borderRadius:8, padding:8, display:'grid', gap:4}}>
+                <div className="dim">Result</div>
+                <div style={{fontSize:'1rem', fontWeight:600}}>
+                  {initiativeRoll.winner === 'friendly' && `${friendlyLabel} acts first`}
+                  {initiativeRoll.winner === 'enemy' && `${enemyLabel} acts first`}
+                  {initiativeRoll.winner === 'tie' && initiativeRoll.friendly !== null ? 'Tie — roll again' : '—'}
+                </div>
+                {initiativeRoll.rolledAt && (
+                  <div className="dim" style={{fontSize:'0.8rem'}}>
+                    Rolled {new Date(initiativeRoll.rolledAt).toLocaleTimeString()}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{display:'flex', gap:8, flexWrap:'wrap', alignItems:'center'}}>
+              <button onClick={rollInitiative}>Roll d20 for Initiative</button>
+              <span className="dim" style={{fontSize:'0.85rem'}}>
+                Use this roll to decide who acts first in tabletop encounters. Highest D20 takes priority.
+              </span>
             </div>
           </section>
 

@@ -1,0 +1,17 @@
+{
+  "name": "Pokémon TTRPG",
+  "short_name": "PokeTTRPG",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1d3557",
+  "theme_color": "#1d3557",
+  "description": "Pokémon TTRPG companion app",
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

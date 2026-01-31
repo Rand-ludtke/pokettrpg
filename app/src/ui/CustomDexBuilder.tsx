@@ -147,9 +147,9 @@ export function CustomDexBuilder({ onAddToPC }: { onAddToPC: (mons: BattlePokemo
                 <option value="other">Other</option>
               </select>
             </label>
-            <label>Evo Level <input type="number" min={1} max={100} value={evoLevel} onChange={e=>{
+            <label>Evo Level <input type="number" min={1} max={255} value={evoLevel} onChange={e=>{
               const v = e.target.value;
-              setEvoLevel(v === '' ? '' : Math.max(1, Math.min(100, Number(v)||1)));
+              setEvoLevel(v === '' ? '' : Math.max(1, Math.min(255, Number(v)||1)));
             }} placeholder="16" /></label>
             <label>Evo Condition <input value={evoCondition} onChange={e=>setEvoCondition(e.target.value)} placeholder="Daytime, Holding Razor Claw, etc." /></label>
             <label>Evoutions (CSV) <input value={evosCsv} onChange={e=>setEvosCsv(e.target.value)} placeholder="Raichu, Raichu-Alola" /></label>
@@ -191,7 +191,7 @@ export function CustomDexBuilder({ onAddToPC }: { onAddToPC: (mons: BattlePokemo
           </div>
           <div>
             <label className="dim">Level to add</label>
-            <input type="number" min={1} max={100} value={level} onChange={e=>setLevel(Number(e.target.value)||1)} />
+            <input type="number" min={1} max={255} value={level} onChange={e=>setLevel(Number(e.target.value)||1)} />
           </div>
           {error && <span style={{color:'#ff8'}}>{error}</span>}
           <p className="dim" style={{marginTop:8}}>

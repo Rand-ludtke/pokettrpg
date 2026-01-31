@@ -207,7 +207,10 @@ function getEV(evs: Pokemon['evs']|undefined, key: 'hp'|'atk'|'def'|'spa'|'spd'|
 }
 
 export function computeRealStats(p: Pokemon): { hp:number; atk:number; def:number; spa:number; spd:number; spe:number } {
-  const L = Math.max(1, Math.min(100, Math.floor(p.level||1)));
+  // Allow levels beyond 100 - use standard formula up to 100, then linear extrapolation
+  const rawLevel = Math.max(1, Math.floor(p.level || 1));
+  const cappedLevel = Math.min(100, rawLevel);
+  const L = cappedLevel;
   const bs = p.baseStats;
   const iv = {
     hp: getIV(p.ivs, 'hp'), atk: getIV(p.ivs, 'atk'), def: getIV(p.ivs, 'def'), spa: getIV(p.ivs, 'spa'), spd: getIV(p.ivs, 'spd'), spe: getIV(p.ivs, 'spe')
@@ -217,16 +220,46 @@ export function computeRealStats(p: Pokemon): { hp:number; atk:number; def:numbe
   };
   // Shedinja special case: always 1 HP
   const isShedinja = normalizeName(p.species || p.name) === 'shedinja';
-  const hp = isShedinja ? 1 : (Math.floor(((2*bs.hp + iv.hp + Math.floor(ev.hp/4)) * L) / 100) + L + 10);
+  
+  // Base stats at level 100 (or current capped level)
+  const hpBase = isShedinja ? 1 : (Math.floor(((2*bs.hp + iv.hp + Math.floor(ev.hp/4)) * L) / 100) + L + 10);
   const calc = (base:number, ivv:number, evv:number, stat:'atk'|'def'|'spa'|'spd'|'spe') => {
     const n = Math.floor(((2*base + ivv + Math.floor(evv/4)) * L) / 100) + 5;
     return Math.floor(n * natureMultiplier(p.nature, stat));
   };
-  const atk = calc(bs.atk, iv.atk, ev.atk, 'atk');
-  const def = calc(bs.def, iv.def, ev.def, 'def');
-  const spa = calc(bs.spAtk, iv.spa, ev.spa, 'spa');
-  const spd = calc(bs.spDef, iv.spd, ev.spd, 'spd');
-  const spe = calc(bs.speed, iv.spe, ev.spe, 'spe');
+  const atkBase = calc(bs.atk, iv.atk, ev.atk, 'atk');
+  const defBase = calc(bs.def, iv.def, ev.def, 'def');
+  const spaBase = calc(bs.spAtk, iv.spa, ev.spa, 'spa');
+  const spdBase = calc(bs.spDef, iv.spd, ev.spd, 'spd');
+  const speBase = calc(bs.speed, iv.spe, ev.spe, 'spe');
+  
+  // If level > 100, apply linear scaling based on level 99 to 100 growth rate
+  if (rawLevel <= 100) {
+    return { hp: hpBase, atk: atkBase, def: defBase, spa: spaBase, spd: spdBase, spe: speBase };
+  }
+  
+  // Calculate stats at level 99 for growth rate estimation
+  const L99 = 99;
+  const hpAt99 = isShedinja ? 1 : (Math.floor(((2*bs.hp + iv.hp + Math.floor(ev.hp/4)) * L99) / 100) + L99 + 10);
+  const calcAt99 = (base:number, ivv:number, evv:number, stat:'atk'|'def'|'spa'|'spd'|'spe') => {
+    const n = Math.floor(((2*base + ivv + Math.floor(evv/4)) * L99) / 100) + 5;
+    return Math.floor(n * natureMultiplier(p.nature, stat));
+  };
+  const atkAt99 = calcAt99(bs.atk, iv.atk, ev.atk, 'atk');
+  const defAt99 = calcAt99(bs.def, iv.def, ev.def, 'def');
+  const spaAt99 = calcAt99(bs.spAtk, iv.spa, ev.spa, 'spa');
+  const spdAt99 = calcAt99(bs.spDef, iv.spd, ev.spd, 'spd');
+  const speAt99 = calcAt99(bs.speed, iv.spe, ev.spe, 'spe');
+  
+  // Linear extrapolation: stat = baseAt100 + (baseAt100 - baseAt99) * (level - 100)
+  const extraLevels = rawLevel - 100;
+  const hp = isShedinja ? 1 : Math.floor(hpBase + (hpBase - hpAt99) * extraLevels);
+  const atk = Math.floor(atkBase + (atkBase - atkAt99) * extraLevels);
+  const def = Math.floor(defBase + (defBase - defAt99) * extraLevels);
+  const spa = Math.floor(spaBase + (spaBase - spaAt99) * extraLevels);
+  const spd = Math.floor(spdBase + (spdBase - spdAt99) * extraLevels);
+  const spe = Math.floor(speBase + (speBase - speAt99) * extraLevels);
+  
   return { hp, atk, def, spa, spd, spe };
 }
 
@@ -687,7 +720,15 @@ export function addTeamToShowdownStorage(name: string, text: string, opts?: { fo
 }
 
 // Multi-team persistence
-export type TeamRecord = { id: string; name: string; members: BattlePokemon[] };
+// Regular teams: 6 max, TTRPG teams: unlimited (or custom max)
+export type TeamRecord = { 
+  id: string; 
+  name: string; 
+  members: BattlePokemon[];
+  type?: 'standard' | 'ttrpg'; // default is 'standard'
+  maxSize?: number; // undefined = 6 for standard, no limit for ttrpg
+};
+export const DEFAULT_TEAM_SIZE = 6;
 const LS_TEAMS = 'ttrpg.teams';
 const LS_ACTIVE_TEAM = 'ttrpg.activeTeamId';
 export function loadTeams(): { teams: TeamRecord[]; activeId: string | null } {
@@ -706,10 +747,22 @@ export function saveTeams(teams: TeamRecord[], activeId?: string | null) {
     if (typeof activeId !== 'undefined') {
       if (activeId) localStorage.setItem(LS_ACTIVE_TEAM, activeId); else localStorage.removeItem(LS_ACTIVE_TEAM);
     }
+    // Dispatch custom event to notify same-window listeners (e.g. LobbyTab)
+    window.dispatchEvent(new CustomEvent('teamsUpdated'));
   } catch {}
 }
-export function createTeam(name: string): TeamRecord {
-  return { id: `t_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,6)}`, name, members: [] };
+export function createTeam(name: string, options?: { type?: 'standard' | 'ttrpg'; maxSize?: number }): TeamRecord {
+  const type = options?.type || 'standard';
+  const maxSize = options?.maxSize ?? (type === 'ttrpg' ? undefined : DEFAULT_TEAM_SIZE);
+  return { id: `t_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,6)}`, name, members: [], type, maxSize };
+}
+export function getTeamMaxSize(team: TeamRecord): number {
+  if (team.type === 'ttrpg') return team.maxSize ?? Infinity;
+  return team.maxSize ?? DEFAULT_TEAM_SIZE;
+}
+export function isTeamFull(team: TeamRecord): boolean {
+  const max = getTeamMaxSize(team);
+  return team.members.length >= max;
 }
 export function cloneForTeam(p: Pokemon): BattlePokemon {
   // Ensure mechanics fields are carried through and computed

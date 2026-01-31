@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BattlePokemon } from '../types';
-import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL } from '../data/adapter';
+import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE } from '../data/adapter';
 
 export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected }: {
   selected: BattlePokemon | null;
@@ -311,7 +311,6 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                         <div className="dim" style={{fontSize:'0.9em'}}>
                           {basePow >= 0 ? `Power ${basePow}` : 'Status'}
                           {(m as any).accuracy != null ? ` • Acc ${(m as any).accuracy === true ? '—' : (m as any).accuracy+'%'}` : ''}
-                          {(m as any).secondary ? ` • Secondary` : ''}
                         </div>
                       )}
                     </div>
@@ -347,7 +346,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                 </label>
                 <label>
                   <div className="label"><strong>Level</strong></div>
-                  <input type="number" min={1} max={100} value={level} onChange={e=>setLevel(Number(e.target.value)||1)} />
+                  <input type="number" min={1} max={255} value={level} onChange={e=>setLevel(Number(e.target.value)||1)} />
                 </label>
                 <label>
                   <div className="label"><strong>Gender</strong></div>
@@ -654,7 +653,7 @@ function AddNewPanel({ onAdd }: { onAdd?: (p: BattlePokemon) => void }) {
           </label>
           <label>
             <div className="label"><strong>Level</strong></div>
-            <input type="number" min={1} max={100} value={level} onChange={e=>setLevel(Number(e.target.value)||1)} />
+            <input type="number" min={1} max={255} value={level} onChange={e=>setLevel(Number(e.target.value)||1)} />
           </label>
           <label style={{display:'flex', alignItems:'center', gap:8}}>
             <input type="checkbox" checked={shiny} onChange={e=>setShiny(e.target.checked)} /> Shiny
@@ -738,10 +737,12 @@ function diceFromPower(power: number): 'D20'|'D12'|'D10'|'D8'|'D6'|'D4'|null {
 function capitalize(s: string): string { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 function titleCase(s: string): string { return s.split(/[\-\s]/).map(capitalize).join(' '); }
 
-// Mechanics editor for EVs/IVs/Nature
+// Mechanics editor for EVs/IVs/Nature/Tera Type
 function MechanicsEditor({ selected }: { selected: BattlePokemon }) {
   const natures = ['Hardy','Lonely','Brave','Adamant','Naughty','Bold','Docile','Relaxed','Impish','Lax','Timid','Hasty','Serious','Jolly','Naive','Modest','Mild','Quiet','Bashful','Rash','Calm','Gentle','Sassy','Careful','Quirky'];
+  const teraTypes = ['','Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy'];
   const [nature, setNature] = useState<string>((selected as any).nature || 'Serious');
+  const [teraType, setTeraType] = useState<string>((selected as any).teraType || '');
   const [evs, setEvs] = useState<Partial<Record<'hp'|'atk'|'def'|'spa'|'spd'|'spe', number>>>((selected as any).evs || {});
   const [ivs, setIvs] = useState<Partial<Record<'hp'|'atk'|'def'|'spa'|'spd'|'spe', number>>>((selected as any).ivs || {});
 
@@ -751,6 +752,7 @@ function MechanicsEditor({ selected }: { selected: BattlePokemon }) {
   const clampIV = (v:number)=> Math.max(0, Math.min(31, Math.floor(v)));
 
   useEffect(()=>{ (selected as any).nature = nature; }, [nature]);
+  useEffect(()=>{ (selected as any).teraType = teraType || undefined; }, [teraType]);
   useEffect(()=>{ (selected as any).evs = evs; }, [evs]);
   useEffect(()=>{ (selected as any).ivs = ivs; }, [ivs]);
 
@@ -781,6 +783,13 @@ function MechanicsEditor({ selected }: { selected: BattlePokemon }) {
           </select>
         </label>
         <div className="dim" style={{marginTop:-4}}>Nature effects are neutral for now.</div>
+        <label>
+          <div className="label"><strong>Tera Type</strong></div>
+          <select value={teraType} onChange={e=> setTeraType(e.target.value)}>
+            {teraTypes.map(t => <option key={t || 'none'} value={t}>{t || '(Default / None)'}</option>)}
+          </select>
+        </label>
+        <div className="dim" style={{marginTop:-4}}>Select a Tera Type for Terastallization in battle.</div>
         <div style={{display:'grid', gridTemplateColumns:'90px minmax(140px,1fr) 70px 70px', gap:8, alignItems:'center', fontWeight:600}}>
           <div />
           <div>EVs</div>
@@ -854,9 +863,10 @@ function AddToTeamModal({ selected, onPick, onClose }: { selected: BattlePokemon
   const [state, setState] = useState(loadTeams());
   const [teamId, setTeamId] = useState(state.activeId || (state.teams[0]?.id ?? ''));
   const [newName, setNewName] = useState('');
+  const [newType, setNewType] = useState<'standard' | 'ttrpg'>('standard');
   const create = () => {
     const name = newName.trim(); if (!name) return;
-    const t = createTeam(name); const teams = [...state.teams, t];
+    const t = createTeam(name, { type: newType }); const teams = [...state.teams, t];
     const next = { teams, activeId: t.id } as any; setState(next); saveTeams(teams, t.id); setTeamId(t.id); setNewName('');
   };
   const add = () => {
@@ -864,7 +874,10 @@ function AddToTeamModal({ selected, onPick, onClose }: { selected: BattlePokemon
     onPick({ ...selected }, teamId);
   };
   const team = state.teams.find(t => t.id === teamId) || null;
-  const isFull = !!team && team.members.length >= 6;
+  const teamMax = team ? getTeamMaxSize(team) : DEFAULT_TEAM_SIZE;
+  const isFull = team ? isTeamFull(team) : false;
+  const displayMax = teamMax === Infinity ? '∞' : teamMax;
+  const progressPct = teamMax === Infinity ? Math.min(100, (team?.members.length ?? 0) * 5) : ((team?.members.length ?? 0) / teamMax) * 100;
   return (
     <div className="modal-backdrop">
       <div className="modal" role="dialog" aria-modal="true" style={{width:420}}>
@@ -873,30 +886,44 @@ function AddToTeamModal({ selected, onPick, onClose }: { selected: BattlePokemon
           <label>
             <div className="label"><strong>Existing Team</strong></div>
             <select value={teamId} onChange={e=> setTeamId(e.target.value)}>
-              {state.teams.map(t => (
-                <option key={t.id} value={t.id}>
-                  {t.name} ({t.members.length}/6{t.members.length>=6 ? ' • FULL' : ''})
-                </option>
-              ))}
+              {state.teams.map(t => {
+                const max = getTeamMaxSize(t);
+                const full = isTeamFull(t);
+                const maxStr = max === Infinity ? '∞' : max;
+                const typeLabel = t.type === 'ttrpg' ? ' [TTRPG]' : '';
+                return (
+                  <option key={t.id} value={t.id}>
+                    {t.name} ({t.members.length}/{maxStr}{full ? ' • FULL' : ''}){typeLabel}
+                  </option>
+                );
+              })}
             </select>
           </label>
           {team && (
             <div className="dim" style={{display:'flex', alignItems:'center', gap:8}}>
-              <span style={{minWidth:52,textAlign:'right'}}>{team.members.length} / 6</span>
+              <span style={{minWidth:52,textAlign:'right'}}>{team.members.length} / {displayMax}</span>
               <div className="hpbar mini" style={{flex:1}}>
-                <span style={{width: `${Math.min(100, (team.members.length/6)*100)}%`}} />
+                <span style={{width: `${Math.min(100, progressPct)}%`}} />
               </div>
+              {team.type === 'ttrpg' && <span style={{color:'#6ec6ff', fontSize:'0.85em'}}>TTRPG</span>}
             </div>
           )}
           <div className="dim" style={{fontSize:'0.9em'}}>Or create a new team:</div>
-          <div style={{display:'grid', gridTemplateColumns:'1fr auto', gap:6}}>
+          <div style={{display:'grid', gridTemplateColumns:'1fr auto auto', gap:6}}>
             <input value={newName} onChange={e=> setNewName(e.target.value)} placeholder={`Team ${state.teams.length+1}`} />
+            <select value={newType} onChange={e => setNewType(e.target.value as 'standard' | 'ttrpg')} style={{width:90}} title="Team type">
+              <option value="standard">Standard</option>
+              <option value="ttrpg">TTRPG</option>
+            </select>
             <button className="secondary" onClick={create}>+ Create</button>
+          </div>
+          <div className="dim" style={{fontSize:'0.8em', marginTop:-4}}>
+            {newType === 'ttrpg' ? 'TTRPG teams have no size limit' : 'Standard teams are limited to 6 Pokémon'}
           </div>
           {team && (
             <div style={{border:'1px solid #444', borderRadius:6, padding:6}}>
               <div className="dim" style={{marginBottom:6}}>Preview</div>
-              <div style={{display:'flex', gap:8, flexWrap:'wrap', alignItems:'center'}}>
+              <div style={{display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', maxHeight: 200, overflowY: 'auto'}}>
                 {team.members.map((m,i)=> (
                   <div key={i} style={{display:'flex', alignItems:'center', gap:6}} title={`${m.name} • Lv ${m.level}`}>
                     <img className="pixel" src={spriteUrl(m.species || m.name, !!(m as any).shiny, (m as any).cosmeticForm ? { cosmetic: (m as any).cosmeticForm } : undefined)} alt="" style={{width:48,height:48}}
@@ -911,7 +938,7 @@ function AddToTeamModal({ selected, onPick, onClose }: { selected: BattlePokemon
                 ))}
                 {team.members.length===0 && <span className="dim">Empty</span>}
               </div>
-              {isFull && <div className="dim" style={{marginTop:6, color:'#ffb3b3'}}>Team is full (6/6).</div>}
+              {isFull && <div className="dim" style={{marginTop:6, color:'#ffb3b3'}}>Team is full ({team.members.length}/{displayMax}).</div>}
             </div>
           )}
         </div>
@@ -923,3 +950,4 @@ function AddToTeamModal({ selected, onPick, onClose }: { selected: BattlePokemon
     </div>
   );
 }
+

@@ -75,6 +75,271 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
 .panel.battle img{transition:opacity .25s ease}
 .hp-fill{transition:width .3s ease-out}
 
+/* ===== BATTLE ANIMATIONS ===== */
+
+/* Physical Attack - Lunge Forward */
+@keyframes attackForward {
+  0%{transform:translateX(0) translateY(0)}
+  40%{transform:translateX(40px) translateY(-15px)}
+  60%{transform:translateX(45px) translateY(0)}
+  100%{transform:translateX(0) translateY(0)}
+}
+@keyframes attackBackward {
+  0%{transform:translateX(0) translateY(0)}
+  40%{transform:translateX(-40px) translateY(-15px)}
+  60%{transform:translateX(-45px) translateY(0)}
+  100%{transform:translateX(0) translateY(0)}
+}
+
+/* Contact Attack - Jump onto opponent */
+@keyframes contactForward {
+  0%{transform:translateX(0) translateY(0) scale(1)}
+  30%{transform:translateX(60px) translateY(-40px) scale(1.1)}
+  50%{transform:translateX(80px) translateY(0) scale(1)}
+  70%{transform:translateX(60px) translateY(-20px) scale(1)}
+  100%{transform:translateX(0) translateY(0) scale(1)}
+}
+@keyframes contactBackward {
+  0%{transform:translateX(0) translateY(0) scale(1)}
+  30%{transform:translateX(-60px) translateY(-40px) scale(1.1)}
+  50%{transform:translateX(-80px) translateY(0) scale(1)}
+  70%{transform:translateX(-60px) translateY(-20px) scale(1)}
+  100%{transform:translateX(0) translateY(0) scale(1)}
+}
+
+/* Breath/Beam Attack - Expand and pulse */
+@keyframes breathAttack {
+  0%{transform:scale(1);filter:brightness(1)}
+  20%{transform:scale(1.15);filter:brightness(1.3)}
+  40%{transform:scale(1.1);filter:brightness(1.5) saturate(1.3)}
+  60%{transform:scale(1.05);filter:brightness(1.2)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+
+/* Special Attack - Glow and pulse */
+@keyframes specialAttack {
+  0%{filter:brightness(1) drop-shadow(0 0 0 transparent)}
+  30%{filter:brightness(1.4) drop-shadow(0 0 12px rgba(100,180,255,.7))}
+  60%{filter:brightness(1.2) drop-shadow(0 0 8px rgba(100,180,255,.5))}
+  100%{filter:brightness(1) drop-shadow(0 0 0 transparent)}
+}
+
+/* Projectile Attack - Projectile motion */
+@keyframes projectileForward {
+  0%{transform:translateX(0);opacity:1}
+  50%{transform:translateX(50px);opacity:0.8}
+  100%{transform:translateX(0);opacity:1}
+}
+
+/* Slash/Claw Attack - Quick strike */
+@keyframes slashAttack {
+  0%{transform:rotate(0deg) scale(1)}
+  30%{transform:rotate(-15deg) scale(1.1)}
+  50%{transform:rotate(10deg) scale(1.05)}
+  100%{transform:rotate(0deg) scale(1)}
+}
+
+/* Punch Attack - Thrust forward */
+@keyframes punchAttack {
+  0%{transform:translateX(0) scale(1)}
+  40%{transform:translateX(30px) scale(1.15)}
+  60%{transform:translateX(35px) scale(1.1)}
+  100%{transform:translateX(0) scale(1)}
+}
+
+/* Kick Attack - Sweep motion */
+@keyframes kickAttack {
+  0%{transform:translateY(0) rotate(0deg)}
+  40%{transform:translateY(-10px) rotate(-10deg)}
+  60%{transform:translateY(5px) rotate(5deg)}
+  100%{transform:translateY(0) rotate(0deg)}
+}
+
+/* Bite Attack - Chomp */
+@keyframes biteAttack {
+  0%{transform:scale(1)}
+  30%{transform:scale(1.2) translateY(-5px)}
+  50%{transform:scale(0.95) translateY(3px)}
+  100%{transform:scale(1) translateY(0)}
+}
+
+/* Spin Attack */
+@keyframes spinAttack {
+  0%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+
+/* Sound Attack - Pulse waves */
+@keyframes soundAttack {
+  0%{transform:scale(1);filter:brightness(1)}
+  25%{transform:scale(1.05);filter:brightness(1.1)}
+  50%{transform:scale(1);filter:brightness(1.2)}
+  75%{transform:scale(1.05);filter:brightness(1.1)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+
+/* Damage - Shake and flash */
+@keyframes damageShake {
+  0%, 100%{transform:translateX(0);filter:brightness(1)}
+  15%{transform:translateX(-10px);filter:brightness(1.5)}
+  30%{transform:translateX(10px);filter:brightness(0.8)}
+  45%{transform:translateX(-8px);filter:brightness(1.2)}
+  60%{transform:translateX(8px);filter:brightness(0.9)}
+  75%{transform:translateX(-5px)}
+  90%{transform:translateX(5px)}
+}
+
+/* Super Effective Damage */
+@keyframes superEffective {
+  0%{transform:translateX(0) scale(1);filter:brightness(1)}
+  20%{transform:translateX(-15px) scale(1.1);filter:brightness(2)}
+  40%{transform:translateX(15px) scale(0.95);filter:brightness(0.5)}
+  60%{transform:translateX(-10px) scale(1.05);filter:brightness(1.5)}
+  80%{transform:translateX(10px);filter:brightness(0.8)}
+  100%{transform:translateX(0) scale(1);filter:brightness(1)}
+}
+
+/* Faint Animation */
+@keyframes faintAnimation {
+  0%{opacity:1;transform:translateY(0) scale(1);filter:brightness(1)}
+  30%{opacity:0.7;transform:translateY(10px) scale(0.95);filter:brightness(0.7)}
+  60%{opacity:0.4;transform:translateY(30px) scale(0.85);filter:grayscale(0.5)}
+  100%{opacity:0;transform:translateY(60px) scale(0.7);filter:grayscale(1)}
+}
+
+/* Switch In - Pop in with bounce */
+@keyframes switchIn {
+  0%{opacity:0;transform:scale(0.2) translateY(40px)}
+  50%{opacity:1;transform:scale(1.15) translateY(-10px)}
+  70%{transform:scale(0.95) translateY(5px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+
+/* Switch Out - Shrink into pokeball */
+@keyframes switchOut {
+  0%{opacity:1;transform:scale(1) translateY(0)}
+  50%{opacity:0.6;transform:scale(1.1) translateY(-15px)}
+  100%{opacity:0;transform:scale(0.15) translateY(-30px)}
+}
+
+/* Heal Pulse - Green glow */
+@keyframes healPulse {
+  0%{box-shadow:0 0 0 0 rgba(76,175,80,0);filter:brightness(1)}
+  30%{box-shadow:0 0 20px 6px rgba(76,175,80,.6);filter:brightness(1.2)}
+  60%{box-shadow:0 0 15px 4px rgba(76,175,80,.4);filter:brightness(1.1)}
+  100%{box-shadow:0 0 0 0 rgba(76,175,80,0);filter:brightness(1)}
+}
+
+/* Critical Hit - Flash bright */
+@keyframes criticalHit {
+  0%{filter:brightness(1);transform:scale(1)}
+  15%{filter:brightness(2) saturate(1.5);transform:scale(1.15)}
+  30%{filter:brightness(0.5);transform:scale(0.95)}
+  50%{filter:brightness(1.5);transform:scale(1.05)}
+  100%{filter:brightness(1);transform:scale(1)}
+}
+
+/* Stat Boost - Blue/Green glow */
+@keyframes statBoost {
+  0%{box-shadow:0 0 0 0 rgba(76,175,80,0);filter:brightness(1)}
+  30%{box-shadow:0 0 15px 5px rgba(100,200,120,.6);filter:brightness(1.15)}
+  60%{box-shadow:0 0 10px 3px rgba(100,200,120,.4)}
+  100%{box-shadow:0 0 0 0 rgba(76,175,80,0);filter:brightness(1)}
+}
+
+/* Stat Drop - Red glow */
+@keyframes statDrop {
+  0%{box-shadow:0 0 0 0 rgba(244,67,54,0);filter:brightness(1)}
+  30%{box-shadow:0 0 15px 5px rgba(244,100,100,.6);filter:brightness(0.9)}
+  60%{box-shadow:0 0 10px 3px rgba(244,100,100,.4)}
+  100%{box-shadow:0 0 0 0 rgba(244,67,54,0);filter:brightness(1)}
+}
+
+/* Status Inflict - Purple tinge */
+@keyframes statusInflict {
+  0%, 100%{filter:brightness(1) saturate(1)}
+  30%{filter:brightness(0.85) saturate(0.8) hue-rotate(30deg)}
+  60%{filter:brightness(0.9) saturate(0.9) hue-rotate(15deg)}
+}
+
+/* Protect/Shield - Flash barrier */
+@keyframes protectAnim {
+  0%{box-shadow:0 0 0 0 rgba(100,200,255,0);filter:brightness(1)}
+  30%{box-shadow:0 0 25px 8px rgba(100,200,255,.7);filter:brightness(1.2)}
+  70%{box-shadow:0 0 15px 5px rgba(100,200,255,.4)}
+  100%{box-shadow:0 0 0 0 rgba(100,200,255,0);filter:brightness(1)}
+}
+
+/* Miss - Dodge/evade */
+@keyframes missAnim {
+  0%{transform:translateX(0)}
+  30%{transform:translateX(-25px) translateY(-10px)}
+  60%{transform:translateX(-20px)}
+  100%{transform:translateX(0)}
+}
+
+/* Recoil Damage */
+@keyframes recoilDamage {
+  0%{transform:translateX(0);filter:brightness(1)}
+  40%{transform:translateX(-15px);filter:brightness(1.3)}
+  70%{transform:translateX(10px);filter:brightness(0.8)}
+  100%{transform:translateX(0);filter:brightness(1)}
+}
+
+/* Confusion self-hit */
+@keyframes confusionHit {
+  0%{transform:rotate(0deg)}
+  25%{transform:rotate(-10deg) translateY(-5px)}
+  50%{transform:rotate(10deg)}
+  75%{transform:rotate(-5deg) translateY(3px)}
+  100%{transform:rotate(0deg)}
+}
+
+/* Weather damage (sandstorm, hail) */
+@keyframes weatherDamage {
+  0%, 100%{filter:brightness(1)}
+  30%{filter:brightness(0.85)}
+  60%{filter:brightness(0.9)}
+}
+
+/* Charging move preparation */
+@keyframes chargeUp {
+  0%{filter:brightness(1);transform:scale(1)}
+  50%{filter:brightness(1.3) drop-shadow(0 0 10px rgba(255,255,100,.5));transform:scale(1.05)}
+  100%{filter:brightness(1.5) drop-shadow(0 0 15px rgba(255,255,100,.7));transform:scale(1.08)}
+}
+
+/* ===== ANIMATION CLASSES ===== */
+.ps-anim-attack-forward{animation:attackForward .4s ease-out}
+.ps-anim-attack-backward{animation:attackBackward .4s ease-out}
+.ps-anim-contact-forward{animation:contactForward .5s ease-out}
+.ps-anim-contact-backward{animation:contactBackward .5s ease-out}
+.ps-anim-breath{animation:breathAttack .5s ease-out}
+.ps-anim-special{animation:specialAttack .45s ease-out}
+.ps-anim-projectile{animation:projectileForward .35s ease-out}
+.ps-anim-slash{animation:slashAttack .35s ease-out}
+.ps-anim-punch{animation:punchAttack .35s ease-out}
+.ps-anim-kick{animation:kickAttack .35s ease-out}
+.ps-anim-bite{animation:biteAttack .35s ease-out}
+.ps-anim-spin{animation:spinAttack .5s linear}
+.ps-anim-sound{animation:soundAttack .4s ease-out}
+.ps-anim-damage{animation:damageShake .35s ease-in-out}
+.ps-anim-super-effective{animation:superEffective .5s ease-in-out}
+.ps-anim-faint{animation:faintAnimation .7s ease-in forwards}
+.ps-anim-switch-in{animation:switchIn .45s ease-out}
+.ps-anim-switch-out{animation:switchOut .35s ease-in}
+.ps-anim-heal{animation:healPulse .55s ease-out}
+.ps-anim-critical{animation:criticalHit .45s ease-out}
+.ps-anim-boost{animation:statBoost .45s ease-out}
+.ps-anim-drop{animation:statDrop .45s ease-out}
+.ps-anim-status{animation:statusInflict .45s ease-out}
+.ps-anim-protect{animation:protectAnim .4s ease-out}
+.ps-anim-miss{animation:missAnim .4s ease-out}
+.ps-anim-recoil{animation:recoilDamage .4s ease-out}
+.ps-anim-confusion{animation:confusionHit .4s ease-out}
+.ps-anim-weather{animation:weatherDamage .35s ease-out}
+.ps-anim-charge{animation:chargeUp .6s ease-out forwards}
+
 .battle-ps .ps-battle__header{display:flex;align-items:center;gap:16px;margin-bottom:12px}
 .battle-ps .ps-battle__header h2{margin:0;font-size:1.15rem}
 .battle-ps .ps-battle__subtitle{font-size:.9rem;color:var(--fg-dim)}
@@ -83,37 +348,75 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
 .battle-ps .ps-battle__watchers{color:var(--fg-dim)}
 .battle-ps .ps-battle__layout{display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1fr);gap:12px;align-items:start}
 .battle-ps .ps-battle__field{position:relative;border:2px solid var(--panel-outer);border-radius:14px;padding:16px;background:linear-gradient(180deg,#e0f2ff 0%,#f8fdff 45%,#e5f8e9 100%);box-shadow:inset 0 0 18px rgba(0,0,0,.08);min-height:320px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
-.battle-ps .ps-lineup{display:flex;align-items:center;gap:18px;min-height:72px;width:100%}
+.battle-ps .ps-battle__field-inner{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:space-between;gap:12px;min-height:320px}
+.battle-ps .ps-battle__fx{position:absolute;inset:0;z-index:1;border-radius:inherit;overflow:hidden;pointer-events:none}
+.battle-ps .ps-battle__bg{position:absolute;inset:-8%;background-size:cover;background-position:center;filter:saturate(1.08);transform:scale(1.05);opacity:.9}
+.battle-ps .ps-battle__fx-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,12,24,.65),rgba(6,32,38,.35));mix-blend-mode:multiply;opacity:.8}
+.battle-ps .ps-battle__weather{position:absolute;inset:-10%;display:flex;align-items:center;justify-content:center}
+.battle-ps .ps-battle__weather-video{width:140%;height:140%;object-fit:cover;filter:blur(1px);opacity:.6;pointer-events:none}
+.battle-ps .ps-battle__terrain{position:absolute;bottom:-12%;left:50%;transform:translateX(-50%);width:150%;max-width:none;opacity:.6;mix-blend-mode:screen}
+.battle-ps .ps-lineup{display:flex;align-items:center;gap:12px;min-height:72px;width:100%}
 .battle-ps .ps-lineup--opponent{justify-content:flex-end}
 .battle-ps .ps-lineup--player{justify-content:flex-start}
-.battle-ps .ps-lineup__mons{display:flex;align-items:flex-end;gap:10px;padding:6px 10px;border:1px solid rgba(15,122,165,.25);border-radius:12px;background:rgba(255,255,255,.6);backdrop-filter:blur(4px)}
-.battle-ps .ps-lineup__mons--opponent{flex-direction:row}
-.battle-ps .ps-lineup__mons--player{flex-direction:row-reverse}
-.battle-ps .ps-lineup__mon{width:54px;height:54px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid transparent;position:relative;overflow:hidden;background:rgba(15,122,165,.08)}
-.battle-ps .ps-lineup__mon.active{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(16,152,194,.3)}
-.battle-ps .ps-lineup__mon.fainted{opacity:.45;filter:grayscale(.8)}
+.battle-ps .ps-lineup__mons{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:4px;padding:6px 8px;border:1px solid rgba(15,122,165,.25);border-radius:10px;background:rgba(0,0,0,.3);backdrop-filter:blur(4px)}
+.battle-ps .ps-lineup__mons--opponent{direction:rtl}
+.battle-ps .ps-lineup__mons--opponent .ps-lineup__mon{direction:ltr}
+.battle-ps .ps-lineup__mons--player{direction:ltr}
+.battle-ps .ps-lineup__mon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid transparent;position:relative;overflow:hidden;background:rgba(255,255,255,.15)}
+.battle-ps .ps-lineup__mon.active{border-color:#4caf50;box-shadow:0 0 0 1px rgba(76,175,80,.4)}
+.battle-ps .ps-lineup__mon.fainted{opacity:.35;filter:grayscale(.9)}
 .battle-ps .ps-lineup__mon img{max-width:100%;max-height:100%;image-rendering:pixelated;transition:opacity .2s ease}
-.battle-ps .ps-trainer{width:92px;height:92px;position:relative;display:flex;align-items:flex-end;justify-content:center;padding:6px;border-radius:12px;background:rgba(255,255,255,.7);border:1px solid rgba(15,122,165,.35);box-shadow:0 4px 10px rgba(15,42,42,.12)}
-.battle-ps .ps-trainer img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,.18))}
-.battle-ps .ps-trainer__initial{position:absolute;inset:auto 6px 6px auto;font-size:1.2rem;font-weight:700;color:rgba(15,42,42,.6);background:rgba(255,255,255,.9);border-radius:6px;padding:2px 8px;display:none}
+.battle-ps .ps-trainer{width:96px;height:96px;position:relative;display:flex;align-items:flex-end;justify-content:center;padding:4px;border-radius:8px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.2);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.battle-ps .ps-trainer img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(1px 2px 2px rgba(0,0,0,.3))}
+.battle-ps .ps-trainer__initial{position:absolute;inset:auto 4px 4px auto;font-size:1rem;font-weight:700;color:rgba(255,255,255,.9);background:rgba(0,0,0,.5);border-radius:4px;padding:2px 6px;display:none}
 .battle-ps .ps-trainer--fallback{justify-content:center;align-items:center}
 .battle-ps .ps-trainer--fallback .ps-trainer__initial{display:block}
 .battle-ps .ps-trainer--fallback img{display:none}
-.battle-ps .ps-active-zone{display:flex;justify-content:space-between;gap:18px;margin:8px 0;padding:14px 18px;border:1px solid rgba(15,122,165,.3);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(236,250,255,.65));box-shadow:inset 0 0 12px rgba(15,42,42,.08)}
-.battle-ps .ps-active-slot{flex:1;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
-.battle-ps .ps-active-slot--opponent{align-items:flex-end;text-align:right}
+.battle-ps .ps-active-zone{display:flex;flex-direction:column;justify-content:space-between;gap:8px;margin:8px 0;padding:16px 64px;min-height:360px;position:relative}
+.battle-ps .ps-active-slot{display:flex;flex-direction:column;gap:8px;align-items:center}
+.battle-ps .ps-active-slot--opponent{align-items:flex-end;align-self:flex-end}
 .battle-ps .ps-active-slot--opponent .ps-actor__active{justify-content:flex-end}
+.battle-ps .ps-active-slot--player{align-items:flex-start;align-self:flex-start}
 .battle-ps .ps-active-slot--player .ps-actor__active{justify-content:flex-start}
-.battle-ps .ps-actor{display:flex;flex-direction:column;gap:12px;min-width:220px;flex:1 1 220px}
-.battle-ps .ps-actor__header{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--fg-dim)}
-.battle-ps .ps-actor__active{display:flex;gap:12px;flex-wrap:wrap}
-.battle-ps .ps-pokemon-card{background:rgba(255,255,255,.93);border:1px solid var(--accent);border-radius:12px;padding:10px;box-shadow:0 2px 6px rgba(15,42,42,.12);min-width:200px;display:grid;gap:8px;position:relative;transition:transform .15s ease, box-shadow .15s ease}
-.battle-ps .ps-pokemon-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(15,42,42,.18)}
-.battle-ps .ps-pokemon-card.fainted{opacity:.6;filter:grayscale(.6)}
-.battle-ps .ps-pokemon-card__header{display:flex;align-items:center;gap:8px;font-weight:600}
+.battle-ps .ps-actor{display:flex;flex-direction:column;gap:8px;min-width:180px}
+.battle-ps .ps-actor__header{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:#fff;text-shadow:1px 1px 2px rgba(0,0,0,.5);background:rgba(0,0,0,.4);padding:4px 10px;border-radius:6px}
+.battle-ps .ps-actor__active{display:flex;gap:8px;flex-wrap:wrap}
+.battle-ps .ps-pokemon-card{background:transparent;border:none;border-radius:0;padding:0;box-shadow:none;min-width:140px;display:flex;flex-direction:column;gap:4px;position:relative;transition:transform .15s ease}
+.battle-ps .ps-pokemon-card:hover{transform:scale(1.02)}
+.battle-ps .ps-pokemon-card.fainted{opacity:.5;filter:grayscale(.7)}
+.battle-ps .ps-pokemon-card.terastallized .ps-pokemon-card__sprite{filter:drop-shadow(0 0 8px rgba(255,200,100,.6))}
+.battle-ps .ps-pokemon-card__header{display:flex;align-items:center;gap:6px;font-weight:600;flex-wrap:wrap;background:rgba(0,0,0,.5);padding:4px 8px;border-radius:6px;color:#fff;text-shadow:1px 1px 2px rgba(0,0,0,.5);font-size:.85rem}
 .battle-ps .ps-pokemon-card__name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.battle-ps .ps-pokemon-card__level{font-size:.8rem;color:var(--fg-dim)}
-.battle-ps .ps-status{font-size:.7rem;font-weight:700;padding:2px 6px;border-radius:6px;color:#fff;text-transform:uppercase;box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.battle-ps .ps-pokemon-card__level{font-size:.75rem;color:rgba(255,255,255,.8)}
+
+/* Terastallization badge */
+.battle-ps .ps-tera-badge{font-size:.7rem;font-weight:700;padding:2px 6px;border-radius:6px;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#5a4000;box-shadow:0 1px 4px rgba(255,200,0,.4);display:flex;align-items:center;gap:2px;text-transform:capitalize}
+.battle-ps .ps-tera-badge--normal{background:linear-gradient(135deg,#a8a878,#8a8a5c)}
+.battle-ps .ps-tera-badge--fire{background:linear-gradient(135deg,#ff6b35,#ee5a24);color:#fff}
+.battle-ps .ps-tera-badge--water{background:linear-gradient(135deg,#4f9fff,#2980b9);color:#fff}
+.battle-ps .ps-tera-badge--electric{background:linear-gradient(135deg,#ffc107,#f9a825);color:#5a4000}
+.battle-ps .ps-tera-badge--grass{background:linear-gradient(135deg,#78c850,#5a9a32);color:#fff}
+.battle-ps .ps-tera-badge--ice{background:linear-gradient(135deg,#98d8d8,#76c8c8);color:#2a5a5a}
+.battle-ps .ps-tera-badge--fighting{background:linear-gradient(135deg,#c03028,#9a2820);color:#fff}
+.battle-ps .ps-tera-badge--poison{background:linear-gradient(135deg,#a040a0,#803080);color:#fff}
+.battle-ps .ps-tera-badge--ground{background:linear-gradient(135deg,#e0c068,#b89840);color:#5a4020}
+.battle-ps .ps-tera-badge--flying{background:linear-gradient(135deg,#a890f0,#8878d0);color:#fff}
+.battle-ps .ps-tera-badge--psychic{background:linear-gradient(135deg,#f85888,#e84878);color:#fff}
+.battle-ps .ps-tera-badge--bug{background:linear-gradient(135deg,#a8b820,#889810);color:#fff}
+.battle-ps .ps-tera-badge--rock{background:linear-gradient(135deg,#b8a038,#9a8828);color:#fff}
+.battle-ps .ps-tera-badge--ghost{background:linear-gradient(135deg,#705898,#584878);color:#fff}
+.battle-ps .ps-tera-badge--dragon{background:linear-gradient(135deg,#7038f8,#5028d8);color:#fff}
+.battle-ps .ps-tera-badge--dark{background:linear-gradient(135deg,#705848,#504038);color:#fff}
+.battle-ps .ps-tera-badge--steel{background:linear-gradient(135deg,#b8b8d0,#9898b0);color:#3a3a5a}
+.battle-ps .ps-tera-badge--fairy{background:linear-gradient(135deg,#ee99ac,#d888a0);color:#5a2040}
+.battle-ps .ps-tera-badge--stellar{background:linear-gradient(135deg,#3a6080,#2a4a60);color:#fff}
+
+/* Volatile status badges */
+.battle-ps .ps-volatile-badges{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin:2px 0 4px;background:rgba(0,0,0,.4);padding:2px 6px;border-radius:4px}
+.battle-ps .ps-volatile-badge{font-size:.75rem;cursor:help;animation:badgePop .2s ease-out}
+@keyframes badgePop{0%{transform:scale(0)}100%{transform:scale(1)}}
+
+.battle-ps .ps-status{font-size:.65rem;font-weight:700;padding:2px 5px;border-radius:4px;color:#fff;text-transform:uppercase;box-shadow:0 1px 0 rgba(0,0,0,.25)}
 .battle-ps .ps-status--par{background:#c9c953;color:#222}
 .battle-ps .ps-status--slp{background:#7aa7ff;color:#111}
 .battle-ps .ps-status--brn{background:#ff7a59}
@@ -121,21 +424,39 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
 .battle-ps .ps-status--psn{background:#a65ad9}
 .battle-ps .ps-status--tox{background:#6b2c8c}
 .battle-ps .ps-pokemon-card__sprite{display:flex;justify-content:center}
-.battle-ps .ps-pokemon-card__sprite img{height:96px;image-rendering:pixelated;transition:opacity .2s ease}
-.battle-ps .ps-pokemon-card__hp{display:grid;gap:4px}
-.battle-ps .ps-pokemon-card__hpbar{height:10px;background:rgba(28,58,58,.13);border-radius:6px;overflow:hidden}
+.battle-ps .ps-pokemon-card__sprite img{height:128px;image-rendering:pixelated;transition:opacity .2s ease;filter:drop-shadow(2px 3px 3px rgba(0,0,0,.35))}
+.battle-ps .ps-pokemon-card__hp{display:grid;gap:2px;background:rgba(0,0,0,.4);padding:4px 8px;border-radius:6px}
+.battle-ps .ps-pokemon-card__hpbar{height:8px;background:rgba(0,0,0,.4);border-radius:4px;overflow:hidden}
 .battle-ps .ps-pokemon-card__hpbar span{display:block;height:100%;transition:width .3s ease-out}
-.battle-ps .ps-pokemon-card__hptext{font-size:.8rem;color:var(--fg-dim)}
-.battle-ps .ps-bench-pill{min-width:90px;padding:6px 8px;border:1px solid var(--accent);border-radius:8px;background:rgba(255,255,255,.86);display:grid;gap:4px;font-size:.75rem}
+.battle-ps .ps-pokemon-card__hptext{font-size:.75rem;color:rgba(255,255,255,.9);text-align:center}
+
+/* Stat tooltip popup on hover */
+.battle-ps .ps-stat-tooltip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:1000;background:rgba(35,45,55,.96);border:1px solid var(--accent2);border-radius:10px;padding:12px 14px;min-width:180px;max-width:280px;box-shadow:0 4px 16px rgba(0,0,0,.35);pointer-events:none;animation:tooltipFadeIn .15s ease-out}
+.battle-ps .ps-stat-tooltip--top{bottom:auto;top:calc(100% + 8px)}
+.battle-ps .ps-stat-tooltip--left{left:0;transform:translateX(0)}
+.battle-ps .ps-stat-tooltip--right{left:auto;right:0;transform:translateX(0)}
+.battle-ps .ps-stat-tooltip__header{font-weight:700;color:#fff;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.15);font-size:.9rem;text-align:center}
+.battle-ps .ps-stat-tooltip__stats{display:grid;gap:4px}
+.battle-ps .ps-stat-tooltip__row{display:flex;justify-content:space-between;align-items:center;font-size:.8rem}
+.battle-ps .ps-stat-tooltip__label{font-weight:500;color:#aaa}
+.battle-ps .ps-stat-tooltip__value{font-weight:600}
+.battle-ps .ps-stat-tooltip__summary{font-size:.7rem;color:var(--accent2);margin-top:6px;text-align:center;font-style:italic}
+@keyframes tooltipFadeIn{0%{opacity:0;transform:translateX(-50%) translateY(8px)}100%{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+.battle-ps .ps-bench-pill{min-width:120px;padding:10px 12px;border:1px solid var(--accent);border-radius:10px;background:rgba(255,255,255,.86);display:grid;gap:6px;font-size:.85rem;position:relative;cursor:pointer}
 .battle-ps .ps-bench-pill.fainted{opacity:.55;filter:grayscale(.7)}
-.battle-ps .ps-bench-pill__name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.battle-ps .ps-bench-pill__hpbar{height:6px;background:rgba(28,58,58,.13);border-radius:6px;overflow:hidden}
+.battle-ps .ps-bench-pill__name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.9rem}
+.battle-ps .ps-bench-pill__hpbar{height:8px;background:rgba(28,58,58,.13);border-radius:6px;overflow:hidden}
 .battle-ps .ps-bench-pill__hpbar span{display:block;height:100%;transition:width .3s ease-out}
-.battle-ps .ps-bench-pill__meta{font-size:.7rem;color:var(--fg-dim)}
+.battle-ps .ps-bench-pill__meta{font-size:.8rem;color:var(--fg-dim)}
+.battle-ps .ps-bench-pill:hover .ps-stat-tooltip{display:block}
+.battle-ps .ps-bench-pill .ps-stat-tooltip{display:none}
 .battle-ps .ps-battle__log{border:1px solid var(--accent);border-radius:12px;background:rgba(255,255,255,.92);padding:12px;max-height:360px;display:flex;flex-direction:column;gap:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px}
 .battle-ps .ps-battle__log-section{display:flex;flex-direction:column;gap:8px}
 .battle-ps .ps-battle__log-section h3{margin:0;font-size:.85rem;color:var(--fg-dim);text-transform:uppercase;letter-spacing:.05em}
-.battle-ps .ps-battle__log-list{max-height:150px;overflow:auto;display:flex;flex-direction:column;gap:4px;padding-right:4px}
+.battle-ps .ps-battle__log-list{max-height:280px;overflow:auto;display:flex;flex-direction:column;gap:4px;padding-right:4px}
+.battle-ps .ps-battle__combined-log{max-height:320px}
+.battle-ps .ps-battle__turn-marker{font-weight:700;color:var(--accent2);text-align:center;padding:6px 0;margin:8px 0;font-size:.9rem;letter-spacing:.08em}
 .battle-ps .ps-battle__log-line{margin:0}
 .battle-ps .ps-battle__chat-list{max-height:150px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
 .battle-ps .ps-chat-line{display:flex;gap:6px;align-items:flex-start;font-size:.85rem}
@@ -148,29 +469,136 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
 .battle-ps .ps-empty{color:var(--fg-dim);font-size:.85rem}
 .battle-ps .ps-battle__commands{margin-top:12px;border:1px solid var(--accent);border-radius:12px;background:rgba(255,255,255,.94);padding:12px;display:grid;gap:12px}
 .battle-ps .ps-battle__commands header{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--fg-dim)}
-.battle-ps .ps-command-status{font-size:.95rem;color:var(--fg-dim)}
-.battle-ps .ps-command-grid{display:grid;gap:12px}
+.battle-ps .ps-command-status{font-size:.85rem;color:var(--fg-dim);margin-bottom:4px}
+.battle-ps .ps-command-grid{display:grid;gap:16px}
 .battle-ps .ps-command-section{display:grid;gap:8px}
 .battle-ps .ps-command-section h4{margin:0;font-size:.9rem;text-transform:uppercase;letter-spacing:.04em;color:var(--fg-dim)}
+.battle-ps .ps-switch-section{margin-top:8px;padding-top:16px;border-top:2px dashed rgba(0,100,100,.2)}
+.battle-ps .ps-switch-section h4{color:var(--accent);font-size:.95rem}
 .battle-ps .ps-preview-grid{display:flex;flex-wrap:wrap;gap:8px}
 .battle-ps .ps-preview-btn{border:1px solid var(--accent2);border-radius:8px;padding:6px 10px;background:rgba(255,255,255,.9);cursor:pointer;font-size:.85rem}
 .battle-ps .ps-preview-btn.chosen{background:var(--accent2);color:#fff}
+
+/* New Team Preview Layout */
+.battle-ps .ps-team-preview{padding:16px}
+.battle-ps .ps-preview-side{display:grid;gap:8px;padding:12px;border-radius:12px;background:rgba(0,0,0,.03)}
+.battle-ps .ps-preview-side--opponent{border:1px solid rgba(200,100,100,.2);background:rgba(255,230,230,.3)}
+.battle-ps .ps-preview-side--player{border:1px solid rgba(100,180,100,.3);background:rgba(230,255,230,.3)}
+.battle-ps .ps-preview-label{font-size:.85rem;font-weight:600;color:var(--fg-dim);text-transform:uppercase;letter-spacing:.05em}
+.battle-ps .ps-preview-sprites{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.battle-ps .ps-preview-mon{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;border-radius:10px;min-width:72px;transition:all .15s ease}
+.battle-ps .ps-preview-mon--opponent{background:rgba(255,255,255,.6);border:1px solid rgba(180,100,100,.15)}
+.battle-ps .ps-preview-mon--player{background:rgba(255,255,255,.8);border:2px solid rgba(100,160,100,.3);cursor:pointer}
+.battle-ps .ps-preview-mon--player:hover{border-color:var(--accent);background:rgba(220,255,220,.9);transform:translateY(-2px)}
+.battle-ps .ps-preview-mon--selected{border-color:#2a8a2a !important;background:rgba(180,255,180,.95) !important;box-shadow:0 3px 12px rgba(40,150,40,.25)}
+.battle-ps .ps-preview-mon__badge{position:absolute;top:-6px;left:50%;transform:translateX(-50%);background:#2a8a2a;color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em}
+.battle-ps .ps-preview-mon__name{font-size:.75rem;font-weight:500;color:var(--fg-dim);text-align:center;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.battle-ps .ps-preview-mon{position:relative}
+.battle-ps .ps-preview-divider{text-align:center;font-size:1.2rem;font-weight:700;color:var(--fg-dim);padding:8px 0;letter-spacing:.1em}
+
+/* Team Preview in Field Mode */
+.battle-ps .ps-active-zone--preview{display:flex;flex-direction:column;gap:12px;padding:16px;background:rgba(255,255,255,.85);border-radius:12px;backdrop-filter:blur(6px)}
+.battle-ps .ps-preview-slot{background:rgba(255,255,255,.7);border-radius:12px;padding:12px;border:1px solid rgba(0,0,0,.08)}
+.battle-ps .ps-preview-sprites--field{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:8px}
+.battle-ps .ps-preview-divider--field{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 0;background:linear-gradient(90deg,transparent,rgba(0,0,0,.06),transparent);margin:4px 0}
+.battle-ps .ps-preview-divider__vs{font-size:1.5rem;font-weight:800;color:var(--accent);text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.battle-ps .ps-preview-actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.battle-ps .ps-preview-start-btn{background:linear-gradient(180deg,#4a9f4a,#2e7d2e);color:#fff;border:none;border-radius:10px;padding:10px 24px;font-weight:600;font-size:.95rem;cursor:pointer;box-shadow:0 3px 10px rgba(40,120,40,.3);transition:all .15s ease}
+.battle-ps .ps-preview-start-btn:hover:not(:disabled){background:linear-gradient(180deg,#5ab05a,#389038);transform:translateY(-1px);box-shadow:0 4px 14px rgba(40,120,40,.4)}
+.battle-ps .ps-preview-start-btn:disabled{opacity:.5;cursor:not-allowed}
+.battle-ps .ps-command-status--preview{text-align:center;padding:20px;font-style:italic;color:var(--fg-dim)}
+
+/* Enhanced Move Stats */
+.battle-ps .ps-move__stats{display:flex;gap:10px;flex-wrap:wrap;font-size:.7rem;color:var(--fg-dim);margin-top:2px}
+.battle-ps .ps-move__power,.battle-ps .ps-move__accuracy,.battle-ps .ps-move__pp{display:flex;align-items:center;gap:3px;background:rgba(0,0,0,.06);padding:2px 6px;border-radius:4px}
+.battle-ps .ps-move__badge{font-size:.65rem;font-weight:700;background:var(--accent2);color:#fff;padding:2px 6px;border-radius:4px;text-transform:uppercase;margin-top:4px;width:fit-content}
 .battle-ps .ps-move-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
 .battle-ps .ps-move{border:1px solid var(--accent2);border-radius:10px;padding:10px;text-align:left;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(240,255,250,.9));display:grid;gap:6px;min-height:72px}
 .battle-ps .ps-move.disabled{opacity:.55;cursor:not-allowed}
 .battle-ps .ps-move__name{font-weight:600;font-size:.95rem}
 .battle-ps .ps-move__meta{display:flex;gap:8px;flex-wrap:wrap;font-size:.75rem;color:var(--fg-dim)}
-.battle-ps .ps-switch-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
-.battle-ps .ps-switch-btn{border:1px solid var(--accent2);border-radius:10px;padding:8px;background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(236,250,255,.9));text-align:left;cursor:pointer;display:grid;gap:6px;font-size:.8rem}
-.battle-ps .ps-switch-btn.disabled{opacity:.5;cursor:not-allowed}
-.battle-ps .ps-switch-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.battle-ps .ps-switch-hpbar{height:6px;background:rgba(28,58,58,.13);border-radius:6px;overflow:hidden}
-.battle-ps .ps-switch-hpbar span{display:block;height:100%;transition:width .3s ease-out}
-.battle-ps .ps-switch-meta{font-size:.7rem;color:var(--fg-dim);display:flex;gap:6px;flex-wrap:wrap}
+.battle-ps .ps-move__desc{font-size:.7rem;color:var(--fg-dim);line-height:1.3;margin-top:2px;opacity:.85;font-style:italic}
+.battle-ps .ps-switch-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.battle-ps .ps-switch-btn{border:2px solid var(--accent2);border-radius:12px;padding:8px 10px;background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(236,250,255,.92));text-align:left;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:.85rem;transition:all .15s ease;box-shadow:0 2px 6px rgba(0,80,80,.12)}
+.battle-ps .ps-switch-btn:hover:not(.disabled){border-color:var(--accent);background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(220,250,245,.95));transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,80,80,.18)}
+.battle-ps .ps-switch-btn.disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.4)}
+.battle-ps .ps-switch-btn.forced{border-color:#e55;animation:forcedPulse 1s ease-in-out infinite}
+@keyframes forcedPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,60,60,.3)}50%{box-shadow:0 0 0 6px rgba(220,60,60,0)}}
+.battle-ps .ps-switch-sprite{flex-shrink:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center}
+.battle-ps .ps-switch-sprite img{max-width:100%;max-height:100%;object-fit:contain}
+.battle-ps .ps-switch-info{flex:1;min-width:0;display:grid;gap:4px}
+.battle-ps .ps-switch-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.9rem;color:#1a3a3a}
+.battle-ps .ps-switch-hpbar{height:8px;background:rgba(28,58,58,.13);border-radius:6px;overflow:hidden}
+.battle-ps .ps-switch-hpbar span{display:block;height:100%;transition:width .3s ease-out;border-radius:6px}
+.battle-ps .ps-switch-meta{font-size:.75rem;color:var(--fg-dim);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.battle-ps .ps-switch-status{background:rgba(180,60,60,.15);color:#a33;padding:1px 6px;border-radius:4px;font-weight:600;text-transform:uppercase;font-size:.7rem}
 .battle-ps .ps-command-footer{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 .battle-ps .ps-command-footer button{border:1px solid var(--accent2);border-radius:8px;background:transparent;padding:6px 12px;cursor:pointer}
 .battle-ps .ps-command-footer button.secondary{opacity:.75}
 
+/* Weather & Terrain Field Conditions */
+.battle-ps .ps-field-conditions{display:flex;justify-content:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.battle-ps .ps-field-condition{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:.85rem;font-weight:600;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.15);animation:conditionFadeIn .3s ease-out}
+.battle-ps .ps-field-condition__icon{font-size:1.1rem}
+.battle-ps .ps-field-condition__name{white-space:nowrap}
+.battle-ps .ps-field-condition__turns{font-size:.75rem;font-weight:400;opacity:.85}
+
+/* Weather conditions */
+.battle-ps .ps-field-condition--weather{background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(220,240,255,.85));border:1px solid rgba(100,150,200,.4)}
+.battle-ps .ps-field-condition--sunnyday,.battle-ps .ps-field-condition--sun{background:linear-gradient(135deg,rgba(255,240,180,.95),rgba(255,200,100,.85));border-color:rgba(255,160,0,.5);color:#8b5a00}
+.battle-ps .ps-field-condition--desolateland{background:linear-gradient(135deg,rgba(255,200,150,.95),rgba(255,120,80,.85));border-color:rgba(255,100,50,.6);color:#8b2500}
+.battle-ps .ps-field-condition--raindance,.battle-ps .ps-field-condition--rain{background:linear-gradient(135deg,rgba(180,210,255,.95),rgba(130,180,230,.85));border-color:rgba(80,140,200,.5);color:#1a4a7a}
+.battle-ps .ps-field-condition--primordialsea{background:linear-gradient(135deg,rgba(130,190,255,.95),rgba(80,150,220,.85));border-color:rgba(50,120,180,.6);color:#0a3a6a}
+.battle-ps .ps-field-condition--sandstorm,.battle-ps .ps-field-condition--sand{background:linear-gradient(135deg,rgba(230,210,180,.95),rgba(200,175,140,.85));border-color:rgba(180,140,80,.5);color:#6b4a00}
+.battle-ps .ps-field-condition--hail{background:linear-gradient(135deg,rgba(220,240,255,.95),rgba(180,210,240,.85));border-color:rgba(100,160,200,.5);color:#2a5a8a}
+.battle-ps .ps-field-condition--snow{background:linear-gradient(135deg,rgba(240,250,255,.95),rgba(200,225,245,.85));border-color:rgba(150,180,210,.5);color:#3a6a9a}
+.battle-ps .ps-field-condition--deltastream{background:linear-gradient(135deg,rgba(200,220,200,.95),rgba(150,180,150,.85));border-color:rgba(100,140,100,.5);color:#3a5a3a}
+
+/* Terrain conditions */
+.battle-ps .ps-field-condition--terrain{background:linear-gradient(135deg,rgba(230,255,230,.9),rgba(200,240,200,.85));border:1px solid rgba(100,180,100,.4)}
+.battle-ps .ps-field-condition--electricterrain,.battle-ps .ps-field-condition--electric{background:linear-gradient(135deg,rgba(255,250,180,.95),rgba(255,235,100,.85));border-color:rgba(200,180,50,.5);color:#7a6a00}
+.battle-ps .ps-field-condition--grassyterrain,.battle-ps .ps-field-condition--grassy{background:linear-gradient(135deg,rgba(200,255,200,.95),rgba(150,230,150,.85));border-color:rgba(100,180,100,.5);color:#2a6a2a}
+.battle-ps .ps-field-condition--mistyterrain,.battle-ps .ps-field-condition--misty{background:linear-gradient(135deg,rgba(255,210,230,.95),rgba(240,180,210,.85));border-color:rgba(200,140,170,.5);color:#8a3a6a}
+.battle-ps .ps-field-condition--psychicterrain,.battle-ps .ps-field-condition--psychic{background:linear-gradient(135deg,rgba(255,200,220,.95),rgba(240,160,190,.85));border-color:rgba(200,120,160,.5);color:#8a2a5a}
+
+@keyframes conditionFadeIn{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:translateY(0)}}
+
+/* Side conditions (hazards, screens) */
+.battle-ps .ps-side-conditions{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}
+.battle-ps .ps-side-condition{font-size:.85rem;cursor:help;padding:2px 4px;border-radius:4px;background:rgba(0,0,0,.1);animation:badgePop .25s ease-out}
+.battle-ps .ps-side-condition--hazard{color:#c62828}
+.battle-ps .ps-side-condition--screen{color:#1565c0}
+.battle-ps .ps-side-condition--buff{color:#2e7d32}
+
+/* Effectiveness text overlay */
+.battle-ps .ps-effectiveness-text{position:absolute;z-index:50;font-size:1.3rem;font-weight:700;text-shadow:2px 2px 4px rgba(0,0,0,.4);animation:effectivenessPop .4s ease-out forwards;pointer-events:none}
+.battle-ps .ps-effectiveness-text--p1{top:30%;left:50%;transform:translateX(-50%)}
+.battle-ps .ps-effectiveness-text--p2{bottom:30%;left:50%;transform:translateX(-50%)}
+.battle-ps .ps-effectiveness-text--super{color:#ff5722}
+.battle-ps .ps-effectiveness-text--resisted{color:#78909c}
+.battle-ps .ps-effectiveness-text--immune{color:#9e9e9e}
+.battle-ps .ps-effectiveness-text--crit{color:#ffc107}
+@keyframes effectivenessPop{0%{opacity:0;transform:translateX(-50%) scale(.5)}20%{opacity:1;transform:translateX(-50%) scale(1.15)}40%{transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-20px) scale(.9)}}
+
+/* Battle End Panel */
+.battle-ps .ps-battle-end{text-align:center;padding:20px}
+.battle-ps .ps-battle-end__result{margin-bottom:20px}
+.battle-ps .ps-battle-end__winner{font-size:1.4rem;margin:0 0 8px}
+.battle-ps .ps-battle-end__verdict{font-size:1.1rem;font-weight:600;padding:8px 16px;border-radius:8px;display:inline-block}
+.battle-ps .ps-battle-end__verdict.victory{background:rgba(76,175,80,.15);color:#2e7d32}
+.battle-ps .ps-battle-end__verdict.defeat{background:rgba(244,67,54,.15);color:#c62828}
+.battle-ps .ps-battle-end__actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.battle-ps .ps-battle-end__actions button{padding:10px 20px;border-radius:8px;border:1px solid var(--accent);cursor:pointer;font-size:1rem}
+.battle-ps .ps-battle-end__actions button.secondary{background:transparent;opacity:.8}
+
 @media (max-width:1040px){
   .battle-ps .ps-battle__layout{grid-template-columns:1fr}
 }
+/* Waiting UI Styles */
+.battle-ps .ps-command-waiting{text-align:center}
+.battle-ps .ps-waiting-action{display:flex;align-items:center;justify-content:center;gap:12px;padding:20px;margin:12px 0;background:rgba(255,255,255,.8);border-radius:12px;border:2px dashed var(--accent2);animation:waitingPulse 2s ease-in-out infinite}
+.battle-ps .ps-waiting-action__icon{font-size:2rem}
+.battle-ps .ps-waiting-action__text{font-size:1.1rem;color:var(--fg-dim)}
+.battle-ps .ps-waiting-action__text strong{color:var(--fg);font-weight:600}
+.battle-ps .ps-waiting-hint{font-size:.85rem;color:var(--fg-dim);font-style:italic;margin-bottom:12px}
+@keyframes waitingPulse{0%,100%{border-color:var(--accent2);opacity:1}50%{border-color:var(--accent);opacity:.85}}

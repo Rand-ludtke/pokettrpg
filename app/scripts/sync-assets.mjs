@@ -33,6 +33,22 @@ async function main() {
   async function buildJson(jsFile, exportVar, outName) {
     const full = path.join(dataSrc, jsFile);
     let code;
+
+    // Copy battle FX assets (backgrounds, weather loops, terrain overlays) into /public/fx for runtime use
+    const fxSrc = path.join(showdown, 'fx');
+    const fxDest = path.join(process.cwd(), 'public', 'fx');
+    try { await rm(fxDest, { recursive: true, force: true }); } catch {}
+    try {
+      await mkdir(path.dirname(fxDest), { recursive: true });
+      await cp(fxSrc, fxDest, { recursive: true });
+      console.log('Copied fx assets to', fxDest);
+    } catch (e) {
+      if (e?.code === 'ENOENT') {
+        console.warn('FX assets folder missing – skipping /public/fx copy.');
+      } else {
+        console.warn('Failed to copy FX assets:', e?.message || e);
+      }
+    }
     try {
       code = await readFile(full, 'utf8');
     } catch {
@@ -92,7 +108,7 @@ async function main() {
   const argv = process.argv.slice(2);
   const copyAll = argv.includes('--all');
   const setsArg = argv.find(a => a.startsWith('--sets='));
-  const sets = copyAll ? ['__ALL__'] : (setsArg ? setsArg.replace(/^--sets=/, '').split(',') : ['gen5','gen5-shiny','gen5-back','gen5-back-shiny','gen5icons','types','home','trainers']);
+  const sets = copyAll ? ['__ALL__'] : (setsArg ? setsArg.replace(/^--sets=/, '').split(',') : ['gen5','gen5-shiny','gen5-back','gen5-back-shiny','gen5icons','gen6bgs','types','home','trainers','categories']);
   if (showdownPresent) {
     if (sets.includes('__ALL__')) {
       try { await cp(spritesSrc, spritesDest, { recursive: true }); } catch {}
@@ -105,6 +121,13 @@ async function main() {
       // Explicitly copy itemicons sheet (used for inventory icons) if present
       try {
         await cp(path.join(spritesSrc, 'itemicons-sheet.png'), path.join(spritesDest, 'itemicons-sheet.png'));
+      } catch {}
+      // Copy pokemonicons sheets (used for team picons in sidebars)
+      try {
+        await cp(path.join(spritesSrc, 'pokemonicons-sheet.png'), path.join(spritesDest, 'pokemonicons-sheet.png'));
+      } catch {}
+      try {
+        await cp(path.join(spritesSrc, 'pokemonicons-pokeball-sheet.png'), path.join(spritesDest, 'pokemonicons-pokeball-sheet.png'));
       } catch {}
     }
   } else {

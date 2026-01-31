@@ -64,11 +64,12 @@ export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNext
             key={i}
             className={`slot large${selectedSet.has(i) ? ' selected' : ''}`}
             onClick={(e) => {
+              // Shift-click: toggle selection for multi-select (works even without selectMode)
               if ((e as any).shiftKey && p && onShiftToggle) { onShiftToggle(i); return; }
-              if (selectMode && p && onToggleSelect) { onToggleSelect(i); return; }
+              // Normal click: always open details page, never toggle selection
               onSelect(p ?? null, i);
             }}
-            title={p ? `${(p.types||[]).join('/') } • Lv${p.level} • HP ${p.currentHp}/${p.maxHp}` : 'Empty slot - click to add'}
+            title={p ? `${(p.types||[]).join('/') } • Lv${p.level} • HP ${p.currentHp}/${p.maxHp}${selectMode ? '\n(Shift-click to toggle selection)' : ''}` : 'Empty slot - click to add'}
             style={selectedSet.has(i) ? { outline: '2px solid var(--acc)', outlineOffset: -2, background: 'rgba(0,255,128,0.08)' } : undefined}
             draggable={!!p}
             onDragStart={(e)=>{
