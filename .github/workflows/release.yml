@@ -16,6 +16,11 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    env:
+      CARGO_INCREMENTAL: 0
+      CARGO_TARGET_DIR: ${{ runner.temp }}/cargo-target
+      RUSTC_WRAPPER: ""
+      SCCACHE_DISABLE: "1"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,12 +35,14 @@ jobs:
         working-directory: tauri-app/src-tauri
         run: |
           rm -rf target
+          rm -rf "$RUNNER_TEMP/cargo-target"
       - name: Clean Rust build cache (Windows)
         if: runner.os == 'Windows'
         working-directory: tauri-app/src-tauri
         shell: pwsh
         run: |
           if (Test-Path "target") { Remove-Item -Recurse -Force "target" }
+          if (Test-Path "$env:RUNNER_TEMP\cargo-target") { Remove-Item -Recurse -Force "$env:RUNNER_TEMP\cargo-target" }
       - name: Install dependencies
         working-directory: tauri-app
         run: npm install
@@ -44,6 +51,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_INCREMENTAL: 0
+          CARGO_TARGET_DIR: ${{ runner.temp }}/cargo-target
+          RUSTC_WRAPPER: ""
+          SCCACHE_DISABLE: "1"
         with:
           projectPath: tauri-app
           tagName: ${{ github.ref_name }}
