@@ -25,10 +25,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Clean Rust build cache
+      - name: Clean Rust build cache (Unix)
+        if: runner.os != 'Windows'
         working-directory: tauri-app/src-tauri
         run: |
           rm -rf target
+      - name: Clean Rust build cache (Windows)
+        if: runner.os == 'Windows'
+        working-directory: tauri-app/src-tauri
+        shell: pwsh
+        run: |
+          if (Test-Path "target") { Remove-Item -Recurse -Force "target" }
       - name: Install dependencies
         working-directory: tauri-app
         run: npm install
