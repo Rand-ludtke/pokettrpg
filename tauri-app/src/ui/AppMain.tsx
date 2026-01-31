@@ -432,7 +432,12 @@ export function App() {
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           <label className="dim" htmlFor="spriteSet">Sprites:</label>
           <select id="spriteSet" defaultValue={getSpriteSettings().set} onChange={(e) => setSpriteSettings({ set: e.target.value as SpriteSet })}>
+            <option value="gen1">Gen 1</option>
+            <option value="gen2">Gen 2</option>
+            <option value="gen3">Gen 3</option>
+            <option value="gen4">Gen 4</option>
             <option value="gen5">Gen 5</option>
+            <option value="gen6">Gen 6</option>
             <option value="home">HOME</option>
           </select>
           <label className="dim" htmlFor="aniToggle" style={{display:'inline-flex', alignItems:'center', gap:6}}>

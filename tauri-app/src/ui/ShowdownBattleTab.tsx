@@ -111,7 +111,18 @@ export function ShowdownBattleTab({ id, title }: { id: string; title: string }) 
   useEffect(() => {
     try {
       const set = getSpriteSettings().set;
-      const dir = set === 'home' ? '/vendor/showdown/sprites/home' : '/vendor/showdown/sprites/gen5';
+      const dir = (() => {
+        switch (set) {
+          case 'gen1': return '/vendor/showdown/sprites/gen1';
+          case 'gen2': return '/vendor/showdown/sprites/gen2';
+          case 'gen3': return '/vendor/showdown/sprites/gen3';
+          case 'gen4': return '/vendor/showdown/sprites/gen4';
+          case 'gen6': return '/vendor/showdown/sprites/gen6';
+          case 'home': return '/vendor/showdown/sprites/home';
+          case 'gen5':
+          default: return '/vendor/showdown/sprites/gen5';
+        }
+      })();
       iframeRef.current?.contentWindow?.postMessage({ type:'mb:setSpritesDir', url: dir }, '*');
     } catch {}
     try {

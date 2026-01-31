@@ -264,9 +264,9 @@ export function computeRealStats(p: Pokemon): { hp:number; atk:number; def:numbe
 }
 
 // Sprite helpers: prefer Gen 5 static for retro vibe
-export type SpriteSet = 'gen5'|'home';
+export type SpriteSet = 'gen1'|'gen2'|'gen3'|'gen4'|'gen5'|'gen6'|'home';
 export function getSpriteSettings(): { set: SpriteSet; animated: boolean } {
-  const allowed: SpriteSet[] = ['gen5','home'];
+  const allowed: SpriteSet[] = ['gen1','gen2','gen3','gen4','gen5','gen6','home'];
   try {
     const raw = JSON.parse(localStorage.getItem('ttrpg.spriteSettings') || '{}');
     let set = raw?.set as string | undefined;
@@ -276,6 +276,42 @@ export function getSpriteSettings(): { set: SpriteSet; animated: boolean } {
     if (!set || !allowed.includes(set as SpriteSet)) return { set: 'gen5', animated };
     return { set: set as SpriteSet, animated };
   } catch { return { set: 'gen5', animated: true }; }
+}
+
+function spriteFolderForSet(set: SpriteSet, shiny: boolean, back: boolean, useAni: boolean): string | null {
+  if (set === 'gen5') {
+    if (useAni) {
+      if (back) return shiny ? 'ani-back-shiny' : 'ani-back';
+      return shiny ? 'ani-shiny' : 'ani';
+    }
+    if (back) return shiny ? 'gen5-back-shiny' : 'gen5-back';
+    return shiny ? 'gen5-shiny' : 'gen5';
+  }
+  if (set === 'home') {
+    if (back) return null;
+    return shiny ? 'home-shiny' : 'home';
+  }
+  if (set === 'gen1') {
+    if (back) return 'gen1-back';
+    return 'gen1';
+  }
+  if (set === 'gen2') {
+    if (back) return shiny ? 'gen2-back-shiny' : 'gen2-back';
+    return shiny ? 'gen2-shiny' : 'gen2';
+  }
+  if (set === 'gen3') {
+    if (back) return shiny ? 'gen3-back-shiny' : 'gen3-back';
+    return shiny ? 'gen3-shiny' : 'gen3';
+  }
+  if (set === 'gen4') {
+    if (back) return shiny ? 'gen4-back-shiny' : 'gen4-back';
+    return shiny ? 'gen4-shiny' : 'gen4';
+  }
+  if (set === 'gen6') {
+    if (back) return 'gen6-back';
+    return 'gen6';
+  }
+  return null;
 }
 
 export function setSpriteSettings(s: Partial<{ set: SpriteSet; animated: boolean }>) {
@@ -301,19 +337,12 @@ export function spriteUrl(speciesId: string, shiny = false, options?: { base?: s
   const chosen = options?.setOverride ?? settings.set;
   const useAni = settings.animated && chosen === 'gen5';
   // Construct folder and extension
-  const folder = (() => {
-    if (chosen === 'gen5') {
-      if (useAni) {
-        if (options?.back) return shiny ? 'ani-back-shiny' : 'ani-back';
-        return shiny ? 'ani-shiny' : 'ani';
-      }
-      if (options?.back) return shiny ? 'gen5-back-shiny' : 'gen5-back';
-      return shiny ? 'gen5-shiny' : 'gen5';
-    }
-    // HOME has only front sprites
-    return shiny ? 'home-shiny' : 'home';
-  })();
-  const ext = useAni ? 'gif' : 'png';
+  const folder =
+    spriteFolderForSet(chosen, shiny, !!options?.back, useAni) ||
+    spriteFolderForSet('gen5', shiny, !!options?.back, useAni) ||
+    spriteFolderForSet('home', shiny, false, false) ||
+    'gen5';
+  const ext = folder.startsWith('ani') ? 'gif' : 'png';
   const ids = spriteIdCandidates(speciesId, options?.cosmetic);
   // Prefer locally stored custom sprite data URL if present (try each candidate id)
   const slot: SpriteSlot = options?.back ? (shiny ? 'back-shiny' : 'back') : (shiny ? 'shiny' : 'front');
@@ -400,18 +429,13 @@ export function spriteUrlWithFallback(
 
   // Candidate folders by priority
   const folders: string[] = [];
-  if (chosen === 'gen5') {
-    // Prefer animated if enabled, then static gen5
-    if (useAni) folders.push(back ? (shiny ? 'ani-back-shiny' : 'ani-back') : (shiny ? 'ani-shiny' : 'ani'));
-    folders.push(back ? (shiny ? 'gen5-back-shiny' : 'gen5-back') : (shiny ? 'gen5-shiny' : 'gen5'));
-    // Fallback to HOME front sprite
-    folders.push(shiny ? 'home-shiny' : 'home');
-  } else {
-    // HOME first (front-only), then gen5 (front/back)
-    folders.push(shiny ? 'home-shiny' : 'home');
-    if (useAni) folders.push(back ? (shiny ? 'ani-back-shiny' : 'ani-back') : (shiny ? 'ani-shiny' : 'ani'));
-    folders.push(back ? (shiny ? 'gen5-back-shiny' : 'gen5-back') : (shiny ? 'gen5-shiny' : 'gen5'));
-  }
+  const addFolder = (set: SpriteSet) => {
+    const f = spriteFolderForSet(set, shiny, back, settings.animated && set === 'gen5');
+    if (f && !folders.includes(f)) folders.push(f);
+  };
+  addFolder(chosen);
+  if (chosen !== 'gen5') addFolder('gen5');
+  if (chosen !== 'home') addFolder('home');
 
   // Insert custom sprite data URL at the front if available (try every candidate id)
   const slot: SpriteSlot = back ? (shiny ? 'back-shiny' : 'back') : (shiny ? 'shiny' : 'front');
