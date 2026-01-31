@@ -25,6 +25,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Clean Rust build cache
+        working-directory: tauri-app/src-tauri
+        run: |
+          rm -rf target
       - name: Install dependencies
         working-directory: tauri-app
         run: npm install
@@ -32,6 +36,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARGO_INCREMENTAL: 0
         with:
           projectPath: tauri-app
           tagName: ${{ github.ref_name }}
