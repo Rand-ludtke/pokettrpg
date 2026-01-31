@@ -5,6 +5,7 @@ import { rmSync, existsSync, mkdirSync, cpSync } from 'node:fs';
 
 export default defineConfig({
   root: '.',
+  base: './',
   server: {
     port: 5173,
     open: false,
