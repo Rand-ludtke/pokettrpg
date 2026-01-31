@@ -10,13 +10,12 @@ export default defineConfig(({ mode }) => {
   return {
     root: '.',
     base: process.env.VITE_PUBLIC_BASE || './',
-    publicDir: isTauri ? false : 'public',
+    publicDir: 'public',
     plugins: [
       react(),
       {
         name: 'prune-ps-from-dist',
         closeBundle() {
-          if (isTauri) return;
           // Ensure /public/vendor/showdown is copied by Vite; remove any accidental /showdown root artifact
           const distPs = path.resolve(__dirname, 'dist', 'showdown');
           if (existsSync(distPs)) {
