@@ -7,6 +7,7 @@
  */
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { withPublicBase } from '../utils/publicBase';
 import { loadPokemonShowdown, createPSBattle, getDex, toID } from './ps-loader';
 import { ProtocolConverter, requestToPS } from './protocol-adapter';
 import type { PoketTRPGClient } from '../net/pokettrpgClient';
@@ -447,8 +448,8 @@ function getPokemonIconStyle(species: string | undefined): React.CSSProperties {
     height: '30px',
   };
 
-  const iconSheet = "var(--ps-pokemonicons-sheet, url('/vendor/showdown/sprites/pokemonicons-sheet.png?v20'))";
-  const pokeballSheet = "var(--ps-pokemonicons-pokeball-sheet, url('/vendor/showdown/sprites/pokemonicons-pokeball-sheet.png?v20'))";
+  const iconSheet = `var(--ps-pokemonicons-sheet, url('${withPublicBase('vendor/showdown/sprites/pokemonicons-sheet.png?v20')}'))`;
+  const pokeballSheet = `var(--ps-pokemonicons-pokeball-sheet, url('${withPublicBase('vendor/showdown/sprites/pokemonicons-pokeball-sheet.png?v20')}'))`;
   
   if (!species) {
     // Return pokeball icon for missing species
@@ -646,7 +647,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       return;
     }
     const url = match[1];
-    if (!url || !url.includes('/vendor/showdown/sprites/gen6bgs/')) return;
+    if (!url || !url.includes('/sprites/gen6bgs/')) return;
     lastBackdropUrlRef.current = url;
   }, []);
   
@@ -704,8 +705,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     if (iconSheetReadyRef.current) return;
     iconSheetReadyRef.current = true;
 
-    const localSheet = '/vendor/showdown/sprites/pokemonicons-sheet.png?v20';
-    const localPokeballSheet = '/vendor/showdown/sprites/pokemonicons-pokeball-sheet.png?v20';
+    const localSheet = withPublicBase('vendor/showdown/sprites/pokemonicons-sheet.png?v20');
+    const localPokeballSheet = withPublicBase('vendor/showdown/sprites/pokemonicons-pokeball-sheet.png?v20');
     const remoteSheet = 'https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png?v20';
     const remotePokeballSheet = 'https://play.pokemonshowdown.com/sprites/pokemonicons-pokeball-sheet.png?v20';
 
@@ -713,6 +714,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const root = document.documentElement;
       root.style.setProperty('--ps-pokemonicons-sheet', `url('${sheetUrl}')`);
       root.style.setProperty('--ps-pokemonicons-pokeball-sheet', `url('${pokeballUrl}')`);
+      root.style.setProperty('--ps-category-physical', `url('${withPublicBase('vendor/showdown/sprites/categories/Physical.png')}')`);
+      root.style.setProperty('--ps-category-special', `url('${withPublicBase('vendor/showdown/sprites/categories/Special.png')}')`);
+      root.style.setProperty('--ps-category-status', `url('${withPublicBase('vendor/showdown/sprites/categories/Status.png')}')`);
+      root.style.setProperty('--ps-fx-bg', `url('${withPublicBase('fx/bg.png')}')`);
     };
 
     const checkLocal = async () => {

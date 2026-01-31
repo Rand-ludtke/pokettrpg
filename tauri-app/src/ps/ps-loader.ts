@@ -53,7 +53,9 @@ declare global {
 }
 
 // Base URL for PS assets
-const PS_BASE = '/vendor/showdown';
+import { withPublicBase } from '../utils/publicBase';
+
+const PS_BASE = withPublicBase('vendor/showdown').replace(/\/$/, '');
 
 // List of scripts to load in order (matches PS's index.template.html)
 const PS_SCRIPTS = [
@@ -217,7 +219,7 @@ async function loadCommonJSDataFile(config: { url: string; globalName: string; e
 function setupPSGlobals(): void {
   // Determine the base URL for PS assets
   // In dev it's served from the same origin, in prod from /vendor/showdown/
-  const psBase = '/vendor/showdown';
+  const psBase = withPublicBase('vendor/showdown').replace(/\/$/, '');
   
   // Set up PS Config before loading scripts
   window.Config = window.Config || {
@@ -321,7 +323,7 @@ export async function loadPokemonShowdown(): Promise<void> {
         // Dex.fxPrefix in an IIFE to prefix all BattleEffects URLs
         if (scriptName === 'battledata.js' && window.Dex) {
           window.Dex.resourcePrefix = `${PS_BASE}/`;
-          window.Dex.fxPrefix = '/fx/';
+          window.Dex.fxPrefix = withPublicBase('fx/');
           console.log('[PS Loader] Fixed Dex paths early (before animations):', {
             resourcePrefix: window.Dex.resourcePrefix,
             fxPrefix: window.Dex.fxPrefix,
@@ -377,8 +379,8 @@ export async function loadPokemonShowdown(): Promise<void> {
     if (window.Dex) {
       // Use relative path - this works in both dev (http://localhost:5173) and Tauri production
       window.Dex.resourcePrefix = `${PS_BASE}/`;
-      // FX sprites are at /fx/ not /vendor/showdown/fx/
-      setFxPrefix('/fx/');
+      // FX sprites are at /fx/
+      setFxPrefix(withPublicBase('fx/'));
       console.log('[PS Loader] Fixed Dex paths (relative):', {
         resourcePrefix: window.Dex.resourcePrefix,
         fxPrefix: window.Dex.fxPrefix,

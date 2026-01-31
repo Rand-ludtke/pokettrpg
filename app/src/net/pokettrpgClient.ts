@@ -483,9 +483,18 @@ export class PoketTRPGClient {
     }
 
     this.updateStatus('connecting');
-    const socket = io(this.socketEndpoint, {
+    let endpoint = this.socketEndpoint;
+    let path = this.socketPath;
+    if (typeof window !== 'undefined' && window.location?.protocol === 'https:' && endpoint.startsWith('http://')) {
+      const upgraded = endpoint.replace(/^http:/i, 'https:');
+      this.emitter.emit('error', {
+        message: `HTTPS page cannot connect to HTTP server. Trying ${upgraded}. If it fails, use an HTTPS/WSS backend or a tunnel.`,
+      });
+      endpoint = upgraded;
+    }
+    const socket = io(endpoint, {
       transports: ['websocket', 'polling'],
-      path: this.socketPath,
+      path,
       forceNew: true,
       withCredentials: true,
     });
@@ -501,7 +510,13 @@ export class PoketTRPGClient {
     });
 
     socket.on('connect_error', err => {
-      this.emitter.emit('error', { message: err?.message || 'Connection error' });
+      const isHttpsPage = typeof window !== 'undefined' && window.location?.protocol === 'https:';
+      const isHttpServer = this.socketEndpoint.startsWith('http://');
+      const fallbackMessage = err?.message || 'Connection error';
+      const message = (isHttpsPage && isHttpServer)
+        ? 'HTTPS page cannot connect to an HTTP server. Use an HTTPS/WSS backend or a tunnel.'
+        : fallbackMessage;
+      this.emitter.emit('error', { message });
       this.updateStatus('error');
     });
 

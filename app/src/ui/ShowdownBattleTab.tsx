@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { getSpriteSettings } from '../data/adapter';
+import { withPublicBase } from '../utils/publicBase';
 
 const DEFAULT_TRAINER_SPRITE = 'acetrainer';
 
@@ -113,14 +114,14 @@ export function ShowdownBattleTab({ id, title }: { id: string; title: string }) 
       const set = getSpriteSettings().set;
       const dir = (() => {
         switch (set) {
-          case 'gen1': return '/vendor/showdown/sprites/gen1';
-          case 'gen2': return '/vendor/showdown/sprites/gen2';
-          case 'gen3': return '/vendor/showdown/sprites/gen3';
-          case 'gen4': return '/vendor/showdown/sprites/gen4';
-          case 'gen6': return '/vendor/showdown/sprites/gen6';
-          case 'home': return '/vendor/showdown/sprites/home';
+          case 'gen1': return withPublicBase('vendor/showdown/sprites/gen1');
+          case 'gen2': return withPublicBase('vendor/showdown/sprites/gen2');
+          case 'gen3': return withPublicBase('vendor/showdown/sprites/gen3');
+          case 'gen4': return withPublicBase('vendor/showdown/sprites/gen4');
+          case 'gen6': return withPublicBase('vendor/showdown/sprites/gen6');
+          case 'home': return withPublicBase('vendor/showdown/sprites/home');
           case 'gen5':
-          default: return '/vendor/showdown/sprites/gen5';
+          default: return withPublicBase('vendor/showdown/sprites/gen5');
         }
       })();
       iframeRef.current?.contentWindow?.postMessage({ type:'mb:setSpritesDir', url: dir }, '*');

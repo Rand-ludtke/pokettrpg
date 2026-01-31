@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { withPublicBase } from '../utils/publicBase';
 import { spriteUrl } from '../data/adapter';
 import { getClient } from '../net/pokettrpgClient';
 import { getCustomItems } from '../data/adapter';
@@ -197,7 +198,7 @@ export function CharacterSheet() {
 		let cancelled=false;
 		(async()=>{
 			try {
-				const res = await fetch('/vendor/showdown/data/items.json');
+				const res = await fetch(withPublicBase('vendor/showdown/data/items.json'));
 				if(!res.ok) return; const json = await res.json();
 				if(cancelled) return;
 				// Normalize into id->entry map; id function replicates PS toID semantics
@@ -236,7 +237,7 @@ export function CharacterSheet() {
 		};
 		const loadFromManifest = async () => {
 			try {
-				const res = await fetch('/vendor/showdown/sprites/trainers.json');
+				const res = await fetch(withPublicBase('vendor/showdown/sprites/trainers.json'));
 				if (!res.ok) return [] as string[];
 				const json = await res.json();
 				if (Array.isArray(json)) return dedupeAndSort(json.map(String));
@@ -248,7 +249,7 @@ export function CharacterSheet() {
 		};
 		const loadFromBattleDataFile = async () => {
 			try {
-				const res = await fetch('/vendor/showdown/js/battledata.js');
+				const res = await fetch(withPublicBase('vendor/showdown/js/battledata.js'));
 				if (!res.ok) return [] as string[];
 				const text = await res.text();
 				const match = text.match(/BattleAvatarNumbers\s*=\s*\{([\s\S]*?)\};/);
@@ -404,7 +405,7 @@ export function CharacterSheet() {
 		const num = entry.spritenum; // Showdown spritenum mapping
 		const top = Math.floor(num / 16) * 24;
 		const left = (num % 16) * 24;
-		return <span style={{display:'inline-block', width:size, height:size, background:`transparent url(/vendor/showdown/sprites/itemicons-sheet.png) no-repeat -${left}px -${top}px`, imageRendering:'pixelated', transform: size!==24? `scale(${size/24})` : undefined, transformOrigin:'top left'}} />;
+		return <span style={{display:'inline-block', width:size, height:size, background:`transparent url(${withPublicBase('vendor/showdown/sprites/itemicons-sheet.png')}) no-repeat -${left}px -${top}px`, imageRendering:'pixelated', transform: size!==24? `scale(${size/24})` : undefined, transformOrigin:'top left'}} />;
 	}
 
 	// Inventory tab icons (simple inline SVG outlines)
@@ -630,7 +631,7 @@ export function CharacterSheet() {
 								{trainerImage ? (
 									<img src={trainerImage} alt="Trainer" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
 								) : (
-									<img src={`/vendor/showdown/sprites/trainers/${trainerSprite}.png`} alt="Sprite" style={{ imageRendering:'pixelated', width:'80%', height:'80%', objectFit:'contain', background:'transparent' }} />
+									<img src={withPublicBase(`vendor/showdown/sprites/trainers/${trainerSprite}.png`)} alt="Sprite" style={{ imageRendering:'pixelated', width:'80%', height:'80%', objectFit:'contain', background:'transparent' }} />
 								)}
 							</div>
 							<div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
@@ -757,7 +758,7 @@ export function CharacterSheet() {
 										.filter(name => { const q = spriteSearch.toLowerCase().trim(); return !q || name.toLowerCase().includes(q); })
 										.map((name)=> (
 											<button key={name} title={name} className={trainerSprite===name? 'active':''} onClick={()=>{ applyTrainerSprite(name); setShowSpritePicker(false); }} style={{width:64, height:64, padding:0, border: trainerSprite===name? '2px solid var(--acc)': '1px solid #444', borderRadius:4, background:'transparent', display:'flex', alignItems:'center', justifyContent:'center'}}>
-												<img src={`/vendor/showdown/sprites/trainers/${name}.png`} alt={name} style={{ width:48, height:48, imageRendering:'pixelated', background:'transparent' }} />
+												<img src={withPublicBase(`vendor/showdown/sprites/trainers/${name}.png`)} alt={name} style={{ width:48, height:48, imageRendering:'pixelated', background:'transparent' }} />
 											</button>
 										))}
 								</div>

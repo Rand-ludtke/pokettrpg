@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
 import { spriteUrlWithFallback, loadShowdownDex, normalizeName, speciesFormesInfo, eligibleMegaFormForItem, prepareBattle, toPokemon, loadTeams } from '../data/adapter';
 
@@ -570,7 +571,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                 <img
                   key={t}
                   className="pixel"
-                  src={`/vendor/showdown/sprites/types/${titleCase(t)}.png`}
+                  src={withPublicBase(`vendor/showdown/sprites/types/${titleCase(t)}.png`)}
                   alt={titleCase(t)}
                   style={{height:18}}
                 />
@@ -620,7 +621,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                   <img
                     key={t}
                     className="pixel"
-                    src={`/vendor/showdown/sprites/types/${titleCase(t)}.png`}
+                    src={withPublicBase(`vendor/showdown/sprites/types/${titleCase(t)}.png`)}
                     alt={titleCase(t)}
                     style={{height:18}}
                   />

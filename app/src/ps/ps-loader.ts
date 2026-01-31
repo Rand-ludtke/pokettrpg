@@ -52,8 +52,10 @@ declare global {
   }
 }
 
+import { withPublicBase } from '../utils/publicBase';
+
 // Base URL for PS assets
-const PS_BASE = '/vendor/showdown';
+const PS_BASE = withPublicBase('vendor/showdown').replace(/\/$/, '');
 
 // List of scripts to load in order (matches PS's index.template.html)
 const PS_SCRIPTS = [
@@ -327,7 +329,7 @@ export async function loadPokemonShowdown(): Promise<void> {
     // The scripts compute these at load time with possibly wrong Config
     if (window.Dex) {
       window.Dex.resourcePrefix = `${PS_BASE}/`;
-      window.Dex.fxPrefix = `${PS_BASE}/fx/`;
+      window.Dex.fxPrefix = withPublicBase('fx/');
       console.log('[PS Loader] Fixed Dex paths:', {
         resourcePrefix: window.Dex.resourcePrefix,
         fxPrefix: window.Dex.fxPrefix,
@@ -339,7 +341,7 @@ export async function loadPokemonShowdown(): Promise<void> {
           const effect = window.BattleEffects[id];
           if (effect.url && !effect.url.startsWith('/') && !effect.url.startsWith('http')) {
             // URL is relative, prepend the fx prefix
-            effect.url = `${PS_BASE}/fx/` + effect.url;
+            effect.url = `${withPublicBase('fx/')}` + effect.url;
           }
         }
         console.log('[PS Loader] Fixed BattleEffects URLs');

@@ -50,15 +50,15 @@
 }
 .ps-battle-panel .category-icon.physical {
   background-color: #c05040;
-  background-image: url('/vendor/showdown/sprites/categories/Physical.png');
+  background-image: var(--ps-category-physical, url('/vendor/showdown/sprites/categories/Physical.png'));
 }
 .ps-battle-panel .category-icon.special {
   background-color: #4a90e2;
-  background-image: url('/vendor/showdown/sprites/categories/Special.png');
+  background-image: var(--ps-category-special, url('/vendor/showdown/sprites/categories/Special.png'));
 }
 .ps-battle-panel .category-icon.status {
   background-color: #9b9b9b;
-  background-image: url('/vendor/showdown/sprites/categories/Status.png');
+  background-image: var(--ps-category-status, url('/vendor/showdown/sprites/categories/Status.png'));
 }
 
 /* Keep app background, but allow PS battle room to render its own arena background */
@@ -190,7 +190,7 @@ body {
 /* Ensure the battle background effects show a default arena image */
 .ps-battle-panel .background {
   display: block !important;
-  background-image: url('/vendor/showdown/fx/bg.png');
+  background-image: var(--ps-fx-bg, url('/vendor/showdown/fx/bg.png'));
   background-size: cover;
   background-position: center;
 }

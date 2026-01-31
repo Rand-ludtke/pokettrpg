@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { withPublicBase } from '../utils/publicBase';
 import { spriteUrlWithFallback, normalizeName } from '../data/adapter';
 import { getClient, PromptActionPayload, RoomSummary, ChatMessage } from '../net/pokettrpgClient';
 
@@ -7,7 +8,7 @@ let cachedMovesData: Record<string, { desc?: string; shortDesc?: string }> | nul
 async function loadMovesData() {
   if (cachedMovesData) return cachedMovesData;
   try {
-    const resp = await fetch('/vendor/showdown/data/moves.json');
+    const resp = await fetch(withPublicBase('vendor/showdown/data/moves.json'));
     cachedMovesData = await resp.json();
   } catch {
     cachedMovesData = {};
@@ -712,11 +713,7 @@ function trainerSpriteSources(spriteId: string | undefined, side: SideId): strin
   add(fallback);
   const ids = Array.from(variantSet);
   const bases = [
-    'vendor/showdown/sprites/trainers',
-    './vendor/showdown/sprites/trainers',
-    '../vendor/showdown/sprites/trainers',
-    '/vendor/showdown/sprites/trainers',
-    '/showdown/sprites/trainers',
+    withPublicBase('vendor/showdown/sprites/trainers').replace(/\/$/, ''),
     'https://play.pokemonshowdown.com/sprites/trainers',
   ];
   const sources: string[] = [];
