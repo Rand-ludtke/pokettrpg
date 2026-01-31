@@ -710,6 +710,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const remoteSheet = 'https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png?v20';
     const remotePokeballSheet = 'https://play.pokemonshowdown.com/sprites/pokemonicons-pokeball-sheet.png?v20';
 
+    const setSheetVars = (sheetUrl: string, pokeballUrl: string) => {
       const root = document.documentElement;
       root.style.setProperty('--ps-pokemonicons-sheet', `url('${sheetUrl}')`);
       root.style.setProperty('--ps-pokemonicons-pokeball-sheet', `url('${pokeballUrl}')`);
