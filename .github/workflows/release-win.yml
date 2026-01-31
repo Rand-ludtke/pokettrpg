@@ -1,9 +1,6 @@
 name: Release Windows build
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
 
 permissions:
