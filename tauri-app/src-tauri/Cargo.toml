@@ -14,7 +14,7 @@ app-lib = []
 
 [lib]
 name = "app_lib"
-path = "src/lib.rs"
+path = "src/lib_disabled.rs"
 crate-type = ["staticlib", "cdylib", "rlib"]
 required-features = ["app-lib"]
 
