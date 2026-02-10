@@ -1,0 +1,42 @@
+/* SpriteWithHat component styles */
+
+.sprite-with-hat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sprite-with-hat img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Hat picker styles */
+.hat-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  background: var(--panel-bg, #1a1a2e);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #333);
+}
+
+.hat-picker--compact {
+  gap: 4px;
+  padding: 6px;
+}
+
+.hat-picker button {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.hat-picker button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hat-picker button:active {
+  transform: scale(0.95);
+}

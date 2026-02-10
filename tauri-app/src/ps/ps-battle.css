@@ -222,6 +222,19 @@ body {
   opacity: 1 !important;
 }
 
+/* Clamp trainer sprites to a consistent box without warping */
+.ps-battle-panel .trainer-near .trainersprite,
+.ps-battle-panel .trainer-far .trainersprite,
+.ps-battle-panel .trainer-near .trainersprite:before,
+.ps-battle-panel .trainer-far .trainersprite:before {
+  background-size: contain !important;
+  background-position: center bottom !important;
+  background-repeat: no-repeat !important;
+  width: 96px !important;
+  height: 96px !important;
+  image-rendering: pixelated;
+}
+
 /* Team icons under trainers */
 .ps-battle-panel .teamicons {
   display: block !important;

@@ -336,8 +336,9 @@ function generatePSRequest(prompt: any, state: any, side: 'p1' | 'p2'): any {
   if (!player) return null;
   
   // Build the request object in PS format
+  const requestType = prompt.requestType || (prompt.forceSwitch ? 'switch' : (prompt.teamPreview ? 'team' : 'move'));
   const request: any = {
-    requestType: prompt.requestType || 'move',
+    requestType,
     rqid: Date.now(),
     side: {
       id: side,
@@ -361,7 +362,7 @@ function generatePSRequest(prompt: any, state: any, side: 'p1' | 'p2'): any {
   };
   
   // Add active Pokemon moves
-  if (prompt.requestType === 'move' && prompt.active) {
+  if (requestType === 'move' && prompt.active) {
     request.active = prompt.active.map((active: any) => ({
       moves: (active.moves || []).map((m: any) => ({
         move: m.name,
@@ -615,6 +616,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const [waitingForOpponent, setWaitingForOpponent] = useState(false);
   const cancelledTurnsRef = useRef<Set<number>>(new Set());
   const [waitingForAnimations, setWaitingForAnimations] = useState(false);
+  const [isSpectator, setIsSpectator] = useState(false);
+  const [spectatorView, setSpectatorView] = useState<'p1' | 'p2'>('p1');
+  const [spectatorTurn, setSpectatorTurn] = useState<number | null>(null); // null = live
   const [mySide, setMySide] = useState<'p1' | 'p2' | null>(null);
   const [currentTurn, setCurrentTurn] = useState<number>(0); // Track current turn for duplicate prevention
   const [currentRqid, setCurrentRqid] = useState<number | null>(null); // Track request ID
@@ -655,6 +659,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   useEffect(() => {
     mySideRef.current = mySide;
   }, [mySide]);
+
+  useEffect(() => {
+    if (!isSpectator && mySide) {
+      setSpectatorView(mySide);
+    }
+  }, [isSpectator, mySide]);
 
   // REPLAY MODE: Feed protocol to battle when replayProtocol changes
   const lastReplayProtocolLengthRef = useRef(0);
@@ -795,6 +805,37 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     } catch (e) {
       console.warn('[PSBattlePanel] Failed to force-advance queue:', e);
     }
+  }, []);
+
+  const handleSkipAnimations = useCallback(() => {
+    const battle = battleRef.current;
+    if (!battle) return;
+    forceAdvanceQueue(battle, true);
+    setWaitingForAnimations(false);
+  }, [forceAdvanceQueue]);
+
+  const applySpectatorView = useCallback((side: 'p1' | 'p2') => {
+    const battle = battleRef.current;
+    if (!battle) return;
+    if (typeof battle.setViewpoint === 'function') {
+      battle.setViewpoint(side);
+    }
+    setSpectatorView(side);
+    if (battle.scene?.updateSidebars) {
+      battle.scene.updateSidebars();
+    }
+  }, []);
+
+  const seekSpectatorTurn = useCallback((target: number | 'live') => {
+    const battle = battleRef.current;
+    if (!battle || typeof battle.seekTurn !== 'function') return;
+    if (target === 'live') {
+      battle.seekTurn(Infinity, true);
+      setSpectatorTurn(null);
+      return;
+    }
+    battle.seekTurn(target, true);
+    setSpectatorTurn(target);
   }, []);
 
   const startAnimationWait = useCallback((battle: any) => {
@@ -1187,6 +1228,13 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         });
         
         // If we have a cached prompt, set up the request for UI (but don't generate protocol)
+        if (cachedState?.players && myPlayerId) {
+          const isPlayer = cachedState.players.some((p: any) => p?.id === myPlayerId || p?.name === myPlayerId);
+          setIsSpectator(!isPlayer);
+        } else if (!myPlayerId) {
+          setIsSpectator(true);
+        }
+
         if (cachedPrompt && cachedPrompt.prompt) {
           const prompt = cachedPrompt.prompt as any;
           const playerIdFromPrompt = cachedPrompt.playerId || prompt?.playerId;
@@ -1486,6 +1534,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
       if (result?.state) {
         lastBattleStateRef.current = result.state;
+        if (result.state.players && myPlayerId) {
+          const isPlayer = result.state.players.some((p: any) => p?.id === myPlayerId || p?.name === myPlayerId);
+          setIsSpectator(!isPlayer);
+        } else if (!myPlayerId) {
+          setIsSpectator(true);
+        }
       }
 
       // Capture whether we've already received protocol BEFORE marking this batch
@@ -2414,6 +2468,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         maxTeamSize: prompt?.maxTeamSize,
         rqid: prompt?.rqid,
       };
+      if (psRequest.requestType === 'switch' && (!psRequest.forceSwitch || psRequest.forceSwitch.length === 0)) {
+        const activeCount = psRequest.side?.pokemon?.filter((p: any) => p.active).length || 1;
+        psRequest.forceSwitch = Array.from({ length: activeCount }, () => true);
+      }
+      if (psRequest.requestType === 'move' && Array.isArray(psRequest.active) && psRequest.active[0]) {
+        const active = psRequest.active[0] as any;
+        if (typeof active.canSwitch !== 'boolean') {
+          const trapped = !!active.trapped || !!active.maybeTrapped;
+          active.canSwitch = !trapped;
+        }
+      }
       // Debug: log active Pokemon discrepancy
       const activeFromPrompt = psRequest.active?.[0]?.id || psRequest.active?.[0]?.pokemonId;
       const activePokemonForDebug = psRequest.side?.pokemon?.find((p: any) => p.active);
@@ -3470,6 +3535,47 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         {/* Controls - only shown when not loading, no error, and not in replay mode */}
         {!loading && !error && !isReplay && (
           <div className="battle-controls" role="complementary" aria-label="Battle Controls" ref={controlsContainerRef}>
+            {isSpectator && (
+              <div className="controls">
+                <div className="whatdo">Spectator Controls</div>
+                <div className="switchcontrols" style={{ display: 'grid', gap: 8 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                    <span className="dim" style={{ fontSize: '0.9em' }}>View:</span>
+                    <button
+                      className={`button${spectatorView === 'p1' ? ' active' : ''}`}
+                      onClick={() => applySpectatorView('p1')}
+                    >P1</button>
+                    <button
+                      className={`button${spectatorView === 'p2' ? ' active' : ''}`}
+                      onClick={() => applySpectatorView('p2')}
+                    >P2</button>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                    <button
+                      className="button"
+                      onClick={() => seekSpectatorTurn(Math.max(1, (battleRef.current?.turn || currentTurnRef.current || 1) - 1))}
+                      disabled={(battleRef.current?.turn || currentTurnRef.current || 1) <= 1}
+                    >⟲ Prev Turn</button>
+                    <button
+                      className="button"
+                      onClick={() => {
+                        const next = (battleRef.current?.turn || currentTurnRef.current || 1) + 1;
+                        const latest = currentTurnRef.current || next;
+                        if (next >= latest) {
+                          seekSpectatorTurn('live');
+                        } else {
+                          seekSpectatorTurn(next);
+                        }
+                      }}
+                      disabled={spectatorTurn === null && (battleRef.current?.turn || 0) >= (currentTurnRef.current || 0)}
+                    >Next Turn ⟳</button>
+                    <button className="button" onClick={() => seekSpectatorTurn('live')}>
+                      Catch up
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Show appropriate controls based on request type */}
             {request?.teamPreview && !waitingForOpponent && !waitingForAnimations && renderTeamPreview}
 
@@ -3490,6 +3596,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                   <button className="button" onClick={cancelWaiting}>
                     <i className="fa fa-chevron-left" aria-hidden="true" /> Cancel / Change Move
                   </button>
+                  {waitingForAnimations && !isSpectator && (
+                    <button className="button" onClick={handleSkipAnimations}>
+                      Skip animations
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -3520,6 +3631,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 <div className="whatdo">
                   <em>Waiting for animations...</em>
                 </div>
+                {!isSpectator && (
+                  <div className="switchcontrols">
+                    <button className="button" onClick={handleSkipAnimations}>Skip animations</button>
+                  </div>
+                )}
               </div>
             )}
             

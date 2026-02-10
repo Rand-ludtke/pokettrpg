@@ -1,6 +1,6 @@
 import React from 'react';
 import { BattlePokemon } from '../types';
-import { spriteUrl } from '../data/adapter';
+import { SpriteWithHat, HatId } from './SpriteWithHat';
 
 export function TeamView({ team, onRemove, onMove }: {
   team: BattlePokemon[];
@@ -32,16 +32,13 @@ export function TeamView({ team, onRemove, onMove }: {
                 onDrop={onDrop}
                 style={{display:'grid',gridTemplateColumns:'auto 1fr auto',gap:8,alignItems:'center'}}>
               <div style={{width:80,height:80,display:'flex',alignItems:'center',justifyContent:'center'}}>
-                <img
-                  style={{imageRendering:'pixelated',maxWidth:80,maxHeight:80}}
-                  src={spriteUrl(p.species || p.name, !!p.shiny, (p as any).cosmeticForm ? { cosmetic: (p as any).cosmeticForm } : undefined)}
-                  alt=""
-                  onError={(e)=>{
-                    const img = e.currentTarget as HTMLImageElement;
-                    if ((img as any).dataset.fallback) return;
-                    (img as any).dataset.fallback = '1';
-                    img.src = spriteUrl(p.species || p.name, !!p.shiny, { setOverride: 'gen5', cosmetic: (p as any).cosmeticForm });
-                  }}
+                <SpriteWithHat
+                  species={p.species || p.name}
+                  shiny={!!p.shiny}
+                  cosmeticForm={(p as any).cosmeticForm}
+                  hatId={((p as any).hatId as HatId) || 'none'}
+                  fusion={(p as any).fusion}
+                  size={80}
                 />
               </div>
               <div>

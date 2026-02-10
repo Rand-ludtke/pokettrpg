@@ -164,6 +164,7 @@ export function CharacterSheet() {
 	const [addingItem, setAddingItem] = useState<boolean>(false);
 	const [newItemName, setNewItemName] = useState<string>('');
 	const [newItemCount, setNewItemCount] = useState<number>(1);
+	const [moneyDelta, setMoneyDelta] = useState<number>(0);
 	// Trainer visual state (shared sprite with Lobby via localStorage; optional custom image for sheet)
 	const [trainerSprite, setTrainerSpriteId] = useState<string>(() => {
 		try {
@@ -184,6 +185,15 @@ export function CharacterSheet() {
 	const applyTrainerSprite = (value: string) => {
 		const sanitized = sanitizeTrainerSpriteId(value) || DEFAULT_TRAINER_SPRITE;
 		setTrainerSpriteId(sanitized);
+	};
+	const adjustMoney = (delta: number) => {
+		setCh(prev => ({ ...prev, money: Math.max(0, Number(prev.money || 0) + delta) }));
+	};
+	const applyMoneyDelta = (sign: 1 | -1) => {
+		const amt = Math.max(0, Number(moneyDelta || 0));
+		if (!amt) return;
+		adjustMoney(sign * amt);
+		setMoneyDelta(0);
 	};
 	// Item data (for icons + descriptions)
 	const [itemData, setItemData] = useState<Record<string, any>>({});
@@ -502,9 +512,26 @@ export function CharacterSheet() {
 						</div>
 						<div>
 							<div className="dim" style={{textAlign:'center'}}>Money</div>
-							<div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:6}}>
-								<span style={{fontSize:'1.1em'}}>₽</span>
-								<input type="number" min={0} value={ch.money||0} onChange={e=> setCh({ ...ch, money: Math.max(0, Number(e.target.value)||0) })} style={{ width:120, textAlign:'right' }} />
+							<div style={{ display:'grid', gap:6, justifyItems:'center' }}>
+								<div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:6}}>
+									<span style={{fontSize:'1.1em'}}>₽</span>
+									<span style={{ minWidth: 90, textAlign:'right', fontVariantNumeric:'tabular-nums', fontWeight:600 }}>
+										{Number(ch.money||0).toLocaleString()}
+									</span>
+								</div>
+								<div style={{ display:'grid', gridTemplateColumns:'repeat(5, auto)', gap:4 }}>
+									{[1, 10, 100, 1000, 10000].map(step => (
+										<div key={step} style={{ display:'grid', gap:2, justifyItems:'center' }}>
+											<button className="mini" onClick={()=> adjustMoney(step)} title={`Add ${step}`}>+{step}</button>
+											<button className="mini secondary" onClick={()=> adjustMoney(-step)} title={`Remove ${step}`}>-{step}</button>
+										</div>
+									))}
+								</div>
+								<div style={{ display:'flex', alignItems:'center', gap:6, justifyContent:'center' }}>
+									<input type="number" min={0} value={moneyDelta} onChange={e=> setMoneyDelta(Math.max(0, Number(e.target.value)||0))} style={{ width:90, textAlign:'right' }} />
+									<button className="mini" onClick={()=> applyMoneyDelta(1)}>Add</button>
+									<button className="mini secondary" onClick={()=> applyMoneyDelta(-1)}>Remove</button>
+								</div>
 							</div>
 						</div>
 					</div>

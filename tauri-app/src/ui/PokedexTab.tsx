@@ -11,6 +11,11 @@ type SpriteSlot =
 
 const adapter = adapterUtils;
 
+const TYPE_OPTIONS = [
+  'Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying',
+  'Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy',
+];
+
 // Helper to convert to ID (same as PS's toID)
 function toID(text: string): string {
   return adapter.normalizeName(text);
@@ -1104,6 +1109,19 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
   const [customItemShortDesc, setCustomItemShortDesc] = useState('');
   const [customItemSprite, setCustomItemSprite] = useState<string>('');
   const [customItemMega, setCustomItemMega] = useState('');
+  const [customMoveName, setCustomMoveName] = useState('');
+  const [customMoveType, setCustomMoveType] = useState('Normal');
+  const [customMoveCategory, setCustomMoveCategory] = useState<'Physical'|'Special'|'Status'>('Status');
+  const [customMovePower, setCustomMovePower] = useState<number>(0);
+  const [customMoveAccuracy, setCustomMoveAccuracy] = useState<number>(100);
+  const [customMovePP, setCustomMovePP] = useState<number>(10);
+  const [customMovePriority, setCustomMovePriority] = useState<number>(0);
+  const [customMoveAlwaysHits, setCustomMoveAlwaysHits] = useState<boolean>(false);
+  const [customMoveShortDesc, setCustomMoveShortDesc] = useState('');
+  const [customMoveDesc, setCustomMoveDesc] = useState('');
+  const [customAbilityName, setCustomAbilityName] = useState('');
+  const [customAbilityShortDesc, setCustomAbilityShortDesc] = useState('');
+  const [customAbilityDesc, setCustomAbilityDesc] = useState('');
 
   const dexOptions = useMemo(() => {
     if (!dexData) return null;
@@ -1451,6 +1469,58 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
     setMode('items');
   };
 
+  const handleSaveCustomMove = () => {
+    if (!customMoveName.trim()) return;
+    const key = adapter.normalizeName(customMoveName);
+    const entry = {
+      name: customMoveName.trim(),
+      type: customMoveType,
+      category: customMoveCategory,
+      basePower: Math.max(0, Number(customMovePower) || 0),
+      accuracy: customMoveAlwaysHits ? true : Math.max(1, Math.min(100, Number(customMoveAccuracy) || 100)),
+      pp: Math.max(1, Number(customMovePP) || 10),
+      priority: Number(customMovePriority) || 0,
+      shortDesc: customMoveShortDesc.trim() || undefined,
+      desc: customMoveDesc.trim() || undefined,
+    };
+    adapter.saveCustomMove(key, entry as any);
+    setDexData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        moves: {
+          ...prev.moves,
+          [key]: { id: key, ...entry } as any,
+        },
+      };
+    });
+    setSelectedId(key);
+    setMode('moves');
+  };
+
+  const handleSaveCustomAbility = () => {
+    if (!customAbilityName.trim()) return;
+    const key = adapter.normalizeName(customAbilityName);
+    const entry = {
+      name: customAbilityName.trim(),
+      shortDesc: customAbilityShortDesc.trim() || undefined,
+      desc: customAbilityDesc.trim() || undefined,
+    };
+    adapter.saveCustomAbility(key, entry as any);
+    setDexData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        abilities: {
+          ...prev.abilities,
+          [key]: { id: key, ...entry } as any,
+        },
+      };
+    });
+    setSelectedId(key);
+    setMode('abilities');
+  };
+
   // Get filtered list
   const filteredList = useMemo(() => {
     if (!dexData) return [];
@@ -1750,10 +1820,96 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
       );
     }
     if (mode === 'moves') {
+      if (!selectedId) {
+        return (
+          <div style={{ padding: 16, maxWidth: 640 }}>
+            <h2 style={{ marginTop: 0 }}>Create Custom Move</h2>
+            <div style={{ display: 'grid', gap: 10 }}>
+              <label style={{ display: 'grid', gap: 4 }}>
+                Name
+                <input value={customMoveName} onChange={e => setCustomMoveName(e.target.value)} />
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <label style={{ display: 'grid', gap: 4 }}>
+                  Type
+                  <select value={customMoveType} onChange={e => setCustomMoveType(e.target.value)}>
+                    {TYPE_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </label>
+                <label style={{ display: 'grid', gap: 4 }}>
+                  Category
+                  <select value={customMoveCategory} onChange={e => setCustomMoveCategory(e.target.value as any)}>
+                    <option value="Physical">Physical</option>
+                    <option value="Special">Special</option>
+                    <option value="Status">Status</option>
+                  </select>
+                </label>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                <label style={{ display: 'grid', gap: 4 }}>
+                  Power
+                  <input type="number" min={0} value={customMovePower} onChange={e => setCustomMovePower(Number(e.target.value) || 0)} />
+                </label>
+                <label style={{ display: 'grid', gap: 4 }}>
+                  Accuracy
+                  <input type="number" min={1} max={100} value={customMoveAccuracy} onChange={e => setCustomMoveAccuracy(Number(e.target.value) || 100)} disabled={customMoveAlwaysHits} />
+                </label>
+                <label style={{ display: 'grid', gap: 4 }}>
+                  PP
+                  <input type="number" min={1} value={customMovePP} onChange={e => setCustomMovePP(Number(e.target.value) || 10)} />
+                </label>
+                <label style={{ display: 'grid', gap: 4 }}>
+                  Priority
+                  <input type="number" value={customMovePriority} onChange={e => setCustomMovePriority(Number(e.target.value) || 0)} />
+                </label>
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input type="checkbox" checked={customMoveAlwaysHits} onChange={e => setCustomMoveAlwaysHits(e.target.checked)} />
+                Always hits (— accuracy)
+              </label>
+              <label style={{ display: 'grid', gap: 4 }}>
+                Short Description
+                <input value={customMoveShortDesc} onChange={e => setCustomMoveShortDesc(e.target.value)} />
+              </label>
+              <label style={{ display: 'grid', gap: 4 }}>
+                Description
+                <textarea value={customMoveDesc} onChange={e => setCustomMoveDesc(e.target.value)} rows={3} />
+              </label>
+              <button type="button" onClick={handleSaveCustomMove} disabled={!customMoveName.trim()}>
+                Save Custom Move
+              </button>
+            </div>
+          </div>
+        );
+      }
       const move = dexData.moves[activeId];
       if (move) return <MoveDetail move={move} dexData={dexData} onNavigate={handleNavigate} />;
     }
     if (mode === 'abilities') {
+      if (!selectedId) {
+        return (
+          <div style={{ padding: 16, maxWidth: 640 }}>
+            <h2 style={{ marginTop: 0 }}>Create Custom Ability</h2>
+            <div style={{ display: 'grid', gap: 10 }}>
+              <label style={{ display: 'grid', gap: 4 }}>
+                Name
+                <input value={customAbilityName} onChange={e => setCustomAbilityName(e.target.value)} />
+              </label>
+              <label style={{ display: 'grid', gap: 4 }}>
+                Short Description
+                <input value={customAbilityShortDesc} onChange={e => setCustomAbilityShortDesc(e.target.value)} />
+              </label>
+              <label style={{ display: 'grid', gap: 4 }}>
+                Description
+                <textarea value={customAbilityDesc} onChange={e => setCustomAbilityDesc(e.target.value)} rows={3} />
+              </label>
+              <button type="button" onClick={handleSaveCustomAbility} disabled={!customAbilityName.trim()}>
+                Save Custom Ability
+              </button>
+            </div>
+          </div>
+        );
+      }
       const ability = dexData.abilities[activeId];
       if (ability) return <AbilityDetail ability={ability} dexData={dexData} onNavigate={handleNavigate} />;
     }
@@ -1879,6 +2035,60 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
               }}
             >
               + New Custom Pokémon
+            </button>
+          </div>
+        )}
+        {mode === 'moves' && (
+          <div style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={() => setSelectedId(null)}
+              style={{
+                padding: '6px 12px',
+                border: '1px solid #bbb',
+                background: '#e6e6e6',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontSize: 12,
+              }}
+            >
+              + New Custom Move
+            </button>
+          </div>
+        )}
+        {mode === 'abilities' && (
+          <div style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={() => setSelectedId(null)}
+              style={{
+                padding: '6px 12px',
+                border: '1px solid #bbb',
+                background: '#e6e6e6',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontSize: 12,
+              }}
+            >
+              + New Custom Ability
+            </button>
+          </div>
+        )}
+        {mode === 'items' && (
+          <div style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={() => setSelectedId(null)}
+              style={{
+                padding: '6px 12px',
+                border: '1px solid #bbb',
+                background: '#e6e6e6',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontSize: 12,
+              }}
+            >
+              + New Custom Item
             </button>
           </div>
         )}

@@ -56,6 +56,11 @@ export function DiceLevelingPanel({ pendingLevels, onPendingLevelsChange, leveli
   const [manualRollInput, setManualRollInput] = useState<string>('');
   const [showManualInput, setShowManualInput] = useState(false);
   const rollAnimationRef = useRef<number | null>(null);
+  const resetStamina = useCallback(() => {
+    const latest = getCharacterSP();
+    setCharacterSP(latest.max);
+    setStaminaData({ current: latest.max, max: latest.max });
+  }, []);
   
   // Read stamina from character sheet
   const [staminaData, setStaminaData] = useState(() => getCharacterSP());
@@ -295,6 +300,9 @@ export function DiceLevelingPanel({ pendingLevels, onPendingLevelsChange, leveli
             {staminaData.current}
           </span>
           <span className="dim">/ {staminaData.max}</span>
+          <button className="mini secondary" onClick={resetStamina} title="Reset SP to max">
+            Reset SP
+          </button>
         </div>
         <div style={{ fontSize: '0.8em', opacity: 0.7, textAlign: 'center' }}>
           Uses SP from Character Sheet

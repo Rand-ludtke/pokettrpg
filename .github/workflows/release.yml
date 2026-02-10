@@ -56,9 +56,8 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Disable code signing — no Apple Developer account
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-          APPLE_SIGNING_IDENTITY: ''
+          # Ad-hoc signing — no Apple Developer account needed
+          APPLE_SIGNING_IDENTITY: '-'
         with:
           projectPath: tauri-app
           tagName: ${{ steps.tag.outputs.tag }}

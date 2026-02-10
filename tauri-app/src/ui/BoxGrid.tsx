@@ -1,6 +1,6 @@
 import React from 'react';
 import { BattlePokemon } from '../types';
-import { spriteUrl, placeholderSpriteDataURL } from '../data/adapter';
+import { SpriteWithHat, HatId } from './SpriteWithHat';
 
 export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNextBox, selectMode, selectedIndices, onToggleSelect, onShiftToggle, onDrop, levelingMode, pendingLevels, levelingSelectedIndices, onToggleLevelingSelect }: {
   pokes: Array<BattlePokemon | null>;
@@ -106,23 +106,14 @@ export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNext
             {p ? (
               <>
                 <div className="slot-sprite-wrap" style={{ position: 'relative' }}>
-                  <img
+                  <SpriteWithHat
+                    species={p.species || p.name}
+                    shiny={!!p.shiny}
+                    cosmeticForm={(p as any).cosmeticForm}
+                    hatId={((p as any).hatId as HatId) || 'none'}
+                    fusion={(p as any).fusion}
+                    size={56}
                     className="pixel slot-sprite"
-                    src={spriteUrl(p.species || p.name, !!p.shiny, (p as any).cosmeticForm ? { cosmetic: (p as any).cosmeticForm } : undefined)}
-                    alt=""
-                    onError={(e)=>{
-                      const img = e.currentTarget as HTMLImageElement;
-                      // prevent loop
-                      if (img.dataset.fallback) return;
-                      img.dataset.fallback = '1';
-                      // show placeholder immediately
-                      img.src = placeholderSpriteDataURL('?');
-                      // then probe alternative source in background; if it loads, swap it in
-                      const alt = spriteUrl(p.species || p.name, !!p.shiny, { setOverride: 'gen5', cosmetic: (p as any).cosmeticForm });
-                      const probe = new Image();
-                      probe.onload = () => { img.src = alt; };
-                      probe.src = alt;
-                    }}
                   />
                   {/* Show level badge when in leveling mode */}
                   {levelingMode && (
@@ -139,6 +130,30 @@ export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNext
                       color: p.level >= 100 ? '#ffd700' : '#fff',
                     }}>
                       {p.level}
+                    </div>
+                  )}
+                  {/* Show hat indicator when Pokemon has a hat */}
+                  {(p as any).hatId && (p as any).hatId !== 'none' && !levelingMode && (
+                    <div style={{
+                      position: 'absolute',
+                      top: -2,
+                      right: -2,
+                      fontSize: '10px',
+                      lineHeight: 1,
+                    }}>
+                      🎩
+                    </div>
+                  )}
+                  {/* Show fusion indicator */}
+                  {(p as any).fusion && !levelingMode && (
+                    <div style={{
+                      position: 'absolute',
+                      top: -2,
+                      left: -2,
+                      fontSize: '10px',
+                      lineHeight: 1,
+                    }}>
+                      🔀
                     </div>
                   )}
                 </div>

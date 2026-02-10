@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
 import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE } from '../data/adapter';
+import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
 
 const TYPE_COLORS: Record<string, string> = {
   normal: '#A8A878',
@@ -90,6 +91,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   const [movesInput, setMovesInput] = useState<string[]>(selected.moves.map(m=>m.name));
   const [itemSel, setItemSel] = useState<string>(((selected as any).item as string) || '');
   const [shinySel, setShinySel] = useState<boolean>(!!selected.shiny);
+  const [showHatPicker, setShowHatPicker] = useState<boolean>(false);
   const [importText, setImportText] = useState<string>('');
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
@@ -450,6 +452,15 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
     setShinySel(!!next.shiny);
   };
 
+  const setHat = (hatId: HatId) => {
+    const next = { ...selected, hatId: hatId === 'none' ? undefined : hatId } as BattlePokemon;
+    onReplaceSelected && onReplaceSelected(next);
+    setShowHatPicker(false);
+  };
+
+  const currentHatId = ((selected as any).hatId as HatId) || 'none';
+  const currentHatIcon = AVAILABLE_HATS.find(h => h.id === currentHatId)?.icon || '❌';
+
   const applyShowdownUpdate = (overrides: {
     species?: string;
     level?: number;
@@ -535,30 +546,6 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
     setShowdownMoveValue('');
   };
 
-  function ZoomableSprite({ species, shiny, cosmetic, back, zoom, onWheel }: { species: string; shiny: boolean; cosmetic?: string; back?: boolean; zoom: number; onWheel?: (e: React.WheelEvent)=>void }) {
-    const params: any = cosmetic ? { cosmetic } : {};
-    if (back) params.back = true;
-    return (
-      <div onWheel={onWheel} title="Scroll to zoom"
-           style={{ overflow:'hidden', position:'relative', width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', background:'transparent' }}>
-        <img
-          className="pixel side-sprite"
-          src={spriteUrl(species, shiny, params)}
-          alt=""
-          style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
-          onError={(e)=>{
-            const img = e.currentTarget as HTMLImageElement;
-            if (img.dataset.fallback) return;
-            img.dataset.fallback = '1';
-            const p2: any = { setOverride: 'gen5' };
-            if (back) p2.back = true; if (cosmetic) p2.cosmetic = cosmetic;
-            img.src = spriteUrl(species, shiny, p2);
-          }}
-        />
-      </div>
-    );
-  }
-
   const jumpToSection = (s: 'basics'|'ability'|'mechanics'|'moves') => {
     setEditMode(true);
     setActiveEditSection(s);
@@ -576,11 +563,6 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   // Back/front flip for sprite (independent of shiny toggle)
   const [showBack, setShowBack] = useState(false);
   const [zoom, setZoom] = useState<number>(1);
-  const onWheelZoom = (e: React.WheelEvent) => {
-    // Don't call preventDefault to avoid passive listener warning
-    const delta = -Math.sign(e.deltaY) * 0.1;
-    setZoom(z => Math.max(0.5, Math.min(3, +(z + delta).toFixed(2))));
-  };
 
   // Inline learn prompt will be rendered in compact view (below moves)
 
@@ -622,6 +604,15 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                 color: selected.shiny ? '#fff' : '#444'
               }}
             >{selected.shiny ? '★' : '☆'}</button>
+            <button
+              title={`Hat: ${AVAILABLE_HATS.find(h => h.id === currentHatId)?.name || 'None'} (click to change)`}
+              onClick={() => setShowHatPicker(p => !p)}
+              style={{
+                border:'1px solid var(--accent)', background: currentHatId !== 'none' ? 'var(--accent)' : '#fff', cursor:'pointer',
+                fontSize:'14px', lineHeight:'14px', padding:'2px 6px', borderRadius:4,
+                color: currentHatId !== 'none' ? '#fff' : '#444'
+              }}
+            >{currentHatIcon}</button>
             {panelMode === 'compact' && (
               <button className="mini" onClick={()=> setEditMode(e=>!e)}>{editMode ? 'Close' : 'Edit'}</button>
             )}
@@ -664,7 +655,16 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
 
       {/* Sprite (full seafoam area, outer border only) */}
   <div style={{ position:'relative', border:'1px solid var(--accent)', borderRadius:8, background:'var(--panel-bg-dark)', padding:0, display:'flex', justifyContent:'center', alignItems:'center', height: panelMode === 'compact' ? 100 : 132, overflow:'hidden', flexShrink:0 }}>
-        <ZoomableSprite species={resolveSpeciesName()} shiny={!!selected.shiny} cosmetic={selected.cosmeticForm as any} back={showBack} zoom={zoom} onWheel={onWheelZoom} />
+        <SpriteWithHat 
+          species={resolveSpeciesName()} 
+          shiny={!!selected.shiny} 
+          cosmeticForm={selected.cosmeticForm} 
+          back={showBack && !(selected as any).fusion}
+          hatId={currentHatId}
+          fusion={(selected as any).fusion}
+          size={panelMode === 'compact' ? 80 : 100}
+          style={{ transform: `scale(${zoom})${(showBack && (selected as any).fusion) ? ' scaleX(-1)' : ''}`, transformOrigin: 'center center' }}
+        />
         <div style={{ position:'absolute', top:4, right:4, display:'flex', flexDirection:'column', gap:4 }}>
           <button className="mini" onClick={()=> setShowBack(b=>!b)}>{showBack? 'Front' : 'Back'}</button>
         </div>
@@ -672,7 +672,19 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
           <button className="mini" onClick={()=> setZoom(z => Math.max(0.5, +(z - 0.1).toFixed(2)))}>-</button>
           <button className="mini" onClick={()=> setZoom(z => Math.min(3, +(z + 0.1).toFixed(2)))}>+</button>
         </div>
+        {(selected as any).fusion && (
+          <div style={{ position: 'absolute', top: 4, left: 4, fontSize: '10px', background: 'rgba(0,0,0,0.6)', padding: '2px 6px', borderRadius: 4 }}>
+            🔀 Fusion
+          </div>
+        )}
       </div>
+
+      {/* Hat Picker Popup */}
+      {showHatPicker && (
+        <div style={{ position: 'relative', marginTop: -4 }}>
+          <HatPicker selectedHat={currentHatId} onSelect={setHat} compact />
+        </div>
+      )}
 
       {!editMode && panelMode === 'compact' && (
         <>

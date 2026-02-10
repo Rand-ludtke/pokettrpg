@@ -3,10 +3,36 @@ import { io, Socket } from 'socket.io-client';
 export type RoomSummary = {
   id: string;
   name: string;
+  roomType?: 'battle' | 'map';
+  mapOwnerId?: string;
   players: Array<{ id: string; username?: string; name?: string; avatar?: string; trainerSprite?: string }>;
   spectCount: number;
   battleStarted: boolean;
   challengeCount?: number;
+};
+
+export type MapToken = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  size?: number;
+  color?: string;
+  sprite?: string;
+  ownerId?: string;
+};
+
+export type MapState = {
+  width: number;
+  height: number;
+  gridSize: number;
+  gridColor: string;
+  gridOpacity: number;
+  showGrid: boolean;
+  showLabels: boolean;
+  lockTokens: boolean;
+  background?: string;
+  tokens: MapToken[];
 };
 
 export type ChatMessage = {
@@ -142,6 +168,7 @@ export type ClientEvents = {
   challengeRemoved: { roomId: string; challengeId: string; reason?: ChallengeRemovedReason };
   trainerSpriteChanged: { trainerSprite: string | null };
   actionCancelled: { playerId: string; roomId: string };
+  mapState: { roomId: string; state: MapState };
 };
 
 type EventKey = keyof ClientEvents;
@@ -295,6 +322,7 @@ export class PoketTRPGClient {
   battlePrompts = new Map<string, PromptActionPayload>();
   battleNeedsSwitch = new Map<string, any>();
   roomChallenges = new Map<string, ChallengeSummary[]>();
+  mapStates = new Map<string, MapState>();
 
   on = this.emitter.on.bind(this.emitter);
   off = this.emitter.off.bind(this.emitter);
@@ -329,6 +357,10 @@ export class PoketTRPGClient {
 
   getServerEndpoint(): string {
     return this.apiBase;
+  }
+
+  getMapState(roomId: string): MapState | null {
+    return this.mapStates.get(roomId) || null;
   }
 
   getDefaultServerEndpoint(): string {
@@ -565,6 +597,8 @@ export class PoketTRPGClient {
       const summary: RoomSummary = {
         id: room.id,
         name: room.name || 'Room',
+        roomType: room.roomType || room.type || 'battle',
+        mapOwnerId: room.mapOwnerId || room.ownerId,
         players: normalizePlayerList(room.players),
         spectCount: room.spectCount ?? 0,
         battleStarted: !!(room.battleStarted ?? room.started),
@@ -582,6 +616,8 @@ export class PoketTRPGClient {
       const summary: RoomSummary = {
         id: room.id,
         name: room.name || prev?.name || 'Room',
+        roomType: room.roomType || room.type || prev?.roomType || 'battle',
+        mapOwnerId: room.mapOwnerId || room.ownerId || prev?.mapOwnerId,
         players: normalizePlayerList(room.players, prev?.players),
         spectCount: room.spectCount ?? prev?.spectCount ?? 0,
         battleStarted: (room.battleStarted ?? room.started ?? prev?.battleStarted ?? false) as boolean,
@@ -741,6 +777,12 @@ export class PoketTRPGClient {
       console.log('[Client] Action cancelled confirmed by server:', { playerId, roomId });
       this.emitter.emit('actionCancelled', { playerId, roomId });
     });
+
+    socket.on('mapState', (payload: { roomId: string; state: MapState }) => {
+      if (!payload?.roomId || !payload?.state) return;
+      this.mapStates.set(payload.roomId, payload.state);
+      this.emitter.emit('mapState', payload);
+    });
   }
 
   private appendChat(roomId: string, msg: ChatMessage) {
@@ -827,8 +869,8 @@ export class PoketTRPGClient {
     }
   }
 
-  createRoom(name: string) {
-    this.socket?.emit('createRoom', { name });
+  createRoom(name: string, options?: { roomType?: 'battle' | 'map' }) {
+    this.socket?.emit('createRoom', { name, roomType: options?.roomType });
   }
 
   joinRoom(roomId: string, role: 'player' | 'spectator' = 'player') {
@@ -843,6 +885,14 @@ export class PoketTRPGClient {
 
   leaveRoom(roomId: string) {
     this.socket?.emit('leaveRoom', { roomId });
+  }
+
+  updateMapState(roomId: string, state: Partial<MapState>) {
+    this.socket?.emit('mapUpdate', { roomId, state });
+  }
+
+  moveMapToken(roomId: string, tokenId: string, x: number, y: number) {
+    this.socket?.emit('mapTokenMove', { roomId, tokenId, x, y });
   }
 
   sendChat(roomId: string, text: string) {

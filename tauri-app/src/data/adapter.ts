@@ -68,6 +68,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
   const customDex = getCustomDex();
   const customLearnsets = getCustomLearnsets();
   const customItems = getCustomItems();
+  const customMoves = getCustomMoves();
+  const customAbilities = getCustomAbilities();
   const mergedDex = { ...(pokedex as DexIndex), ...customDex } as DexIndex;
   // Built-in overlay tweaks
   try {
@@ -87,6 +89,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
   } catch {}
   const mergedLs = { ...(learnsets as LearnsetsIndex), ...customLearnsets } as LearnsetsIndex;
   const mergedItems = { ...(items as ItemIndex), ...customItems } as ItemIndex;
+  const mergedMoves = { ...(moves as MoveIndex), ...customMoves } as MoveIndex;
+  const mergedAbilities = { ...(abilities as AbilityIndex), ...customAbilities } as AbilityIndex;
   // Cache aliases globally for species resolution
   try {
     gAliases = {};
@@ -99,8 +103,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
   } catch { gAliases = {}; }
   return {
     pokedex: mergedDex,
-    moves: moves as MoveIndex,
-    abilities: abilities as AbilityIndex,
+    moves: mergedMoves,
+    abilities: mergedAbilities,
     items: mergedItems,
     learnsets: mergedLs,
   };
@@ -546,6 +550,8 @@ export function spriteUrlWithFallback(
 const LS_CUSTOM_DEX = 'ttrpg.customDex';
 const LS_CUSTOM_LS = 'ttrpg.customLearnsets';
 const LS_CUSTOM_ITEMS = 'ttrpg.customItems';
+const LS_CUSTOM_MOVES = 'ttrpg.customMoves';
+const LS_CUSTOM_ABILITIES = 'ttrpg.customAbilities';
 export function getCustomDex(): DexIndex {
   try { return JSON.parse(localStorage.getItem(LS_CUSTOM_DEX) || '{}'); } catch { return {}; }
 }
@@ -570,6 +576,24 @@ export function saveCustomItem(entryKey: string, item: ItemEntry) {
   const all = getCustomItems();
   all[entryKey] = item;
   try { localStorage.setItem(LS_CUSTOM_ITEMS, JSON.stringify(all)); } catch {}
+}
+
+export function getCustomMoves(): MoveIndex {
+  try { return JSON.parse(localStorage.getItem(LS_CUSTOM_MOVES) || '{}'); } catch { return {}; }
+}
+export function saveCustomMove(entryKey: string, move: MoveEntry) {
+  const all = getCustomMoves();
+  all[entryKey] = move;
+  try { localStorage.setItem(LS_CUSTOM_MOVES, JSON.stringify(all)); } catch {}
+}
+
+export function getCustomAbilities(): AbilityIndex {
+  try { return JSON.parse(localStorage.getItem(LS_CUSTOM_ABILITIES) || '{}'); } catch { return {}; }
+}
+export function saveCustomAbility(entryKey: string, ability: AbilityEntry) {
+  const all = getCustomAbilities();
+  all[entryKey] = ability;
+  try { localStorage.setItem(LS_CUSTOM_ABILITIES, JSON.stringify(all)); } catch {}
 }
 
 // Custom sprite storage (data URLs) — local only
@@ -748,6 +772,7 @@ function sanitizeSecondary(sec: any) {
 
 function findSpeciesKey(id: string, dex: DexIndex): string | undefined {
   const norm = normalizeName(id);
+  if (!norm) return undefined;
   // alias map first
   const aliased = gAliases[norm];
   if (aliased) {
@@ -925,8 +950,12 @@ export const adapter = {
   normalizeName,
   loadShowdownDex,
   getCustomDex,
+  getCustomMoves,
+  getCustomAbilities,
   getCustomItems,
   getCustomSprite,
+  saveCustomMove,
+  saveCustomAbility,
   saveCustomSprite,
   saveCustomItem,
   placeholderSpriteDataURL,

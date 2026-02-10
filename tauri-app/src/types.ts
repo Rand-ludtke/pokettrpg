@@ -16,6 +16,16 @@ export interface Pokemon {
   species?: string;
   // cosmetic sprite-only override (does not change stats/species)
   cosmeticForm?: string;
+  // decorative hat overlay ID (e.g., 'party', 'crown', 'tophat')
+  hatId?: string;
+  // fusion data for Infinite Fusion support
+  fusion?: {
+    headId: number;    // National dex number of head Pokemon
+    bodyId: number;    // National dex number of body Pokemon
+    headName: string;  // Name of head Pokemon
+    bodyName: string;  // Name of body Pokemon
+    spriteFile?: string; // Selected fusion sprite file
+  };
   level: number;
   types: string[];
   gender?: 'M' | 'F' | 'N';

@@ -3,6 +3,7 @@ import { loadTeams, normalizeName } from '../data/adapter';
 import { BattlePokemon } from '../types';
 import { ChatMessage, ChallengeParticipant, ChallengeSummary, ClientStatus, getClient, PlayerPayload, RoomSummary } from '../net/pokettrpgClient';
 import { CustomsImportExport } from './CustomsImportExport';
+import { MapRoomPanel } from './MapRoomPanel';
 
 type RoomRole = 'player' | 'spectator';
 
@@ -159,6 +160,7 @@ export function LobbyTab() {
   const [activeRoomId, setActiveRoomId] = useState<string>(DEFAULT_ROOM);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(client.getChat(DEFAULT_ROOM));
   const [newRoomName, setNewRoomName] = useState('');
+  const [newRoomType, setNewRoomType] = useState<'battle' | 'map'>('battle');
   const [messageText, setMessageText] = useState('');
   const [lastError, setLastError] = useState<string>('');
   const [activeRole, setActiveRole] = useState<Record<string, RoomRole>>({ [DEFAULT_ROOM]: 'player' });
@@ -462,7 +464,7 @@ export function LobbyTab() {
       }
     };
     unsubscribe = client.on('roomCreated', handler);
-    client.createRoom(name);
+    client.createRoom(name, { roomType: newRoomType });
     window.setTimeout(() => {
       if (unsubscribe) {
         unsubscribe();
@@ -704,6 +706,9 @@ export function LobbyTab() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <strong>{room.name}</strong>
                       <span className="dim" style={{ fontSize: '0.85em' }}>({room.id})</span>
+                      {room.roomType === 'map' && (
+                        <span className="chip" style={{ fontSize: '0.7em' }}>Map</span>
+                      )}
                       {challengeCount > 0 && (
                         <span className="chip" style={{ marginLeft: 'auto' }}>{challengeCount} challenge{challengeCount === 1 ? '' : 's'}</span>
                       )}
@@ -740,12 +745,16 @@ export function LobbyTab() {
                 onChange={e => setNewRoomName(e.target.value)}
                 placeholder="Room name"
               />
+              <select value={newRoomType} onChange={e => setNewRoomType(e.target.value as 'battle' | 'map')}>
+                <option value="battle">Battle Room</option>
+                <option value="map">Battle Map Room</option>
+              </select>
               <button onClick={handleCreateRoom}>Create</button>
             </div>
           </div>
         </aside>
 
-        <section className="panel" style={{ padding: 12, display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 12 }}>
+        <section className="panel" style={{ padding: 12, display: 'grid', gridTemplateRows: currentRoom?.roomType === 'map' ? 'auto 1fr auto auto' : 'auto 1fr auto', gap: 12 }}>
           <header>
             <h3 style={{ margin: '0 0 6px 0' }}>{currentRoom?.name || 'Room'}</h3>
             <div className="dim" style={{ fontSize: '0.9em' }}>{currentRoom ? roomStatus(currentRoom) : 'Select a room to view details.'}</div>
@@ -760,6 +769,17 @@ export function LobbyTab() {
               </div>
             ))}
           </div>
+
+          {currentRoom?.roomType === 'map' && (
+            <div style={{ border: '1px solid #444', borderRadius: 6, padding: 10, background: 'var(--section-bg)' }}>
+              <MapRoomPanel
+                roomId={currentRoom.id}
+                client={client}
+                isOwner={Boolean(currentRoom.mapOwnerId && currentRoom.mapOwnerId === client.user?.id)}
+                players={currentRoom.players}
+              />
+            </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
             <input

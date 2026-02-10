@@ -2,38 +2,62 @@ import React, { useEffect, useState } from 'react';
 
 const LS_BADGES = 'ttrpg.badgecase';
 
-type Badge = { image?: string; earned: boolean; name?: string };
+type Badge = { id: string; image?: string; earned: boolean; name?: string };
 type BadgeState = { color: string; badges: Badge[] };
 
 const defaultState: BadgeState = {
 	color: '#c83a3a',
 	badges: [
-		{ earned:false, name:'Boulder' },
-		{ earned:false, name:'Cascade' },
-		{ earned:false, name:'Thunder' },
-		{ earned:false, name:'Rainbow' },
-		{ earned:false, name:'Soul' },
-		{ earned:false, name:'Marsh' },
-		{ earned:false, name:'Volcano' },
-		{ earned:false, name:'Earth' },
+		{ id:'boulder', earned:false, name:'Boulder' },
+		{ id:'cascade', earned:false, name:'Cascade' },
+		{ id:'thunder', earned:false, name:'Thunder' },
+		{ id:'rainbow', earned:false, name:'Rainbow' },
+		{ id:'soul', earned:false, name:'Soul' },
+		{ id:'marsh', earned:false, name:'Marsh' },
+		{ id:'volcano', earned:false, name:'Volcano' },
+		{ id:'earth', earned:false, name:'Earth' },
 	],
 };
 
+function normalizeState(raw: any): BadgeState {
+	const parsed = (raw && typeof raw === 'object') ? raw : {};
+	const storedBadges: any[] = Array.isArray(parsed.badges) ? parsed.badges : [];
+	const badges = defaultState.badges.map((base, idx) => {
+		const stored = storedBadges[idx];
+		return {
+			...base,
+			id: base.id,
+			name: typeof stored?.name === 'string' ? stored.name : base.name,
+			earned: typeof stored?.earned === 'boolean' ? stored.earned : base.earned,
+			image: typeof stored?.image === 'string' ? stored.image : undefined,
+		};
+	});
+	return {
+		color: typeof parsed.color === 'string' ? parsed.color : defaultState.color,
+		badges,
+	};
+}
+
 export function BadgeCase() {
 	const [state, setState] = useState<BadgeState>(() => {
-		try { const raw = localStorage.getItem(LS_BADGES); if (raw) return { ...defaultState, ...JSON.parse(raw) }; } catch {}
+		try { const raw = localStorage.getItem(LS_BADGES); if (raw) return normalizeState(JSON.parse(raw)); } catch {}
 		return defaultState;
 	});
 	useEffect(()=>{ try { localStorage.setItem(LS_BADGES, JSON.stringify(state)); } catch {} }, [state]);
 
 	const setColor = (color:string)=> setState(prev=>({ ...prev, color }));
-	const toggleEarned = (i:number)=> setState(prev=>({ ...prev, badges: prev.badges.map((b,idx)=> idx===i? { ...b, earned: !b.earned }: b)}));
-	const setImage = (i:number, dataUrl?:string)=> setState(prev=>({ ...prev, badges: prev.badges.map((b,idx)=> idx===i? { ...b, image: dataUrl }: b)}));
-	const setName = (i:number, name?:string)=> setState(prev=>({ ...prev, badges: prev.badges.map((b,idx)=> idx===i? { ...b, name }: b)}));
+	const updateBadge = (id:string, updater:(badge:Badge)=>Badge)=>
+		setState(prev=>({
+			...prev,
+			badges: prev.badges.map(b => b.id === id ? updater(b) : b),
+		}));
+	const toggleEarned = (id:string)=> updateBadge(id, b => ({ ...b, earned: !b.earned }));
+	const setImage = (id:string, dataUrl?:string)=> updateBadge(id, b => ({ ...b, image: dataUrl }));
+	const setName = (id:string, name?:string)=> updateBadge(id, b => ({ ...b, name }));
 
-	const onUpload = (i:number)=>{
+	const onUpload = (id:string)=>{
 		const input = document.createElement('input'); input.type='file'; input.accept='image/*';
-		input.onchange=()=>{ const f=input.files&&input.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=> setImage(i, String(r.result||'')); r.readAsDataURL(f); };
+		input.onchange=()=>{ const f=input.files&&input.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=> setImage(id, String(r.result||'')); r.readAsDataURL(f); };
 		input.click();
 	};
 
@@ -85,13 +109,13 @@ export function BadgeCase() {
 						<circle cx="32" cy="32" r="4" fill="#fff" stroke="#000" strokeWidth="3" />
 					</svg>
 				</div>
-				<EditableNames names={state.badges.map(b=> b.name||'')} onChange={(idx,val)=> setName(idx,val)} />
+				<EditableNames names={state.badges.map(b=> b.name||'')} onChange={(idx,val)=> setName(state.badges[idx]?.id || `badge-${idx}`, val)} />
 			</div>
 
 			{/* Base with badge slots */}
 			<div style={baseStyle}>
 				{state.badges.map((b,i)=> (
-					<div key={i} style={slotStyle} className={b.earned? 'checked':''} onClick={()=> toggleEarned(i)} title={b.name || `Badge ${i+1}`}>
+					<div key={b.id} style={slotStyle} className={b.earned? 'checked':''} onClick={()=> toggleEarned(b.id)} title={b.name || `Badge ${i+1}`}>
 						<div style={ringStyle} />
 									{b.image ? (
 										<img src={b.image} alt={`Badge ${i+1}`} style={{ position:'relative', zIndex:2, width:imageSize, height:imageSize, objectFit:'contain', borderRadius:'50%' }} />
@@ -105,9 +129,9 @@ export function BadgeCase() {
 			{/* Controls */}
 			<div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:10, width:caseW }}>
 				{state.badges.map((b,i)=> (
-					<div key={i} style={{ display:'flex', gap:6, justifyContent:'center' }}>
-						<button className="mini" onClick={()=> onUpload(i)}>Add Image</button>
-						{b.image && <button className="mini" onClick={()=> setImage(i, undefined)}>Clear</button>}
+					<div key={b.id} style={{ display:'flex', gap:6, justifyContent:'center' }}>
+						<button className="mini" onClick={()=> onUpload(b.id)}>Add Image</button>
+						{b.image && <button className="mini" onClick={()=> setImage(b.id, undefined)}>Clear</button>}
 					</div>
 				))}
 			</div>
