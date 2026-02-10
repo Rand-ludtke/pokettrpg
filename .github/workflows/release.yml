@@ -5,32 +5,93 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (e.g. v1.3.0). Leave empty for draft.'
+        required: false
+        default: ''
 
 permissions:
   contents: write
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest]
-    runs-on: ${{ matrix.os }}
+  build-macos:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tauri-app/src-tauri
+
       - name: Install dependencies
         working-directory: tauri-app
         run: npm install
-      - name: Build and release
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "draft=false" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ github.event.inputs.release_tag }}" ]; then
+            echo "tag=${{ github.event.inputs.release_tag }}" >> "$GITHUB_OUTPUT"
+            echo "draft=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=dev-$(date +%Y%m%d-%H%M%S)" >> "$GITHUB_OUTPUT"
+            echo "draft=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Tauri macOS (unsigned, universal)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Disable code signing — no Apple Developer account
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          APPLE_SIGNING_IDENTITY: ''
         with:
           projectPath: tauri-app
-          tagName: ${{ github.ref_name }}
-          releaseName: "Pokettrpg ${{ github.ref_name }}"
-          releaseBody: "Automated release for ${{ github.ref_name }}"
-          args: "--config src-tauri/tauri.conf.json"
+          tagName: ${{ steps.tag.outputs.tag }}
+          releaseName: "PokéTTRPG ${{ steps.tag.outputs.tag }}"
+          releaseBody: |
+            ## PokéTTRPG ${{ steps.tag.outputs.tag }}
+
+            ### macOS Installation (Unsigned App)
+            This build is **not code-signed** (no Apple Developer account).
+            macOS will block it by default. To open it:
+
+            1. Download the `.dmg` file
+            2. Open it and drag the app to Applications
+            3. **Right-click** (or Control-click) the app → **Open** → Click **Open** in the dialog
+            4. Alternatively, run in Terminal:
+               ```
+               xattr -cr /Applications/pokettrpg.app
+               ```
+
+            See [MACOS_INSTALL.md](https://github.com/${{ github.repository }}/blob/main/docs/MACOS_INSTALL.md) for detailed instructions.
+          releaseDraft: ${{ steps.tag.outputs.draft }}
+          args: >
+            --config src-tauri/tauri.conf.json
+            --target universal-apple-darwin
+            --bundles dmg
+
+      - name: Upload macOS artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: |
+            tauri-app/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: ignore
+
+  # Web/PWA deploy is handled by pages.yml on push to main/clean-snapshot

@@ -51,27 +51,30 @@ export default defineConfig(({ mode }) => {
               writeFileSync(manifestPath, JSON.stringify(files, null, 2));
             }
           } catch {}
-          // Mirror vendor/showdown assets into dist/assets for PWA hosting
-          try {
-            const srcVendor = path.resolve(__dirname, 'public', 'vendor', 'showdown');
-            const dstVendor = path.resolve(__dirname, 'dist', 'assets', 'vendor', 'showdown');
-            if (existsSync(srcVendor)) {
-              try { mkdirSync(dstVendor, { recursive: true }); } catch {}
-              try { cpSync(srcVendor, dstVendor, { recursive: true }); } catch {}
-            }
-            const srcCustomSprites = path.resolve(__dirname, 'public', 'assets', 'custom-sprites');
-            const dstCustomSprites = path.resolve(__dirname, 'dist', 'assets', 'custom-sprites');
-            if (existsSync(srcCustomSprites)) {
-              try { mkdirSync(dstCustomSprites, { recursive: true }); } catch {}
-              try { cpSync(srcCustomSprites, dstCustomSprites, { recursive: true }); } catch {}
-            }
-            const srcCustomItems = path.resolve(__dirname, 'public', 'assets', 'custom-items');
-            const dstCustomItems = path.resolve(__dirname, 'dist', 'assets', 'custom-items');
-            if (existsSync(srcCustomItems)) {
-              try { mkdirSync(dstCustomItems, { recursive: true }); } catch {}
-              try { cpSync(srcCustomItems, dstCustomItems, { recursive: true }); } catch {}
-            }
-          } catch {}
+          // Mirror vendor/showdown assets into dist/assets for PWA hosting only
+          // Skip for Tauri desktop builds to avoid doubling the dist size (~650MB)
+          if (!isTauri) {
+            try {
+              const srcVendor = path.resolve(__dirname, 'public', 'vendor', 'showdown');
+              const dstVendor = path.resolve(__dirname, 'dist', 'assets', 'vendor', 'showdown');
+              if (existsSync(srcVendor)) {
+                try { mkdirSync(dstVendor, { recursive: true }); } catch {}
+                try { cpSync(srcVendor, dstVendor, { recursive: true }); } catch {}
+              }
+              const srcCustomSprites = path.resolve(__dirname, 'public', 'assets', 'custom-sprites');
+              const dstCustomSprites = path.resolve(__dirname, 'dist', 'assets', 'custom-sprites');
+              if (existsSync(srcCustomSprites)) {
+                try { mkdirSync(dstCustomSprites, { recursive: true }); } catch {}
+                try { cpSync(srcCustomSprites, dstCustomSprites, { recursive: true }); } catch {}
+              }
+              const srcCustomItems = path.resolve(__dirname, 'public', 'assets', 'custom-items');
+              const dstCustomItems = path.resolve(__dirname, 'dist', 'assets', 'custom-items');
+              if (existsSync(srcCustomItems)) {
+                try { mkdirSync(dstCustomItems, { recursive: true }); } catch {}
+                try { cpSync(srcCustomItems, dstCustomItems, { recursive: true }); } catch {}
+              }
+            } catch {}
+          }
         }
       }
     ],
