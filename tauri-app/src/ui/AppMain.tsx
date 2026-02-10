@@ -13,14 +13,16 @@ import { PSBattlePanel } from '../ps';
 import { CharacterSheet } from './CharacterSheet';
 import { BadgeCase } from './BadgeCase';
 import { PokedexTab } from './PokedexTab';
+import { FusionTab } from './FusionTab';
 import { DiceLevelingPanel } from './DiceLevelingPanel';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
+import { BugReporter } from './BugReporter';
 
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
-type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | 'dex' | { kind: 'psbattle'; id: string; title: string };
+type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | 'dex' | 'fusion' | { kind: 'psbattle'; id: string; title: string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -415,6 +417,7 @@ export function App() {
           <button className={tab === 'battle' ? 'active' : ''} onClick={() => setTab('battle')}>Battle</button>
           <button className={tab === 'lobby' ? 'active' : ''} onClick={() => setTab('lobby')}>Lobby</button>
           <button className={tab === 'dex' ? 'active' : ''} onClick={() => setTab('dex')}>Dex</button>
+          <button className={tab === 'fusion' ? 'active' : ''} onClick={() => setTab('fusion')}>Fusion</button>
           <button className={tab === 'sheet' ? 'active' : ''} onClick={() => setTab('sheet')}>Character</button>
           <button className={tab === 'badges' ? 'active' : ''} onClick={() => setTab('badges')}>Badges</button>
           {extraTabs.map(t => (
@@ -747,6 +750,7 @@ export function App() {
       {tab === "sheet" && (<CharacterSheet />)}
       {tab === 'badges' && (<BadgeCase />)}
       {tab === 'dex' && (<PokedexTab onAddToPC={(mons) => addAcrossBoxes(mons)} />)}
+      {tab === 'fusion' && (<FusionTab />)}
 
       {Object.values(mountedBattles).map(b => (
         <div key={b.id} style={{ display: (typeof tab === 'object' && (tab as any).id === b.id) ? 'block' : 'none', height: '100%' }}>
@@ -770,7 +774,6 @@ export function App() {
             <SimpleBattleTab roomId={b.id} title={b.title} />
           )}
         </div>
-      ))}
-    </div>
+      ))}      <BugReporter currentTab={typeof tab === 'string' ? tab : tab.kind + ':' + tab.id} />    </div>
   );
 }
