@@ -113,8 +113,9 @@ const PS_DATA_SCRIPTS: { url: string; globalName: string; exportName: string }[]
 
 // CSS files to load
 const PS_STYLES = [
-  // Core PS layout styles (required for ps-room/battle-log/controls UI)
-  `${PS_BASE}/style/client.css`,
+  // NOTE: client.css intentionally excluded — it sets global body/html styles
+  // (background, font-family, color:white) that leak into the rest of the app
+  // and persist after battle ends, causing the "app bugged out" issue.
   `${PS_BASE}/style/font-awesome.css`,
   `${PS_BASE}/style/battle.css`,
   `${PS_BASE}/style/battle-log.css`,

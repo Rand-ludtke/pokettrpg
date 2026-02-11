@@ -922,3 +922,23 @@
 .dark .ps-chat > strong {
 	color: #8097BA;
 }
+
+/* =========================================================
+ * PS Room stubs (from client.css, scoped here to prevent
+ * client.css global body/html style leaks)
+ * ========================================================= */
+
+.ps-room {
+	position: relative;
+	display: block;
+}
+
+.ps-room.ps-room-light {
+	background: rgba(242,247,250,.85);
+	color: black;
+}
+
+.ps-room.ps-room-opaque {
+	background: #EEF2F5;
+	color: black;
+}

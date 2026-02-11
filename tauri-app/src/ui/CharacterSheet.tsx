@@ -165,6 +165,7 @@ export function CharacterSheet() {
 	const [newItemName, setNewItemName] = useState<string>('');
 	const [newItemCount, setNewItemCount] = useState<number>(1);
 	const [moneyDelta, setMoneyDelta] = useState<number>(0);
+	const [showMoneyControls, setShowMoneyControls] = useState(false);
 	// Trainer visual state (shared sprite with Lobby via localStorage; optional custom image for sheet)
 	const [trainerSprite, setTrainerSpriteId] = useState<string>(() => {
 		try {
@@ -513,12 +514,17 @@ export function CharacterSheet() {
 						<div>
 							<div className="dim" style={{textAlign:'center'}}>Money</div>
 							<div style={{ display:'grid', gap:6, justifyItems:'center' }}>
-								<div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:6}}>
+								<div
+									style={{display:'flex', alignItems:'center', justifyContent:'center', gap:6, cursor:'pointer', userSelect:'none', padding:'4px 8px', borderRadius:8, background: showMoneyControls ? 'rgba(0,255,128,0.08)' : 'transparent', border: showMoneyControls ? '1px solid var(--accent)' : '1px solid transparent', transition:'all .15s'}}
+									onClick={() => setShowMoneyControls(v => !v)}
+									title="Click to add/remove money"
+								>
 									<span style={{fontSize:'1.1em'}}>₽</span>
 									<span style={{ minWidth: 90, textAlign:'right', fontVariantNumeric:'tabular-nums', fontWeight:600 }}>
 										{Number(ch.money||0).toLocaleString()}
 									</span>
 								</div>
+								{showMoneyControls && (<>
 								<div style={{ display:'grid', gridTemplateColumns:'repeat(5, auto)', gap:4 }}>
 									{[1, 10, 100, 1000, 10000].map(step => (
 										<div key={step} style={{ display:'grid', gap:2, justifyItems:'center' }}>
@@ -532,6 +538,7 @@ export function CharacterSheet() {
 									<button className="mini" onClick={()=> applyMoneyDelta(1)}>Add</button>
 									<button className="mini secondary" onClick={()=> applyMoneyDelta(-1)}>Remove</button>
 								</div>
+								</>)}
 							</div>
 						</div>
 					</div>
