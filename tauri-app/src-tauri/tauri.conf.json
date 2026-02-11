@@ -41,7 +41,10 @@
       "hardenedRuntime": false
     },
     "windows": {
-      "wix": null
+      "wix": null,
+      "nsis": {
+        "installerHooks": "nsis-hooks.nsh"
+      }
     }
   }
 }
