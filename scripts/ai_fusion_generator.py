@@ -2,12 +2,23 @@
 AI-Powered Fusion Sprite Generator for PokéTTRPG
 ==================================================
 
-Uses cloud AI image generation (Replicate API) to create NEW clean fusion
-sprites instead of cut-and-paste pixel manipulation.
+Uses AI image generation to create NEW clean fusion sprites instead of
+cut-and-paste pixel manipulation.
+
+Supports three backends:
+  1. CLOUD (Replicate API) — Best quality, ~$0.15/image
+  2. LOCAL (Qwen-Image GGUF via stable-diffusion.cpp) — Free, runs on CPU/GPU
+  3. DIFFUSERS (HuggingFace diffusers pipeline) — Free, needs GPU (or slow CPU)
+
+For Raspberry Pi AI HAT+ 2 (Hailo-10H, 40 TOPS, 8GB):
+  The Hailo NPU doesn't natively support diffusion model architectures yet.
+  Use LOCAL mode with stable-diffusion.cpp on the Pi5 CPU — sprite-sized (96×96)
+  images are small enough that generation is feasible even without GPU.
+  Qwen-Image Q2_K GGUF (7.3GB) fits in the HAT+'s 8GB onboard RAM.
 
 Pipeline:
   1. Load two Pokemon reference sprites (base + donor)
-  2. Send to AI model (Nano Banana Pro, GPT Image, etc.) with a fusion prompt
+  2. Send to AI model with a fusion prompt
   3. Post-process the output:
      a. Remove background → transparent PNG
      b. Downscale to 96×96 with nearest-neighbor
@@ -15,12 +26,20 @@ Pipeline:
      d. Save as game-ready sprite
 
 Requirements:
-  pip install replicate Pillow numpy scikit-learn
+  Cloud:  pip install replicate Pillow numpy scikit-learn
+  Local:  Download stable-diffusion.cpp + Qwen-Image GGUF
+  Diffusers: pip install diffusers transformers torch Pillow numpy scikit-learn
 
 Usage:
+  # Cloud (Replicate API)
   export REPLICATE_API_TOKEN=r8_...
-  python ai_fusion_generator.py --base pikachu --donor charizard
-  python ai_fusion_generator.py --batch pairs.json --model nano-banana-pro
+  python ai_fusion_generator.py --base Pikachu --donor Charizard
+
+  # Local (Qwen-Image GGUF via stable-diffusion.cpp)
+  python ai_fusion_generator.py --base Pikachu --donor Charizard --backend local
+
+  # HuggingFace Diffusers (needs GPU)
+  python ai_fusion_generator.py --base Pikachu --donor Charizard --backend diffusers
 """
 
 import argparse
@@ -230,6 +249,203 @@ def generate_with_replicate(
         return None
 
 
+# ── Local Generation (stable-diffusion.cpp + Qwen-Image GGUF) ──
+
+# Default paths for local model files
+LOCAL_MODEL_DIR = Path(__file__).parent.parent / "models" / "qwen-image"
+SD_CPP_BINARY = Path(__file__).parent.parent / "vendor" / "stable-diffusion.cpp" / "sd"
+
+# GGUF models ranked by size/quality (smallest → largest)
+LOCAL_MODELS = {
+    "qwen-q2":  "Qwen-Image-2512-Q2_K.gguf",      # 7.3 GB — fits RPi HAT+ 2
+    "qwen-q4":  "Qwen-Image-2512-Q4_0.gguf",       # 11.9 GB
+    "qwen-q5":  "Qwen-Image-2512-Q5_K_M.gguf",     # 15 GB
+    "qwen-q8":  "Qwen-Image-2512-Q8_0.gguf",       # 21.8 GB
+}
+
+DEFAULT_LOCAL_MODEL = "qwen-q4"
+
+
+def check_local_setup() -> dict:
+    """Check if local generation dependencies are available."""
+    status = {
+        "sd_cpp": SD_CPP_BINARY.exists() or bool(which_sd_cpp()),
+        "model": False,
+        "model_path": None,
+    }
+
+    for key, filename in LOCAL_MODELS.items():
+        model_path = LOCAL_MODEL_DIR / filename
+        if model_path.exists():
+            status["model"] = True
+            status["model_path"] = model_path
+            status["model_key"] = key
+            break
+
+    return status
+
+
+def which_sd_cpp() -> Optional[str]:
+    """Find stable-diffusion.cpp binary on PATH."""
+    import shutil
+    for name in ["sd", "sd.exe", "stable-diffusion", "stable-diffusion.exe"]:
+        found = shutil.which(name)
+        if found:
+            return found
+    return None
+
+
+def generate_with_sd_cpp(
+    prompt: str,
+    model_path: Optional[Path] = None,
+    width: int = 512,
+    height: int = 512,
+    steps: int = 20,
+    cfg_scale: float = 4.0,
+    seed: int = -1,
+) -> Optional[Image.Image]:
+    """Generate an image using stable-diffusion.cpp with a GGUF model.
+
+    This is the primary local backend for running Qwen-Image on CPU/GPU
+    without Python ML frameworks — suitable for Raspberry Pi.
+    """
+    import subprocess
+    import tempfile
+
+    # Find sd binary
+    sd_bin = str(SD_CPP_BINARY) if SD_CPP_BINARY.exists() else which_sd_cpp()
+    if not sd_bin:
+        print("  ERROR: stable-diffusion.cpp binary not found")
+        print("  Install: https://github.com/leejet/stable-diffusion.cpp")
+        print(f"  Expected at: {SD_CPP_BINARY}")
+        return None
+
+    # Find model
+    if model_path is None:
+        for key, filename in LOCAL_MODELS.items():
+            p = LOCAL_MODEL_DIR / filename
+            if p.exists():
+                model_path = p
+                break
+    if model_path is None or not model_path.exists():
+        print(f"  ERROR: No GGUF model found in {LOCAL_MODEL_DIR}")
+        print("  Download from: https://huggingface.co/unsloth/Qwen-Image-2512-GGUF")
+        print(f"  Place in: {LOCAL_MODEL_DIR}/")
+        return None
+
+    # Output to temp file
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+        out_path = tmp.name
+
+    cmd = [
+        sd_bin,
+        "--mode", "txt2img",
+        "-m", str(model_path),
+        "-p", prompt,
+        "-o", out_path,
+        "-W", str(width),
+        "-H", str(height),
+        "--steps", str(steps),
+        "--cfg-scale", str(cfg_scale),
+    ]
+    if seed >= 0:
+        cmd.extend(["--seed", str(seed)])
+
+    print(f"  Running stable-diffusion.cpp...")
+    print(f"  Model: {model_path.name}")
+    print(f"  Resolution: {width}x{height}, Steps: {steps}")
+
+    try:
+        result = subprocess.run(
+            cmd,
+            capture_output=True, text=True,
+            timeout=600,  # 10 min timeout for RPi
+        )
+        if result.returncode != 0:
+            print(f"  sd.cpp failed: {result.stderr[:500]}")
+            return None
+
+        if os.path.exists(out_path):
+            img = Image.open(out_path)
+            os.unlink(out_path)
+            return img
+        else:
+            print(f"  No output file produced")
+            return None
+
+    except subprocess.TimeoutExpired:
+        print("  TIMEOUT: Generation took > 10 minutes")
+        return None
+    except FileNotFoundError:
+        print(f"  ERROR: Binary not found: {sd_bin}")
+        return None
+
+
+def generate_with_diffusers(
+    prompt: str,
+    negative_prompt: str = "",
+    width: int = 512,
+    height: int = 512,
+    steps: int = 30,
+    cfg_scale: float = 4.0,
+    model_name: str = "Qwen/Qwen-Image-2512",
+    seed: int = -1,
+) -> Optional[Image.Image]:
+    """Generate an image using HuggingFace diffusers pipeline.
+
+    Requires: pip install diffusers transformers torch
+    Needs GPU for reasonable speed with the 20B Qwen-Image model.
+    For CPU-only, consider using sd.cpp backend instead.
+    """
+    try:
+        import torch
+        from diffusers import DiffusionPipeline
+    except ImportError:
+        print("  ERROR: Install diffusers: pip install diffusers transformers torch")
+        return None
+
+    print(f"  Loading diffusers pipeline: {model_name}")
+    print(f"  This may take a while on first run (downloading ~40GB)...")
+
+    try:
+        if torch.cuda.is_available():
+            torch_dtype = torch.bfloat16
+            device = "cuda"
+        else:
+            torch_dtype = torch.float32
+            device = "cpu"
+            print("  WARNING: Running on CPU — expect VERY slow generation")
+
+        pipe = DiffusionPipeline.from_pretrained(
+            model_name, torch_dtype=torch_dtype
+        ).to(device)
+
+        generator = None
+        if seed >= 0:
+            generator = torch.Generator(device=device).manual_seed(seed)
+
+        neg = negative_prompt or (
+            "blurry, low quality, deformed, text, watermark, "
+            "multiple creatures, split image, comparison"
+        )
+
+        image = pipe(
+            prompt=prompt,
+            negative_prompt=neg,
+            width=width,
+            height=height,
+            num_inference_steps=steps,
+            true_cfg_scale=cfg_scale,
+            generator=generator,
+        ).images[0]
+
+        return image
+
+    except Exception as e:
+        print(f"  ERROR: {e}")
+        return None
+
+
 # ── Post-Processing Pipeline ─────────────────────────────────
 
 def remove_background(img: Image.Image) -> Image.Image:
@@ -423,6 +639,7 @@ def generate_fusion(
     base: str,
     donor: str,
     model: str = DEFAULT_MODEL,
+    backend: str = "cloud",
     style: str = "pixel_art",
     n_colors: int = 16,
     save_raw: bool = True,
@@ -432,7 +649,8 @@ def generate_fusion(
     Args:
         base: Base Pokemon name/number
         donor: Donor Pokemon name/number
-        model: AI model key (see MODELS dict)
+        model: AI model key (see MODELS dict for cloud, LOCAL_MODELS for local)
+        backend: "cloud" (Replicate API), "local" (sd.cpp + GGUF), "diffusers"
         style: Prompt style ("pixel_art", "concept", "minimal")
         n_colors: Palette size for post-processing
         save_raw: Also save the unprocessed AI output
@@ -455,7 +673,7 @@ def generate_fusion(
     fusion_id = f"{name_to_id(base_name)}_{name_to_id(donor_name)}"
     print(f"\n{'='*60}")
     print(f"Generating fusion: {base_name} + {donor_name}")
-    print(f"  Model: {model} | Style: {style}")
+    print(f"  Backend: {backend} | Model: {model} | Style: {style}")
 
     # Find reference sprites
     ref_images = []
@@ -478,9 +696,31 @@ def generate_fusion(
     prompt = build_fusion_prompt(base_name, donor_name, style)
     print(f"  Prompt: {prompt[:100]}...")
 
-    # Call AI model
+    # Call AI model using selected backend
     t0 = time.time()
-    raw_img = generate_with_replicate(prompt, ref_images, model)
+    raw_img = None
+
+    if backend == "cloud":
+        raw_img = generate_with_replicate(prompt, ref_images, model)
+    elif backend == "local":
+        # Find local GGUF model
+        local_model = model if model in LOCAL_MODELS else DEFAULT_LOCAL_MODEL
+        model_path = LOCAL_MODEL_DIR / LOCAL_MODELS.get(local_model, "")
+        if not model_path.exists():
+            model_path = None  # Let generate_with_sd_cpp find it
+        raw_img = generate_with_sd_cpp(
+            prompt, model_path=model_path,
+            width=512, height=512, steps=20,
+        )
+    elif backend == "diffusers":
+        raw_img = generate_with_diffusers(
+            prompt, width=512, height=512, steps=30,
+        )
+    else:
+        print(f"  ERROR: Unknown backend '{backend}'")
+        print("  Valid backends: cloud, local, diffusers")
+        return None
+
     elapsed = time.time() - t0
 
     if raw_img is None:
@@ -493,7 +733,7 @@ def generate_fusion(
     if save_raw:
         raw_dir = OUTPUT_DIR / "raw"
         raw_dir.mkdir(exist_ok=True)
-        raw_path = raw_dir / f"{fusion_id}_{model}.png"
+        raw_path = raw_dir / f"{fusion_id}_{backend}_{model}.png"
         raw_img.save(raw_path)
         print(f"  Raw saved: {raw_path}")
 
@@ -501,14 +741,14 @@ def generate_fusion(
     sprite = postprocess_sprite(raw_img, n_colors)
 
     # Save final sprite
-    out_path = OUTPUT_DIR / f"{fusion_id}_{model}.png"
+    out_path = OUTPUT_DIR / f"{fusion_id}_{backend}_{model}.png"
     sprite.save(out_path, "PNG")
     print(f"  Final sprite: {out_path}")
 
     return out_path
 
 
-def batch_generate(pairs_file: str, model: str = DEFAULT_MODEL, style: str = "pixel_art"):
+def batch_generate(pairs_file: str, model: str = DEFAULT_MODEL, backend: str = "cloud", style: str = "pixel_art"):
     """Generate fusions from a JSON file of pairs."""
     with open(pairs_file) as f:
         pairs = json.load(f)
@@ -522,7 +762,7 @@ def batch_generate(pairs_file: str, model: str = DEFAULT_MODEL, style: str = "pi
             continue
 
         print(f"\n[{i+1}/{len(pairs)}]")
-        result = generate_fusion(base, donor, model, style)
+        result = generate_fusion(base, donor, model, backend=backend, style=style)
         results.append({
             "base": base,
             "donor": donor,
@@ -620,33 +860,76 @@ def main():
     parser.add_argument("--base", help="Base Pokemon name or dex number")
     parser.add_argument("--donor", help="Donor Pokemon name or dex number")
     parser.add_argument("--batch", help="JSON file with pairs [{base, donor}, ...]")
-    parser.add_argument("--model", default=DEFAULT_MODEL, choices=list(MODELS.keys()),
-                        help=f"AI model to use (default: {DEFAULT_MODEL})")
+    parser.add_argument("--backend", default="cloud",
+                        choices=["cloud", "local", "diffusers"],
+                        help="Generation backend: cloud (Replicate API), local (sd.cpp + GGUF), diffusers")
+    parser.add_argument("--model", default=DEFAULT_MODEL,
+                        help=f"AI model key (default: {DEFAULT_MODEL}). "
+                             f"Cloud: {', '.join(MODELS.keys())}. "
+                             f"Local: {', '.join(LOCAL_MODELS.keys())}.")
     parser.add_argument("--style", default="pixel_art", choices=["pixel_art", "concept", "minimal"],
                         help="Prompt style")
     parser.add_argument("--colors", type=int, default=16, help="Palette size")
     parser.add_argument("--defaults", action="store_true", help="Run default fusion pairs")
     parser.add_argument("--test", action="store_true", help="Test with 3 pairs only")
+    parser.add_argument("--check", action="store_true", help="Check local setup status")
 
     args = parser.parse_args()
 
+    if args.check:
+        print("Checking local generation setup...")
+        status = check_local_setup()
+        print(f"  stable-diffusion.cpp: {'FOUND' if status['sd_cpp'] else 'NOT FOUND'}")
+        print(f"  GGUF model: {'FOUND' if status['model'] else 'NOT FOUND'}")
+        if status.get("model_path"):
+            print(f"    → {status['model_path']}")
+        if not status["sd_cpp"]:
+            print(f"\n  Install sd.cpp: https://github.com/leejet/stable-diffusion.cpp")
+            print(f"  Expected at: {SD_CPP_BINARY}")
+        if not status["model"]:
+            print(f"\n  Download GGUF: https://huggingface.co/unsloth/Qwen-Image-2512-GGUF")
+            print(f"  Place in: {LOCAL_MODEL_DIR}/")
+            print(f"  Recommended for RPi: {LOCAL_MODELS['qwen-q2']} (7.3 GB)")
+            print(f"  Recommended for PC:  {LOCAL_MODELS['qwen-q4']} (11.9 GB)")
+        return
+
     if args.base and args.donor:
-        generate_fusion(args.base, args.donor, args.model, args.style, args.colors)
+        generate_fusion(args.base, args.donor, args.model,
+                        backend=args.backend, style=args.style, n_colors=args.colors)
     elif args.batch:
-        batch_generate(args.batch, args.model, args.style)
+        batch_generate(args.batch, args.model, backend=args.backend, style=args.style)
     elif args.defaults or args.test:
         pairs = DEFAULT_PAIRS[:3] if args.test else DEFAULT_PAIRS
         pairs_file = OUTPUT_DIR / "_default_pairs.json"
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
         with open(pairs_file, "w") as f:
             json.dump([{"base": p[0], "donor": p[1]} for p in pairs], f)
-        batch_generate(str(pairs_file), args.model, args.style)
+        batch_generate(str(pairs_file), args.model, backend=args.backend, style=args.style)
     else:
         parser.print_help()
-        print("\nExamples:")
+        print("\n" + "="*60)
+        print("BACKENDS:")
+        print("  cloud     — Replicate API (best quality, ~$0.15/image)")
+        print("  local     — stable-diffusion.cpp + Qwen-Image GGUF (free, CPU/GPU)")
+        print("  diffusers — HuggingFace diffusers pipeline (free, needs GPU)")
+        print()
+        print("EXAMPLES:")
+        print("  # Cloud (needs REPLICATE_API_TOKEN)")
         print("  python ai_fusion_generator.py --base Charizard --donor Blastoise")
-        print("  python ai_fusion_generator.py --test --model nano-banana-pro")
-        print("  python ai_fusion_generator.py --defaults")
+        print()
+        print("  # Local (needs sd.cpp + GGUF model)")
+        print("  python ai_fusion_generator.py --base Pikachu --donor Eevee --backend local")
+        print()
+        print("  # Check local setup")
+        print("  python ai_fusion_generator.py --check")
+        print()
+        print("  # Batch generate")
+        print("  python ai_fusion_generator.py --test --backend cloud")
+        print()
+        print("RPi AI HAT+ 2 SETUP:")
+        print("  1. Download: Qwen-Image-2512-Q2_K.gguf (7.3 GB, fits 8GB HAT+ RAM)")
+        print("  2. Build stable-diffusion.cpp for aarch64")
+        print("  3. Run: python ai_fusion_generator.py --backend local --model qwen-q2")
 
 
 if __name__ == "__main__":
