@@ -64,6 +64,8 @@ interface SpriteWithHatProps {
   splicedSpritesBase?: string;
   /** Hat vertical offset from top (0-100% of sprite height), default 10 */
   hatYOffset?: number;
+  /** Hat horizontal offset from center (-50 to 50, percentage), default 0 */
+  hatXOffset?: number;
   /** Sprite dimensions */
   size?: number;
   /** Enable zoom on click */
@@ -700,7 +702,8 @@ export function SpriteWithHat({
   aiSpritesBase = '/ai-sprites',
   splicedSpritesBase = '/spliced-sprites',
   hatYOffset = 10,
-  size = 80,
+  hatXOffset = 0,
+  size = 96,
   zoomEnabled = false,
   zoomScale = 2,
   className = '',
@@ -857,7 +860,7 @@ export function SpriteWithHat({
         <div style={{
           position: 'absolute',
           top: `${hatYOffset}%`,
-          left: '50%',
+          left: `${50 + (hatXOffset || 0)}%`,
           transform: 'translateX(-50%)',
           pointerEvents: 'none',
         }}>

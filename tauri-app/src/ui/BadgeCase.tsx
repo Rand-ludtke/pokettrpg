@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 const LS_BADGES = 'ttrpg.badgecase';
+const MAX_IMG_DIM = 200;  // resize uploaded images to save localStorage space
 
 type Badge = { id: string; image?: string; earned: boolean; name?: string };
 type BadgeState = { color: string; badges: Badge[] };
@@ -43,7 +44,16 @@ export function BadgeCase() {
 		try { const raw = localStorage.getItem(LS_BADGES); if (raw) return normalizeState(JSON.parse(raw)); } catch {}
 		return defaultState;
 	});
-	useEffect(()=>{ try { localStorage.setItem(LS_BADGES, JSON.stringify(state)); } catch {} }, [state]);
+	useEffect(()=>{
+		try {
+			const json = JSON.stringify(state);
+			localStorage.setItem(LS_BADGES, json);
+			setSaveError(null);
+		} catch (e: any) {
+			// localStorage full — likely too many large images
+			setSaveError('Storage full! Try using smaller badge images.');
+		}
+	}, [state]);
 
 	const setColor = (color:string)=> setState(prev=>({ ...prev, color }));
 	const updateBadge = (id:string, updater:(badge:Badge)=>Badge)=>
@@ -55,9 +65,46 @@ export function BadgeCase() {
 	const setImage = (id:string, dataUrl?:string)=> updateBadge(id, b => ({ ...b, image: dataUrl }));
 	const setName = (id:string, name?:string)=> updateBadge(id, b => ({ ...b, name }));
 
+	const [saveError, setSaveError] = useState<string|null>(null);
+
+	/** Resize image to fit within MAX_IMG_DIM then convert to compressed data URL */
+	const resizeImage = (dataUrl: string): Promise<string> => {
+		return new Promise((resolve) => {
+			const img = new Image();
+			img.onload = () => {
+				const w = img.naturalWidth, h = img.naturalHeight;
+				let nw = w, nh = h;
+				if (w > MAX_IMG_DIM || h > MAX_IMG_DIM) {
+					const scale = Math.min(MAX_IMG_DIM / w, MAX_IMG_DIM / h);
+					nw = Math.round(w * scale);
+					nh = Math.round(h * scale);
+				}
+				const canvas = document.createElement('canvas');
+				canvas.width = nw; canvas.height = nh;
+				const ctx = canvas.getContext('2d')!;
+				ctx.drawImage(img, 0, 0, nw, nh);
+				// Use webp for smaller size, fallback to png
+				const result = canvas.toDataURL('image/webp', 0.8) || canvas.toDataURL('image/png');
+				resolve(result);
+			};
+			img.onerror = () => resolve(dataUrl); // fallback to original
+			img.src = dataUrl;
+		});
+	};
+
 	const onUpload = (id:string)=>{
 		const input = document.createElement('input'); input.type='file'; input.accept='image/*';
-		input.onchange=()=>{ const f=input.files&&input.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=> setImage(id, String(r.result||'')); r.readAsDataURL(f); };
+		input.onchange=()=>{
+			const f=input.files&&input.files[0]; if(!f) return;
+			const r=new FileReader();
+			r.onload= async ()=>{
+				const raw = String(r.result||'');
+				const resized = await resizeImage(raw);
+				setImage(id, resized);
+				setSaveError(null);
+			};
+			r.readAsDataURL(f);
+		};
 		input.click();
 	};
 
@@ -137,8 +184,13 @@ export function BadgeCase() {
 			</div>
 
 			{/* Subtle helper to reduce blank space and guide users */}
+			{saveError && (
+				<div style={{fontSize:'0.85em', textAlign:'center', maxWidth:caseW, color:'#e53935', background:'rgba(229,57,53,0.12)', padding:'6px 12px', borderRadius:8}}>
+					⚠️ {saveError}
+				</div>
+			)}
 			<div className="dim" style={{fontSize:'0.85em', textAlign:'center', maxWidth:caseW}}>
-				Tip: Click a slot to mark a badge earned. Use “Add Image” to place your badge art; images display slightly larger than the ring to look pinned but won’t overlap neighboring slots.
+				Tip: Click a slot to mark a badge earned. Use "Add Image" to place your badge art. Images are auto-resized for storage.
 			</div>
 		</div>
 	);

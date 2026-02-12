@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { spriteUrl, loadShowdownDex, DexIndex } from '../data/adapter';
 
+/* ───────── Sprite source modes for region painting ───────── */
+type SpriteSource = 'gen5' | 'fusion';
+
+const DEFAULT_FUSION_BASE = '/spliced-sprites';
+
 /* ───────── Region bitmask constants ───────── */
 const REGION = {
   HEAD:    1,
@@ -147,6 +152,9 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
   const [showOnlyUnpainted, setShowOnlyUnpainted] = useState(false);
   const [progress, setProgress] = useState<Record<string, boolean>>(getProgress);
   const [loadingSprite, setLoadingSprite] = useState(false);
+  const [spriteSource, setSpriteSource] = useState<SpriteSource>('gen5');
+  const [fusionHeadId, setFusionHeadId] = useState('');
+  const [fusionBodyId, setFusionBodyId] = useState('');
 
   const regionsRef = useRef<Uint8Array>(new Uint8Array(CANVAS_SIZE * CANVAS_SIZE));
   const paintingRef = useRef(false);
@@ -230,7 +238,8 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
     setCurrentIndex(index);
     setDirty(false);
 
-    const url = spriteUrl(pkmn.id, false);
+    // Always use Gen5 static sprites for region painting (consistent 96x96 PNGs)
+    const url = spriteUrl(pkmn.id, false, { setOverride: 'gen5', forceStatic: true });
     loadImage(url);
   }, [filteredPokemon, loadImage]);
 
@@ -461,9 +470,17 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
   };
 
   /* ───────── Save / Save & Next ───────── */
+  const getCurrentSaveId = () => {
+    if (spriteSource === 'fusion' && fusionHeadId && fusionBodyId) {
+      return `fusion-${fusionHeadId}.${fusionBodyId}`;
+    }
+    return currentPokemon?.id || null;
+  };
+
   const handleSave = () => {
-    if (currentPokemon) {
-      saveRegionData(currentPokemon.id, regionsRef.current, spriteWidth, spriteHeight);
+    const saveId = getCurrentSaveId();
+    if (saveId) {
+      saveRegionData(saveId, regionsRef.current, spriteWidth, spriteHeight);
       setDirty(false);
       setProgress(getProgress());
     }
@@ -640,7 +657,7 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
               onClick={() => navigateTo(i)}
             >
               <img
-                src={spriteUrl(p.id, false)}
+                src={spriteUrl(p.id, false, { setOverride: 'gen5', forceStatic: true })}
                 alt={p.name}
                 style={{ width: 32, height: 32, imageRendering: 'pixelated' }}
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -674,6 +691,34 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
             </span>
           </div>
         )}
+
+        <div style={S.toolbar}>
+          <div className="toggle small" role="tablist" style={{ display: 'flex', gap: 2 }}>
+            <button className={spriteSource === 'gen5' ? 'active' : ''} onClick={() => { setSpriteSource('gen5'); if (currentPokemon) navigateTo(currentIndex); }} style={{ padding: '3px 8px', fontSize: '0.8em' }}>
+              🎮 Gen5 Sprites
+            </button>
+            <button className={spriteSource === 'fusion' ? 'active' : ''} onClick={() => setSpriteSource('fusion')} style={{ padding: '3px 8px', fontSize: '0.8em' }}>
+              🔀 Fusion Sprites
+            </button>
+          </div>
+          {spriteSource === 'fusion' && (
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center', fontSize: '0.8em' }}>
+              <input type="number" placeholder="Head #" min={1} max={1025} value={fusionHeadId} onChange={e => setFusionHeadId(e.target.value)} style={{ width: 60, padding: '2px 4px', fontSize: '0.8em' }} />
+              <span>+</span>
+              <input type="number" placeholder="Body #" min={1} max={1025} value={fusionBodyId} onChange={e => setFusionBodyId(e.target.value)} style={{ width: 60, padding: '2px 4px', fontSize: '0.8em' }} />
+              <button className="mini" style={{ fontSize: '0.78em' }} onClick={() => {
+                if (fusionHeadId && fusionBodyId) {
+                  const fusionId = `fusion-${fusionHeadId}.${fusionBodyId}`;
+                  regionsRef.current = new Uint8Array(CANVAS_SIZE * CANVAS_SIZE);
+                  const saved = loadRegionData(fusionId);
+                  if (saved) regionsRef.current = saved.data;
+                  setDirty(false);
+                  loadImage(`${DEFAULT_FUSION_BASE}/${fusionHeadId}.${fusionBodyId}.png`);
+                }
+              }}>Load Fusion</button>
+            </div>
+          )}
+        </div>
 
         <div style={S.toolbar}>
           <button className="mini" onClick={() => fileInputRef.current?.click()}>📂 Custom Sprite</button>

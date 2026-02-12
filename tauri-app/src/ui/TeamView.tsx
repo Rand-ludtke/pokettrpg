@@ -31,14 +31,16 @@ export function TeamView({ team, onRemove, onMove }: {
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 style={{display:'grid',gridTemplateColumns:'auto 1fr auto',gap:8,alignItems:'center'}}>
-              <div style={{width:80,height:80,display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <div style={{width:96,height:96,display:'flex',alignItems:'center',justifyContent:'center'}}>
                 <SpriteWithHat
                   species={p.species || p.name}
                   shiny={!!p.shiny}
                   cosmeticForm={(p as any).cosmeticForm}
                   hatId={((p as any).hatId as HatId) || 'none'}
+                  hatYOffset={((p as any).hatYOffset as number) ?? 10}
+                  hatXOffset={((p as any).hatXOffset as number) ?? 0}
                   fusion={(p as any).fusion}
-                  size={80}
+                  size={96}
                 />
               </div>
               <div>

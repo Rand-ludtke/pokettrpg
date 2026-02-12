@@ -363,12 +363,12 @@ function toAscii(s: string): string {
   } catch { return s; }
 }
 
-export function spriteUrl(speciesId: string, shiny = false, options?: { base?: string, setOverride?: SpriteSet, cosmetic?: string, back?: boolean }) {
+export function spriteUrl(speciesId: string, shiny = false, options?: { base?: string, setOverride?: SpriteSet, cosmetic?: string, back?: boolean, forceStatic?: boolean }) {
   // Default to the vendor showdown sprites path (both Electron and Tauri serve from public/vendor/showdown)
   const base = options?.base ?? DEFAULT_SPRITE_BASE;
   const settings = getSpriteSettings();
   const chosen = options?.setOverride ?? settings.set;
-  const useAni = settings.animated && chosen === 'gen5';
+  const useAni = !options?.forceStatic && settings.animated && chosen === 'gen5';
   // Construct folder and extension
   const folder =
     spriteFolderForSet(chosen, shiny, !!options?.back, useAni) ||

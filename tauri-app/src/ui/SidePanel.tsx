@@ -661,8 +661,10 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
           cosmeticForm={selected.cosmeticForm} 
           back={showBack && !(selected as any).fusion}
           hatId={currentHatId}
+          hatYOffset={((selected as any).hatYOffset as number) ?? 10}
+          hatXOffset={((selected as any).hatXOffset as number) ?? 0}
           fusion={(selected as any).fusion}
-          size={panelMode === 'compact' ? 80 : 100}
+          size={panelMode === 'compact' ? 96 : 100}
           style={{ transform: `scale(${zoom})${(showBack && (selected as any).fusion) ? ' scaleX(-1)' : ''}`, transformOrigin: 'center center' }}
         />
         <div style={{ position:'absolute', top:4, right:4, display:'flex', flexDirection:'column', gap:4 }}>
@@ -683,6 +685,34 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
       {showHatPicker && (
         <div style={{ position: 'relative', marginTop: -4 }}>
           <HatPicker selectedHat={currentHatId} onSelect={setHat} compact />
+          {currentHatId !== 'none' && (
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6, fontSize: '0.78em' }}>
+              <label className="dim" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                ↕ Y:
+                <input type="range" min={-20} max={60} value={((selected as any).hatYOffset as number) ?? 10}
+                  onChange={e => {
+                    const next = { ...selected, hatYOffset: Number(e.target.value) } as any;
+                    onReplaceSelected && onReplaceSelected(next);
+                  }}
+                  style={{ width: 70 }} />
+                <span style={{ minWidth: 22 }}>{((selected as any).hatYOffset as number) ?? 10}</span>
+              </label>
+              <label className="dim" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                ↔ X:
+                <input type="range" min={-30} max={30} value={((selected as any).hatXOffset as number) ?? 0}
+                  onChange={e => {
+                    const next = { ...selected, hatXOffset: Number(e.target.value) } as any;
+                    onReplaceSelected && onReplaceSelected(next);
+                  }}
+                  style={{ width: 70 }} />
+                <span style={{ minWidth: 22 }}>{((selected as any).hatXOffset as number) ?? 0}</span>
+              </label>
+              <button className="mini" style={{ fontSize: '0.78em', padding: '1px 6px' }} onClick={() => {
+                const next = { ...selected, hatYOffset: 10, hatXOffset: 0 } as any;
+                onReplaceSelected && onReplaceSelected(next);
+              }}>Reset</button>
+            </div>
+          )}
         </div>
       )}
 

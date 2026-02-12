@@ -111,6 +111,8 @@ export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNext
                     shiny={!!p.shiny}
                     cosmeticForm={(p as any).cosmeticForm}
                     hatId={((p as any).hatId as HatId) || 'none'}
+                    hatYOffset={((p as any).hatYOffset as number) ?? 10}
+                    hatXOffset={((p as any).hatXOffset as number) ?? 0}
                     fusion={(p as any).fusion}
                     size={56}
                     className="pixel slot-sprite"
