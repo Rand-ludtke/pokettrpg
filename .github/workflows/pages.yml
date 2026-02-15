@@ -2,7 +2,7 @@ name: Deploy PWA to GitHub Pages
 
 on:
   push:
-    branches: [main, clean-snapshot]
+    branches: [main, master, clean-snapshot]
   workflow_dispatch:
 
 permissions:
@@ -22,9 +22,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
       - name: Install dependencies
         working-directory: tauri-app
-        run: npm install
+        run: npm ci
       - name: Build PWA
         working-directory: tauri-app
         env:
