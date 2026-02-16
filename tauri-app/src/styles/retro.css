@@ -28,9 +28,9 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
 .arrow-btn:enabled{cursor:pointer}
 .box-grid .grid{display:grid;gap:6px}
 .box-grid .slot{border:1px solid var(--accent);background:var(--slot-bg);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;border-radius:8px}
-.box-grid .slot.large{height:88px}
+.box-grid .slot.large{height:112px}
 .box-grid .slot .slot-sprite-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.box-grid .slot .slot-sprite{max-height:100%;max-width:100%;object-fit:contain}
+.box-grid .slot .slot-sprite{max-height:105%;max-width:105%;object-fit:contain}
 .pixel{image-rendering: pixelated}
 .box-grid .slot .empty{opacity:.3}
 .hpbar{height:6px;border:1px solid var(--accent);background:var(--panel-bg-dark);position:relative;border-radius:6px;overflow:hidden}

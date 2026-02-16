@@ -113,8 +113,9 @@ export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNext
                     hatId={((p as any).hatId as HatId) || 'none'}
                     hatYOffset={((p as any).hatYOffset as number) ?? 10}
                     hatXOffset={((p as any).hatXOffset as number) ?? 0}
+                    hatScale={((p as any).hatScale as number) ?? 1}
                     fusion={(p as any).fusion}
-                    size={56}
+                    size={104}
                     className="pixel slot-sprite"
                   />
                   {/* Show level badge when in leveling mode */}

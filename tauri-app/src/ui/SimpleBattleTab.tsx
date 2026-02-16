@@ -646,10 +646,109 @@ function parseHpInfo(pkm: any): { hpPct: number; text: string } {
 }
 
 function buildSpriteChain(pkm: any, side: SideId, showBack: boolean) {
+  const buildFusionCandidates = () => {
+    const fusion = pkm?.fusion;
+    if (!fusion || !Number.isFinite(fusion?.headId) || !Number.isFinite(fusion?.bodyId)) {
+      return { front: [] as string[], back: [] as string[] };
+    }
+
+    const headId = Number(fusion.headId);
+    const bodyId = Number(fusion.bodyId);
+    const spriteFile = typeof fusion?.spriteFile === 'string' && fusion.spriteFile.trim()
+      ? fusion.spriteFile.trim()
+      : `${headId}.${bodyId}.png`;
+    const defaultFile = `${headId}.${bodyId}.png`;
+    const mode = pkm?.spriteMode || fusion?.mode || 'auto';
+    const baseByMode: Record<string, string[]> = {
+      'ai-generated': ['/ai-sprites', '/spliced-sprites', '/fusion-sprites'],
+      'two-step': ['/spliced-sprites', '/ai-sprites', '/fusion-sprites'],
+      'auto': ['/fusion-sprites', '/ai-sprites', '/spliced-sprites'],
+    };
+    const bases = baseByMode[mode] || baseByMode.auto;
+    const explicitUrl = /^https?:\/\//i.test(spriteFile) || /^data:image\//i.test(spriteFile) || spriteFile.startsWith('/');
+
+    const front: string[] = [];
+    const back: string[] = [];
+
+    if (explicitUrl) {
+      front.push(spriteFile);
+      if (showBack) {
+        const slashIndex = spriteFile.lastIndexOf('/');
+        if (slashIndex >= 0) {
+          const prefix = spriteFile.slice(0, slashIndex);
+          const filename = spriteFile.slice(slashIndex + 1);
+          back.push(`${prefix}/back/${filename}`);
+        }
+      }
+    }
+
+    for (const base of bases) {
+      const normalizedBase = withPublicBase(base.replace(/^\//, ''));
+      if (showBack) {
+        back.push(`${normalizedBase}/back/${spriteFile}`);
+        if (spriteFile !== defaultFile) {
+          back.push(`${normalizedBase}/back/${defaultFile}`);
+        }
+      }
+      front.push(`${normalizedBase}/${spriteFile}`);
+      if (spriteFile !== defaultFile) {
+        front.push(`${normalizedBase}/${defaultFile}`);
+      }
+    }
+
+    return {
+      front: Array.from(new Set(front.filter(Boolean))),
+      back: Array.from(new Set(back.filter(Boolean))),
+    };
+  };
+
+  const fusionCandidates = buildFusionCandidates();
   const species = speciesFromPokemon(pkm) || 'Missingno';
   const shiny = !!pkm?.shiny;
-  const { src, candidates, placeholder } = spriteUrlWithFallback(species, () => {}, { back: showBack, shiny });
-  return { initial: src, candidates, placeholder };
+  const directFront = [
+    ...fusionCandidates.front,
+    pkm?.sprite,
+    pkm?.spriteUrl,
+    pkm?.image,
+    pkm?.art,
+  ].find((value: unknown) => typeof value === 'string' && String(value).trim()) as string | undefined;
+  const directBack = [
+    ...fusionCandidates.back,
+    pkm?.backSprite,
+    pkm?.backSpriteUrl,
+  ].find((value: unknown) => typeof value === 'string' && String(value).trim()) as string | undefined;
+
+  const frontChain = spriteUrlWithFallback(species, () => {}, { back: false, shiny });
+
+  if (showBack) {
+    const backChain = spriteUrlWithFallback(species, () => {}, { back: true, shiny });
+    const preferredBack = directBack ? [directBack, ...fusionCandidates.back] : [...fusionCandidates.back];
+    const preferredFront = directFront ? [directFront, ...fusionCandidates.front] : [...fusionCandidates.front];
+    const backCandidates = [...preferredBack, backChain.src, ...(backChain.candidates || [])].filter(Boolean) as string[];
+    const frontCandidates = [...preferredFront, frontChain.src, ...(frontChain.candidates || [])].filter(Boolean) as string[];
+    const candidates = Array.from(new Set([...backCandidates, ...frontCandidates]));
+    const placeholder = backChain.placeholder || frontChain.placeholder;
+    return {
+      initial: candidates[0] || placeholder,
+      candidates,
+      placeholder,
+      backFallbackStart: backCandidates.length,
+      mirrorBackFallback: true,
+    };
+  }
+
+  const candidates = Array.from(new Set([
+    ...(directFront ? [directFront] : []),
+    frontChain.src,
+    ...(frontChain.candidates || []),
+  ].filter(Boolean) as string[]));
+  return {
+    initial: candidates[0] || frontChain.placeholder,
+    candidates,
+    placeholder: frontChain.placeholder,
+    backFallbackStart: Number.MAX_SAFE_INTEGER,
+    mirrorBackFallback: false,
+  };
 }
 
 function sanitizeTrainerSpriteId(raw: unknown): string {
@@ -2375,7 +2474,15 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
                       src={chain.initial} 
                       alt={species}
                       style={{ height: 64, imageRendering: 'pixelated' }}
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = chain.placeholder; }}
+                      onError={(e) => {
+                        const el = e.currentTarget as HTMLImageElement;
+                        const idxCurrent = Number(el.dataset.fbIdx || '0') + 1;
+                        el.dataset.fbIdx = String(idxCurrent);
+                        el.src = chain.candidates[idxCurrent] || chain.placeholder;
+                        if (chain.mirrorBackFallback && idxCurrent >= chain.backFallbackStart) {
+                          el.style.transform = 'scaleX(-1)';
+                        }
+                      }}
                     />
                     <div className="ps-preview-mon__name">{species}</div>
                   </div>
@@ -2482,7 +2589,15 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
                     src={chain.initial} 
                     alt={species}
                     style={{ height: 80, imageRendering: 'pixelated' }}
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = chain.placeholder; }}
+                    onError={(e) => {
+                      const el = e.currentTarget as HTMLImageElement;
+                      const idxCurrent = Number(el.dataset.fbIdx || '0') + 1;
+                      el.dataset.fbIdx = String(idxCurrent);
+                      el.src = chain.candidates[idxCurrent] || chain.placeholder;
+                      if (chain.mirrorBackFallback && idxCurrent >= chain.backFallbackStart) {
+                        el.style.transform = 'scaleX(-1)';
+                      }
+                    }}
                   />
                   <div className="ps-preview-mon__name">{species}</div>
                 </div>
@@ -2903,6 +3018,9 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
                   const idx = Number(img.dataset.fbIdx || '0') + 1;
                   img.dataset.fbIdx = String(idx);
                   img.src = chain.candidates[idx] || chain.placeholder;
+                  if (chain.mirrorBackFallback && idx >= chain.backFallbackStart) {
+                    img.style.transform = 'scaleX(-1)';
+                  }
                 }}
               />
             </div>
@@ -3098,6 +3216,9 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
         const idxCurrent = Number(el.dataset.fbIdx || '0') + 1;
         el.dataset.fbIdx = String(idxCurrent);
         el.src = chain.candidates[idxCurrent] || chain.placeholder;
+        if (chain.mirrorBackFallback && idxCurrent >= chain.backFallbackStart) {
+          el.style.transform = 'scaleX(-1)';
+        }
       }
     };
 

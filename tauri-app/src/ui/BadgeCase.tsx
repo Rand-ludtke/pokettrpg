@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 const LS_BADGES = 'ttrpg.badgecase';
-const MAX_IMG_DIM = 200;  // resize uploaded images to save localStorage space
+const LS_BADGES_BACKUP = 'ttrpg.badgecase.backup';
+const MAX_IMG_DIM = 160;  // resize uploaded images to save localStorage space
 
 type Badge = { id: string; image?: string; earned: boolean; name?: string };
 type BadgeState = { color: string; badges: Badge[] };
@@ -41,18 +42,29 @@ function normalizeState(raw: any): BadgeState {
 
 export function BadgeCase() {
 	const [state, setState] = useState<BadgeState>(() => {
-		try { const raw = localStorage.getItem(LS_BADGES); if (raw) return normalizeState(JSON.parse(raw)); } catch {}
+		try {
+			const raw = localStorage.getItem(LS_BADGES);
+			if (raw) return normalizeState(JSON.parse(raw));
+		} catch {}
+		try {
+			const backup = localStorage.getItem(LS_BADGES_BACKUP);
+			if (backup) return normalizeState(JSON.parse(backup));
+		} catch {}
 		return defaultState;
 	});
 	useEffect(()=>{
+		const json = JSON.stringify(state);
 		try {
-			const json = JSON.stringify(state);
 			localStorage.setItem(LS_BADGES, json);
 			setSaveError(null);
 		} catch (e: any) {
 			// localStorage full — likely too many large images
 			setSaveError('Storage full! Try using smaller badge images.');
+			return;
 		}
+		try {
+			localStorage.setItem(LS_BADGES_BACKUP, json);
+		} catch {}
 	}, [state]);
 
 	const setColor = (color:string)=> setState(prev=>({ ...prev, color }));
@@ -84,7 +96,7 @@ export function BadgeCase() {
 				const ctx = canvas.getContext('2d')!;
 				ctx.drawImage(img, 0, 0, nw, nh);
 				// Use webp for smaller size, fallback to png
-				const result = canvas.toDataURL('image/webp', 0.8) || canvas.toDataURL('image/png');
+				const result = canvas.toDataURL('image/webp', 0.7) || canvas.toDataURL('image/png');
 				resolve(result);
 			};
 			img.onerror = () => resolve(dataUrl); // fallback to original
