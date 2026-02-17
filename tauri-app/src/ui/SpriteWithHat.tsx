@@ -3,7 +3,7 @@
  * 
  * The hat is positioned relative to the sprite and can be offset for fine-tuning.
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { spriteUrl, placeholderSpriteDataURL } from '../data/adapter';
 import '../styles/sprite-with-hat.css';
 
@@ -66,12 +66,18 @@ interface SpriteWithHatProps {
   hatYOffset?: number;
   /** Hat horizontal offset from center (-50 to 50, percentage), default 0 */
   hatXOffset?: number;
+  /** Hat scale multiplier (default 1) */
+  hatScale?: number;
   /** Sprite dimensions */
   size?: number;
   /** Enable zoom on click */
   zoomEnabled?: boolean;
   /** Zoom scale factor (default: 2) */
   zoomScale?: number;
+  /** Callback when hat is dragged — provides new x/y offset percentages */
+  onHatMove?: (xOffset: number, yOffset: number) => void;
+  /** Callback when hat is resized via scroll wheel — provides new scale */
+  onHatScale?: (scale: number) => void;
   /** Additional className */
   className?: string;
   /** Additional style */
@@ -703,9 +709,12 @@ export function SpriteWithHat({
   splicedSpritesBase = '/spliced-sprites',
   hatYOffset = 10,
   hatXOffset = 0,
+  hatScale = 1,
   size = 96,
   zoomEnabled = false,
   zoomScale = 2,
+  onHatMove,
+  onHatScale,
   className = '',
   style = {},
   alt = '',
@@ -820,14 +829,57 @@ export function SpriteWithHat({
     setUseFlipFallback(back); // If we wanted back view, flip the fallback
   }, [species, shiny, cosmeticForm, back, fallbackUsed, fallbackLevel, fusion, fusionSpriteBase, imgSrc, useFlipFallback, currentMode, getFusionUrl]);
   
+  // ── Hat drag state ──
+  const containerRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0, ox: 0, oy: 0 });
+
+  const handleHatPointerDown = useCallback((e: React.PointerEvent) => {
+    if (!onHatMove) return;
+    e.preventDefault();
+    e.stopPropagation();
+    draggingRef.current = true;
+    dragStartRef.current = { x: e.clientX, y: e.clientY, ox: hatXOffset, oy: hatYOffset };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [onHatMove, hatXOffset, hatYOffset]);
+
+  const handleHatPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!draggingRef.current || !onHatMove || !containerRef.current) return;
+    e.preventDefault();
+    const rect = containerRef.current.getBoundingClientRect();
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+    // Convert pixel delta to percentage of container size
+    const newX = Math.round(Math.max(-50, Math.min(50, dragStartRef.current.ox + (dx / rect.width) * 100)));
+    const newY = Math.round(Math.max(-30, Math.min(80, dragStartRef.current.oy + (dy / rect.height) * 100)));
+    onHatMove(newX, newY);
+  }, [onHatMove]);
+
+  const handleHatPointerUp = useCallback((e: React.PointerEvent) => {
+    draggingRef.current = false;
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+  }, []);
+
+  const handleHatWheel = useCallback((e: React.WheelEvent) => {
+    if (!onHatScale) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    const newScale = Math.max(0.3, Math.min(3, (hatScale ?? 1) + delta));
+    onHatScale(Math.round(newScale * 10) / 10);
+  }, [onHatScale, hatScale]);
+
   const handleClick = useCallback(() => {
     if (zoomEnabled) {
       setIsZoomed(prev => !prev);
     }
   }, [zoomEnabled]);
   
+  const isDraggable = !!onHatMove;
+  
   return (
     <div
+      ref={containerRef}
       className={`sprite-with-hat ${className} ${zoomEnabled ? 'sprite-with-hat--zoomable' : ''} ${isZoomed ? 'sprite-with-hat--zoomed' : ''}`}
       style={{
         position: 'relative',
@@ -857,14 +909,34 @@ export function SpriteWithHat({
         onError={handleError}
       />
       {hatId !== 'none' && (
-        <div style={{
-          position: 'absolute',
-          top: `${hatYOffset}%`,
-          left: `${50 + (hatXOffset || 0)}%`,
-          transform: 'translateX(-50%)',
-          pointerEvents: 'none',
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: `${hatYOffset}%`,
+            left: `${50 + (hatXOffset || 0)}%`,
+            transform: `translateX(-50%) scale(${hatScale ?? 1})`,
+            pointerEvents: isDraggable ? 'auto' : 'none',
+            cursor: isDraggable ? (draggingRef.current ? 'grabbing' : 'grab') : 'default',
+            userSelect: 'none',
+            touchAction: 'none',
+          }}
+          onPointerDown={isDraggable ? handleHatPointerDown : undefined}
+          onPointerMove={isDraggable ? handleHatPointerMove : undefined}
+          onPointerUp={isDraggable ? handleHatPointerUp : undefined}
+          onWheel={onHatScale ? handleHatWheel : undefined}
+          title={isDraggable ? 'Drag to move hat • Scroll to resize' : undefined}
+        >
           <HatOverlay hatId={hatId} size={size} />
+          {/* Resize ring indicator when draggable */}
+          {isDraggable && (
+            <div style={{
+              position: 'absolute',
+              inset: -3,
+              border: '1px dashed rgba(255,255,255,0.4)',
+              borderRadius: '50%',
+              pointerEvents: 'none',
+            }} />
+          )}
         </div>
       )}
       {/* Sprite mode indicator (small, subtle) */}
