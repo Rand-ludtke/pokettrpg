@@ -855,7 +855,7 @@ function FusionSpriteImg({ chain, size, alt, overrideSrc, headNum, bodyNum }: {
         if (!requestedRef.current && typeof headNum === 'number' && typeof bodyNum === 'number') {
           requestedRef.current = true;
           ensureFusionSpriteOnDemand(headNum, bodyNum)
-            .then((url) => {
+            .then((url: string | null) => {
               if (url) setSrc(url);
             })
             .catch(() => {});

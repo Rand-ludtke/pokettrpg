@@ -1004,6 +1004,15 @@ export function fusionSpriteUrlWithFallback(
   const custom = getCustomSprite(customKey, 'front');
   if (custom) candidates.push(custom);
 
+  const apiBases = getFusionApiBases();
+  for (const apiBase of apiBases) {
+    candidates.push(`${apiBase}/fusion/sprites/${filename}`);
+    for (const suffix of ['a', 'b', 'c']) {
+      candidates.push(`${apiBase}/fusion/sprites/${headNum}.${bodyNum}${suffix}.png`);
+      candidates.push(`${apiBase}/fusion/sprites/${headNum}.${bodyNum}_${suffix}.png`);
+    }
+  }
+
   candidates.push(`${base}/fusion-sprites/${filename}`);
   candidates.push(`${base}/ai-sprites/${filename}`);
   candidates.push(`${base}/ai-sprites/${headNum}.${bodyNum}ai.png`);
@@ -1027,6 +1036,98 @@ export function fusionSpriteUrlWithFallback(
     candidates,
     placeholder,
   };
+}
+
+const DEFAULT_FUSION_API_BASE = 'https://pokettrpg.duckdns.org';
+const LOCAL_FUSION_API_BASES = ['http://127.0.0.1:3000', 'http://localhost:3000'];
+const gFusionEnsurePromises = new Map<string, Promise<string | null>>();
+
+function safeGetLocalStorage(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeBase(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const trimmed = String(raw).trim();
+  if (!trimmed) return null;
+  return trimmed.replace(/\/+$/, '');
+}
+
+export function getFusionApiBases(): string[] {
+  const explicit = normalizeBase(safeGetLocalStorage('ttrpg.fusionApiBase'));
+  const apiBase = normalizeBase(safeGetLocalStorage('ttrpg.apiBase'));
+  const ordered = [
+    explicit,
+    ...LOCAL_FUSION_API_BASES,
+    apiBase,
+    DEFAULT_FUSION_API_BASE,
+  ].filter((x): x is string => !!x);
+  return Array.from(new Set(ordered));
+}
+
+async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}, timeoutMs = 5000): Promise<Response> {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: ctrl.signal });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+async function requestFusionGenerateOnce(headNum: number, bodyNum: number): Promise<{ base: string } | null> {
+  const payload = { headNum, bodyNum, mode: 'splice' };
+  for (const base of getFusionApiBases()) {
+    try {
+      const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
+      const timeout = isLocal ? 2500 : 6000;
+      const res = await fetchWithTimeout(`${base}/fusion/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }, timeout);
+      if (res.ok) return { base };
+    } catch {}
+  }
+  return null;
+}
+
+async function waitForFusionReady(headNum: number, bodyNum: number, base: string, maxMs = 30000): Promise<string | null> {
+  const started = Date.now();
+  while (Date.now() - started < maxMs) {
+    try {
+      const res = await fetchWithTimeout(`${base}/fusion/gen-check/${headNum}/${bodyNum}`, {}, 3000);
+      if (res.ok) {
+        const data = await res.json() as { exists?: boolean };
+        if (data?.exists) {
+          return `${base}/fusion/sprites/${headNum}.${bodyNum}.png?t=${Date.now()}`;
+        }
+      }
+    } catch {}
+    await new Promise(r => setTimeout(r, 1500));
+  }
+  return null;
+}
+
+export function ensureFusionSpriteOnDemand(headNum: number, bodyNum: number): Promise<string | null> {
+  const key = `${headNum}.${bodyNum}`;
+  const existing = gFusionEnsurePromises.get(key);
+  if (existing) return existing;
+
+  const task = (async () => {
+    const started = await requestFusionGenerateOnce(headNum, bodyNum);
+    if (!started) return null;
+    return waitForFusionReady(headNum, bodyNum, started.base);
+  })().finally(() => {
+    gFusionEnsurePromises.delete(key);
+  });
+
+  gFusionEnsurePromises.set(key, task);
+  return task;
 }
 
 /** Save a custom fusion sprite (data URL) to localStorage */
@@ -1058,4 +1159,5 @@ export const adapter = {
   fusionSpriteUrl,
   fusionSpriteUrlWithFallback,
   saveCustomFusionSprite,
+  ensureFusionSpriteOnDemand,
 };
