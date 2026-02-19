@@ -648,7 +648,7 @@ function FusionComboCard({ label, preview, selected, chosenSprite, onSelect, onS
         {/* Variant thumbnails */}
         {preview.spriteChain.candidates.length > 1 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
-            {preview.spriteChain.candidates.slice(0, 8).map((url, i) => (
+            {preview.spriteChain.candidates.slice(0, 8).map((url: string, i: number) => (
               <button
                 key={i}
                 className="mini"

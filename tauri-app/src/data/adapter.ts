@@ -942,6 +942,99 @@ function scoreMatch(q: string, s: string): number {
   return 0;
 }
 
+// ── Fusion Helpers ──
+
+// Global dex-number maps, populated lazily from loadShowdownDex results
+let gNumToName: Record<number, string> = {};
+let gNameToNum: Record<string, number> = {};
+let gDexMapsBuilt = false;
+
+/** Ensure dex number maps are built (idempotent). Call after loadShowdownDex(). */
+export function buildDexNumMaps(dex: DexIndex): void {
+  if (gDexMapsBuilt) return;
+  gNumToName = {};
+  gNameToNum = {};
+  for (const [key, entry] of Object.entries(dex)) {
+    const num = (entry as any).num as number | undefined;
+    if (num == null || num === 0) continue;
+    const name = normalizeName(entry.name || key);
+    if (!gNumToName[num]) gNumToName[num] = name;
+    gNameToNum[name] = num;
+  }
+  gDexMapsBuilt = true;
+}
+
+/** Convert a dex number to the normalised species name (e.g. 6 → "charizard") */
+export function dexNumToName(num: number): string | undefined {
+  return gNumToName[num];
+}
+
+/** Convert a species name to its dex number (e.g. "charizard" → 6) */
+export function nameToDexNum(name: string): number | undefined {
+  return gNameToNum[normalizeName(name)];
+}
+
+/**
+ * Fusion sprite URL with onerror fallback chain:
+ *   custom (localStorage) → fusion-sprites/ → ai-sprites/ → variants → placeholder
+ *
+ * The RPi backend URL is used as base when available; otherwise default to
+ * relative paths (for GitHub-Pages deployment).
+ */
+export function fusionSpriteUrl(headNum: number, bodyNum: number, options?: { base?: string }): string {
+  const base = options?.base ?? '';
+  const filename = `${headNum}.${bodyNum}.png`;
+  const customKey = `fusion:${headNum}.${bodyNum}`;
+  const custom = getCustomSprite(customKey, 'front');
+  if (custom) return custom;
+  return `${base}/fusion-sprites/${filename}`;
+}
+
+export function fusionSpriteUrlWithFallback(
+  headNum: number,
+  bodyNum: number,
+  onError: (nextUrl: string) => void,
+  options?: { base?: string },
+) {
+  const base = options?.base ?? '';
+  const filename = `${headNum}.${bodyNum}.png`;
+  const customKey = `fusion:${headNum}.${bodyNum}`;
+
+  const candidates: string[] = [];
+  const custom = getCustomSprite(customKey, 'front');
+  if (custom) candidates.push(custom);
+
+  candidates.push(`${base}/fusion-sprites/${filename}`);
+  candidates.push(`${base}/ai-sprites/${filename}`);
+  candidates.push(`${base}/ai-sprites/${headNum}.${bodyNum}ai.png`);
+
+  for (const suffix of ['a', 'b', 'c']) {
+    candidates.push(`${base}/fusion-sprites/${headNum}.${bodyNum}${suffix}.png`);
+  }
+  for (const suffix of ['a', 'b', 'c', 'd', 'e']) {
+    candidates.push(`${base}/ai-sprites/${headNum}.${bodyNum}${suffix}ai.png`);
+  }
+
+  const headName = gNumToName[headNum] || String(headNum);
+  const bodyName = gNumToName[bodyNum] || String(bodyNum);
+  const phLabel = `${headName.slice(0, 4)}/${bodyName.slice(0, 4)}`.toUpperCase();
+  const placeholder = placeholderSpriteDataURL(phLabel);
+
+  let idx = 0;
+  return {
+    src: candidates[0] || placeholder,
+    handleError: () => { idx++; onError(candidates[idx] || placeholder); },
+    candidates,
+    placeholder,
+  };
+}
+
+/** Save a custom fusion sprite (data URL) to localStorage */
+export function saveCustomFusionSprite(headNum: number, bodyNum: number, dataUrl: string) {
+  const customKey = `fusion:${headNum}.${bodyNum}`;
+  saveCustomSprite(customKey, 'front', dataUrl);
+}
+
 export const adapter = {
   spriteUrl,
   spriteUrlWithFallback,
@@ -959,4 +1052,10 @@ export const adapter = {
   saveCustomSprite,
   saveCustomItem,
   placeholderSpriteDataURL,
+  buildDexNumMaps,
+  dexNumToName,
+  nameToDexNum,
+  fusionSpriteUrl,
+  fusionSpriteUrlWithFallback,
+  saveCustomFusionSprite,
 };
