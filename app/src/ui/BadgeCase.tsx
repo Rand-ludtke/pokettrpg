@@ -1,39 +1,121 @@
 import React, { useEffect, useState } from 'react';
 
 const LS_BADGES = 'ttrpg.badgecase';
+const LS_BADGES_BACKUP = 'ttrpg.badgecase.backup';
+const MAX_IMG_DIM = 160;  // resize uploaded images to save localStorage space
 
-type Badge = { image?: string; earned: boolean; name?: string };
+type Badge = { id: string; image?: string; earned: boolean; name?: string };
 type BadgeState = { color: string; badges: Badge[] };
 
 const defaultState: BadgeState = {
 	color: '#c83a3a',
 	badges: [
-		{ earned:false, name:'Boulder' },
-		{ earned:false, name:'Cascade' },
-		{ earned:false, name:'Thunder' },
-		{ earned:false, name:'Rainbow' },
-		{ earned:false, name:'Soul' },
-		{ earned:false, name:'Marsh' },
-		{ earned:false, name:'Volcano' },
-		{ earned:false, name:'Earth' },
+		{ id:'boulder', earned:false, name:'Boulder' },
+		{ id:'cascade', earned:false, name:'Cascade' },
+		{ id:'thunder', earned:false, name:'Thunder' },
+		{ id:'rainbow', earned:false, name:'Rainbow' },
+		{ id:'soul', earned:false, name:'Soul' },
+		{ id:'marsh', earned:false, name:'Marsh' },
+		{ id:'volcano', earned:false, name:'Volcano' },
+		{ id:'earth', earned:false, name:'Earth' },
 	],
 };
 
+function normalizeState(raw: any): BadgeState {
+	const parsed = (raw && typeof raw === 'object') ? raw : {};
+	const storedBadges: any[] = Array.isArray(parsed.badges) ? parsed.badges : [];
+	const badges = defaultState.badges.map((base, idx) => {
+		const stored = storedBadges[idx];
+		return {
+			...base,
+			id: base.id,
+			name: typeof stored?.name === 'string' ? stored.name : base.name,
+			earned: typeof stored?.earned === 'boolean' ? stored.earned : base.earned,
+			image: typeof stored?.image === 'string' ? stored.image : undefined,
+		};
+	});
+	return {
+		color: typeof parsed.color === 'string' ? parsed.color : defaultState.color,
+		badges,
+	};
+}
+
 export function BadgeCase() {
 	const [state, setState] = useState<BadgeState>(() => {
-		try { const raw = localStorage.getItem(LS_BADGES); if (raw) return { ...defaultState, ...JSON.parse(raw) }; } catch {}
+		try {
+			const raw = localStorage.getItem(LS_BADGES);
+			if (raw) return normalizeState(JSON.parse(raw));
+		} catch {}
+		try {
+			const backup = localStorage.getItem(LS_BADGES_BACKUP);
+			if (backup) return normalizeState(JSON.parse(backup));
+		} catch {}
 		return defaultState;
 	});
-	useEffect(()=>{ try { localStorage.setItem(LS_BADGES, JSON.stringify(state)); } catch {} }, [state]);
+	useEffect(()=>{
+		const json = JSON.stringify(state);
+		try {
+			localStorage.setItem(LS_BADGES, json);
+			setSaveError(null);
+		} catch (e: any) {
+			setSaveError('Storage full! Try using smaller badge images.');
+			return;
+		}
+		try {
+			localStorage.setItem(LS_BADGES_BACKUP, json);
+		} catch {}
+	}, [state]);
 
 	const setColor = (color:string)=> setState(prev=>({ ...prev, color }));
-	const toggleEarned = (i:number)=> setState(prev=>({ ...prev, badges: prev.badges.map((b,idx)=> idx===i? { ...b, earned: !b.earned }: b)}));
-	const setImage = (i:number, dataUrl?:string)=> setState(prev=>({ ...prev, badges: prev.badges.map((b,idx)=> idx===i? { ...b, image: dataUrl }: b)}));
-	const setName = (i:number, name?:string)=> setState(prev=>({ ...prev, badges: prev.badges.map((b,idx)=> idx===i? { ...b, name }: b)}));
+	const updateBadge = (id:string, updater:(badge:Badge)=>Badge)=>
+		setState(prev=>({
+			...prev,
+			badges: prev.badges.map(b => b.id === id ? updater(b) : b),
+		}));
+	const toggleEarned = (id:string)=> updateBadge(id, b => ({ ...b, earned: !b.earned }));
+	const setImage = (id:string, dataUrl?:string)=> updateBadge(id, b => ({ ...b, image: dataUrl }));
+	const setName = (id:string, name?:string)=> updateBadge(id, b => ({ ...b, name }));
 
-	const onUpload = (i:number)=>{
+	const [saveError, setSaveError] = useState<string|null>(null);
+
+	/** Resize image to fit within MAX_IMG_DIM then convert to compressed data URL */
+	const resizeImage = (dataUrl: string): Promise<string> => {
+		return new Promise((resolve) => {
+			const img = new Image();
+			img.onload = () => {
+				const w = img.naturalWidth, h = img.naturalHeight;
+				let nw = w, nh = h;
+				if (w > MAX_IMG_DIM || h > MAX_IMG_DIM) {
+					const scale = Math.min(MAX_IMG_DIM / w, MAX_IMG_DIM / h);
+					nw = Math.round(w * scale);
+					nh = Math.round(h * scale);
+				}
+				const canvas = document.createElement('canvas');
+				canvas.width = nw; canvas.height = nh;
+				const ctx = canvas.getContext('2d')!;
+				ctx.drawImage(img, 0, 0, nw, nh);
+				// Use webp for smaller size, fallback to png
+				const result = canvas.toDataURL('image/webp', 0.7) || canvas.toDataURL('image/png');
+				resolve(result);
+			};
+			img.onerror = () => resolve(dataUrl); // fallback to original
+			img.src = dataUrl;
+		});
+	};
+
+	const onUpload = (id:string)=>{
 		const input = document.createElement('input'); input.type='file'; input.accept='image/*';
-		input.onchange=()=>{ const f=input.files&&input.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=> setImage(i, String(r.result||'')); r.readAsDataURL(f); };
+		input.onchange=()=>{
+			const f=input.files&&input.files[0]; if(!f) return;
+			const r=new FileReader();
+			r.onload= async ()=>{
+				const raw = String(r.result||'');
+				const resized = await resizeImage(raw);
+				setImage(id, resized);
+				setSaveError(null);
+			};
+			r.readAsDataURL(f);
+		};
 		input.click();
 	};
 
@@ -85,13 +167,13 @@ export function BadgeCase() {
 						<circle cx="32" cy="32" r="4" fill="#fff" stroke="#000" strokeWidth="3" />
 					</svg>
 				</div>
-				<EditableNames names={state.badges.map(b=> b.name||'')} onChange={(idx,val)=> setName(idx,val)} />
+				<EditableNames names={state.badges.map(b=> b.name||'')} onChange={(idx,val)=> setName(state.badges[idx]?.id || `badge-${idx}`, val)} />
 			</div>
 
 			{/* Base with badge slots */}
 			<div style={baseStyle}>
 				{state.badges.map((b,i)=> (
-					<div key={i} style={slotStyle} className={b.earned? 'checked':''} onClick={()=> toggleEarned(i)} title={b.name || `Badge ${i+1}`}>
+					<div key={b.id} style={slotStyle} className={b.earned? 'checked':''} onClick={()=> toggleEarned(b.id)} title={b.name || `Badge ${i+1}`}>
 						<div style={ringStyle} />
 									{b.image ? (
 										<img src={b.image} alt={`Badge ${i+1}`} style={{ position:'relative', zIndex:2, width:imageSize, height:imageSize, objectFit:'contain', borderRadius:'50%' }} />
@@ -105,16 +187,21 @@ export function BadgeCase() {
 			{/* Controls */}
 			<div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:10, width:caseW }}>
 				{state.badges.map((b,i)=> (
-					<div key={i} style={{ display:'flex', gap:6, justifyContent:'center' }}>
-						<button className="mini" onClick={()=> onUpload(i)}>Add Image</button>
-						{b.image && <button className="mini" onClick={()=> setImage(i, undefined)}>Clear</button>}
+					<div key={b.id} style={{ display:'flex', gap:6, justifyContent:'center' }}>
+						<button className="mini" onClick={()=> onUpload(b.id)}>Add Image</button>
+						{b.image && <button className="mini" onClick={()=> setImage(b.id, undefined)}>Clear</button>}
 					</div>
 				))}
 			</div>
 
 			{/* Subtle helper to reduce blank space and guide users */}
+			{saveError && (
+				<div style={{fontSize:'0.85em', textAlign:'center', maxWidth:caseW, color:'#e53935', background:'rgba(229,57,53,0.12)', padding:'6px 12px', borderRadius:8}}>
+					⚠️ {saveError}
+				</div>
+			)}
 			<div className="dim" style={{fontSize:'0.85em', textAlign:'center', maxWidth:caseW}}>
-				Tip: Click a slot to mark a badge earned. Use “Add Image” to place your badge art; images display slightly larger than the ring to look pinned but won’t overlap neighboring slots.
+				Tip: Click a slot to mark a badge earned. Use "Add Image" to place your badge art. Images are auto-resized for storage.
 			</div>
 		</div>
 	);
