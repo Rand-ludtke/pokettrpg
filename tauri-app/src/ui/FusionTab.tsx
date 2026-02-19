@@ -3,7 +3,7 @@ import {
   loadShowdownDex, normalizeName, toPokemon, prepareBattle, mapMoves,
   nameToDexNum, dexNumToName, fusionSpriteUrlWithFallback, buildDexNumMaps,
   speciesAbilityOptions, isMoveLegalForSpecies, placeholderSpriteDataURL,
-  spriteUrl,
+  spriteUrlWithFallback, ensureFusionSpriteOnDemand,
 } from '../data/adapter';
 import type { BattlePokemon, Pokemon, Move } from '../types';
 
@@ -53,6 +53,40 @@ function fusionTypes(headTypes: string[], bodyTypes: string[]): string[] {
   return [t1, t2];
 }
 
+const REGION_DEMONYM: Record<string, string> = {
+  alola: 'alolan',
+  galar: 'galarian',
+  hisui: 'hisuian',
+  paldea: 'paldean',
+};
+
+function buildSpeciesSearchText(name: string, key?: string): string {
+  const values = [name, key || ''];
+  const out: string[] = [];
+
+  for (const v of values) {
+    if (!v) continue;
+    out.push(v);
+    out.push(v.replace(/-/g, ' '));
+    out.push(normalizeName(v));
+  }
+
+  const m = name.match(/^(.+)-([^-]+)$/);
+  if (m) {
+    const base = m[1].replace(/-/g, ' ');
+    const form = m[2].toLowerCase();
+    out.push(`${base} ${form}`);
+    out.push(`${form} ${base}`);
+    const demonym = REGION_DEMONYM[form];
+    if (demonym) {
+      out.push(`${demonym} ${base}`);
+      out.push(`${base} ${demonym}`);
+    }
+  }
+
+  return out.join(' ');
+}
+
 /* ──────────────────────────── types ──────────────────────────────── */
 
 type FusionMode = 'pc' | 'creative';
@@ -84,7 +118,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   const [mode, setMode] = useState<FusionMode>('pc');
   const [step, setStep] = useState<FusionStep>('select');
   const [dex, setDex] = useState<any>(null);
-  const [dexList, setDexList] = useState<{name:string; num:number}[]>([]);
+  const [dexList, setDexList] = useState<{name:string; num:number; searchText:string}[]>([]);
 
   // Selected Pokemon
   const [headSpecies, setHeadSpecies] = useState('');
@@ -113,14 +147,29 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
       const d = await loadShowdownDex();
       buildDexNumMaps(d.pokedex);
       setDex(d);
-      const list: {name:string;num:number}[] = [];
-      for (const [, entry] of Object.entries(d.pokedex)) {
+      const list: {name:string;num:number;searchText:string}[] = [];
+      const seen = new Set<string>();
+      for (const [key, entry] of Object.entries(d.pokedex)) {
         const e = entry as any;
-        if (e.num > 0 && e.num <= 1025 && !e.forme) {
-          list.push({ name: e.name, num: e.num });
-        }
+        const name = String(e.name || key || '').trim();
+        if (!name) continue;
+        const normName = normalizeName(name);
+        if (!normName || seen.has(normName)) continue;
+
+        const num = Number(e.num);
+        const isCap = normalizeName(String(e.isNonstandard || '')) === 'cap';
+        if (!(num > 0 || isCap)) continue;
+
+        seen.add(normName);
+        list.push({ name, num: Number.isFinite(num) ? num : 0, searchText: buildSpeciesSearchText(name, key) });
       }
-      list.sort((a, b) => a.num - b.num);
+      list.sort((a, b) => {
+        const aPositive = a.num > 0;
+        const bPositive = b.num > 0;
+        if (aPositive !== bPositive) return aPositive ? -1 : 1;
+        if (aPositive && bPositive && a.num !== b.num) return a.num - b.num;
+        return a.name.localeCompare(b.name);
+      });
       setDexList(list);
     })();
   }, []);
@@ -145,6 +194,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
       return pcPokemon.map(p => ({
         name: p.mon.species || p.mon.name,
         num: nameToDexNum(p.mon.species || p.mon.name) || 0,
+        searchText: buildSpeciesSearchText(p.mon.species || p.mon.name),
         mon: p.mon,
         box: p.box,
         slot: p.slot,
@@ -154,18 +204,24 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   }, [mode, pcPokemon, dexList]);
 
   const filteredHeadList = useMemo(() => {
-    const q = headSearch.toLowerCase().trim();
-    if (!q) return availableList;
+    const q = headSearch.trim();
+    const qNorm = normalizeName(q);
+    if (!qNorm && !q) return availableList;
     return availableList.filter(p =>
-      p.name.toLowerCase().includes(q) || String(p.num).includes(q)
+      normalizeName(p.name).includes(qNorm) ||
+      normalizeName(p.searchText || '').includes(qNorm) ||
+      (q ? String(p.num).includes(q) : false)
     );
   }, [availableList, headSearch]);
 
   const filteredBodyList = useMemo(() => {
-    const q = bodySearch.toLowerCase().trim();
-    if (!q) return availableList;
+    const q = bodySearch.trim();
+    const qNorm = normalizeName(q);
+    if (!qNorm && !q) return availableList;
     return availableList.filter(p =>
-      p.name.toLowerCase().includes(q) || String(p.num).includes(q)
+      normalizeName(p.name).includes(qNorm) ||
+      normalizeName(p.searchText || '').includes(qNorm) ||
+      (q ? String(p.num).includes(q) : false)
     );
   }, [availableList, bodySearch]);
 
@@ -397,6 +453,8 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
                 <FusionComboCard
                   label={`${headPokemon?.species || headPokemon?.name || '?'} head + ${bodyPokemon?.species || bodyPokemon?.name || '?'} body`}
                   preview={comboAB}
+                  headNum={headNum}
+                  bodyNum={bodyNum}
                   selected={chosenCombo === 'ab'}
                   chosenSprite={chosenCombo === 'ab' ? chosenSprite : null}
                   onSelect={() => { setChosenCombo('ab'); setChosenSprite(null); }}
@@ -405,6 +463,8 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
                 <FusionComboCard
                   label={`${bodyPokemon?.species || bodyPokemon?.name || '?'} head + ${headPokemon?.species || headPokemon?.name || '?'} body`}
                   preview={comboBA}
+                  headNum={bodyNum}
+                  bodyNum={headNum}
                   selected={chosenCombo === 'ba'}
                   chosenSprite={chosenCombo === 'ba' ? chosenSprite : null}
                   onSelect={() => { setChosenCombo('ba'); setChosenSprite(null); }}
@@ -434,7 +494,14 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
             {/* Left: fusion summary */}
             <div style={{ border: '1px solid #444', borderRadius: 8, padding: 12, display: 'grid', gap: 8 }}>
               <div style={{ textAlign: 'center' }}>
-                <FusionSpriteImg chain={activeCombo.spriteChain} size={96} alt={activeCombo.name} overrideSrc={chosenSprite} />
+                <FusionSpriteImg
+                  chain={activeCombo.spriteChain}
+                  size={96}
+                  alt={activeCombo.name}
+                  overrideSrc={chosenSprite}
+                  headNum={chosenCombo === 'ab' ? headNum : bodyNum}
+                  bodyNum={chosenCombo === 'ab' ? bodyNum : headNum}
+                />
               </div>
               <h3 style={{ margin: 0, textAlign: 'center' }}>{activeCombo.name}</h3>
               <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
@@ -517,7 +584,7 @@ function PokemonPicker({ label, sublabel, selected, search, onSearch, list, onSe
   selected: string;
   search: string;
   onSearch: (v: string) => void;
-  list: { name: string; num: number; mon?: BattlePokemon | null; box: number; slot: number }[];
+  list: { name: string; num: number; searchText?: string; mon?: BattlePokemon | null; box: number; slot: number }[];
   onSelect: (name: string, box: number, slot: number) => void;
   dex: any;
 }) {
@@ -533,24 +600,19 @@ function PokemonPicker({ label, sublabel, selected, search, onSearch, list, onSe
       <div style={{ fontWeight: 700, fontSize: '0.95em' }}>{label} <span className="dim" style={{ fontWeight: 400, fontSize: '0.85em' }}>({sublabel})</span></div>
 
       {/* Selected preview */}
-      {selectedMon && selectedNum > 0 ? (
+      {selectedMon ? (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8, padding: 8,
           background: 'var(--panel-bg-dark, #111)', borderRadius: 8, border: '1px solid var(--accent, #333)',
         }}>
-          <img
-            src={spriteUrl(selectedMon.species || selectedMon.name)}
-            alt={selectedMon.species || selectedMon.name}
-            style={{ width: 64, height: 64, imageRendering: 'pixelated' }}
-            onError={e => { (e.target as HTMLImageElement).src = placeholderSpriteDataURL(String(selectedNum)); }}
-          />
+          <SpeciesSprite species={selectedMon.species || selectedMon.name} size={64} fallbackLabel={selectedNum > 0 ? String(selectedNum) : (selectedMon.species || selectedMon.name)} />
           <div>
             <div style={{ fontWeight: 600 }}>{selectedMon.species || selectedMon.name}</div>
             <div style={{ display: 'flex', gap: 3, marginTop: 2 }}>
               {selectedMon.types.map(t => <TypeBadge key={t} type={t} small />)}
             </div>
             <div className="dim" style={{ fontSize: '0.78em', marginTop: 2 }}>
-              #{selectedNum} · BST {selectedMon.baseStats.hp + selectedMon.baseStats.atk + selectedMon.baseStats.def + selectedMon.baseStats.spAtk + selectedMon.baseStats.spDef + selectedMon.baseStats.speed}
+              {selectedNum > 0 ? `#${selectedNum}` : 'Special'} · BST {selectedMon.baseStats.hp + selectedMon.baseStats.atk + selectedMon.baseStats.def + selectedMon.baseStats.spAtk + selectedMon.baseStats.spDef + selectedMon.baseStats.speed}
             </div>
           </div>
           <button className="mini" onClick={() => onSelect('', -1, -1)} style={{ marginLeft: 'auto', fontSize: '0.8em' }}>✕</button>
@@ -570,24 +632,18 @@ function PokemonPicker({ label, sublabel, selected, search, onSearch, list, onSe
             border: '1px solid var(--accent, #333)',
           }}>
             {list.slice(0, 150).map((p, i) => {
-              const sUrl = spriteUrl(p.name);
               return (
                 <button
                   key={`${p.name}-${p.box}-${p.slot}-${i}`}
                   className="mini"
                   onClick={() => onSelect(p.name, p.box, p.slot)}
-                  title={`#${p.num} ${p.name}`}
+                  title={p.num > 0 ? `#${p.num} ${p.name}` : p.name}
                   style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                     padding: 2, fontSize: '0.65em', gap: 0, minHeight: 56,
                   }}
                 >
-                  <img
-                    src={sUrl}
-                    alt={p.name}
-                    style={{ width: 40, height: 40, imageRendering: 'pixelated' }}
-                    onError={e => { (e.target as HTMLImageElement).src = placeholderSpriteDataURL(String(p.num)); }}
-                  />
+                  <SpeciesSprite species={p.name} size={40} fallbackLabel={p.num > 0 ? String(p.num) : p.name} />
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 52, whiteSpace: 'nowrap' }}>{p.name}</span>
                 </button>
               );
@@ -602,9 +658,11 @@ function PokemonPicker({ label, sublabel, selected, search, onSearch, list, onSe
 }
 
 /** One side of the combo comparison */
-function FusionComboCard({ label, preview, selected, chosenSprite, onSelect, onSpriteSelect }: {
+function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSprite, onSelect, onSpriteSelect }: {
   label: string;
   preview: FusionPreview;
+  headNum: number;
+  bodyNum: number;
   selected: boolean;
   chosenSprite: string | null;
   onSelect: () => void;
@@ -640,7 +698,7 @@ function FusionComboCard({ label, preview, selected, chosenSprite, onSelect, onS
           display: 'flex', justifyContent: 'center', padding: 8,
           background: 'linear-gradient(135deg, #16213e 0%, #0f172a 100%)', borderRadius: 8,
         }}>
-          <FusionSpriteImg chain={preview.spriteChain} size={80} alt={preview.name} overrideSrc={chosenSprite} />
+          <FusionSpriteImg chain={preview.spriteChain} size={80} alt={preview.name} overrideSrc={chosenSprite} headNum={headNum} bodyNum={bodyNum} />
         </div>
         {/* Variant thumbnails */}
         {preview.spriteChain.candidates.length > 1 && (
@@ -727,18 +785,53 @@ function TypeBadge({ type, small }: { type: string; small?: boolean }) {
   );
 }
 
-/** Fusion sprite image with fallback chain */
-function FusionSpriteImg({ chain, size, alt, overrideSrc }: {
-  chain: ReturnType<typeof fusionSpriteUrlWithFallback>;
-  size: number;
-  alt: string;
-  overrideSrc?: string | null;
-}) {
-  const [src, setSrc] = useState(overrideSrc || chain.src || chain.placeholder);
+function SpeciesSprite({ species, size, fallbackLabel }: { species: string; size: number; fallbackLabel: string }) {
+  const chain = useMemo(
+    () => spriteUrlWithFallback(species, () => {}, {}),
+    [species],
+  );
+  const [src, setSrc] = useState(chain.src || chain.placeholder);
   const idxRef = useRef(0);
 
   useEffect(() => {
     idxRef.current = 0;
+    setSrc(chain.src || chain.placeholder);
+  }, [chain]);
+
+  return (
+    <img
+      src={src}
+      alt={species}
+      style={{ width: size, height: size, imageRendering: 'pixelated' }}
+      onError={() => {
+        idxRef.current++;
+        const next = chain.candidates[idxRef.current];
+        if (next) {
+          setSrc(next);
+          return;
+        }
+        setSrc(placeholderSpriteDataURL(fallbackLabel));
+      }}
+    />
+  );
+}
+
+/** Fusion sprite image with fallback chain */
+function FusionSpriteImg({ chain, size, alt, overrideSrc, headNum, bodyNum }: {
+  chain: ReturnType<typeof fusionSpriteUrlWithFallback>;
+  size: number;
+  alt: string;
+  overrideSrc?: string | null;
+  headNum?: number;
+  bodyNum?: number;
+}) {
+  const [src, setSrc] = useState(overrideSrc || chain.src || chain.placeholder);
+  const idxRef = useRef(0);
+  const requestedRef = useRef(false);
+
+  useEffect(() => {
+    idxRef.current = 0;
+    requestedRef.current = false;
     setSrc(overrideSrc || chain.src || chain.placeholder);
   }, [chain, overrideSrc]);
 
@@ -751,7 +844,22 @@ function FusionSpriteImg({ chain, size, alt, overrideSrc }: {
       style={{ imageRendering: 'pixelated' }}
       onError={() => {
         idxRef.current++;
-        setSrc(chain.candidates[idxRef.current] || chain.placeholder);
+        const next = chain.candidates[idxRef.current];
+        if (next) {
+          setSrc(next);
+          return;
+        }
+
+        setSrc(chain.placeholder);
+
+        if (!requestedRef.current && typeof headNum === 'number' && typeof bodyNum === 'number') {
+          requestedRef.current = true;
+          ensureFusionSpriteOnDemand(headNum, bodyNum)
+            .then((url) => {
+              if (url) setSrc(url);
+            })
+            .catch(() => {});
+        }
       }}
     />
   );
