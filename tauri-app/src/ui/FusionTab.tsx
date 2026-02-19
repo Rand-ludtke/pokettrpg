@@ -20,25 +20,22 @@ const TYPE_COLORS: Record<string, string> = {
 /* ──────────────────────────── stat helpers ───────────────────────── */
 
 /**
- * Infinite Fusion stat formula:
- *   HP:      head HP / 3   + 2 × body HP / 3
- *   Attack:  2 × head Atk / 3 + body Atk / 3
- *   Defense: head Def / 3   + 2 × body Def / 3
- *   Sp.Atk:  2 × head SpA / 3 + body SpA / 3
- *   Sp.Def:  head SpD / 3   + 2 × body SpD / 3
- *   Speed:   (head Spe + body Spe) / 2
+ * Infinite Fusion stat formula (matches Autoritysama calculator):
+ *   HEAD dominates: HP, Sp.Atk, Sp.Def
+ *   BODY dominates: Attack, Defense, Speed
+ *   Formula: floor((2 × dominant + other) / 3)
  */
 function fusionStats(
   head: { hp:number; atk:number; def:number; spAtk:number; spDef:number; speed:number },
   body: { hp:number; atk:number; def:number; spAtk:number; spDef:number; speed:number },
 ) {
   return {
-    hp:    Math.round(head.hp / 3 + (2 * body.hp) / 3),
-    atk:   Math.round((2 * head.atk) / 3 + body.atk / 3),
-    def:   Math.round(head.def / 3 + (2 * body.def) / 3),
-    spAtk: Math.round((2 * head.spAtk) / 3 + body.spAtk / 3),
-    spDef: Math.round(head.spDef / 3 + (2 * body.spDef) / 3),
-    speed: Math.round((head.speed + body.speed) / 2),
+    hp:    Math.floor((2 * head.hp    + body.hp)    / 3),
+    atk:   Math.floor((2 * body.atk   + head.atk)   / 3),
+    def:   Math.floor((2 * body.def   + head.def)   / 3),
+    spAtk: Math.floor((2 * head.spAtk + body.spAtk) / 3),
+    spDef: Math.floor((2 * head.spDef + body.spDef) / 3),
+    speed: Math.floor((2 * body.speed + head.speed) / 3),
   };
 }
 
