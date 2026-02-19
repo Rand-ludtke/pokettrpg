@@ -12,9 +12,7 @@ import { SimpleBattleTab } from './SimpleBattleTab';
 import { PSBattlePanel } from '../ps';
 import { CharacterSheet } from './CharacterSheet';
 import { BadgeCase } from './BadgeCase';
-import { PokedexTab } from './PokedexTab';
 import { FusionTab } from './FusionTab';
-import { RegionPainter } from './RegionPainter';
 import { DiceLevelingPanel } from './DiceLevelingPanel';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
@@ -23,7 +21,7 @@ import { BugReporter } from './BugReporter';
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
-type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | 'dex' | 'fusion' | 'regions' | { kind: 'psbattle'; id: string; title: string };
+type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | 'fusion' | { kind: 'psbattle'; id: string; title: string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -417,9 +415,7 @@ export function App() {
           <button className={tab === 'team' ? 'active' : ''} onClick={() => setTab('team')}>Team</button>
           <button className={tab === 'battle' ? 'active' : ''} onClick={() => setTab('battle')}>Battle</button>
           <button className={tab === 'lobby' ? 'active' : ''} onClick={() => setTab('lobby')}>Lobby</button>
-          <button className={tab === 'dex' ? 'active' : ''} onClick={() => setTab('dex')}>Dex</button>
           <button className={tab === 'fusion' ? 'active' : ''} onClick={() => setTab('fusion')}>Fusion</button>
-          <button className={tab === 'regions' ? 'active' : ''} onClick={() => setTab('regions')}>Regions</button>
           <button className={tab === 'sheet' ? 'active' : ''} onClick={() => setTab('sheet')}>Character</button>
           <button className={tab === 'badges' ? 'active' : ''} onClick={() => setTab('badges')}>Badges</button>
           {extraTabs.map(t => (
@@ -436,12 +432,12 @@ export function App() {
         </nav>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
           <label className="dim" htmlFor="spriteSet">Sprites:</label>
-          <select id="spriteSet" defaultValue={getSpriteSettings().set} onChange={(e) => setSpriteSettings({ set: e.target.value as SpriteSet })}>
+          <select id="spriteSet" defaultValue={getSpriteSettings().set || 'gen5'} onChange={(e) => setSpriteSettings({ set: e.target.value as SpriteSet })}>
+            <option value="gen5">Gen 5 (default)</option>
             <option value="gen1">Gen 1</option>
             <option value="gen2">Gen 2</option>
             <option value="gen3">Gen 3</option>
             <option value="gen4">Gen 4</option>
-            <option value="gen5">Gen 5</option>
             <option value="gen6">Gen 6</option>
             <option value="home">HOME</option>
           </select>
@@ -751,9 +747,24 @@ export function App() {
       </div>
       {tab === "sheet" && (<CharacterSheet />)}
       {tab === 'badges' && (<BadgeCase />)}
-      {tab === 'dex' && (<PokedexTab onAddToPC={(mons) => addAcrossBoxes(mons)} />)}
-      {tab === 'fusion' && (<FusionTab />)}
-      {tab === 'regions' && (<RegionPainter />)}
+      {tab === 'fusion' && (
+        <FusionTab
+          onAddToPC={(mons) => addAcrossBoxes(mons)}
+          boxes={boxes}
+          onReplaceInPC={(boxIdx, slotIdx, mon) => {
+            setBoxes(prev => prev.map((b, i) => {
+              if (i !== boxIdx) return b;
+              const row = b.slice(); row[slotIdx] = mon; return row;
+            }));
+          }}
+          onRemoveFromPC={(boxIdx, slotIdx) => {
+            setBoxes(prev => prev.map((b, i) => {
+              if (i !== boxIdx) return b;
+              const row = b.slice(); row[slotIdx] = null; return row;
+            }));
+          }}
+        />
+      )}
 
       {Object.values(mountedBattles).map(b => (
         <div key={b.id} style={{ display: (typeof tab === 'object' && (tab as any).id === b.id) ? 'block' : 'none', height: '100%' }}>
