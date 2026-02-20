@@ -3,6 +3,8 @@ import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
 import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE } from '../data/adapter';
 import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
+import { FusionCreator } from './FusionCreator';
+import { SpriteModeToggle, VariantPicker } from './SpriteVariantSelector';
 
 const TYPE_COLORS: Record<string, string> = {
   normal: '#A8A878',
@@ -69,12 +71,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   onDeleteSelected?: () => void;
 }) {
   if (!selected) return (
-    <aside className="panel side">
-      <div className="side-header">
-        <h2>Add Pokémon</h2>
-      </div>
-      <AddNewPanel onAdd={onAddToSlot} />
-    </aside>
+    <NoSelectionPanel onAddToSlot={onAddToSlot} onAdd={onAdd} />
   );
 
   const [dex, setDex] = useState<any>(null);
@@ -108,6 +105,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   const [showMoveLearnPrompt, setShowMoveLearnPrompt] = useState(false);
   const [learnableMoves, setLearnableMoves] = useState<{name: string, level: number}[]>([]);
   const [learnReplaceMove, setLearnReplaceMove] = useState<{name: string, level: number} | null>(null);
+  const [showFusePanel, setShowFusePanel] = useState<boolean>(false);
   const prevLevelRef = React.useRef<number>(selected.level);
   const basicsRef = React.useRef<HTMLDivElement|null>(null);
   const abilityRef = React.useRef<HTMLDivElement|null>(null);
@@ -663,9 +661,18 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
           hatId={currentHatId}
           hatYOffset={((selected as any).hatYOffset as number) ?? 10}
           hatXOffset={((selected as any).hatXOffset as number) ?? 0}
+          hatScale={((selected as any).hatScale as number) ?? 1}
           fusion={(selected as any).fusion}
           size={panelMode === 'compact' ? 96 : 100}
           style={{ transform: `scale(${zoom})${(showBack && (selected as any).fusion) ? ' scaleX(-1)' : ''}`, transformOrigin: 'center center' }}
+          onHatMove={currentHatId !== 'none' && onReplaceSelected ? (x, y) => {
+            const next = { ...selected, hatXOffset: x, hatYOffset: y } as any;
+            onReplaceSelected(next);
+          } : undefined}
+          onHatScale={currentHatId !== 'none' && onReplaceSelected ? (s) => {
+            const next = { ...selected, hatScale: s } as any;
+            onReplaceSelected(next);
+          } : undefined}
         />
         <div style={{ position:'absolute', top:4, right:4, display:'flex', flexDirection:'column', gap:4 }}>
           <button className="mini" onClick={()=> setShowBack(b=>!b)}>{showBack? 'Front' : 'Back'}</button>
@@ -679,14 +686,58 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
             🔀 Fusion
           </div>
         )}
+        {!(selected as any).fusion && (
+          <button
+            className="mini"
+            onClick={() => setShowFusePanel(p => !p)}
+            style={{ position: 'absolute', bottom: 4, left: 4, fontSize: '10px', padding: '2px 6px' }}
+            title="Fuse with another Pokémon"
+          >🔀 Fuse</button>
+        )}
       </div>
+
+      {/* Fusion Creator Panel */}
+      {showFusePanel && (
+        <div style={{ border: '1px solid var(--accent)', borderRadius: 8, padding: 10, background: 'var(--panel-bg-dark)' }}>
+          <FusionCreator
+            initialHead={selected.species || selected.name}
+            onAdd={(p) => { onAdd(p); setShowFusePanel(false); }}
+            onClose={() => setShowFusePanel(false)}
+          />
+        </div>
+      )}
+
+      {/* Sprite Variant Chooser for Fusions */}
+      {(selected as any).fusion && onReplaceSelected && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: '0.82em' }}>
+          <span className="dim">Sprite:</span>
+          <SpriteModeToggle
+            mode={(selected as any).spriteMode || 'auto'}
+            onModeChange={(mode: string) => {
+              const next = { ...selected, spriteMode: mode } as any;
+              onReplaceSelected(next);
+            }}
+            compact
+          />
+          <VariantPicker
+            variants={(selected as any).fusion?.variants || ['default', 'a', 'b']}
+            selectedVariant={(selected as any).fusion?.spriteFile || ''}
+            onSelect={(variant) => {
+              const fusion = { ...(selected as any).fusion, spriteFile: variant };
+              const next = { ...selected, fusion } as any;
+              onReplaceSelected(next);
+            }}
+          />
+        </div>
+      )}
 
       {/* Hat Picker Popup */}
       {showHatPicker && (
         <div style={{ position: 'relative', marginTop: -4 }}>
           <HatPicker selectedHat={currentHatId} onSelect={setHat} compact />
           {currentHatId !== 'none' && (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6, fontSize: '0.78em' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6, fontSize: '0.78em', flexWrap: 'wrap' }}>
+              <span className="dim" style={{ fontSize: '0.85em' }}>💡 Drag hat to move • Scroll to resize</span>
               <label className="dim" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 ↕ Y:
                 <input type="range" min={-20} max={60} value={((selected as any).hatYOffset as number) ?? 10}
@@ -707,8 +758,18 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                   style={{ width: 70 }} />
                 <span style={{ minWidth: 22 }}>{((selected as any).hatXOffset as number) ?? 0}</span>
               </label>
+              <label className="dim" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                🔍 Size:
+                <input type="range" min={3} max={30} value={Math.round(((selected as any).hatScale as number ?? 1) * 10)}
+                  onChange={e => {
+                    const next = { ...selected, hatScale: Number(e.target.value) / 10 } as any;
+                    onReplaceSelected && onReplaceSelected(next);
+                  }}
+                  style={{ width: 60 }} />
+                <span style={{ minWidth: 22 }}>{((selected as any).hatScale as number ?? 1).toFixed(1)}</span>
+              </label>
               <button className="mini" style={{ fontSize: '0.78em', padding: '1px 6px' }} onClick={() => {
-                const next = { ...selected, hatYOffset: 10, hatXOffset: 0 } as any;
+                const next = { ...selected, hatYOffset: 10, hatXOffset: 0, hatScale: 1 } as any;
                 onReplaceSelected && onReplaceSelected(next);
               }}>Reset</button>
             </div>
@@ -1122,6 +1183,11 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                   </div>
                 );
               })}
+              <div style={{display:'grid', gridTemplateColumns:'1fr auto auto', gap:8, alignItems:'center', marginTop:4, paddingTop:4, borderTop:'1px solid #333', fontSize:'0.8em'}}>
+                <div className="dim">Base Stat Total</div>
+                <div style={{fontWeight:'bold'}}>{total}</div>
+                <div className="dim" style={{fontSize:'0.75em'}}>Real: {realTotal}</div>
+              </div>
             </div>
           </div>
 
@@ -1799,6 +1865,34 @@ function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]
   const sort = (a: string, b: string) => a.localeCompare(b);
   quadWeak.sort(sort); weak.sort(sort); resist.sort(sort); quadResist.sort(sort); immune.sort(sort);
   return { quadWeak, weak, resist, quadResist, immune };
+}
+
+/** No-selection view: toggle between "Add Pokémon" and "Create Fusion" */
+function NoSelectionPanel({ onAddToSlot, onAdd }: {
+  onAddToSlot?: (p: BattlePokemon) => void;
+  onAdd: (p: BattlePokemon, teamId?: string) => void;
+}) {
+  const [mode, setMode] = useState<'add' | 'fuse'>('add');
+  return (
+    <aside className="panel side">
+      <div className="side-header" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <button className={mode === 'add' ? 'active' : 'mini'} onClick={() => setMode('add')} style={{ fontWeight: mode === 'add' ? 700 : 400 }}>
+          Add Pokémon
+        </button>
+        <button className={mode === 'fuse' ? 'active' : 'mini'} onClick={() => setMode('fuse')} style={{ fontWeight: mode === 'fuse' ? 700 : 400 }}>
+          🔀 Create Fusion
+        </button>
+      </div>
+      {mode === 'add' && <AddNewPanel onAdd={onAddToSlot} />}
+      {mode === 'fuse' && (
+        <FusionCreator
+          creative
+          onAdd={(p) => onAdd(p)}
+          onClose={() => setMode('add')}
+        />
+      )}
+    </aside>
+  );
 }
 
 // --- Modal to pick a team or create a new one ---

@@ -13,7 +13,7 @@ import { PSBattlePanel } from '../ps';
 import { CharacterSheet } from './CharacterSheet';
 import { BadgeCase } from './BadgeCase';
 import { FusionTab } from './FusionTab';
-import { CustomDexBuilder } from './CustomDexBuilder';
+import { PokedexTab } from './PokedexTab';
 import { DiceLevelingPanel } from './DiceLevelingPanel';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
@@ -768,7 +768,7 @@ export function App() {
         />
       )}
       {tab === 'dex' && (
-        <CustomDexBuilder onAddToPC={(mons) => addAcrossBoxes(mons)} />
+        <PokedexTab onAddToPC={(mons) => addAcrossBoxes(mons)} />
       )}
 
       {Object.values(mountedBattles).map(b => (
