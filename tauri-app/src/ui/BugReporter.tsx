@@ -22,7 +22,7 @@ export interface BugReport {
 
 const LS_KEY = 'ttrpg.bugReports';
 const MAX_LOG_LINES = 80;
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.2';
 
 /* ---------- console capture ring buffer ---------- */
 const logRing: string[] = [];

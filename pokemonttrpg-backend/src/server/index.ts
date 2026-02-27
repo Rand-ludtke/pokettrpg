@@ -23,8 +23,10 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
 const REPLAYS_DIR = path.join(DATA_DIR, "replays");
 const CUSTOM_DEX_FILE = path.join(DATA_DIR, "customdex.json");
 const CUSTOM_SPRITES_FILE = path.join(DATA_DIR, "customsprites.json");
+const TRAINER_SPRITES_DIR = path.join(DATA_DIR, "trainer-sprites");
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 if (!fs.existsSync(REPLAYS_DIR)) fs.mkdirSync(REPLAYS_DIR);
+if (!fs.existsSync(TRAINER_SPRITES_DIR)) fs.mkdirSync(TRAINER_SPRITES_DIR, { recursive: true });
 
 export interface ClientInfo {
   id: string;
@@ -233,6 +235,9 @@ function removeClientFromRoom(room: Room, socketId: string) {
 
 const app = express();
 
+// Respect reverse-proxy headers from Caddy (X-Forwarded-Proto, etc.)
+app.set("trust proxy", true);
+
 // Enable CORS for all API routes
 app.use((_req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -245,6 +250,55 @@ app.use((_req, res, next) => {
 });
 
 app.use(express.json({ limit: "25mb" }));
+
+app.get("/", (_req: Request, res: Response) => {
+  res.status(200).json({
+    ok: true,
+    service: "pokemonttrpg-backend",
+    message: "Backend is running. Use /api/health for status.",
+  });
+});
+
+app.get("/api/health", (_req: Request, res: Response) => {
+  res.status(200).json({
+    ok: true,
+    service: "pokemonttrpg-backend",
+    uptimeSec: Math.floor(process.uptime()),
+    ts: Date.now(),
+  });
+});
+
+app.get("/api/trainer-sprites/:filename", (req: Request, res: Response) => {
+  const safeName = path.basename(String(req.params.filename || ""));
+  if (!safeName) return res.status(400).json({ error: "missing filename" });
+  const target = path.join(TRAINER_SPRITES_DIR, safeName);
+  if (!fs.existsSync(target)) return res.status(404).json({ error: "not found" });
+  return res.sendFile(target);
+});
+
+app.post("/api/trainer-sprites/upload", (req: Request, res: Response) => {
+  try {
+    const dataUrl = String(req.body?.dataUrl || "").trim();
+    if (!dataUrl) return res.status(400).json({ error: "missing dataUrl" });
+    const m = dataUrl.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/i);
+    if (!m) return res.status(400).json({ error: "invalid dataUrl" });
+
+    const ext = m[1].toLowerCase() === "jpeg" ? "jpg" : m[1].toLowerCase();
+    const buf = Buffer.from(m[2], "base64");
+    const prefixRaw = String(req.body?.prefix || "trainer").replace(/[^a-z0-9_-]/gi, "").toLowerCase();
+    const prefix = prefixRaw || "trainer";
+    const name = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const outPath = path.join(TRAINER_SPRITES_DIR, name);
+    fs.writeFileSync(outPath, buf);
+
+    const host = req.get("host") || "localhost:3000";
+    const origin = `${req.protocol}://${host}`;
+    const url = `${origin}/api/trainer-sprites/${name}`;
+    return res.json({ ok: true, filename: name, url });
+  } catch (err: any) {
+    return res.status(500).json({ error: err?.message || "upload failed" });
+  }
+});
 
 // --- Fusion sprites (Infinite Fusion) ---
 const FUSION_SPRITES_DIR = process.env.FUSION_SPRITES_DIR
@@ -615,6 +669,8 @@ function coerceTrainerSprite(value: unknown): string | undefined {
     raw = String(Math.trunc(value));
   }
   if (!raw) return undefined;
+  if (/^https?:\/\//i.test(raw) || raw.startsWith("/")) return raw;
+  if (/^data:image\//i.test(raw)) return raw;
   // Normalize: lowercase, remove spaces/special chars
   const normalized = raw.toLowerCase().replace(/[\s_-]+/g, "").replace(/[^a-z0-9]/gi, "");
   // Filter out invalid/placeholder values
@@ -757,7 +813,7 @@ function checkTeamPreviewComplete(room: Room) {
   room.teamPreviewRules = undefined;
   
   // Start the actual battle
-  beginBattle(room, orderedPlayers, rules?.seed);
+  beginBattle(room, orderedPlayers, rules?.seed, rules);
 }
 
 function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) {
