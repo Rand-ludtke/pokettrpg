@@ -160,6 +160,9 @@ export default defineConfig(({ mode }) => {
       target: process.env.TAURI_PLATFORM === 'windows' ? 'chrome105' : 'safari13',
       // Skip automatic public/ copy for Tauri; plugin copies a curated subset.
       copyPublicDir: !isTauri,
+      // Prevent Vite from rm-ing the massive dist/vendor tree (ENOTEMPTY on Windows).
+      // Our closeBundle plugin handles the assets.
+      emptyOutDir: true,
       // don't minify for debug builds
       minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
       // produce sourcemaps for debug builds
