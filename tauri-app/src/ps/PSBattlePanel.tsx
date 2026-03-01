@@ -106,7 +106,16 @@ function normalizeTrainerSpriteId(raw?: string): string | undefined {
   return candidate;
 }
 
+function isDirectTrainerSprite(raw?: string): boolean {
+  if (!raw) return false;
+  const trimmed = String(raw).trim();
+  if (!trimmed) return false;
+  return /^https?:\/\//i.test(trimmed) || /^asset:/i.test(trimmed) || /^tauri:/i.test(trimmed) || trimmed.startsWith('/');
+}
+
 function resolveTrainerSprite(avatar?: string, fallback?: string): string {
+  if (isDirectTrainerSprite(avatar)) return String(avatar).trim();
+  if (isDirectTrainerSprite(fallback)) return String(fallback).trim();
   const normalized = normalizeTrainerSpriteId(avatar);
   if (normalized) return normalized;
   const fallbackNormalized = normalizeTrainerSpriteId(fallback);

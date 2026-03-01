@@ -302,12 +302,12 @@ export function useFusionStats(head: PokemonStats | null, body: PokemonStats | n
     if (!head || !body) return null;
     
     return {
-      hp: Math.floor(head.hp / 3) + Math.floor((2 * body.hp) / 3),
-      attack: Math.floor((2 * head.attack) / 3) + Math.floor(body.attack / 3),
-      defense: Math.floor(head.defense / 3) + Math.floor((2 * body.defense) / 3),
-      spAttack: Math.floor((2 * head.spAttack) / 3) + Math.floor(body.spAttack / 3),
-      spDefense: Math.floor(head.spDefense / 3) + Math.floor((2 * body.spDefense) / 3),
-      speed: Math.floor((head.speed + body.speed) / 2),
+      hp: Math.floor((2 * head.hp + body.hp) / 3),
+      attack: Math.floor((2 * body.attack + head.attack) / 3),
+      defense: Math.floor((2 * body.defense + head.defense) / 3),
+      spAttack: Math.floor((2 * head.spAttack + body.spAttack) / 3),
+      spDefense: Math.floor((2 * head.spDefense + body.spDefense) / 3),
+      speed: Math.floor((2 * body.speed + head.speed) / 3),
     };
   }, [head, body])();
 }

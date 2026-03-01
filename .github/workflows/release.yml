@@ -15,7 +15,62 @@ permissions:
   contents: write
 
 jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tauri-app/src-tauri
+
+      - name: Install dependencies
+        working-directory: tauri-app
+        run: npm install
+
+      - name: Sync Sage dex data into app public assets
+        working-directory: tauri-app
+        run: npm run sync:sage-data
+
+      - name: Determine tag
+        id: tag
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "push") {
+            "tag=${{ github.ref_name }}" >> $env:GITHUB_OUTPUT
+            "draft=false" >> $env:GITHUB_OUTPUT
+          } elseif ("${{ github.event.inputs.release_tag }}") {
+            "tag=${{ github.event.inputs.release_tag }}" >> $env:GITHUB_OUTPUT
+            "draft=false" >> $env:GITHUB_OUTPUT
+          } else {
+            $ts = Get-Date -Format "yyyyMMdd-HHmmss"
+            "tag=dev-$ts" >> $env:GITHUB_OUTPUT
+            "draft=true" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Build Tauri Windows
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: tauri-app
+          tagName: ${{ steps.tag.outputs.tag }}
+          releaseName: "PokéTTRPG ${{ steps.tag.outputs.tag }}"
+          releaseDraft: ${{ steps.tag.outputs.draft }}
+          args: >
+            --config src-tauri/tauri.conf.json
+            --bundles nsis,msi
+
   build-macos:
+    needs: build-windows
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +92,10 @@ jobs:
       - name: Install dependencies
         working-directory: tauri-app
         run: npm install
+
+      - name: Sync Sage dex data into app public assets
+        working-directory: tauri-app
+        run: npm run sync:sage-data
 
       - name: Determine tag
         id: tag

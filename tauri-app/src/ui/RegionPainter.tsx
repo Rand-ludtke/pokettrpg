@@ -30,6 +30,39 @@ const MAX_ZOOM = 12;
 const STORAGE_KEY_PREFIX = 'ttrpg.regions.';
 const PROGRESS_KEY = 'ttrpg.regions.__progress__';
 
+/* ───────── Pre-computed region data cache ───────── */
+let precomputedCache: Record<string, { mask: number[][]; size: [number, number] }> | null = null;
+let precomputedLoading = false;
+
+async function loadPrecomputedRegions(): Promise<typeof precomputedCache> {
+  if (precomputedCache) return precomputedCache;
+  if (precomputedLoading) {
+    // Wait for in-flight load
+    while (precomputedLoading) await new Promise(r => setTimeout(r, 50));
+    return precomputedCache;
+  }
+  precomputedLoading = true;
+  try {
+    const res = await fetch('/region_data.json');
+    if (res.ok) {
+      precomputedCache = await res.json();
+    }
+  } catch (err) {
+    console.warn('[RegionPainter] Failed to load pre-computed regions:', err);
+  }
+  precomputedLoading = false;
+  return precomputedCache;
+}
+
+/** Convert nested [[value,count],...] RLE to flat [value,count,...] for rleDecode */
+function flattenRle(nested: number[][]): number[] {
+  const flat: number[] = [];
+  for (const [value, count] of nested) {
+    flat.push(value, count);
+  }
+  return flat;
+}
+
 /* ───────── Helpers ───────── */
 
 function bitmaskToColor(mask: number): [number, number, number, number] {
@@ -158,27 +191,37 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
 
   const regionsRef = useRef<Uint8Array>(new Uint8Array(CANVAS_SIZE * CANVAS_SIZE));
   const paintingRef = useRef(false);
+  const navigateRef = useRef<(index: number) => void>(() => {});
 
   /* ───────── Build Pokemon list from dex ───────── */
   const allPokemon: PokemonEntry[] = useMemo(() => {
     if (!dex) return [];
     const list: PokemonEntry[] = [];
     for (const [id, entry] of Object.entries(dex)) {
-      if (!entry.name || !entry.num || entry.num < 1) continue;
-      // Skip alternate formes — keep base species + regional forms
+      if (!entry.name) continue;
+      // Allow negative nums (CAP Pokemon), positive nums (official), skip 0 (MissingNo)
+      if (entry.num === 0 || entry.num == null) continue;
+      // Skip alternate formes — keep base species + regional forms + megas
       if (id.includes('-')) {
         const suffix = id.split('-').slice(1).join('-');
-        const isRegional = ['galar', 'alola', 'hisui', 'paldea'].includes(suffix);
-        if (!isRegional) continue;
+        const keep = ['galar', 'alola', 'hisui', 'paldea', 'mega', 'megax', 'megay'].includes(suffix);
+        if (!keep) continue;
       }
       list.push({ id, name: entry.name, num: entry.num });
     }
-    list.sort((a, b) => a.num - b.num || a.id.localeCompare(b.id));
-    // Deduplicate by num (keep first for each dex number)
-    const seen = new Set<number>();
+    // Sort: official Pokemon by num ascending, then CAP (negative) at end by abs(num)
+    list.sort((a, b) => {
+      const aIsCAP = a.num < 0;
+      const bIsCAP = b.num < 0;
+      if (aIsCAP !== bIsCAP) return aIsCAP ? 1 : -1;
+      if (aIsCAP) return Math.abs(a.num) - Math.abs(b.num);
+      return a.num - b.num || a.id.localeCompare(b.id);
+    });
+    // Deduplicate by id (not by num — CAP Pokemon share no nums with official)
+    const seen = new Set<string>();
     return list.filter(p => {
-      if (seen.has(p.num)) return false;
-      seen.add(p.num);
+      if (seen.has(p.id)) return false;
+      seen.add(p.id);
       return true;
     });
   }, [dex]);
@@ -205,7 +248,8 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
   const loadImage = useCallback((src: string) => {
     setLoadingSprite(true);
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    // NOTE: Do NOT set crossOrigin — Tauri's asset protocol doesn't support CORS
+    // and setting it causes silent load failures in WebView2
     img.onload = () => {
       setSpriteImg(img);
       const w = img.naturalWidth || CANVAS_SIZE;
@@ -217,7 +261,10 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
       }
       setLoadingSprite(false);
     };
-    img.onerror = () => setLoadingSprite(false);
+    img.onerror = () => {
+      console.warn('[RegionPainter] Failed to load sprite:', src);
+      setLoadingSprite(false);
+    };
     img.src = src;
   }, []);
 
@@ -232,7 +279,17 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
     if (saved) {
       regionsRef.current = saved.data;
     } else {
+      // Try pre-computed region data
       regionsRef.current = new Uint8Array(CANVAS_SIZE * CANVAS_SIZE);
+      loadPrecomputedRegions().then(pc => {
+        if (pc && pc[pkmn.id]) {
+          const entry = pc[pkmn.id];
+          const [w, h] = entry.size;
+          const flat = flattenRle(entry.mask);
+          regionsRef.current = rleDecode(flat, w * h);
+          render();
+        }
+      });
     }
 
     setCurrentIndex(index);
@@ -249,6 +306,9 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
       navigateTo(0);
     }
   }, [filteredPokemon.length]); // eslint-disable-line
+
+  // Keep ref in sync so keyboard/save handlers never use a stale closure
+  useEffect(() => { navigateRef.current = navigateTo; }, [navigateTo]);
 
   /* ───────── Render canvas ───────── */
   const render = useCallback(() => {
@@ -356,6 +416,50 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
     paint(e);
   }, [paint]);
   const onMouseUp = useCallback(() => { paintingRef.current = false; }, []);
+
+  /* ───────── Load pre-computed for current pokemon ───────── */
+  const loadPrecomputedForCurrent = useCallback(async () => {
+    const id = currentPokemon?.id;
+    if (!id) return;
+    const pc = await loadPrecomputedRegions();
+    if (pc && pc[id]) {
+      const entry = pc[id];
+      const [w, h] = entry.size;
+      const flat = flattenRle(entry.mask);
+      regionsRef.current = rleDecode(flat, w * h);
+      setDirty(true);
+      render();
+    } else {
+      console.warn('[RegionPainter] No pre-computed data for', id);
+    }
+  }, [currentPokemon, render]);
+
+  /* ───────── Bulk import all pre-computed into localStorage ───────── */
+  const bulkImportPrecomputed = useCallback(async () => {
+    const pc = await loadPrecomputedRegions();
+    if (!pc) { alert('Failed to load pre-computed region data.'); return; }
+    const keys = Object.keys(pc);
+    let imported = 0;
+    const prog = getProgress();
+    for (const id of keys) {
+      // Skip if already manually painted
+      if (prog[id]) continue;
+      const entry = pc[id];
+      const [w, h] = entry.size;
+      const flat = flattenRle(entry.mask);
+      const data = rleDecode(flat, w * h);
+      // Save in localStorage format
+      const rle = rleEncode(data);
+      localStorage.setItem(STORAGE_KEY_PREFIX + id, JSON.stringify({ w, h, rle }));
+      prog[id] = true;
+      imported++;
+    }
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(prog));
+    setProgress(getProgress());
+    alert(`Imported AI regions for ${imported} Pokemon (${keys.length - imported} already had manual data).`);
+    // Reload current pokemon to show data
+    if (currentPokemon) navigateTo(currentIndex);
+  }, [currentPokemon, currentIndex, navigateTo]);
 
   /* ───────── Auto-detect outlines ───────── */
   const autoDetectOutline = useCallback(() => {
@@ -587,16 +691,16 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
           if (e.ctrlKey || e.metaKey) { e.preventDefault(); handleSave(); }
           break;
         case 'ArrowLeft':
-          if (e.ctrlKey) { e.preventDefault(); navigateTo(currentIndex - 1); }
+          if (e.ctrlKey) { e.preventDefault(); navigateRef.current(currentIndex - 1); }
           break;
         case 'ArrowRight':
-          if (e.ctrlKey) { e.preventDefault(); navigateTo(currentIndex + 1); }
+          if (e.ctrlKey) { e.preventDefault(); navigateRef.current(currentIndex + 1); }
           break;
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [currentIndex, filteredPokemon]); // eslint-disable-line
+  }, [currentIndex]); // eslint-disable-line
 
   const S: Record<string, React.CSSProperties> = {
     container: { display: 'grid', gridTemplateColumns: '250px 1fr', gap: 12, padding: 12, height: '100%', overflow: 'hidden' },
@@ -663,7 +767,9 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
               />
               <span style={{ flex: 1 }}>
-                <span style={{ fontWeight: 600 }}>#{p.num}</span>{' '}
+                <span style={{ fontWeight: 600, color: p.num < 0 ? '#ff9' : undefined }}>
+                  {p.num < 0 ? `CAP #${Math.abs(p.num)}` : `#${p.num}`}
+                </span>{' '}
                 <span>{p.name}</span>
               </span>
               {progress[p.id] && (
@@ -703,9 +809,9 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
           </div>
           {spriteSource === 'fusion' && (
             <div style={{ display: 'flex', gap: 4, alignItems: 'center', fontSize: '0.8em' }}>
-              <input type="number" placeholder="Head #" min={1} max={1025} value={fusionHeadId} onChange={e => setFusionHeadId(e.target.value)} style={{ width: 60, padding: '2px 4px', fontSize: '0.8em' }} />
+              <input type="number" placeholder="Head #" min={-999} max={1025} value={fusionHeadId} onChange={e => setFusionHeadId(e.target.value)} style={{ width: 60, padding: '2px 4px', fontSize: '0.8em' }} />
               <span>+</span>
-              <input type="number" placeholder="Body #" min={1} max={1025} value={fusionBodyId} onChange={e => setFusionBodyId(e.target.value)} style={{ width: 60, padding: '2px 4px', fontSize: '0.8em' }} />
+              <input type="number" placeholder="Body #" min={-999} max={1025} value={fusionBodyId} onChange={e => setFusionBodyId(e.target.value)} style={{ width: 60, padding: '2px 4px', fontSize: '0.8em' }} />
               <button className="mini" style={{ fontSize: '0.78em' }} onClick={() => {
                 if (fusionHeadId && fusionBodyId) {
                   const fusionId = `fusion-${fusionHeadId}.${fusionBodyId}`;
@@ -787,6 +893,8 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
         <div style={{ ...S.toolbar, flexWrap: 'wrap' }}>
           <button className="mini" onClick={autoDetectOutline}>🔮 Auto Outlines</button>
           <button className="mini" onClick={autoDetectHeadBody}>🔮 Auto Head/Body</button>
+          <button className="mini" onClick={loadPrecomputedForCurrent} title="Load AI-generated region data for this Pokemon">🤖 AI Regions</button>
+          <button className="mini" onClick={bulkImportPrecomputed} title="Import all AI-generated regions into localStorage (skips manually painted)">📦 Bulk AI Import</button>
           <label style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.85em', cursor: 'pointer' }}>
             <input type="checkbox" checked={showOverlay} onChange={e => setShowOverlay(e.target.checked)} /> Show Overlay
           </label>
@@ -813,7 +921,7 @@ export function RegionPainter({ dex: dexProp }: RegionPainterProps) {
           <strong>Shortcuts:</strong> 1=Head, 2=Body, 3=Accent, 4=Outline, E=Eraser, Ctrl+S=Save, Ctrl+←/→=Prev/Next
         </div>
         <div style={{ fontSize: '0.78em', color: 'var(--fg-dim)' }}>
-          <strong>Workflow:</strong> Auto Outlines → Auto Head/Body → Refine with brushes → Save & Next
+          <strong>Workflow:</strong> 🤖 AI Regions (or Auto Outlines → Auto Head/Body) → Refine with brushes → Save & Next
         </div>
       </div>
     </div>

@@ -53,8 +53,53 @@ const ENV_ASSET_BASE = (import.meta as any)?.env?.VITE_ASSET_BASE || '';
 const DEFAULT_DATA_BASE = ENV_ASSET_BASE ? `${ENV_ASSET_BASE}/vendor/showdown/data` : '/vendor/showdown/data';
 const DEFAULT_SPRITE_BASE = ENV_ASSET_BASE ? `${ENV_ASSET_BASE}/vendor/showdown/sprites` : '/vendor/showdown/sprites';
 
+function normalizeBaseUrl(base: string | null | undefined): string {
+  const value = String(base || '').trim();
+  if (!value) return '';
+  return value.replace(/\/+$/, '');
+}
+
+function getSpriteBaseCandidates(preferredBase?: string): string[] {
+  const explicit = normalizeBaseUrl(preferredBase);
+  const defaults = [
+    normalizeBaseUrl(DEFAULT_SPRITE_BASE),
+    '/sprites',
+    '/vendor/showdown/sprites',
+  ];
+
+  const fromApiBase = (() => {
+    try {
+      const apiBase = normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase'));
+      if (!apiBase) return [] as string[];
+      return [`${apiBase}/sprites`, `${apiBase}/vendor/showdown/sprites`];
+    } catch {
+      return [] as string[];
+    }
+  })();
+
+  const fromOrigin = (() => {
+    if (typeof window === 'undefined' || !window.location?.origin) return [] as string[];
+    const origin = normalizeBaseUrl(window.location.origin);
+    return [`${origin}/sprites`, `${origin}/vendor/showdown/sprites`];
+  })();
+
+  const all = [explicit, ...defaults, ...fromApiBase, ...fromOrigin]
+    .map(normalizeBaseUrl)
+    .filter((v): v is string => !!v);
+  return Array.from(new Set(all));
+}
+
 export async function loadShowdownDex(options?: { base?: string }) {
   const base = options?.base ?? DEFAULT_DATA_BASE;
+  const fetchOptionalJson = async (path: string) => {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
   // prefer JSON if present for faster parse
   const [pokedex, moves, abilities, items, learnsets, aliases] = await Promise.all([
     fetch(`${base}/pokedex.json`).then(r => r.json()),
@@ -64,13 +109,43 @@ export async function loadShowdownDex(options?: { base?: string }) {
     fetch(`${base}/learnsets.json`).then(r => r.json()).catch(() => ({})),
     fetch(`${base}/aliases.json`).then(r => r.json()).catch(() => ({})),
   ]);
+
+  const [sagePokedex, sageLearnsets, sageMoves, sageAbilities, sageItems] = await Promise.all([
+    fetchOptionalJson('/data/sage/generated/pokedex.sage.json'),
+    fetchOptionalJson('/data/sage/generated/learnsets.sage.json'),
+    fetchOptionalJson('/data/sage/generated/moves.custom.sage.json'),
+    fetchOptionalJson('/data/sage/generated/abilities.custom.sage.json'),
+    fetchOptionalJson('/data/sage/generated/items.custom.sage.json'),
+  ]);
+
+  const mergedBaseDex = {
+    ...(pokedex as DexIndex),
+    ...((sagePokedex || {}) as DexIndex),
+  } as DexIndex;
+  const mergedBaseLearnsets = {
+    ...(learnsets as LearnsetsIndex),
+    ...((sageLearnsets || {}) as LearnsetsIndex),
+  } as LearnsetsIndex;
+  const mergedBaseMoves = {
+    ...(moves as MoveIndex),
+    ...((sageMoves || {}) as MoveIndex),
+  } as MoveIndex;
+  const mergedBaseAbilities = {
+    ...(abilities as AbilityIndex),
+    ...((sageAbilities || {}) as AbilityIndex),
+  } as AbilityIndex;
+  const mergedBaseItems = {
+    ...(items as ItemIndex),
+    ...((sageItems || {}) as ItemIndex),
+  } as ItemIndex;
+
   // Merge custom overlays from local storage (local-only additions)
   const customDex = getCustomDex();
   const customLearnsets = getCustomLearnsets();
   const customItems = getCustomItems();
   const customMoves = getCustomMoves();
   const customAbilities = getCustomAbilities();
-  const mergedDex = { ...(pokedex as DexIndex), ...customDex } as DexIndex;
+  const mergedDex = { ...mergedBaseDex, ...customDex } as DexIndex;
   // Built-in overlay tweaks
   try {
     // Ensure Chatot can have Prankster as an additional ability option
@@ -87,10 +162,10 @@ export async function loadShowdownDex(options?: { base?: string }) {
       mergedDex[chatotKey] = entry;
     }
   } catch {}
-  const mergedLs = { ...(learnsets as LearnsetsIndex), ...customLearnsets } as LearnsetsIndex;
-  const mergedItems = { ...(items as ItemIndex), ...customItems } as ItemIndex;
-  const mergedMoves = { ...(moves as MoveIndex), ...customMoves } as MoveIndex;
-  const mergedAbilities = { ...(abilities as AbilityIndex), ...customAbilities } as AbilityIndex;
+  const mergedLs = { ...mergedBaseLearnsets, ...customLearnsets } as LearnsetsIndex;
+  const mergedItems = { ...mergedBaseItems, ...customItems } as ItemIndex;
+  const mergedMoves = { ...mergedBaseMoves, ...customMoves } as MoveIndex;
+  const mergedAbilities = { ...mergedBaseAbilities, ...customAbilities } as AbilityIndex;
   // Cache aliases globally for species resolution
   try {
     gAliases = {};
@@ -295,16 +370,12 @@ export function computeRealStats(p: Pokemon): { hp:number; atk:number; def:numbe
 // Sprite helpers: prefer Gen 5 static for retro vibe
 export type SpriteSet = 'gen1'|'gen2'|'gen3'|'gen4'|'gen5'|'gen6'|'home';
 export function getSpriteSettings(): { set: SpriteSet; animated: boolean } {
-  const allowed: SpriteSet[] = ['gen1','gen2','gen3','gen4','gen5','gen6','home'];
   try {
     const raw = JSON.parse(localStorage.getItem('ttrpg.spriteSettings') || '{}');
-    let set = raw?.set as string | undefined;
     const isTauri = typeof window !== 'undefined' && !!(window as any).__TAURI__;
     const animated = (raw?.animated == null) ? !isTauri : !!raw?.animated;
-    // Migrate legacy values
-    if (set && !allowed.includes(set as SpriteSet)) set = 'gen5';
-    if (!set || !allowed.includes(set as SpriteSet)) return { set: 'gen5', animated };
-    return { set: set as SpriteSet, animated };
+    // Global set is intentionally fixed to Gen 5; per-Pokemon choices are selected in SidePanel.
+    return { set: 'gen5', animated };
   } catch {
     const isTauri = typeof window !== 'undefined' && !!(window as any).__TAURI__;
     return { set: 'gen5', animated: !isTauri };
@@ -350,7 +421,7 @@ function spriteFolderForSet(set: SpriteSet, shiny: boolean, back: boolean, useAn
 export function setSpriteSettings(s: Partial<{ set: SpriteSet; animated: boolean }>) {
   try {
     const cur = getSpriteSettings();
-    const next = { ...cur, ...s };
+    const next = { ...cur, animated: s.animated ?? cur.animated, set: 'gen5' as SpriteSet };
     localStorage.setItem('ttrpg.spriteSettings', JSON.stringify(next));
   } catch {}
 }
@@ -444,7 +515,192 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
     if (/ice/i.test(speciesName) && !ids.includes('calyrex-ice')) ids.push('calyrex-ice');
     if (/shadow/i.test(speciesName) && !ids.includes('calyrex-shadow')) ids.push('calyrex-shadow');
   }
+  const dexNum = gNameToNum?.[normalizeName(speciesName)];
+  if (Number.isFinite(dexNum) && dexNum !== 0) {
+    const numericId = String(Math.trunc(dexNum));
+    if (!ids.includes(numericId)) ids.push(numericId);
+  }
   return ids;
+}
+
+type SpriteIndexPayload = { folders?: Record<string, string[]> };
+type SpriteFolderIndex = Record<string, Set<string>>;
+
+let gSpriteIndexPromise: Promise<SpriteFolderIndex | null> | null = null;
+
+async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex | null> {
+  if (gSpriteIndexPromise) return gSpriteIndexPromise;
+  gSpriteIndexPromise = (async () => {
+    const bases = getSpriteBaseCandidates(base ?? DEFAULT_SPRITE_BASE);
+    for (const spriteBase of bases) {
+      try {
+        const res = await fetch(`${spriteBase}/index.json`);
+        if (!res.ok) continue;
+        const payload = (await res.json()) as SpriteIndexPayload;
+        const rawFolders = payload?.folders || {};
+        const out: SpriteFolderIndex = {};
+        for (const [folder, ids] of Object.entries(rawFolders)) {
+          out[folder] = new Set(Array.isArray(ids) ? ids : []);
+        }
+        return out;
+      } catch {
+        // Try next base.
+      }
+    }
+    return null;
+  })();
+  return gSpriteIndexPromise;
+}
+
+export type PokemonSpriteOption = {
+  id: string;
+  label: string;
+  spriteId: string;
+  set: 'gen5' | 'gen1' | 'gen2' | 'gen3' | 'gen4' | 'gen6' | 'home' | 'ani' | 'custom';
+  front: string;
+  back?: string;
+  animated?: boolean;
+};
+
+function spriteSetFolders(
+  set: PokemonSpriteOption['set'],
+  shiny: boolean
+): { front?: string; back?: string; ext: 'png' | 'gif'; label: string } {
+  switch (set) {
+    case 'ani':
+      return {
+        front: shiny ? 'ani-shiny' : 'ani',
+        back: shiny ? 'ani-back-shiny' : 'ani-back',
+        ext: 'gif',
+        label: 'Animated',
+      };
+    case 'home':
+      return { front: shiny ? 'home-shiny' : 'home', ext: 'png', label: 'HOME' };
+    case 'gen1':
+      return { front: 'gen1', back: 'gen1-back', ext: 'png', label: 'Gen 1' };
+    case 'gen2':
+      return { front: shiny ? 'gen2-shiny' : 'gen2', back: shiny ? 'gen2-back-shiny' : 'gen2-back', ext: 'png', label: 'Gen 2' };
+    case 'gen3':
+      return { front: shiny ? 'gen3-shiny' : 'gen3', back: shiny ? 'gen3-back-shiny' : 'gen3-back', ext: 'png', label: 'Gen 3' };
+    case 'gen4':
+      return { front: shiny ? 'gen4-shiny' : 'gen4', back: shiny ? 'gen4-back-shiny' : 'gen4-back', ext: 'png', label: 'Gen 4' };
+    case 'gen6':
+      return { front: 'gen6', back: 'gen6-back', ext: 'png', label: 'Gen 6' };
+    case 'gen5':
+    default:
+      return { front: shiny ? 'gen5-shiny' : 'gen5', back: shiny ? 'gen5-back-shiny' : 'gen5-back', ext: 'png', label: 'Gen 5' };
+  }
+}
+
+export async function listPokemonSpriteOptions(
+  speciesName: string,
+  options?: { shiny?: boolean; cosmetic?: string; base?: string; allowFormVariants?: boolean; strictExisting?: boolean }
+): Promise<PokemonSpriteOption[]> {
+  const shiny = !!options?.shiny;
+  const allowFormVariants = !!options?.allowFormVariants;
+  const strictExisting = !!options?.strictExisting;
+  const base = normalizeBaseUrl(options?.base ?? DEFAULT_SPRITE_BASE) || '/vendor/showdown/sprites';
+  const candidateIds = spriteIdCandidates(speciesName, options?.cosmetic);
+  const preferredId = candidateIds[0] || normalizeName(speciesName);
+
+  const variantIds = new Set<string>(candidateIds);
+  const roots = new Set<string>();
+  for (const id of candidateIds) {
+    roots.add(id);
+    const dash = id.indexOf('-');
+    if (dash > 0) roots.add(id.slice(0, dash));
+  }
+
+  const folderIndex = await loadSpriteFolderIndex(base);
+  const sourceSets: Array<PokemonSpriteOption['set']> = ['gen5', 'ani', 'home', 'gen6', 'gen4', 'gen3', 'gen2', 'gen1'];
+
+  if (folderIndex) {
+    for (const setId of sourceSets) {
+      const def = spriteSetFolders(setId, shiny);
+      const entries = def.front ? folderIndex[def.front] : undefined;
+      if (!entries) continue;
+      for (const root of roots) {
+        if (entries.has(root)) variantIds.add(root);
+        if (!allowFormVariants) continue;
+        for (const spriteId of entries) {
+          if (spriteId.startsWith(`${root}-`)) variantIds.add(spriteId);
+        }
+      }
+    }
+  }
+
+  const sortedVariantIds = Array.from(variantIds).sort((a, b) => {
+    if (a === preferredId) return -1;
+    if (b === preferredId) return 1;
+    const aLocal = a.startsWith(`${preferredId}-`) ? 0 : 1;
+    const bLocal = b.startsWith(`${preferredId}-`) ? 0 : 1;
+    if (aLocal !== bLocal) return aLocal - bLocal;
+    return a.localeCompare(b, undefined, { sensitivity: 'base' });
+  });
+
+  const out: PokemonSpriteOption[] = [];
+
+  // Local custom sprites for this species/form come first.
+  const customFrontSlots: SpriteSlot[] = shiny ? ['shiny', 'gen5-shiny', 'front', 'gen5'] : ['front', 'gen5', 'shiny', 'gen5-shiny'];
+  const customBackSlots: SpriteSlot[] = shiny ? ['back-shiny', 'gen5-back-shiny', 'back', 'gen5-back'] : ['back', 'gen5-back', 'back-shiny', 'gen5-back-shiny'];
+  for (const id of sortedVariantIds) {
+    const customFront = customFrontSlots.map(slot => getCustomSprite(id, slot)).find(Boolean);
+    if (!customFront) continue;
+    const customBack = customBackSlots.map(slot => getCustomSprite(id, slot)).find(Boolean);
+    out.push({
+      id: `custom:${id}`,
+      label: id === preferredId ? 'Custom (Local)' : `Custom • ${id}`,
+      spriteId: id,
+      set: 'custom',
+      front: customFront,
+      back: customBack,
+    });
+  }
+
+  for (const setId of sourceSets) {
+    const def = spriteSetFolders(setId, shiny);
+    if (!def.front) continue;
+    const frontEntries = folderIndex?.[def.front];
+    const backEntries = def.back ? folderIndex?.[def.back] : undefined;
+    if (strictExisting && !frontEntries) continue;
+    for (const spriteId of sortedVariantIds) {
+      if (frontEntries && !frontEntries.has(spriteId)) continue;
+      const front = `${base}/${def.front}/${spriteId}.${def.ext}`;
+      const back = def.back && (!backEntries || backEntries.has(spriteId))
+        ? `${base}/${def.back}/${spriteId}.${def.ext}`
+        : undefined;
+      const suffix = spriteId === preferredId ? 'Base' : spriteId.replace(`${preferredId}-`, '');
+      out.push({
+        id: `${setId}:${spriteId}`,
+        label: `${def.label} • ${suffix || spriteId}`,
+        spriteId,
+        set: setId,
+        front,
+        back,
+        animated: setId === 'ani',
+      });
+    }
+  }
+
+  // Fallback guard when index.json is unavailable.
+  if (!out.length && !strictExisting) {
+    out.push({
+      id: `fallback:${preferredId}`,
+      label: 'Gen 5 • Base',
+      spriteId: preferredId,
+      set: 'gen5',
+      front: spriteUrl(speciesName, shiny, { setOverride: 'gen5', cosmetic: options?.cosmetic, back: false, forceStatic: true }),
+      back: spriteUrl(speciesName, shiny, { setOverride: 'gen5', cosmetic: options?.cosmetic, back: true, forceStatic: true }),
+    });
+  }
+
+  // De-duplicate by front URL while preserving order.
+  const seen = new Set<string>();
+  return out.filter((opt) => {
+    if (seen.has(opt.front)) return false;
+    seen.add(opt.front);
+    return true;
+  });
 }
 
 export function speciesFormesInfo(name: string, dex: DexIndex) {
@@ -472,7 +728,7 @@ export function spriteUrlWithFallback(
   onError: (nextUrl: string) => void,
   options?: { shiny?: boolean; base?: string; setOverride?: SpriteSet; cosmetic?: string; back?: boolean }
 ) {
-  const base = options?.base ?? DEFAULT_SPRITE_BASE;
+  const spriteBases = getSpriteBaseCandidates(options?.base ?? DEFAULT_SPRITE_BASE);
   const shiny = !!options?.shiny;
   const back = !!options?.back;
   const settings = getSpriteSettings();
@@ -517,10 +773,12 @@ export function spriteUrlWithFallback(
     }
   }
   // Then add file paths for each folder × id combination (local paths first)
-  for (const f of folders) {
-    const isAni = f.startsWith('ani');
-    const ext = isAni ? 'gif' : 'png';
-    for (const id of idList) candidates.push(`${base}/${f}/${id}.${ext}`);
+  for (const base of spriteBases) {
+    for (const f of folders) {
+      const isAni = f.startsWith('ani');
+      const ext = isAni ? 'gif' : 'png';
+      for (const id of idList) candidates.push(`${base}/${f}/${id}.${ext}`);
+    }
   }
   // Add external fallback URLs (play.pokemonshowdown.com) for when local files are missing
   const extBase = 'https://play.pokemonshowdown.com/sprites';
@@ -614,6 +872,52 @@ export function saveCustomSprite(id: string, slot: SpriteSlot, dataUrl: string) 
   const all = getCustomSprites();
   all[id] = { ...(all[id] || {}), [slot]: dataUrl };
   try { localStorage.setItem(LS_CUSTOM_SPRITES, JSON.stringify(all)); } catch {}
+}
+
+async function fetchImageAsDataUrl(url: string, timeoutMs = 10000): Promise<string | null> {
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('file-read-failed'));
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function cacheSpriteSelectionLocally(
+  spriteId: string,
+  frontUrl: string,
+  backUrl?: string,
+  set?: 'gen5' | 'gen1' | 'gen2' | 'gen3' | 'gen4' | 'gen6' | 'home' | 'ani' | 'custom',
+): Promise<void> {
+  const sid = normalizeName(spriteId || '');
+  if (!sid || !frontUrl) return;
+
+  const frontData = await fetchImageAsDataUrl(frontUrl);
+  if (frontData) {
+    saveCustomSprite(sid, 'front', frontData);
+    if (set === 'gen5') saveCustomSprite(sid, 'gen5', frontData);
+    if (set === 'home') saveCustomSprite(sid, 'home', frontData);
+    if (set === 'ani') saveCustomSprite(sid, 'ani', frontData);
+  }
+
+  if (!backUrl) return;
+  const backData = await fetchImageAsDataUrl(backUrl);
+  if (backData) {
+    saveCustomSprite(sid, 'back', backData);
+    if (set === 'gen5') saveCustomSprite(sid, 'gen5-back', backData);
+    if (set === 'home') saveCustomSprite(sid, 'home-back', backData);
+    if (set === 'ani') saveCustomSprite(sid, 'ani-back', backData);
+  }
 }
 
 // Placeholder data URL sprite for missing images (SVG) - grey silhouette with '?'
@@ -982,12 +1286,14 @@ export function nameToDexNum(name: string): number | undefined {
  * relative paths (for GitHub-Pages deployment).
  */
 export function fusionSpriteUrl(headNum: number, bodyNum: number, options?: { base?: string }): string {
-  const base = options?.base ?? '';
-  const filename = `${headNum}.${bodyNum}.png`;
   const customKey = `fusion:${headNum}.${bodyNum}`;
   const custom = getCustomSprite(customKey, 'front');
   if (custom) return custom;
-  return `${base}/fusion-sprites/${filename}`;
+  // Try backend API bases first, then fall back to relative path
+  const apiBases = getFusionApiBases();
+  if (apiBases.length) return `${apiBases[0]}/fusion/sprites/${headNum}.${bodyNum}v1.png`;
+  const base = options?.base ?? '';
+  return `${base}/fusion-sprites/${headNum}.${bodyNum}.png`;
 }
 
 export function fusionSpriteUrlWithFallback(
@@ -1006,23 +1312,15 @@ export function fusionSpriteUrlWithFallback(
 
   const apiBases = getFusionApiBases();
   for (const apiBase of apiBases) {
+    // v1/v2 naming (new format)
+    candidates.push(`${apiBase}/fusion/sprites/${headNum}.${bodyNum}v1.png`);
+    candidates.push(`${apiBase}/fusion/sprites/${headNum}.${bodyNum}v2.png`);
+    // Legacy naming (old format)
     candidates.push(`${apiBase}/fusion/sprites/${filename}`);
-    for (const suffix of ['a', 'b', 'c']) {
-      candidates.push(`${apiBase}/fusion/sprites/${headNum}.${bodyNum}${suffix}.png`);
-      candidates.push(`${apiBase}/fusion/sprites/${headNum}.${bodyNum}_${suffix}.png`);
-    }
   }
 
+  // Local fallback paths
   candidates.push(`${base}/fusion-sprites/${filename}`);
-  candidates.push(`${base}/ai-sprites/${filename}`);
-  candidates.push(`${base}/ai-sprites/${headNum}.${bodyNum}ai.png`);
-
-  for (const suffix of ['a', 'b', 'c']) {
-    candidates.push(`${base}/fusion-sprites/${headNum}.${bodyNum}${suffix}.png`);
-  }
-  for (const suffix of ['a', 'b', 'c', 'd', 'e']) {
-    candidates.push(`${base}/ai-sprites/${headNum}.${bodyNum}${suffix}ai.png`);
-  }
 
   const headName = gNumToName[headNum] || String(headNum);
   const bodyName = gNumToName[bodyNum] || String(bodyNum);
@@ -1039,6 +1337,7 @@ export function fusionSpriteUrlWithFallback(
 }
 
 const DEFAULT_FUSION_API_BASE = 'https://pokettrpg.duckdns.org';
+const EXTERNAL_HTTP_FUSION_API = 'http://pokettrpg.duckdns.org:3000';
 const LOCAL_FUSION_API_BASES = ['http://127.0.0.1:3000', 'http://localhost:3000'];
 const gFusionEnsurePromises = new Map<string, Promise<string | null>>();
 
@@ -1065,6 +1364,7 @@ export function getFusionApiBases(): string[] {
     ...LOCAL_FUSION_API_BASES,
     apiBase,
     DEFAULT_FUSION_API_BASE,
+    EXTERNAL_HTTP_FUSION_API,
   ].filter((x): x is string => !!x);
   return Array.from(new Set(ordered));
 }
@@ -1104,7 +1404,7 @@ async function waitForFusionReady(headNum: number, bodyNum: number, base: string
       if (res.ok) {
         const data = await res.json() as { exists?: boolean };
         if (data?.exists) {
-          return `${base}/fusion/sprites/${headNum}.${bodyNum}.png?t=${Date.now()}`;
+          return `${base}/fusion/sprites/${headNum}.${bodyNum}v1.png?t=${Date.now()}`;
         }
       }
     } catch {}
@@ -1128,6 +1428,24 @@ export function ensureFusionSpriteOnDemand(headNum: number, bodyNum: number): Pr
 
   gFusionEnsurePromises.set(key, task);
   return task;
+}
+
+export async function fetchFusionVariants(headNum: number, bodyNum: number): Promise<string[]> {
+  const fallback = [`${headNum}.${bodyNum}.png`];
+  for (const base of getFusionApiBases().slice(0, 3)) {
+    try {
+      const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
+      const timeout = isLocal ? 1200 : 2200;
+      const res = await fetchWithTimeout(`${base}/fusion/variants/${headNum}/${bodyNum}`, {}, timeout);
+      if (!res.ok) continue;
+      const data = await res.json() as { variants?: unknown };
+      const variants = Array.isArray(data?.variants)
+        ? data.variants.map(v => String(v || '').trim()).filter(Boolean)
+        : [];
+      if (variants.length) return Array.from(new Set(variants));
+    } catch {}
+  }
+  return fallback;
 }
 
 /** Save a custom fusion sprite (data URL) to localStorage */
@@ -1158,6 +1476,9 @@ export const adapter = {
   nameToDexNum,
   fusionSpriteUrl,
   fusionSpriteUrlWithFallback,
+  fetchFusionVariants,
   saveCustomFusionSprite,
+  cacheSpriteSelectionLocally,
   ensureFusionSpriteOnDemand,
+  listPokemonSpriteOptions,
 };

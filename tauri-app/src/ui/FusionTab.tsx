@@ -3,8 +3,9 @@ import {
   loadShowdownDex, normalizeName, toPokemon, prepareBattle, mapMoves,
   nameToDexNum, dexNumToName, fusionSpriteUrlWithFallback, buildDexNumMaps,
   speciesAbilityOptions, isMoveLegalForSpecies, placeholderSpriteDataURL,
-  spriteUrlWithFallback, ensureFusionSpriteOnDemand,
+  spriteUrlWithFallback, ensureFusionSpriteOnDemand, saveCustomFusionSprite, fetchFusionVariants,
 } from '../data/adapter';
+import { SpritePainter } from './SpritePainter';
 import type { BattlePokemon, Pokemon, Move } from '../types';
 
 /* ──────────────────────────── constants ──────────────────────────── */
@@ -89,6 +90,27 @@ function buildSpeciesSearchText(name: string, key?: string): string {
 
 /* ──────────────────────────── types ──────────────────────────────── */
 
+/** Upload a painted fusion sprite data URL to the backend */
+async function uploadFusionSpriteToBackend(headNum: number, bodyNum: number, dataUrl: string) {
+  const bases = [
+    localStorage.getItem('ttrpg.fusionApiBase'),
+    'http://localhost:3000',
+    localStorage.getItem('ttrpg.apiBase'),
+    'https://pokettrpg.duckdns.org',
+  ].filter(Boolean) as string[];
+
+  for (const base of bases) {
+    try {
+      const res = await fetch(`${base}/api/fusion/upload-sprite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ headNum, bodyNum, dataUrl }),
+      });
+      if (res.ok) return;
+    } catch { /* try next */ }
+  }
+}
+
 type FusionMode = 'pc' | 'creative';
 type ComboSide = 'ab' | 'ba';
 type FusionStep = 'select' | 'preview' | 'moves';
@@ -140,6 +162,11 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   // Search filters
   const [headSearch, setHeadSearch] = useState('');
   const [bodySearch, setBodySearch] = useState('');
+
+  // Sprite painting state
+  const [showPainter, setShowPainter] = useState(false);
+  const [painterGuideline, setPainterGuideline] = useState('');
+  const [painterInitialSrc, setPainterInitialSrc] = useState<string | null>(null);
 
   // Load dex
   useEffect(() => {
@@ -288,6 +315,33 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
     const hs = headSlot; setHeadSlot(bodySlot); setBodySlot(hs);
   }, [headSpecies, bodySpecies, headSlot, bodySlot]);
 
+  // Open sprite painter for the currently chosen combo
+  const handleOpenPainter = useCallback((fromSrc?: string | null) => {
+    const isAB = chosenCombo === 'ab';
+    const hNum = isAB ? headNum : bodyNum;
+    const bNum = isAB ? bodyNum : headNum;
+    const hName = headPokemon?.species || headPokemon?.name || '';
+    const bName = bodyPokemon?.species || bodyPokemon?.name || '';
+    const comboName = isAB ? `${hName} head + ${bName} body` : `${bName} head + ${hName} body`;
+    const fusName = activeCombo?.name || 'Fusion';
+    setPainterGuideline(`Draw a fusion sprite for ${fusName} (${comboName}). The sprite should combine visual elements from both Pokémon in a 96×96 pixel art style.`);
+    setPainterInitialSrc(fromSrc || null);
+    setShowPainter(true);
+  }, [chosenCombo, headNum, bodyNum, headPokemon, bodyPokemon, activeCombo]);
+
+  // Accept painted sprite
+  const handleAcceptPaintedSprite = useCallback((dataUrl: string) => {
+    const isAB = chosenCombo === 'ab';
+    const hNum = isAB ? headNum : bodyNum;
+    const bNum = isAB ? bodyNum : headNum;
+    // Save locally
+    saveCustomFusionSprite(hNum, bNum, dataUrl);
+    // Upload to backend
+    uploadFusionSpriteToBackend(hNum, bNum, dataUrl);
+    setChosenSprite(dataUrl);
+    setShowPainter(false);
+  }, [chosenCombo, headNum, bodyNum]);
+
   // Select a Pokémon from the grid
   const selectHead = useCallback((name: string, box: number, slot: number) => {
     setHeadSpecies(name);
@@ -318,12 +372,13 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   }, [dex, headSpecies, bodySpecies]);
 
   // Finalize fusion
-  const handleFuse = useCallback(() => {
+  const handleFuse = useCallback(async () => {
     if (!dex || !activeCombo || !headPokemon || !bodyPokemon) return;
 
     const isAB = chosenCombo === 'ab';
     const hNum = isAB ? headNum : bodyNum;
     const bNum = isAB ? bodyNum : headNum;
+    const variants = await fetchFusionVariants(hNum, bNum).catch(() => [`${hNum}.${bNum}.png`]);
 
     const fusedPokemon: Pokemon = {
       name: nickname.trim() || activeCombo.name,
@@ -340,7 +395,8 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
         bodyId: bNum,
         headName: isAB ? (headPokemon.species || headPokemon.name) : (bodyPokemon.species || bodyPokemon.name),
         bodyName: isAB ? (bodyPokemon.species || bodyPokemon.name) : (headPokemon.species || headPokemon.name),
-        spriteFile: chosenSprite || undefined,
+        spriteFile: chosenSprite || variants[0] || undefined,
+        variants,
       },
     };
 
@@ -472,6 +528,67 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
                 />
               </div>
 
+              {/* Paint Custom Sprite section */}
+              <div style={{
+                display: 'grid', gap: 8,
+                border: '1px solid #444', borderRadius: 8, padding: 12,
+                background: 'rgba(99,102,241,0.04)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: '1em' }}>🎨</span>
+                  <span style={{ fontWeight: 600, fontSize: '0.9em' }}>Custom Sprite</span>
+                  <span className="dim" style={{ fontSize: '0.78em' }}>— paint your own or edit an existing one</span>
+                </div>
+
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <button
+                    className="mini"
+                    onClick={() => handleOpenPainter(null)}
+                    style={{ padding: '6px 14px', fontSize: '0.85em' }}
+                  >
+                    🖌️ Paint from Scratch
+                  </button>
+                  <button
+                    className="mini"
+                    onClick={() => {
+                      const combo = chosenCombo === 'ab' ? comboAB : comboBA;
+                      const src = chosenSprite || combo?.spriteChain?.src || combo?.spriteChain?.candidates?.[0] || null;
+                      handleOpenPainter(src);
+                    }}
+                    style={{ padding: '6px 14px', fontSize: '0.85em' }}
+                  >
+                    ✏️ Edit Current Sprite
+                  </button>
+                  {/* File upload option */}
+                  <label
+                    className="mini"
+                    style={{
+                      padding: '6px 14px', fontSize: '0.85em', cursor: 'pointer',
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      background: 'var(--panel-bg-dark, #181818)', border: '1px solid #444', borderRadius: 6,
+                    }}
+                  >
+                    📁 Upload Image
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const dataUrl = reader.result as string;
+                          handleOpenPainter(dataUrl);
+                        };
+                        reader.readAsDataURL(file);
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+
               {/* Proceed to moves */}
               <button
                 onClick={() => setStep('moves')}
@@ -482,6 +599,25 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Sprite Painter overlay ── */}
+      {showPainter && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.75)', zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 20,
+        }}>
+          <div style={{ maxWidth: 700, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+            <SpritePainter
+              initialSrc={painterInitialSrc}
+              guideline={painterGuideline}
+              onAccept={handleAcceptPaintedSprite}
+              onCancel={() => setShowPainter(false)}
+            />
+          </div>
         </div>
       )}
 

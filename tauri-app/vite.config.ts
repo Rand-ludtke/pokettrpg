@@ -16,26 +16,85 @@ export default defineConfig(({ mode }) => {
       {
         name: 'prune-ps-from-dist',
         closeBundle() {
+          const writeSpriteIndex = (spritesRoot: string) => {
+            try {
+              if (!existsSync(spritesRoot)) return;
+              const folders: Record<string, string[]> = {};
+              const dirents = readdirSync(spritesRoot, { withFileTypes: true }).filter((d) => d.isDirectory());
+              for (const dirent of dirents) {
+                const folder = dirent.name;
+                const abs = path.resolve(spritesRoot, folder);
+                const ids = readdirSync(abs)
+                  .filter((name) => /\.(png|gif)$/i.test(name))
+                  .map((name) => name.replace(/\.(png|gif)$/i, ''))
+                  .sort();
+                folders[folder] = ids;
+              }
+              const outPath = path.resolve(spritesRoot, 'index.json');
+              writeFileSync(outPath, JSON.stringify({ generatedAt: new Date().toISOString(), folders }, null, 2));
+            } catch {}
+          };
+          const syncTauriPublicAssets = () => {
+            try {
+              const srcRoot = path.resolve(__dirname, 'public');
+              const dstRoot = path.resolve(__dirname, 'dist');
+              const excluded = [
+                'spliced-sprites',
+                'vendor/showdown/sprites/ani',
+                'vendor/showdown/sprites/ani-shiny',
+                'vendor/showdown/sprites/ani-back',
+                'vendor/showdown/sprites/ani-back-shiny',
+              ];
+              const normalize = (v: string) => v.replace(/\\/g, '/');
+              const shouldCopy = (src: string) => {
+                const rel = normalize(path.relative(srcRoot, src));
+                if (!rel || rel === '.') return true;
+                return !excluded.some((prefix) => rel === prefix || rel.startsWith(`${prefix}/`));
+              };
+              cpSync(srcRoot, dstRoot, { recursive: true, force: true, filter: shouldCopy });
+            } catch {}
+          };
+
           // Ensure /public/vendor/showdown is copied by Vite; remove any accidental /showdown root artifact
           const distPs = path.resolve(__dirname, 'dist', 'showdown');
           if (existsSync(distPs)) {
             try { rmSync(distPs, { recursive: true, force: true }); } catch {}
           }
           // Ensure animated sprite folders are present in the build output
-          try {
-            const srcRoot = path.resolve(__dirname, '../pokemon-showdown-client/play.pokemonshowdown.com/sprites');
-            const dstRoot = path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites');
-            const ensureDir = (p: string) => { try { mkdirSync(p, { recursive: true }); } catch {} };
-            ensureDir(dstRoot);
-            const folders = ['ani', 'ani-shiny', 'ani-back', 'ani-back-shiny'];
-            for (const f of folders) {
-              const src = path.resolve(srcRoot, f);
-              const dst = path.resolve(dstRoot, f);
-              if (existsSync(src) && !existsSync(dst)) {
-                try { cpSync(src, dst, { recursive: true }); } catch {}
+          if (!isTauri) {
+            try {
+              const srcRoot = path.resolve(__dirname, '../pokemon-showdown-client/play.pokemonshowdown.com/sprites');
+              const dstRoot = path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites');
+              const ensureDir = (p: string) => { try { mkdirSync(p, { recursive: true }); } catch {} };
+              ensureDir(dstRoot);
+              const folders = ['ani', 'ani-shiny', 'ani-back', 'ani-back-shiny'];
+              for (const f of folders) {
+                const src = path.resolve(srcRoot, f);
+                const dst = path.resolve(dstRoot, f);
+                if (existsSync(src) && !existsSync(dst)) {
+                  try { cpSync(src, dst, { recursive: true }); } catch {}
+                }
               }
+            } catch {}
+          }
+          // Keep desktop installer build lean: drop massive runtime-generated folders.
+          // Fusions are served by backend sync/runtime and should not be embedded in the binary.
+          if (isTauri) {
+            // For Tauri builds we disable Vite publicDir copy and sync only selected assets here.
+            syncTauriPublicAssets();
+            const pruneDirs = [
+              path.resolve(__dirname, 'dist', 'spliced-sprites'),
+              path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites', 'ani'),
+              path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites', 'ani-shiny'),
+              path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites', 'ani-back'),
+              path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites', 'ani-back-shiny'),
+            ];
+            for (const p of pruneDirs) {
+              if (!existsSync(p)) continue;
+              try { rmSync(p, { recursive: true, force: true }); } catch {}
             }
-          } catch {}
+            writeSpriteIndex(path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites'));
+          }
           // Generate trainer sprite manifest for static builds (can't list directories)
           try {
             const publicTrainersDir = path.resolve(__dirname, 'public', 'vendor', 'showdown', 'sprites', 'trainers');
@@ -99,6 +158,8 @@ export default defineConfig(({ mode }) => {
     build: {
       // Tauri uses Chromium on Windows and WebKit on macOS and Linux
       target: process.env.TAURI_PLATFORM === 'windows' ? 'chrome105' : 'safari13',
+      // Skip automatic public/ copy for Tauri; plugin copies a curated subset.
+      copyPublicDir: !isTauri,
       // don't minify for debug builds
       minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
       // produce sourcemaps for debug builds

@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
-import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE } from '../data/adapter';
+import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, type PokemonSpriteOption } from '../data/adapter';
 import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
 import { FusionCreator } from './FusionCreator';
 import { SpriteModeToggle, VariantPicker } from './SpriteVariantSelector';
@@ -62,8 +62,9 @@ function moveTooltip(move: any): string {
   return (move.shortDesc || move.desc || `${name}${category}`) as string;
 }
 
-export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected }: {
+export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected }: {
   selected: BattlePokemon | null;
+  boxes?: Array<Array<BattlePokemon | null>>;
   onAdd: (p: BattlePokemon, teamId?: string) => void;
   onChangeAbility?: (nextAbility: string) => void;
   onAddToSlot?: (p: BattlePokemon) => void;
@@ -106,6 +107,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   const [learnableMoves, setLearnableMoves] = useState<{name: string, level: number}[]>([]);
   const [learnReplaceMove, setLearnReplaceMove] = useState<{name: string, level: number} | null>(null);
   const [showFusePanel, setShowFusePanel] = useState<boolean>(false);
+  const [showSecretTriplePanel, setShowSecretTriplePanel] = useState<boolean>(false);
   const prevLevelRef = React.useRef<number>(selected.level);
   const basicsRef = React.useRef<HTMLDivElement|null>(null);
   const abilityRef = React.useRef<HTMLDivElement|null>(null);
@@ -114,6 +116,20 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   const resolveSpeciesName = useCallback(() => {
     return selected.species || (selected as any).originalName || selected.name;
   }, [selected]);
+
+  const pcSpeciesPool = useMemo(() => {
+    const seen = new Set<string>();
+    for (const box of boxes || []) {
+      for (const mon of box || []) {
+        if (!mon) continue;
+        const species = (mon.species || mon.name || '').trim();
+        if (species) seen.add(species);
+      }
+    }
+    const cur = resolveSpeciesName().trim();
+    if (cur) seen.add(cur);
+    return Array.from(seen);
+  }, [boxes, resolveSpeciesName]);
 
   useEffect(() => {
     let mounted = true;
@@ -347,7 +363,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
     const hpPct = selected.currentHp / selected.maxHp;
     battleReady.currentHp = Math.round(hpPct * battleReady.maxHp);
     
-    onReplaceSelected && onReplaceSelected(battleReady);
+    onReplaceSelected && onReplaceSelected(withVisualState(battleReady, false));
   };
 
   // Check for learnable moves when level changes
@@ -445,9 +461,43 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   ] as const;
   const total = stats.reduce((s, x) => s + x.value, 0);
   const toggleShiny = () => {
-    const next = { ...selected, shiny: !selected.shiny } as BattlePokemon;
-    onReplaceSelected && onReplaceSelected(next);
-    setShinySel(!!next.shiny);
+    const nextShiny = !selected.shiny;
+    const fusion = (selected as any)?.fusion;
+    if (!onReplaceSelected || fusion) {
+      const next = { ...selected, shiny: nextShiny } as BattlePokemon;
+      onReplaceSelected && onReplaceSelected(next);
+      setShinySel(!!next.shiny);
+      return;
+    }
+    const preferredId = String((selected as any).spriteChoiceId || '').trim();
+    const species = resolveSpeciesName();
+    listPokemonSpriteOptions(species, {
+      shiny: nextShiny,
+      cosmetic: selected.cosmeticForm,
+      allowFormVariants: false,
+      strictExisting: true,
+    }).then((opts) => {
+      const chosen = preferredId ? opts.find(o => o.id === preferredId) : undefined;
+      const next: any = { ...selected, shiny: nextShiny };
+      if (chosen) {
+        next.sprite = chosen.front;
+        next.backSprite = chosen.back;
+        next.spriteChoiceId = chosen.id;
+        next.spriteChoiceLabel = chosen.label;
+      } else if (preferredId && !String((selected as any).sprite || '').startsWith('data:')) {
+        delete next.sprite;
+        delete next.backSprite;
+        delete next.spriteChoiceId;
+        delete next.spriteChoiceLabel;
+      }
+      onReplaceSelected(next);
+      setShinySel(nextShiny);
+      setSpriteChangeKey(k => k + 1);
+    }).catch(() => {
+      const next = { ...selected, shiny: nextShiny } as BattlePokemon;
+      onReplaceSelected(next);
+      setShinySel(nextShiny);
+    });
   };
 
   const setHat = (hatId: HatId) => {
@@ -458,6 +508,29 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
 
   const currentHatId = ((selected as any).hatId as HatId) || 'none';
   const currentHatIcon = AVAILABLE_HATS.find(h => h.id === currentHatId)?.icon || '❌';
+
+  const withVisualState = useCallback((mon: BattlePokemon, keepSprite: boolean): BattlePokemon => {
+    const next: any = { ...mon };
+    next.cosmeticForm = (selected as any).cosmeticForm;
+    next.hatId = (selected as any).hatId;
+    next.hatYOffset = (selected as any).hatYOffset;
+    next.hatXOffset = (selected as any).hatXOffset;
+    next.hatScale = (selected as any).hatScale;
+    next.spriteMode = (selected as any).spriteMode;
+    next.fusion = (selected as any).fusion;
+    if (keepSprite) {
+      next.sprite = (selected as any).sprite;
+      next.backSprite = (selected as any).backSprite;
+      next.spriteChoiceId = (selected as any).spriteChoiceId;
+      next.spriteChoiceLabel = (selected as any).spriteChoiceLabel;
+    } else {
+      delete next.sprite;
+      delete next.backSprite;
+      delete next.spriteChoiceId;
+      delete next.spriteChoiceLabel;
+    }
+    return next as BattlePokemon;
+  }, [selected]);
 
   const applyShowdownUpdate = (overrides: {
     species?: string;
@@ -491,7 +564,8 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
     p0.moves = mapMoves(moveNames, dex.moves);
     if ((selected as any).cosmeticForm) (p0 as any).cosmeticForm = (selected as any).cosmeticForm;
     const bp = prepareBattle(p0);
-    onReplaceSelected && onReplaceSelected(bp);
+    const speciesChanged = normalizeName(speciesId) !== normalizeName(resolveSpeciesName());
+    onReplaceSelected && onReplaceSelected(withVisualState(bp, !speciesChanged));
   };
 
   const startShowdownEdit = (field: 'level'|'gender'|'shiny'|'tera'|'species'|'item'|'ability', value: string) => {
@@ -561,6 +635,146 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
   // Back/front flip for sprite (independent of shiny toggle)
   const [showBack, setShowBack] = useState(false);
   const [zoom, setZoom] = useState<number>(1);
+  const [spriteOptions, setSpriteOptions] = useState<PokemonSpriteOption[]>([]);
+  const [spriteOptionId, setSpriteOptionId] = useState<string>('');
+  const [spriteOptionsLoading, setSpriteOptionsLoading] = useState<boolean>(false);
+
+  // Sprite change via file upload
+  const spriteFileRef = useRef<HTMLInputElement | null>(null);
+  const [spriteChangeKey, setSpriteChangeKey] = useState(0);
+  const handleSpriteFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selected) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      const fusion = (selected as any).fusion;
+      if (fusion && fusion.headId && fusion.bodyId) {
+        saveCustomFusionSprite(fusion.headId, fusion.bodyId, dataUrl);
+      } else {
+        const next: any = { ...selected, sprite: dataUrl, spriteChoiceId: 'custom-upload', spriteChoiceLabel: 'Custom Upload' };
+        if (!next.backSprite) next.backSprite = undefined;
+        onReplaceSelected && onReplaceSelected(next);
+      }
+      setSpriteChangeKey(k => k + 1);
+      if (fusion && onReplaceSelected) onReplaceSelected({ ...selected });
+    };
+    reader.readAsDataURL(file);
+    // Reset file input so the same file can be re-selected
+    e.target.value = '';
+  }, [selected, onReplaceSelected]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fusion = (selected as any)?.fusion;
+    if (!selected || fusion) {
+      setSpriteOptions([]);
+      setSpriteOptionId('');
+      return () => { cancelled = true; };
+    }
+    setSpriteOptionsLoading(true);
+    const species = resolveSpeciesName();
+    listPokemonSpriteOptions(species, {
+      shiny: !!selected.shiny,
+      cosmetic: selected.cosmeticForm,
+      allowFormVariants: false,
+      strictExisting: true,
+    }).then((opts) => {
+      if (cancelled) return;
+      const currentFront = String((selected as any).sprite || '').trim();
+      const currentBack = String((selected as any).backSprite || '').trim();
+      const preferredId = String((selected as any).spriteChoiceId || '').trim();
+      let resolved = opts.slice();
+      let chosen = preferredId ? resolved.find(o => o.id === preferredId) : undefined;
+      if (!chosen) {
+        chosen = resolved.find(o => o.front === currentFront && (!currentBack || (o.back || '') === currentBack));
+      }
+      if (!chosen && currentFront && currentFront.startsWith('data:')) {
+        const label = String((selected as any).spriteChoiceLabel || 'Current Custom Sprite');
+        const injected: PokemonSpriteOption = {
+          id: `current:${normalizeName(species)}`,
+          label,
+          spriteId: normalizeName(species),
+          set: 'custom',
+          front: currentFront,
+          back: currentBack || undefined,
+        };
+        resolved = [injected, ...resolved];
+        chosen = injected;
+      }
+      setSpriteOptions(resolved);
+      setSpriteOptionId(chosen?.id || '');
+      if (onReplaceSelected && chosen && (chosen.front !== currentFront || String(chosen.back || '') !== currentBack)) {
+        onReplaceSelected({
+          ...(selected as any),
+          sprite: chosen.front,
+          backSprite: chosen.back,
+          spriteChoiceId: chosen.id,
+          spriteChoiceLabel: chosen.label,
+        });
+      }
+    }).catch(() => {
+      if (!cancelled) {
+        setSpriteOptions([]);
+        setSpriteOptionId('');
+      }
+    }).finally(() => {
+      if (!cancelled) setSpriteOptionsLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [selected, resolveSpeciesName, onReplaceSelected]);
+
+  useEffect(() => {
+    const fusion = (selected as any)?.fusion;
+    if (!fusion || !onReplaceSelected) return;
+    if (!fusion.headId || !fusion.bodyId) return;
+    if (fusion.triple) return;
+    const current = Array.isArray(fusion.variants) ? fusion.variants.filter(Boolean) : [];
+    const needsHydration = current.length <= 1 || current.includes('default');
+    if (!needsHydration) return;
+
+    let cancelled = false;
+    fetchFusionVariants(fusion.headId, fusion.bodyId).then((variants) => {
+      if (cancelled || !variants.length) return;
+      const nextFusion = {
+        ...fusion,
+        variants,
+        spriteFile: fusion.spriteFile || variants[0],
+      };
+      onReplaceSelected({ ...(selected as any), fusion: nextFusion });
+    }).catch(() => {});
+
+    return () => { cancelled = true; };
+  }, [selected, onReplaceSelected]);
+
+  const applySpriteOption = useCallback((id: string) => {
+    setSpriteOptionId(id);
+    if (!selected || !onReplaceSelected) return;
+    const chosen = spriteOptions.find(o => o.id === id);
+    if (!chosen) {
+      const next: any = { ...selected };
+      delete next.sprite;
+      delete next.backSprite;
+      delete next.spriteChoiceId;
+      delete next.spriteChoiceLabel;
+      onReplaceSelected(next);
+      setSpriteChangeKey(k => k + 1);
+      return;
+    }
+    const next: any = {
+      ...selected,
+      sprite: chosen.front,
+      backSprite: chosen.back,
+      spriteChoiceId: chosen.id,
+      spriteChoiceLabel: chosen.label,
+    };
+    onReplaceSelected(next);
+    const speciesKey = chosen.spriteId || normalizeName(resolveSpeciesName() || selected.species || selected.name || '');
+    if (speciesKey && chosen.front) {
+      void cacheSpriteSelectionLocally(speciesKey, chosen.front, chosen.back, chosen.set as any);
+    }
+    setSpriteChangeKey(k => k + 1);
+  }, [selected, onReplaceSelected, spriteOptions, resolveSpeciesName]);
 
   // Inline learn prompt will be rendered in compact view (below moves)
 
@@ -654,8 +868,11 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
       {/* Sprite (full seafoam area, outer border only) */}
   <div style={{ position:'relative', border:'1px solid var(--accent)', borderRadius:8, background:'var(--panel-bg-dark)', padding:0, display:'flex', justifyContent:'center', alignItems:'center', height: panelMode === 'compact' ? 100 : 132, overflow:'hidden', flexShrink:0 }}>
         <SpriteWithHat 
+          key={spriteChangeKey}
           species={resolveSpeciesName()} 
           shiny={!!selected.shiny} 
+          spriteOverride={(selected as any).sprite}
+          backSpriteOverride={(selected as any).backSprite}
           cosmeticForm={selected.cosmeticForm} 
           back={showBack && !(selected as any).fusion}
           hatId={currentHatId}
@@ -676,6 +893,8 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
         />
         <div style={{ position:'absolute', top:4, right:4, display:'flex', flexDirection:'column', gap:4 }}>
           <button className="mini" onClick={()=> setShowBack(b=>!b)}>{showBack? 'Front' : 'Back'}</button>
+          <button className="mini" onClick={() => spriteFileRef.current?.click()} title="Upload custom sprite image">📷</button>
+          <input ref={spriteFileRef} type="file" accept="image/*" style={{display:'none'}} onChange={handleSpriteFileChange} />
         </div>
         <div style={{ position:'absolute', bottom:4, right:4, display:'flex', gap:4 }}>
           <button className="mini" onClick={()=> setZoom(z => Math.max(0.5, +(z - 0.1).toFixed(2)))}>-</button>
@@ -689,9 +908,16 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
         {!(selected as any).fusion && (
           <button
             className="mini"
-            onClick={() => setShowFusePanel(p => !p)}
+            onClick={(e) => {
+              if (e.shiftKey || e.altKey) {
+                setShowSecretTriplePanel(true);
+                setShowFusePanel(false);
+                return;
+              }
+              setShowFusePanel(p => !p);
+            }}
             style={{ position: 'absolute', bottom: 4, left: 4, fontSize: '10px', padding: '2px 6px' }}
-            title="Fuse with another Pokémon"
+            title="Fuse with another Pokémon (Shift/Alt+Click: secret triple)"
           >🔀 Fuse</button>
         )}
       </div>
@@ -704,6 +930,24 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
             onAdd={(p) => { onAdd(p); setShowFusePanel(false); }}
             onClose={() => setShowFusePanel(false)}
           />
+        </div>
+      )}
+
+      {showSecretTriplePanel && (
+        <div className="modal-backdrop">
+          <div className="modal" role="dialog" aria-modal="true" style={{ width: 520, maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <h3 style={{ margin: 0 }}>Secret Triple Fusion</h3>
+              <button className="mini" onClick={() => setShowSecretTriplePanel(false)}>✕</button>
+            </div>
+            <FusionCreator
+              initialHead={selected.species || selected.name}
+              tripleUnlockedByDefault
+              allowedThirdSpecies={pcSpeciesPool}
+              onAdd={(p) => { onAdd(p); setShowSecretTriplePanel(false); }}
+              onClose={() => setShowSecretTriplePanel(false)}
+            />
+          </div>
         </div>
       )}
 
@@ -728,6 +972,60 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
               onReplaceSelected(next);
             }}
           />
+        </div>
+      )}
+
+      {!(selected as any).fusion && (
+        <div style={{ display: 'grid', gap: 6, fontSize: '0.82em' }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span className="dim">Sprite:</span>
+            <button className="mini" onClick={() => applySpriteOption('')} title="Use default Gen 5 fallback sprite">
+              Auto (Gen 5)
+            </button>
+            <button className="mini" onClick={() => applySpriteOption('')} title="Clear individual sprite and use default fallback">
+              Reset
+            </button>
+            {spriteOptionsLoading && <span className="dim">Loading...</span>}
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxHeight: 220, overflowY: 'auto', paddingRight: 2 }}>
+            {spriteOptions.map((opt) => {
+              const active = spriteOptionId === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => applySpriteOption(opt.id)}
+                  title={opt.label}
+                  style={{
+                    width: 88,
+                    minHeight: 96,
+                    display: 'grid',
+                    gap: 4,
+                    alignContent: 'start',
+                    justifyItems: 'center',
+                    border: active ? '2px solid var(--accent)' : '1px solid #444',
+                    borderRadius: 6,
+                    background: active ? 'rgba(255,255,255,0.08)' : 'var(--panel-bg-dark)',
+                    padding: 4,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <img
+                    src={opt.front}
+                    alt={opt.label}
+                    style={{ width: 56, height: 56, imageRendering: 'pixelated', objectFit: 'contain' }}
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      img.src = placeholderSpriteDataURL('?');
+                    }}
+                  />
+                  <span className="dim" style={{ fontSize: '0.7em', lineHeight: 1.2, textAlign: 'center' }}>{opt.label}</span>
+                </button>
+              );
+            })}
+            {!spriteOptionsLoading && spriteOptions.length === 0 && (
+              <span className="dim">No local variants found. Using default Gen 5 fallback.</span>
+            )}
+          </div>
         </div>
       )}
 
@@ -862,7 +1160,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
               p0.shiny = selected.shiny;
               p0.moves = selected.moves as any;
               const bp = prepareBattle(p0);
-              onReplaceSelected && onReplaceSelected(bp);
+              onReplaceSelected && onReplaceSelected(withVisualState(bp, false));
             };
             return (
               <div style={{marginTop:8, display:'flex', alignItems:'center', gap:8}}>
@@ -1305,7 +1603,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
               p0.shiny = selected.shiny;
               p0.moves = selected.moves as any;
               const bp = prepareBattle(p0);
-              onReplaceSelected && onReplaceSelected(bp);
+              onReplaceSelected && onReplaceSelected(withVisualState(bp, false));
             };
             return (
               <div style={{marginTop:6}}>
@@ -1437,7 +1735,7 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                 p0.shiny = shinySel;
                 p0.moves = mapMoves(movesInput.filter(Boolean), dex.moves);
                 const bp = prepareBattle(p0);
-                onReplaceSelected && onReplaceSelected(bp);
+                onReplaceSelected && onReplaceSelected(withVisualState(bp, false));
                 setEditMode(false);
               };
               return (
@@ -1472,7 +1770,8 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                     (p as any).item = s.item || (selected as any).item;
                     p.moves = mapMoves(s.moves || [], dex.moves);
                     const bp = prepareBattle(p);
-                    onReplaceSelected && onReplaceSelected(bp);
+                    const speciesChanged = normalizeName(s.species || resolveSpeciesName()) !== normalizeName(resolveSpeciesName());
+                    onReplaceSelected && onReplaceSelected(withVisualState(bp, !speciesChanged));
                   } catch {}
                 }}>&gt; Import One</button>
               </div>
@@ -1506,7 +1805,8 @@ export function SidePanel({ selected, onAdd, onChangeAbility, onAddToSlot, onRep
                   p0.ivs = (selected as any).ivs;
                   p0.moves = mapMoves(movesInput.filter(Boolean), dex.moves);
                   const bp = prepareBattle(p0);
-                  onReplaceSelected && onReplaceSelected(bp);
+                  const speciesChanged = normalizeName(speciesInput || resolveSpeciesName()) !== normalizeName(resolveSpeciesName());
+                  onReplaceSelected && onReplaceSelected(withVisualState(bp, !speciesChanged));
                   setEditMode(false);
                 }}>&gt; Save</button>
                 <button className="secondary" onClick={()=>setEditMode(false)}>&gt; Close</button>
@@ -1873,13 +2173,26 @@ function NoSelectionPanel({ onAddToSlot, onAdd }: {
   onAdd: (p: BattlePokemon, teamId?: string) => void;
 }) {
   const [mode, setMode] = useState<'add' | 'fuse'>('add');
+  const [showSecretCreativeTriple, setShowSecretCreativeTriple] = useState(false);
   return (
     <aside className="panel side">
       <div className="side-header" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <button className={mode === 'add' ? 'active' : 'mini'} onClick={() => setMode('add')} style={{ fontWeight: mode === 'add' ? 700 : 400 }}>
           Add Pokémon
         </button>
-        <button className={mode === 'fuse' ? 'active' : 'mini'} onClick={() => setMode('fuse')} style={{ fontWeight: mode === 'fuse' ? 700 : 400 }}>
+        <button
+          className={mode === 'fuse' ? 'active' : 'mini'}
+          onClick={(e) => {
+            if (e.shiftKey || e.altKey) {
+              setMode('fuse');
+              setShowSecretCreativeTriple(true);
+              return;
+            }
+            setMode('fuse');
+          }}
+          style={{ fontWeight: mode === 'fuse' ? 700 : 400 }}
+          title="Shift/Alt+Click: secret triple popup"
+        >
           🔀 Create Fusion
         </button>
       </div>
@@ -1890,6 +2203,22 @@ function NoSelectionPanel({ onAddToSlot, onAdd }: {
           onAdd={(p) => onAdd(p)}
           onClose={() => setMode('add')}
         />
+      )}
+      {showSecretCreativeTriple && (
+        <div className="modal-backdrop">
+          <div className="modal" role="dialog" aria-modal="true" style={{ width: 520, maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <h3 style={{ margin: 0 }}>Secret Creative Triple Fusion</h3>
+              <button className="mini" onClick={() => setShowSecretCreativeTriple(false)}>✕</button>
+            </div>
+            <FusionCreator
+              creative
+              tripleUnlockedByDefault
+              onAdd={(p) => { onAdd(p); setShowSecretCreativeTriple(false); }}
+              onClose={() => setShowSecretCreativeTriple(false)}
+            />
+          </div>
+        </div>
       )}
     </aside>
   );
@@ -1963,7 +2292,7 @@ function AddToTeamModal({ selected, onPick, onClose }: { selected: BattlePokemon
               <div style={{display:'flex', gap:8, flexWrap:'wrap', alignItems:'center', maxHeight: 200, overflowY: 'auto'}}>
                 {team.members.map((m,i)=> (
                   <div key={i} style={{display:'flex', alignItems:'center', gap:6}} title={`${m.name} • Lv ${m.level}`}>
-                    <img className="pixel" src={spriteUrl(m.species || m.name, !!(m as any).shiny, (m as any).cosmeticForm ? { cosmetic: (m as any).cosmeticForm } : undefined)} alt="" style={{width:48,height:48}}
+                    <img className="pixel" src={String((m as any).sprite || spriteUrl(m.species || m.name, !!(m as any).shiny, (m as any).cosmeticForm ? { cosmetic: (m as any).cosmeticForm } : undefined))} alt="" style={{width:48,height:48}}
                       onError={(e)=>{
                         const img = e.currentTarget as HTMLImageElement;
                         if (!(img as any).dataset.step) { (img as any).dataset.step = '1'; img.src = spriteUrl(m.species || m.name, !!(m as any).shiny, { setOverride: 'gen5', cosmetic: (m as any).cosmeticForm }); return; }

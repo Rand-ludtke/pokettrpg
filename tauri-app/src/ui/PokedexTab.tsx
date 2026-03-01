@@ -331,11 +331,12 @@ function PokemonIcon({ pokemon, style }: { pokemon: Species | string; style?: Re
 }
 
 // Pokemon detail panel - PS style
-function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme }: { 
+function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }: { 
   pokemon: Species; 
   dexData: DexData;
   onNavigate: (id: string, mode: DexMode) => void;
   onMakeForme: (species: Species) => void;
+  onAddToPC?: (mons: BattlePokemon[]) => void;
 }) {
   const [activeTab, setActiveTab] = useState<'moves' | 'details'>('moves');
   const [level, setLevel] = useState(100);
@@ -523,7 +524,7 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme }: {
         {pokemon.forme ? (
           <>{pokemon.baseSpecies}<small style={{ opacity: 0.7, fontSize: '0.7em' }}>-{pokemon.forme}</small></>
         ) : pokemon.name}
-        {pokemon.num > 0 && <code style={{ marginLeft: 8, fontSize: 11, color: '#999', fontWeight: 'normal' }}>#{pokemon.num}</code>}
+        {pokemon.num !== 0 && <code style={{ marginLeft: 8, fontSize: 11, color: '#999', fontWeight: 'normal' }}>{pokemon.num < 0 ? `#S${Math.abs(pokemon.num)}` : `#${pokemon.num}`}</code>}
       </h1>
       <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
         <button
@@ -540,6 +541,44 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme }: {
         >
           Make Forme
         </button>
+        {onAddToPC && (
+          <button
+            type="button"
+            onClick={() => {
+              const mon: BattlePokemon = {
+                name: pokemon.name,
+                species: pokemon.name,
+                level: 50,
+                types: pokemon.types || [],
+                baseStats: {
+                  hp: pokemon.baseStats?.hp ?? 50,
+                  atk: pokemon.baseStats?.atk ?? 50,
+                  def: pokemon.baseStats?.def ?? 50,
+                  spAtk: pokemon.baseStats?.spa ?? 50,
+                  spDef: pokemon.baseStats?.spd ?? 50,
+                  speed: pokemon.baseStats?.spe ?? 50,
+                },
+                moves: [],
+                maxHp: pokemon.baseStats?.hp ?? 50,
+                currentHp: pokemon.baseStats?.hp ?? 50,
+                statStages: { atk: 0, def: 0, spAtk: 0, spDef: 0, speed: 0 },
+                ability: pokemon.abilities ? Object.values(pokemon.abilities)[0] : undefined,
+              };
+              onAddToPC([mon]);
+            }}
+            style={{
+              padding: '4px 8px',
+              border: '1px solid #4a9eff',
+              background: '#4a9eff',
+              color: '#fff',
+              borderRadius: 4,
+              fontSize: 11,
+              cursor: 'pointer',
+            }}
+          >
+            + Add to PC
+          </button>
+        )}
       </div>
       
       {/* Nonstandard warning */}
@@ -555,7 +594,7 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme }: {
           {pokemon.isNonstandard === 'Past' && 'Only usable in past generations and National Dex formats.'}
           {pokemon.isNonstandard === 'LGPE' && "Pokémon Let's Go only."}
           {pokemon.isNonstandard === 'CAP' && 'A made-up Pokémon by Smogon CAP.'}
-          {!['Past', 'LGPE', 'CAP'].includes(pokemon.isNonstandard) && pokemon.num > 0 && 'Unreleased.'}
+          {!['Past', 'LGPE', 'CAP'].includes(pokemon.isNonstandard) && pokemon.num !== 0 && 'Unreleased.'}
         </div>
       )}
       
@@ -931,7 +970,7 @@ function MoveDetail({ move, dexData, onNavigate }: { move: Move; dexData: DexDat
       const ls = dexData.learnsets[id]?.learnset;
       if (ls && move.id in ls) {
         const pokemon = dexData.pokedex[id];
-        if (pokemon && pokemon.num > 0) {
+        if (pokemon && pokemon.num !== 0) {
           results.push(pokemon);
         }
       }
@@ -1013,7 +1052,7 @@ function AbilityDetail({ ability, dexData, onNavigate }: { ability: Ability; dex
         }
       }
     }
-    return results.filter(p => p.num > 0).sort((a, b) => a.num - b.num).slice(0, 50);
+    return results.filter(p => p.num !== 0).sort((a, b) => a.num - b.num).slice(0, 50);
   }, [ability, dexData]);
 
   return (
@@ -1557,7 +1596,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
         );
       }
       
-      return list.slice(0, 200);
+      return list;
     }
     
     if (mode === 'moves') {
@@ -1574,7 +1613,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
         );
       }
       
-      return list.slice(0, 200);
+      return list;
     }
     
     if (mode === 'abilities') {
@@ -1590,7 +1629,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
         );
       }
       
-      return list.slice(0, 200);
+      return list;
     }
     
     if (mode === 'items') {
@@ -1606,7 +1645,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
         );
       }
       
-      return list.slice(0, 200);
+      return list;
     }
 
     if (mode === 'pc') {
@@ -1618,7 +1657,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
           (p.level != null && String(p.level) === query)
         ));
       }
-      return list.slice(0, 200);
+      return list;
     }
 
     if (mode === 'custom') {
@@ -1630,7 +1669,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
           (p.types && p.types.some(t => t.toLowerCase().includes(query)))
         ));
       }
-      return list.slice(0, 200);
+      return list;
     }
     
     return [];
@@ -1657,7 +1696,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
           <PokemonIcon pokemon={p} />
           <div style={{ flex: 1, marginLeft: 4 }}>
             <div style={{ fontWeight: 'bold', fontSize: 12 }}>
-              {p.num > 0 && <span style={{ opacity: 0.5, marginRight: 4 }}>#{p.num}</span>}
+              {p.num !== 0 && <span style={{ opacity: 0.5, marginRight: 4 }}>{p.num < 0 ? `S${Math.abs(p.num)}` : `#${p.num}`}</span>}
               {p.forme ? <>{p.baseSpecies}<small style={{ opacity: 0.7 }}>-{p.forme}</small></> : p.name}
             </div>
             <div>{p.types.map(t => <TypeBadge key={t} type={t} />)}</div>
@@ -1805,11 +1844,11 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
     
     if (mode === 'pokemon' || mode === 'search') {
       const pokemon = dexData.pokedex[activeId];
-      if (pokemon) return <PokemonDetail pokemon={pokemon} dexData={dexData} onNavigate={handleNavigate} onMakeForme={handleMakeForme} />;
+      if (pokemon) return <PokemonDetail pokemon={pokemon} dexData={dexData} onNavigate={handleNavigate} onMakeForme={handleMakeForme} onAddToPC={onAddToPC} />;
     }
     if (mode === 'pc') {
       const pokemon = dexData.pokedex[activeId];
-      if (pokemon) return <PokemonDetail pokemon={pokemon} dexData={dexData} onNavigate={handleNavigate} onMakeForme={handleMakeForme} />;
+      if (pokemon) return <PokemonDetail pokemon={pokemon} dexData={dexData} onNavigate={handleNavigate} onMakeForme={handleMakeForme} onAddToPC={onAddToPC} />;
     }
     if (mode === 'custom') {
       const seed = customSeed || (selectedId ? { key: selectedId, entry: customDex[selectedId], learnset: dexData.learnsets[selectedId]?.learnset } : null);

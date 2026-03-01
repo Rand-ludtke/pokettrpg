@@ -14,6 +14,11 @@ export interface Pokemon {
   name: string;
   // canonical species name (distinct from nickname 'name')
   species?: string;
+  // explicit per-Pokemon sprite overrides (used across PC/team/battle views)
+  sprite?: string;
+  backSprite?: string;
+  spriteChoiceId?: string;
+  spriteChoiceLabel?: string;
   // cosmetic sprite-only override (does not change stats/species)
   cosmeticForm?: string;
   // decorative hat overlay ID (e.g., 'party', 'crown', 'tophat')
@@ -24,7 +29,11 @@ export interface Pokemon {
     bodyId: number;    // National dex number of body Pokemon
     headName: string;  // Name of head Pokemon
     bodyName: string;  // Name of body Pokemon
+    thirdId?: number;  // Optional third Pokemon for triple fusion
+    thirdName?: string; // Name of third Pokemon
+    triple?: boolean;  // Triple-fusion marker
     spriteFile?: string; // Selected fusion sprite file
+    variants?: string[]; // Available sprite files for this fusion
   };
   level: number;
   types: string[];

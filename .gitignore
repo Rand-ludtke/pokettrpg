@@ -63,6 +63,10 @@ dreamo_test_results/
 # Python
 __pycache__/
 *.pyc
+.venv/
+
+# HuggingFace model cache (very large)
+.hf_cache/
 
 # Fusion sprites (junction to sprite pack — too large for git)
 app/public/fusion-sprites/

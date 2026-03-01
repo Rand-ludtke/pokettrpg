@@ -5,10 +5,11 @@ const LS_BADGES_BACKUP = 'ttrpg.badgecase.backup';
 const MAX_IMG_DIM = 160;  // resize uploaded images to save localStorage space
 
 type Badge = { id: string; image?: string; earned: boolean; name?: string };
-type BadgeState = { color: string; badges: Badge[] };
+type BadgeState = { color: string; badges: Badge[]; titles: string[] };
 
 const defaultState: BadgeState = {
 	color: '#c83a3a',
+	titles: ['Row 1', 'Row 2', 'Row 3'],
 	badges: [
 		{ id:'boulder', earned:false, name:'Boulder' },
 		{ id:'cascade', earned:false, name:'Cascade' },
@@ -18,6 +19,10 @@ const defaultState: BadgeState = {
 		{ id:'marsh', earned:false, name:'Marsh' },
 		{ id:'volcano', earned:false, name:'Volcano' },
 		{ id:'earth', earned:false, name:'Earth' },
+		{ id:'zephyr', earned:false, name:'Zephyr' },
+		{ id:'hive', earned:false, name:'Hive' },
+		{ id:'plain', earned:false, name:'Plain' },
+		{ id:'fog', earned:false, name:'Fog' },
 	],
 };
 
@@ -36,6 +41,10 @@ function normalizeState(raw: any): BadgeState {
 	});
 	return {
 		color: typeof parsed.color === 'string' ? parsed.color : defaultState.color,
+		titles: defaultState.titles.map((base, idx) => {
+			const t = Array.isArray(parsed.titles) ? parsed.titles[idx] : undefined;
+			return typeof t === 'string' ? t : base;
+		}),
 		badges,
 	};
 }
@@ -68,6 +77,10 @@ export function BadgeCase() {
 	}, [state]);
 
 	const setColor = (color:string)=> setState(prev=>({ ...prev, color }));
+	const setTitle = (index:number, title:string)=> setState(prev => ({
+		...prev,
+		titles: prev.titles.map((t, i) => (i === index ? title : t)),
+	}));
 	const updateBadge = (id:string, updater:(badge:Badge)=>Badge)=>
 		setState(prev=>({
 			...prev,
@@ -122,7 +135,7 @@ export function BadgeCase() {
 
 	// Dimensions
 	const caseW = 560;
-	const baseH = 360; // bottom height
+	const baseH = 490; // bottom height (3 rows)
 	const lidH = baseH; // make lid same size as bottom
 
 	// Slot geometry: ensure images are larger than the ring but do not overlap neighboring cells
@@ -154,6 +167,14 @@ export function BadgeCase() {
 			<div>
 				<label className="dim" style={{marginRight:8}}>Case Color:</label>
 				<input type="color" value={state.color} onChange={e=> setColor((e.target as HTMLInputElement).value)} />
+			</div>
+			<div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:8, width:caseW }}>
+				{state.titles.map((title, idx) => (
+					<label key={`title-${idx}`} style={{ display:'grid', gap:4 }}>
+						<span className="dim" style={{fontSize:'0.8em'}}>Title {idx + 1}</span>
+						<input value={title} onChange={e => setTitle(idx, (e.target as HTMLInputElement).value)} />
+					</label>
+				))}
 			</div>
 
 			{/* Lid (same size as base) */}
@@ -231,10 +252,12 @@ function EditableNames({ names, onChange }: EditableNamesProps) {
 			))}
 		</p>
 	);
+	const rows: number[][] = [];
+	for (let i = 0; i < names.length; i += 4) rows.push([i, i + 1, i + 2, i + 3].filter(x => x < names.length));
+
 	return (
 		<div style={{ color:'#fff', fontWeight:600, textAlign:'center', fontSize:14 }}>
-			{row([0,1,2,3])}
-			{row([4,5,6,7])}
+			{rows.map((r, idx) => <React.Fragment key={`row-${idx}`}>{row(r)}</React.Fragment>)}
 		</div>
 	);
 }

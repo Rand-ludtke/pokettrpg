@@ -83,6 +83,13 @@ function buildPlayerPayload(username: string, playerId: string | undefined, team
       ability: mon.ability,
       item: mon.item,
       shiny: mon.shiny || false,
+      sprite: (mon as any).sprite,
+      backSprite: (mon as any).backSprite,
+      spriteChoiceId: (mon as any).spriteChoiceId,
+      spriteChoiceLabel: (mon as any).spriteChoiceLabel,
+      cosmeticForm: (mon as any).cosmeticForm,
+      fusion: (mon as any).fusion,
+      hatId: (mon as any).hatId,
       moves: moves.map((move, moveIndex) => ({
         id: normalizeName(move.name || '') || `move-${moveIndex}`,
         name: move.name,
@@ -102,6 +109,29 @@ function buildPlayerPayload(username: string, playerId: string | undefined, team
     team: payloadTeam,
       ...(trainerSprite ? { trainerSprite, avatar: trainerSprite } : {}),
   };
+}
+
+function isDataImageUrl(value: string | null | undefined): boolean {
+  return !!value && /^data:image\//i.test(value.trim());
+}
+
+async function uploadTrainerSpriteIfNeeded(apiBase: string, trainerSprite?: string | null): Promise<string | null | undefined> {
+  if (!trainerSprite) return trainerSprite;
+  const trimmed = trainerSprite.trim();
+  if (!isDataImageUrl(trimmed)) return trimmed;
+  try {
+    const res = await fetch(`${apiBase.replace(/\/+$/, '')}/api/trainer-sprites/upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataUrl: trimmed, prefix: 'trainer' }),
+    });
+    if (!res.ok) return trimmed;
+    const payload = await res.json().catch(() => ({} as any));
+    const url = typeof payload?.url === 'string' ? payload.url.trim() : '';
+    return url || trimmed;
+  } catch {
+    return trimmed;
+  }
 }
 
 const DEFAULT_ROOM = 'global-lobby';
@@ -177,6 +207,10 @@ export function LobbyTab() {
   const [teamPreviewEnabled, setTeamPreviewEnabled] = useState<boolean>(true);
   const [activeCount, setActiveCount] = useState<number>(1);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth <= 900;
+  });
   const teamsState = useTeams();
   const [selectedTeamId, setSelectedTeamId] = useState<string>(() => teamsState.activeId || teamsState.teams[0]?.id || '');
   const chatRef = useRef<HTMLDivElement>(null);
@@ -187,6 +221,14 @@ export function LobbyTab() {
     setServerUrl(current);
     setServerUrlDraft(current);
   }, [client]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onResize = () => setIsMobile(window.innerWidth <= 900);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     if (!teamsState.teams.length) {
@@ -524,7 +566,7 @@ export function LobbyTab() {
     return (selectedTeam as any).members as BattlePokemon[];
   }
 
-  function buildChallengePlayerPayload(): PlayerPayload | null {
+  async function buildChallengePlayerPayload(): Promise<PlayerPayload | null> {
     if (!myId) {
       setLastError('Identify with the server before submitting a challenge.');
       return null;
@@ -532,11 +574,11 @@ export function LobbyTab() {
     const members = getSelectedTeamMembers();
     if (!members) return null;
     setLastError('');
-    const trainerSprite = client.getTrainerSprite();
+    const trainerSprite = await uploadTrainerSpriteIfNeeded(client.getServerEndpoint(), client.getTrainerSprite());
     return buildPlayerPayload(username, myId, members, trainerSprite);
   }
 
-  function handleCreateChallenge() {
+  async function handleCreateChallenge() {
     if (!currentRoom) return;
     if (!iAmPlayer) {
       setLastError('Join the room as a player before creating a challenge.');
@@ -546,7 +588,7 @@ export function LobbyTab() {
       setLastError('You already have a pending challenge for that opponent.');
       return;
     }
-    const payload = buildChallengePlayerPayload();
+    const payload = await buildChallengePlayerPayload();
     if (!payload) return;
     setChallengeBusy(true);
 
@@ -608,13 +650,13 @@ export function LobbyTab() {
     setChallengeNotice('Challenge declined.');
   }
 
-  function handleSubmitChallengeLoadout(challenge: ChallengeSummary, notice: string) {
+  async function handleSubmitChallengeLoadout(challenge: ChallengeSummary, notice: string) {
     if (!currentRoom) return;
     if (!iAmPlayer) {
       setLastError('Join the room as a player before submitting a team.');
       return;
     }
-    const payload = buildChallengePlayerPayload();
+    const payload = await buildChallengePlayerPayload();
     if (!payload) return;
     setChallengeBusy(true);
     try {
@@ -626,11 +668,11 @@ export function LobbyTab() {
   }
 
   function handleAcceptChallenge(challenge: ChallengeSummary) {
-    handleSubmitChallengeLoadout(challenge, 'Challenge accepted.');
+    void handleSubmitChallengeLoadout(challenge, 'Challenge accepted.');
   }
 
   function handleUpdateChallengeLoadout(challenge: ChallengeSummary) {
-    handleSubmitChallengeLoadout(challenge, 'Loadout updated.');
+    void handleSubmitChallengeLoadout(challenge, 'Loadout updated.');
   }
 
   function handleStartBattle() {
@@ -656,43 +698,43 @@ export function LobbyTab() {
   }
 
   return (
-    <section className="panel battle">
+    <section className="panel battle" style={{ borderRadius: 12, padding: isMobile ? 10 : 14 }}>
       <h2>Lobby</h2>
       {challengeNotice && (
         <div style={{ marginBottom: 12, padding: '8px 12px', borderRadius: 6, border: '1px solid var(--accent)', background: 'rgba(0, 128, 128, 0.1)' }}>
           {challengeNotice}
         </div>
       )}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 12, alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 12, alignItems: 'center', padding: isMobile ? 8 : 10, border: '1px solid #3a3a3a', borderRadius: 10, background: 'rgba(255,255,255,0.02)' }}>
         <div className="dim">Status:</div>
         <span>{status}</span>
         {lastError && <span className="dim" style={{ color: '#f66' }}>• {lastError}</span>}
-        <label style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+        <label style={{ display: 'inline-flex', gap: 6, alignItems: 'center', flex: isMobile ? '1 1 100%' : undefined }}>
           <span className="dim">Server URL</span>
           <input
             value={serverUrlDraft}
             onChange={e => setServerUrlDraft(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') handleApplyServerUrl(); }}
-            style={{ width: 220 }}
+            style={{ width: isMobile ? '100%' : 220 }}
             placeholder={defaultServerUrl}
             title={`Current: ${serverUrl}`}
           />
         </label>
         <button className="mini" onClick={handleApplyServerUrl} disabled={!serverUrlDraft.trim()}>Apply</button>
         <button className="mini secondary" onClick={handleResetServerUrl} disabled={serverUrl === defaultServerUrl}>Default</button>
-        <label style={{ marginLeft: 'auto', display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+        <label style={{ marginLeft: isMobile ? 0 : 'auto', display: 'inline-flex', gap: 8, alignItems: 'center', flex: isMobile ? '1 1 100%' : undefined }}>
           <span className="dim">Username</span>
           <input
             value={username}
             onChange={e => setUsername(e.target.value)}
-            style={{ width: 180 }}
+            style={{ width: isMobile ? '100%' : 180 }}
             placeholder="Trainer name"
           />
         </label>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 320px) 1fr 280px', gap: 12 }}>
-        <aside className="panel" style={{ padding: 12, display: 'grid', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'minmax(260px, 320px) 1fr 300px', gap: 12 }}>
+        <aside className="panel" style={{ padding: 12, display: 'grid', gap: 12, borderRadius: 10 }}>
           <div>
             <h3 style={{ marginTop: 0 }}>Rooms</h3>
             <div style={{ display: 'grid', gap: 8 }}>
@@ -754,7 +796,7 @@ export function LobbyTab() {
           </div>
         </aside>
 
-        <section className="panel" style={{ padding: 12, display: 'grid', gridTemplateRows: currentRoom?.roomType === 'map' ? 'auto 1fr auto auto' : 'auto 1fr auto', gap: 12 }}>
+        <section className="panel" style={{ padding: 12, display: 'grid', gridTemplateRows: currentRoom?.roomType === 'map' ? 'auto 1fr auto auto' : 'auto 1fr auto', gap: 12, borderRadius: 10 }}>
           <header>
             <h3 style={{ margin: '0 0 6px 0' }}>{currentRoom?.name || 'Room'}</h3>
             <div className="dim" style={{ fontSize: '0.9em' }}>{currentRoom ? roomStatus(currentRoom) : 'Select a room to view details.'}</div>
@@ -792,7 +834,7 @@ export function LobbyTab() {
           </div>
         </section>
 
-        <aside className="panel" style={{ padding: 12, display: 'grid', gap: 12 }}>
+        <aside className="panel" style={{ padding: 12, display: 'grid', gap: 12, borderRadius: 10 }}>
           <div>
             <h3 style={{ marginTop: 0 }}>Players</h3>
             <ul style={{ margin: 0, paddingLeft: 18 }}>

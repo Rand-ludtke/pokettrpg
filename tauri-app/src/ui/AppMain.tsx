@@ -5,7 +5,7 @@ import { TeamView } from './TeamView.tsx';
 import { BattleTab } from './BattleTab.tsx';
 import { LobbyTab } from './LobbyTab';
 import { BattlePokemon } from '../types.ts';
-import { getSpriteSettings, setSpriteSettings, SpriteSet, loadTeams, saveTeams, createTeam, cloneForTeam, getTeamMaxSize, isTeamFull } from '../data/adapter.ts';
+import { loadTeams, saveTeams, createTeam, cloneForTeam, getTeamMaxSize, isTeamFull } from '../data/adapter.ts';
 import { ImportExport } from './ImportExport';
 import { CustomsFileImporter } from './CustomsFileImporter';
 import { SimpleBattleTab } from './SimpleBattleTab';
@@ -410,7 +410,7 @@ export function App() {
         </div>
       )}
       <header className="topbar">
-  <div className="brand">&gt; POKÉMON TTRPG v1.3.1</div>
+  <div className="brand">&gt; POKÉMON TTRPG v1.3.3</div>
         <nav className="tabs">
           <button className={tab === 'pc' ? 'active' : ''} onClick={() => setTab('pc')}>PC</button>
           <button className={tab === 'team' ? 'active' : ''} onClick={() => setTab('team')}>Team</button>
@@ -432,21 +432,7 @@ export function App() {
             </span>
           ))}
         </nav>
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <label className="dim" htmlFor="spriteSet">Sprites:</label>
-          <select id="spriteSet" defaultValue={getSpriteSettings().set || 'gen5'} onChange={(e) => setSpriteSettings({ set: e.target.value as SpriteSet })}>
-            <option value="gen5">Gen 5 (default)</option>
-            <option value="gen1">Gen 1</option>
-            <option value="gen2">Gen 2</option>
-            <option value="gen3">Gen 3</option>
-            <option value="gen4">Gen 4</option>
-            <option value="gen6">Gen 6</option>
-            <option value="home">HOME</option>
-          </select>
-          <label className="dim" htmlFor="aniToggle" style={{display:'inline-flex', alignItems:'center', gap:6}}>
-            <input id="aniToggle" type="checkbox" defaultChecked={getSpriteSettings().animated} onChange={(e)=> setSpriteSettings({ animated: e.target.checked })} /> Animated
-          </label>
-        </div>
+        <div style={{ marginLeft: 'auto' }} />
       </header>
 
       {tab === 'pc' && (
@@ -589,6 +575,7 @@ export function App() {
           </div>
           <SidePanel
             selected={selected}
+            boxes={boxes}
             onAdd={addToTeam}
             onChangeAbility={changeSelectedAbility}
             onAddToSlot={(p) => {
@@ -796,3 +783,4 @@ export function App() {
       ))}      <BugReporter currentTab={typeof tab === 'string' ? tab : tab.kind + ':' + tab.id} />    </div>
   );
 }
+

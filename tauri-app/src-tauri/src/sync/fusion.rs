@@ -246,10 +246,9 @@ pub struct FusionPart {
 }
 
 /// Calculated fusion stats following Infinite Fusion formula:
-/// - HP: head HP / 3 + 2 * body HP / 3
-/// - Attack: 2 * head Atk / 3 + body Atk / 3
-/// - Defense: body Def / 3 + 2 * head Def / 3
-/// (varies based on head/body contribution ratios)
+/// - HEAD dominates: HP, Sp. Atk, Sp. Def
+/// - BODY dominates: Attack, Defense, Speed
+/// - Formula per stat: floor((2 * dominant + other) / 3)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FusionStats {
     pub hp: u32,
@@ -265,18 +264,12 @@ impl FusionStats {
     /// Using the Infinite Fusion formula
     pub fn calculate(head: &FusionStats, body: &FusionStats) -> Self {
         Self {
-            // HP: head contributes 1/3, body contributes 2/3
-            hp: (head.hp / 3) + (2 * body.hp / 3),
-            // Attack: head contributes 2/3, body contributes 1/3
-            attack: (2 * head.attack / 3) + (body.attack / 3),
-            // Defense: body contributes 2/3, head contributes 1/3
-            defense: (head.defense / 3) + (2 * body.defense / 3),
-            // Sp. Attack: head contributes 2/3, body contributes 1/3
-            sp_attack: (2 * head.sp_attack / 3) + (body.sp_attack / 3),
-            // Sp. Defense: body contributes 2/3, head contributes 1/3
-            sp_defense: (head.sp_defense / 3) + (2 * body.sp_defense / 3),
-            // Speed: Average of both
-            speed: (head.speed + body.speed) / 2,
+            hp: (2 * head.hp + body.hp) / 3,
+            attack: (2 * body.attack + head.attack) / 3,
+            defense: (2 * body.defense + head.defense) / 3,
+            sp_attack: (2 * head.sp_attack + body.sp_attack) / 3,
+            sp_defense: (2 * head.sp_defense + body.sp_defense) / 3,
+            speed: (2 * body.speed + head.speed) / 3,
         }
     }
     
@@ -302,7 +295,7 @@ mod tests {
         let fusion = FusionStats::calculate(&pikachu, &bulbasaur);
         
         // Verify calculation follows the formula
-        assert_eq!(fusion.hp, (35 / 3) + (2 * 45 / 3)); // ~41
-        assert_eq!(fusion.attack, (2 * 55 / 3) + (49 / 3)); // ~52
+        assert_eq!(fusion.hp, (2 * 35 + 45) / 3); // 38
+        assert_eq!(fusion.attack, (2 * 49 + 55) / 3); // 51
     }
 }

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   loadShowdownDex, normalizeName, toPokemon, prepareBattle, mapMoves,
   nameToDexNum, dexNumToName, fusionSpriteUrlWithFallback,
-  speciesAbilityOptions, isMoveLegalForSpecies, buildDexNumMaps,
+  speciesAbilityOptions, isMoveLegalForSpecies, buildDexNumMaps, fetchFusionVariants,
   placeholderSpriteDataURL,
 } from '../data/adapter';
 import type { BattlePokemon, Pokemon } from '../types';
@@ -43,6 +43,35 @@ function fusionTypes(headTypes: string[], bodyTypes: string[]): string[] {
   return [t1, t2];
 }
 
+function normalizeBase(base?: string): string {
+  const clean = String(base || '').trim();
+  return clean.replace(/\/+$/, '');
+}
+
+function tripleVariantPath(head: number, body: number, third: number, variant: number, base?: string): string {
+  const prefix = normalizeBase(base);
+  const root = prefix ? `${prefix}/triple-fusions` : '/triple-fusions';
+  return `${root}/${head}.${body}.${third}.v${variant}.png`;
+}
+
+function tripleSpriteCandidates(head: number, body: number, third: number, base?: string): string[] {
+  const perms: Array<[number, number, number]> = [
+    [head, body, third],
+    [head, third, body],
+    [body, head, third],
+    [body, third, head],
+    [third, head, body],
+    [third, body, head],
+  ];
+  const out: string[] = [];
+  for (const [a, b, c] of perms) {
+    for (let v = 1; v <= 3; v++) {
+      out.push(tripleVariantPath(a, b, c, v, base));
+    }
+  }
+  return Array.from(new Set(out));
+}
+
 const TYPE_COLORS: Record<string, string> = {
   normal: '#A8A878', fire: '#F08030', water: '#6890F0', electric: '#F8D030',
   grass: '#78C850', ice: '#98D8D8', fighting: '#C03028', poison: '#A040A0',
@@ -64,21 +93,41 @@ interface FusionCreatorProps {
   onClose?: () => void;
   /** Creative mode: allows ANY two Pokemon (or three) */
   creative?: boolean;
+  /** Optional allow-list for 3rd fusion species (used for PC-gated flows) */
+  allowedThirdSpecies?: string[];
+  /** Enable triple fusion without unlocking gesture */
+  tripleUnlockedByDefault?: boolean;
   /** Base URL for fusion sprites (RPi backend, etc.) */
   spriteBase?: string;
 }
 
 export function FusionCreator({
-  initialHead, initialBody, initialThird, onAdd, onClose, creative = false, spriteBase = '',
+  initialHead,
+  initialBody,
+  initialThird,
+  onAdd,
+  onClose,
+  creative = false,
+  allowedThirdSpecies,
+  tripleUnlockedByDefault = false,
+  spriteBase = '',
 }: FusionCreatorProps) {
   const [dex, setDex] = useState<any>(null);
   const [headSpecies, setHeadSpecies] = useState(initialHead || '');
   const [bodySpecies, setBodySpecies] = useState(initialBody || '');
   const [thirdSpecies, setThirdSpecies] = useState(initialThird || '');
   const [showTriple, setShowTriple] = useState(!!initialThird);
+  const [tripleUnlockClicks, setTripleUnlockClicks] = useState(0);
+  const [tripleUnlocked, setTripleUnlocked] = useState(!!initialThird || tripleUnlockedByDefault);
   const [nickname, setNickname] = useState('');
   const [level, setLevel] = useState(50);
   const [shiny, setShiny] = useState(false);
+  const [selectedTripleSprite, setSelectedTripleSprite] = useState('');
+
+  const normalizedAllowedThird = useMemo(() => {
+    if (!allowedThirdSpecies?.length) return null;
+    return new Set(allowedThirdSpecies.map(s => normalizeName(s)).filter(Boolean));
+  }, [allowedThirdSpecies]);
 
   useEffect(() => {
     (async () => {
@@ -101,12 +150,42 @@ export function FusionCreator({
 
   const thirdPokemon = useMemo(() => {
     if (!dex || !thirdSpecies.trim() || !showTriple) return null;
+    if (!creative && normalizedAllowedThird && !normalizedAllowedThird.has(normalizeName(thirdSpecies))) return null;
     return toPokemon(thirdSpecies, dex.pokedex, level);
-  }, [dex, thirdSpecies, level, showTriple]);
+  }, [dex, thirdSpecies, level, showTriple, creative, normalizedAllowedThird]);
 
   // Dex numbers
   const headNum = useMemo(() => headPokemon ? nameToDexNum(headPokemon.species || headPokemon.name) || 0 : 0, [headPokemon]);
   const bodyNum = useMemo(() => bodyPokemon ? nameToDexNum(bodyPokemon.species || bodyPokemon.name) || 0 : 0, [bodyPokemon]);
+  const thirdNum = useMemo(() => thirdPokemon ? nameToDexNum(thirdPokemon.species || thirdPokemon.name) || 0 : 0, [thirdPokemon]);
+
+  const thirdSpeciesOptions = useMemo(() => {
+    if (!dex) return [] as string[];
+    if (!creative && normalizedAllowedThird) {
+      return Object.values(dex.pokedex)
+        .map((s: any) => s.name as string)
+        .filter((n: string) => normalizedAllowedThird.has(normalizeName(n)));
+    }
+    return Object.values(dex.pokedex).map((s: any) => s.name as string);
+  }, [dex, creative, normalizedAllowedThird]);
+
+  const triplePrimaryVariants = useMemo(() => {
+    if (!showTriple || !headNum || !bodyNum || !thirdNum) return [] as string[];
+    return [1, 2, 3].map(v => tripleVariantPath(headNum, bodyNum, thirdNum, v, spriteBase));
+  }, [showTriple, headNum, bodyNum, thirdNum, spriteBase]);
+
+  const tripleAllCandidates = useMemo(() => {
+    if (!showTriple || !headNum || !bodyNum || !thirdNum) return [] as string[];
+    return tripleSpriteCandidates(headNum, bodyNum, thirdNum, spriteBase);
+  }, [showTriple, headNum, bodyNum, thirdNum, spriteBase]);
+
+  useEffect(() => {
+    if (!showTriple || !headNum || !bodyNum || !thirdNum) {
+      setSelectedTripleSprite('');
+      return;
+    }
+    setSelectedTripleSprite(prev => prev || triplePrimaryVariants[0] || tripleAllCandidates[0] || '');
+  }, [showTriple, headNum, bodyNum, thirdNum, triplePrimaryVariants, tripleAllCandidates]);
 
   // Fusion preview
   const fusionPreview = useMemo(() => {
@@ -160,15 +239,19 @@ export function FusionCreator({
     setBodySpecies(headSpecies);
   };
 
-  // Sprite preview
-  const spritePreview = useMemo(() => {
+  const isTripleActive = !!(showTriple && thirdPokemon && thirdNum);
+
+  // Standard (2-way) fusion sprite preview
+  const twoWaySpritePreview = useMemo(() => {
     if (!headNum || !bodyNum) return null;
     return fusionSpriteUrlWithFallback(headNum, bodyNum, () => {}, { base: spriteBase });
   }, [headNum, bodyNum, spriteBase]);
 
   // Create fusion
-  const handleCreate = useCallback(() => {
+  const handleCreate = useCallback(async () => {
     if (!dex || !headPokemon || !bodyPokemon || !fusionPreview || !headNum || !bodyNum) return;
+    if (showTriple && !thirdPokemon) return;
+    const variants = thirdPokemon ? tripleAllCandidates : await fetchFusionVariants(headNum, bodyNum).catch(() => [`${headNum}.${bodyNum}.png`]);
 
     const fusedPokemon: Pokemon = {
       name: nickname.trim() || fusionPreview.name,
@@ -185,13 +268,20 @@ export function FusionCreator({
         bodyId: bodyNum,
         headName: headPokemon.species || headPokemon.name,
         bodyName: bodyPokemon.species || bodyPokemon.name,
+        variants,
+        ...(thirdPokemon ? {
+          thirdId: thirdNum,
+          thirdName: thirdPokemon.species || thirdPokemon.name,
+          triple: true,
+          spriteFile: selectedTripleSprite || triplePrimaryVariants[0] || tripleAllCandidates[0] || undefined,
+        } : {}),
       },
     };
 
     const bp = prepareBattle(fusedPokemon);
     onAdd(bp);
     onClose?.();
-  }, [dex, headPokemon, bodyPokemon, fusionPreview, headNum, bodyNum, nickname, level, ability, shiny, moves, abilityOptions, onAdd, onClose]);
+  }, [dex, headPokemon, bodyPokemon, fusionPreview, headNum, bodyNum, showTriple, thirdPokemon, thirdNum, nickname, level, ability, shiny, moves, abilityOptions, onAdd, onClose, selectedTripleSprite, triplePrimaryVariants, tripleAllCandidates]);
 
   const statRows = fusionPreview ? [
     { key: 'hp', label: 'HP', value: fusionPreview.stats.hp, color: '#ff9aa2' },
@@ -205,7 +295,16 @@ export function FusionCreator({
   return (
     <div style={{ display: 'grid', gap: 12 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0 }}>
+        <h3
+          style={{ margin: 0, cursor: 'pointer', userSelect: 'none' }}
+          title={tripleUnlocked ? 'Triple fusion unlocked' : 'Secret: click title 5x to unlock triple fusion'}
+          onClick={() => {
+            if (tripleUnlocked) return;
+            const next = tripleUnlockClicks + 1;
+            setTripleUnlockClicks(next);
+            if (next >= 5) setTripleUnlocked(true);
+          }}
+        >
           🔀 {creative ? 'Creative' : 'Create'} Fusion
           {showTriple && <span style={{ fontSize: '0.7em', marginLeft: 6, color: '#f8d030' }}>✦ Triple</span>}
         </h3>
@@ -242,12 +341,12 @@ export function FusionCreator({
       </div>
 
       {/* Triple fusion (hidden feature — click to reveal) */}
-      {!showTriple && creative && (
+      {!showTriple && tripleUnlocked && (
         <button
           className="mini dim"
           onClick={() => setShowTriple(true)}
           style={{ justifySelf: 'start', fontSize: '0.78em', opacity: 0.4 }}
-          title="Add a third Pokemon (experimental)"
+          title="Add a third Pokémon (experimental)"
         >
           + Triple fusion...
         </button>
@@ -260,10 +359,10 @@ export function FusionCreator({
               list="fusion-third-species"
               value={thirdSpecies}
               onChange={e => setThirdSpecies(e.target.value)}
-              placeholder="e.g., Kyurem"
+              placeholder={!creative && normalizedAllowedThird ? 'Pick from your allowed list' : 'e.g., Kyurem'}
             />
             <datalist id="fusion-third-species">
-              {dex && Object.values(dex.pokedex).map((s: any) => <option key={s.name} value={s.name} />)}
+              {thirdSpeciesOptions.map(name => <option key={name} value={name} />)}
             </datalist>
           </label>
           <button className="mini" onClick={() => { setShowTriple(false); setThirdSpecies(''); }}>✕</button>
@@ -271,9 +370,46 @@ export function FusionCreator({
       )}
 
       {/* Sprite preview */}
-      {spritePreview && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 8, background: 'var(--panel-bg-dark)', borderRadius: 8, border: '1px solid #333' }}>
-          <FusionSpriteImg fb={spritePreview} size={96} alt={fusionPreview?.name || 'Fusion'} />
+      {(isTripleActive || twoWaySpritePreview) && (
+        <div style={{ display: 'grid', gap: 8, padding: 8, background: 'var(--panel-bg-dark)', borderRadius: 8, border: '1px solid #333' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+            {isTripleActive ? (
+              <TripleSpriteImg
+                src={selectedTripleSprite || triplePrimaryVariants[0] || tripleAllCandidates[0] || ''}
+                candidates={tripleAllCandidates}
+                size={96}
+                alt={fusionPreview?.name || 'Triple Fusion'}
+              />
+            ) : (
+              <FusionSpriteImg fb={twoWaySpritePreview!} size={96} alt={fusionPreview?.name || 'Fusion'} />
+            )}
+          </div>
+          {isTripleActive && (
+            <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {triplePrimaryVariants.map((variant, idx) => (
+                <button
+                  key={variant}
+                  className="mini"
+                  onClick={() => setSelectedTripleSprite(variant)}
+                  title={`Triple variant ${idx + 1}`}
+                  style={{
+                    border: selectedTripleSprite === variant ? '2px solid #f8d030' : '1px solid #444',
+                    borderRadius: 6,
+                    padding: 2,
+                    background: selectedTripleSprite === variant ? 'rgba(248, 208, 48, 0.12)' : 'transparent',
+                  }}
+                >
+                  <img
+                    src={variant}
+                    alt={`Variant ${idx + 1}`}
+                    width={42}
+                    height={42}
+                    style={{ imageRendering: 'pixelated', display: 'block' }}
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -338,7 +474,8 @@ export function FusionCreator({
         {moves.map((mv, i) => {
           const legal = !dex || !mv ? true :
             isMoveLegalForSpecies(headSpecies, mv, dex.learnsets) ||
-            isMoveLegalForSpecies(bodySpecies, mv, dex.learnsets);
+            isMoveLegalForSpecies(bodySpecies, mv, dex.learnsets) ||
+            (!!showTriple && !!thirdSpecies && isMoveLegalForSpecies(thirdSpecies, mv, dex.learnsets));
           return (
             <div key={i} style={{ marginBottom: 4 }}>
               <input
@@ -391,6 +528,35 @@ function FusionSpriteImg({ fb, size, alt }: {
       onError={() => {
         idxRef.current++;
         setSrc(fb.candidates[idxRef.current] || fb.placeholder);
+      }}
+    />
+  );
+}
+
+function TripleSpriteImg({ src, candidates, size, alt }: {
+  src: string;
+  candidates: string[];
+  size: number;
+  alt: string;
+}) {
+  const [current, setCurrent] = useState(src || candidates[0] || placeholderSpriteDataURL('?'));
+  const idxRef = React.useRef(0);
+
+  useEffect(() => {
+    idxRef.current = 0;
+    setCurrent(src || candidates[0] || placeholderSpriteDataURL('?'));
+  }, [src, candidates]);
+
+  return (
+    <img
+      src={current}
+      alt={alt}
+      width={size}
+      height={size}
+      style={{ imageRendering: 'pixelated' }}
+      onError={() => {
+        idxRef.current++;
+        setCurrent(candidates[idxRef.current] || placeholderSpriteDataURL('?'));
       }}
     />
   );

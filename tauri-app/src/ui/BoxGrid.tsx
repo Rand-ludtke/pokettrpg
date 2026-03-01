@@ -109,6 +109,8 @@ export function BoxGrid({ pokes, onSelect, boxIndex, boxCount, onPrevBox, onNext
                   <SpriteWithHat
                     species={p.species || p.name}
                     shiny={!!p.shiny}
+                    spriteOverride={(p as any).sprite}
+                    backSpriteOverride={(p as any).backSprite}
                     cosmeticForm={(p as any).cosmeticForm}
                     hatId={((p as any).hatId as HatId) || 'none'}
                     hatYOffset={((p as any).hatYOffset as number) ?? 10}
