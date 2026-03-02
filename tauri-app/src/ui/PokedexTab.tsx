@@ -359,7 +359,7 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
       case 'levelFriendship': return 'level-up with high Friendship' + condition;
       case 'levelHold': return `level-up holding ${evo.evoItem}` + condition;
       case 'useItem': return (evo.evoItem || 'Evolution Item') + condition;
-      case 'levelMove': return `level-up with ${evo.evoMove}` + condition;
+      case 'levelMove': return evo.evoMove ? `level-up while knowing ${evo.evoMove}` + condition : 'level-up' + condition;
       case 'trade': return 'trade' + condition;
       case 'other': return evo.evoCondition || 'Special';
       default: return evo.evoLevel ? `level ${evo.evoLevel}` + condition : 'level-up' + condition;
@@ -379,11 +379,15 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
     while (current.length > 0) {
       chain.push(current);
       const next: Species[] = [];
+      const nextSeen = new Set<string>();
       for (const mon of current) {
         if (mon.evos) {
           for (const evo of mon.evos) {
             const evoMon = dexData.pokedex[toID(evo)];
-            if (evoMon) next.push(evoMon);
+            if (evoMon && !nextSeen.has(evoMon.id)) {
+              nextSeen.add(evoMon.id);
+              next.push(evoMon);
+            }
           }
         }
       }
@@ -695,7 +699,7 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
                     <React.Fragment key={i}>
                       {i > 0 && (
                         <td style={{ padding: '0 8px', fontSize: 21, verticalAlign: 'middle' }}>
-                          <span title={stage[0]?.prevo ? getEvoMethod(stage[0]) : ''}>→</span>
+                          <span title={Array.from(new Set(stage.map(mon => mon.prevo ? getEvoMethod(mon) : '').filter(Boolean))).join(' / ')}>→</span>
                         </td>
                       )}
                       <td style={{ verticalAlign: 'top' }}>
@@ -714,6 +718,11 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
                             <span style={{ fontSize: 11 }}>
                               {mon.forme ? <>{mon.baseSpecies}<small>-{mon.forme}</small></> : mon.name}
                             </span>
+                            {mon.prevo && (
+                              <div style={{ fontSize: 10, color: '#888', marginLeft: 22 }}>
+                                {getEvoMethod(mon)}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </td>

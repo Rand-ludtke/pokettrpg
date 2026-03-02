@@ -771,11 +771,13 @@ export function SpriteWithHat({
   });
   const [fallbackUsed, setFallbackUsed] = useState(false);
   const [fallbackLevel, setFallbackLevel] = useState(0);
+  const [triedNonShinyFallback, setTriedNonShinyFallback] = useState(false);
 
   useEffect(() => {
     const fusionUrl = getFusionUrl();
     setFallbackUsed(false);
     setFallbackLevel(0);
+    setTriedNonShinyFallback(false);
     setUseFlipFallback(false);
     if (fusionUrl) {
       setImgSrc(fusionUrl);
@@ -835,6 +837,13 @@ export function SpriteWithHat({
         }
       }
     }
+
+    if (shiny && !triedNonShinyFallback && !fusion) {
+      setTriedNonShinyFallback(true);
+      setImgSrc(spriteOverride || spriteUrl(species, false, { setOverride: 'gen5', cosmetic: cosmeticForm, back: false }));
+      setUseFlipFallback(back);
+      return;
+    }
     
     if (fallbackUsed) {
       setImgSrc(placeholderSpriteDataURL('?'));
@@ -844,7 +853,7 @@ export function SpriteWithHat({
     // Fall back to regular species sprite
     setImgSrc(spriteOverride || spriteUrl(species, shiny, { setOverride: 'gen5', cosmetic: cosmeticForm, back: false }));
     setUseFlipFallback(back); // If we wanted back view, flip the fallback
-  }, [species, shiny, cosmeticForm, back, fallbackUsed, fallbackLevel, fusion, fusionSpriteBase, imgSrc, useFlipFallback, currentMode, getFusionUrl, getRegularUrl, spriteOverride]);
+  }, [species, shiny, cosmeticForm, back, fallbackUsed, fallbackLevel, fusion, fusionSpriteBase, imgSrc, useFlipFallback, currentMode, getFusionUrl, getRegularUrl, spriteOverride, triedNonShinyFallback]);
   
   // ── Hat drag state ──
   const containerRef = useRef<HTMLDivElement>(null);
