@@ -16,13 +16,14 @@ import { FusionTab } from './FusionTab';
 import { PokedexTab } from './PokedexTab';
 import { DiceLevelingPanel } from './DiceLevelingPanel';
 import { CollapsiblePanel } from './CollapsiblePanel';
+import { RulesTab } from './RulesTab';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
 import { BugReporter } from './BugReporter';
 
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
-type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'badges' | 'fusion' | 'dex' | { kind: 'psbattle'; id: string; title: string };
+type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | { kind: 'psbattle'; id: string; title: string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -419,6 +420,7 @@ export function App() {
           <button className={tab === 'fusion' ? 'active' : ''} onClick={() => setTab('fusion')}>Fusion</button>
           <button className={tab === 'dex' ? 'active' : ''} onClick={() => setTab('dex')}>Dex</button>
           <button className={tab === 'sheet' ? 'active' : ''} onClick={() => setTab('sheet')}>Character</button>
+          <button className={tab === 'rules' ? 'active' : ''} onClick={() => setTab('rules')}>Rules</button>
           <button className={tab === 'badges' ? 'active' : ''} onClick={() => setTab('badges')}>Badges</button>
           {extraTabs.map(t => (
             <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -735,6 +737,7 @@ export function App() {
         <LobbyTab />
       </div>
       {tab === "sheet" && (<CharacterSheet />)}
+      {tab === 'rules' && (<RulesTab />)}
       {tab === 'badges' && (<BadgeCase />)}
       {tab === 'fusion' && (
         <FusionTab

@@ -3,6 +3,7 @@ import { withPublicBase } from '../utils/publicBase';
 import { spriteUrl } from '../data/adapter';
 import { getClient } from '../net/pokettrpgClient';
 import { getCustomItems } from '../data/adapter';
+import { TRAINER_TRAITS } from '../data/trainerTraits';
 
 type Stats = {
 	strength: number;
@@ -322,49 +323,23 @@ export function CharacterSheet() {
 	}, [hpMax, spMax]);
 
 	// Trait catalog with stat-locked requirements
-	type Req = (S: Stats, has: (name: string)=>boolean, hasType: boolean) => boolean;
 	const hasTrait = (name: string) => !!ch.traits.find(t => t.name.toLowerCase() === name.toLowerCase());
 	const hasTypeSpec = !!(ch.typeSpecialty && ch.typeSpecialty.trim());
-	const atLeast = (stat: keyof Stats, n: number): Req => (S) => (S[stat]||0) >= n;
-	const reqAnd = (...rs: Req[]): Req => (S,has,hasType) => rs.every(r => r(S,has,hasType));
-	const reqTrait = (name: string): Req => (_S,has) => has(name);
-	const reqTypeSpec: Req = (_S,_has,hasT) => hasT;
-	const INT = (n:number)=> atLeast('intelligence', n);
-	const STR = (n:number)=> atLeast('strength', n);
-	const ATH = (n:number)=> atLeast('athletics', n);
-	const FTD = (n:number)=> atLeast('fortitude', n);
-	const SCH = (n:number)=> atLeast('speech', n);
-	const LCK = (n:number)=> atLeast('luck', n);
-	const traitCatalog: Array<{ name: string; desc: string; req?: Req; reqText?: string }> = [
-		{ name: 'Pitcher', desc: 'Can throw a Pokéball before the first turn at a 1.5x catch rate. Does not stack with Quick Balls and is overridden by the 4x multiplier. Stacks multiplicatively with any other Pokéball catching multiplier.', req: STR(8), reqText: '8 STR' },
-		{ name: 'Black Belt', desc: 'Can use Strength stat for Athletics rolls.', req: STR(15), reqText: '15 STR' },
-		{ name: 'Runner', desc: 'Can run away from any battle, regardless of location/status. Cannot run from trainer battles.', req: ATH(10), reqText: '10 ATH' },
-		{ name: 'Sneak attack', desc: 'Gains the “Ambush” ability. Can sneak attack a Pokémon to get a free first hit if unseen and actively sneaking.', req: ATH(10), reqText: '10 ATH' },
-		{ name: 'Fisher', desc: 'Can use a fishing rod without an Athletics check.', req: ATH(10), reqText: '10 ATH' },
-		{ name: 'Chef', desc: 'Cook a meal to restore the gang to full HP and SP using extra supplies.', req: INT(10), reqText: '10 INT' },
-		{ name: 'Scholar', desc: 'Gain advantage on Intelligence checks involving history, Pokémon info, and current events.', req: INT(10), reqText: '10 INT' },
-		{ name: 'Double Battler', desc: 'Can use two Pokémon in wild encounters or wild trainer battles. Gym rules are set in stone.', req: INT(10), reqText: '10 INT' },
-		{ name: 'Jr. Professor', desc: 'May use Intelligence to attempt a Wild Bond.', req: INT(12), reqText: 'INT D12 (12 INT)' },
-		{ name: 'Nurse', desc: 'Heal People and Pokémon to full HP during a rest without supplies. Advantage on Wild Bond attempts for injured Pokémon.', req: INT(12), reqText: 'INT D12 (12 INT)' },
-		{ name: 'Aura Guardian', desc: 'Loosely speak with Pokémon that share your Type Specialty. Wild Card can speak fluently with starter.', req: INT(10), reqText: '10 INT' },
-		{ name: 'Trace', desc: 'Copy the ability of one Pokémon; persistent until removed by psychic means.', req: reqAnd(INT(12), reqTrait('Aura Guardian')), reqText: '12 INT + Aura Guardian' },
-		{ name: 'Psychic', desc: 'High-DC Intelligence check to know the opponent’s next Pokémon and allow a switch.', req: INT(20), reqText: '20 INT' },
-		{ name: 'Ace Trainer', desc: 'The more Pokémon in your party (max 6), +1 to catch rolls during the attempt.', req: FTD(10), reqText: '10 FTD' },
-		{ name: 'Biker', desc: 'Ride a bike to expend one-third SP while traveling (flat/mostly unobstructed).', req: FTD(10), reqText: '10 FTD' },
-		{ name: 'Hiker', desc: 'Expend half as much SP when traveling from place to place.', req: FTD(13), reqText: '13 FTD' },
-		{ name: "It's the Vibes", desc: '1.5x modifier to catching Pokémon of the same gender as you.', req: SCH(8), reqText: '8 SCH' },
-		{ name: 'Contest Star', desc: 'Use Contest attributes of Pokémon moves (Smart, Cool, Tough, Cute, Beauty) to gain bonuses on Speech rolls.', req: SCH(10), reqText: '10 SCH' },
-		{ name: 'Down Brock', desc: 'Smooth talk the opposite gender very well (unless a Pokémon is done with your antics).', req: SCH(15), reqText: '15 SCH' },
-		{ name: 'Actor/Actress', desc: '1.5x bonus to Speech checks while impersonating or deceiving.', req: SCH(15), reqText: '15 SCH' },
-		{ name: 'Test Your Luck', desc: 'Once a day, reroll a failed check using Luck.', req: LCK(10), reqText: '10 LCK' },
-		{ name: 'Prepared For Everything', desc: 'Make a “Test Your Luck” roll to just so happen to have exactly what you need.', req: reqAnd(LCK(20), reqTrait('Test Your Luck')), reqText: '20 LCK + Test Your Luck' },
-		{ name: 'Guys Type trainer', desc: 'Boosts catch rate by 1.5x if a Pokémon has more than one head/being in it.', reqText: 'No requirements' },
-		{ name: 'Expanding Horizons', desc: 'Wild Card: gain a Type Specialty. If you already have one, gain another (no limit).', reqText: 'No requirements' },
-		{ name: 'In Tune', desc: 'Become in tune with your Type Specialty (bonuses vary by type).', req: reqTypeSpec, reqText: 'Requires Type Specialty' },
-		{ name: 'People person', desc: 'Instantly know when an Insight (INT) roll can be used without initiating it.', req: SCH(12), reqText: '12 SCH' },
-	];
-
-	const canTake = (t: {req?: any}) => (t.req ? t.req(ch.stats, hasTrait, hasTypeSpec) : true);
+	const traitCatalog = TRAINER_TRAITS;
+	const canTake = (t: typeof TRAINER_TRAITS[number]) => {
+		if (t.requiresTypeSpecialty && !hasTypeSpec) return false;
+		if (t.minStats) {
+			for (const [stat, min] of Object.entries(t.minStats)) {
+				if ((ch.stats[stat as keyof Stats] || 0) < (min || 0)) return false;
+			}
+		}
+		if (t.requiredTraits?.length) {
+			for (const reqName of t.requiredTraits) {
+				if (!hasTrait(reqName)) return false;
+			}
+		}
+		return true;
+	};
 
 	// Helpers to rebuild inventory lines from parsed list
 	function setSectionLinesByKey(key: string, newLines: string) {
