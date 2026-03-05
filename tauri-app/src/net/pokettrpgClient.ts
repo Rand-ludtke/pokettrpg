@@ -545,7 +545,7 @@ export class PoketTRPGClient {
       endpoint = upgraded;
     }
     const socket = io(endpoint, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       path,
       forceNew: true,
       withCredentials: true,
