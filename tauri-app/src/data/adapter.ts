@@ -1,5 +1,6 @@
 import { BattlePokemon, Pokemon } from '../types';
 import { calculateHp } from '../rules';
+import { withPublicBase } from '../utils/publicBase';
 
 export type DexSpecies = {
   name: string;
@@ -50,8 +51,8 @@ export function normalizeName(id: string) {
 }
 
 const ENV_ASSET_BASE = (import.meta as any)?.env?.VITE_ASSET_BASE || '';
-const DEFAULT_DATA_BASE = ENV_ASSET_BASE ? `${ENV_ASSET_BASE}/vendor/showdown/data` : '/vendor/showdown/data';
-const DEFAULT_SPRITE_BASE = ENV_ASSET_BASE ? `${ENV_ASSET_BASE}/vendor/showdown/sprites` : '/vendor/showdown/sprites';
+const DEFAULT_DATA_BASE = ENV_ASSET_BASE ? `${ENV_ASSET_BASE}/vendor/showdown/data` : withPublicBase('vendor/showdown/data').replace(/\/+$/, '');
+const DEFAULT_SPRITE_BASE = ENV_ASSET_BASE ? `${ENV_ASSET_BASE}/vendor/showdown/sprites` : withPublicBase('vendor/showdown/sprites').replace(/\/+$/, '');
 
 function normalizeBaseUrl(base: string | null | undefined): string {
   const value = String(base || '').trim();
@@ -64,7 +65,7 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
   const defaults = [
     normalizeBaseUrl(DEFAULT_SPRITE_BASE),
     '/sprites',
-    '/vendor/showdown/sprites',
+    normalizeBaseUrl(withPublicBase('vendor/showdown/sprites')),
   ];
 
   const fromApiBase = (() => {
@@ -111,11 +112,11 @@ export async function loadShowdownDex(options?: { base?: string }) {
   ]);
 
   const [sagePokedex, sageLearnsets, sageMoves, sageAbilities, sageItems] = await Promise.all([
-    fetchOptionalJson('/data/sage/generated/pokedex.sage.json'),
-    fetchOptionalJson('/data/sage/generated/learnsets.sage.json'),
-    fetchOptionalJson('/data/sage/generated/moves.custom.sage.json'),
-    fetchOptionalJson('/data/sage/generated/abilities.custom.sage.json'),
-    fetchOptionalJson('/data/sage/generated/items.custom.sage.json'),
+    fetchOptionalJson(withPublicBase('data/sage/generated/pokedex.sage.json')),
+    fetchOptionalJson(withPublicBase('data/sage/generated/learnsets.sage.json')),
+    fetchOptionalJson(withPublicBase('data/sage/generated/moves.custom.sage.json')),
+    fetchOptionalJson(withPublicBase('data/sage/generated/abilities.custom.sage.json')),
+    fetchOptionalJson(withPublicBase('data/sage/generated/items.custom.sage.json')),
   ]);
 
   const mergedBaseDex = {
