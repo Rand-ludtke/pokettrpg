@@ -548,7 +548,7 @@ export class PoketTRPGClient {
       transports: ['polling', 'websocket'],
       path,
       forceNew: true,
-      withCredentials: true,
+      withCredentials: false,
     });
     this.socket = socket;
 
