@@ -148,6 +148,10 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   // For PC mode: track which slot they came from
   const [headSlot, setHeadSlot] = useState<{box:number;slot:number}|null>(null);
   const [bodySlot, setBodySlot] = useState<{box:number;slot:number}|null>(null);
+  const sameParentSlot = useMemo(
+    () => !!(headSlot && bodySlot && headSlot.box === bodySlot.box && headSlot.slot === bodySlot.slot),
+    [headSlot, bodySlot],
+  );
 
   // Combo choice & sprite pick
   const [chosenCombo, setChosenCombo] = useState<ComboSide>('ab');
@@ -374,6 +378,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   // Finalize fusion
   const handleFuse = useCallback(async () => {
     if (!dex || !activeCombo || !headPokemon || !bodyPokemon) return;
+    if (mode === 'pc' && sameParentSlot) return;
 
     const isAB = chosenCombo === 'ab';
     const hNum = isAB ? headNum : bodyNum;
@@ -419,7 +424,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
     setChosenSprite(null);
     setSelectedMoves(['', '', '', '']);
     setNickname('');
-  }, [dex, activeCombo, headPokemon, bodyPokemon, chosenCombo, headNum, bodyNum, nickname, level, chosenAbility, selectedMoves, chosenSprite, mode, headSlot, bodySlot, onReplaceInPC, onRemoveFromPC, onAddToPC]);
+  }, [dex, activeCombo, headPokemon, bodyPokemon, chosenCombo, headNum, bodyNum, nickname, level, chosenAbility, selectedMoves, chosenSprite, mode, headSlot, bodySlot, sameParentSlot, onReplaceInPC, onRemoveFromPC, onAddToPC]);
 
   // ─── Render ───
 
@@ -692,6 +697,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
 
               <button
                 onClick={handleFuse}
+                disabled={mode === 'pc' && sameParentSlot}
                 style={{ padding: '10px 20px', fontWeight: 700, fontSize: '1.05em', borderRadius: 8, marginTop: 8 }}
               >
                 🔀 {mode === 'pc' ? 'Fuse in PC' : 'Create & Add to PC'}
@@ -699,6 +705,11 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
               {mode === 'pc' && (
                 <div className="dim" style={{ fontSize: '0.8em', textAlign: 'center' }}>
                   The head Pokémon's slot will become the fusion. The body Pokémon will be consumed.
+                </div>
+              )}
+              {mode === 'pc' && sameParentSlot && (
+                <div className="dim" style={{ fontSize: '0.8em', textAlign: 'center', color: '#ff9e9e' }}>
+                  Select two different PC slots before fusing.
                 </div>
               )}
             </div>

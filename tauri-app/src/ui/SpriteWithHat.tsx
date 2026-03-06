@@ -4,7 +4,7 @@
  * The hat is positioned relative to the sprite and can be offset for fine-tuning.
  */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { spriteUrl, placeholderSpriteDataURL } from '../data/adapter';
+import { spriteUrl, placeholderSpriteDataURL, getFusionApiBases } from '../data/adapter';
 import '../styles/sprite-with-hat.css';
 
 // Available hat options with their overlay images
@@ -57,6 +57,7 @@ interface SpriteWithHatProps {
     headId: number;
     bodyId: number;
     spriteFile?: string;
+    variants?: string[];
   };
   /** Base URL for fusion sprites */
   fusionSpriteBase?: string;
@@ -729,33 +730,96 @@ export function SpriteWithHat({
   const [useFlipFallback, setUseFlipFallback] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [currentMode, setCurrentMode] = useState<SpriteMode>(spriteMode);
+  const [fusionCandidateIndex, setFusionCandidateIndex] = useState(0);
   
   // Determine sprite URL based on mode - fusion sprites take priority
   const getFusionUrl = useCallback((mode: SpriteMode = currentMode) => {
     if (!fusion) return null;
     const { headId, bodyId, spriteFile } = fusion;
+
+    const files: string[] = [];
+    const addFile = (value: unknown) => {
+      const v = String(value || '').trim();
+      if (!v) return;
+      if (!files.includes(v)) files.push(v);
+    };
+    addFile(spriteFile);
+    const variants = Array.isArray(fusion.variants) ? fusion.variants : [];
+    for (const v of variants) addFile(v);
+    addFile(`${headId}.${bodyId}v1.png`);
+    addFile(`${headId}.${bodyId}v2.png`);
+    addFile(`${headId}.${bodyId}.png`);
     
     // If specific file provided, use it
     if (spriteFile) {
       if (/^https?:\/\//i.test(spriteFile) || /^data:image\//i.test(spriteFile) || spriteFile.startsWith('/')) {
         return spriteFile;
       }
-      return `${fusionSpriteBase}/${spriteFile}`;
     }
-    
-    const filename = `${headId}.${bodyId}.png`;
     
     switch (mode) {
       case 'ai-generated':
-        return `${aiSpritesBase}/${filename}`;
+        return `${aiSpritesBase}/${files[0] || `${headId}.${bodyId}.png`}`;
       case 'two-step':
-        return `${splicedSpritesBase}/${filename}`;
+        return `${splicedSpritesBase}/${files[0] || `${headId}.${bodyId}.png`}`;
       case 'auto':
       default:
-        // Auto mode tries fusion base first
-        return `${fusionSpriteBase}/${filename}`;
+        break;
     }
+
+    const apiBases = getFusionApiBases();
+    for (const apiBase of apiBases) {
+      for (const file of files) {
+        if (/^https?:\/\//i.test(file) || /^data:image\//i.test(file) || file.startsWith('/')) continue;
+        return `${apiBase}/fusion/sprites/${file}`;
+      }
+    }
+
+    return `${fusionSpriteBase}/${files[0] || `${headId}.${bodyId}.png`}`;
   }, [fusion, fusionSpriteBase, aiSpritesBase, splicedSpritesBase, currentMode]);
+
+  const getFusionCandidates = useCallback(() => {
+    if (!fusion) return [] as string[];
+    const files: string[] = [];
+    const addFile = (value: unknown) => {
+      const v = String(value || '').trim();
+      if (!v) return;
+      if (!files.includes(v)) files.push(v);
+    };
+    addFile(fusion.spriteFile);
+    const variants = Array.isArray(fusion.variants) ? fusion.variants : [];
+    for (const v of variants) addFile(v);
+    addFile(`${fusion.headId}.${fusion.bodyId}v1.png`);
+    addFile(`${fusion.headId}.${fusion.bodyId}v2.png`);
+    addFile(`${fusion.headId}.${fusion.bodyId}.png`);
+
+    const out: string[] = [];
+    const push = (value: string) => {
+      if (value && !out.includes(value)) out.push(value);
+    };
+
+    // Direct absolute/data file first if present
+    if (fusion.spriteFile && (/^https?:\/\//i.test(fusion.spriteFile) || /^data:image\//i.test(fusion.spriteFile) || fusion.spriteFile.startsWith('/'))) {
+      push(fusion.spriteFile);
+    }
+
+    const apiBases = getFusionApiBases();
+    for (const apiBase of apiBases) {
+      for (const file of files) {
+        if (/^https?:\/\//i.test(file) || /^data:image\//i.test(file) || file.startsWith('/')) continue;
+        push(`${apiBase}/fusion/sprites/${file}`);
+      }
+    }
+
+    for (const file of files) {
+      if (/^https?:\/\//i.test(file) || /^data:image\//i.test(file) || file.startsWith('/')) continue;
+      push(`${fusionSpriteBase}/${file}`);
+      push(`${aiSpritesBase}/${file}`);
+      push(`${splicedSpritesBase}/${file}`);
+    }
+
+    return out;
+  }, [fusion, fusionSpriteBase, aiSpritesBase, splicedSpritesBase]);
 
   const getRegularUrl = useCallback((preferBack: boolean) => {
     if (preferBack && backSpriteOverride) return backSpriteOverride;
@@ -775,6 +839,7 @@ export function SpriteWithHat({
 
   useEffect(() => {
     const fusionUrl = getFusionUrl();
+    setFusionCandidateIndex(0);
     setFallbackUsed(false);
     setFallbackLevel(0);
     setTriedNonShinyFallback(false);
@@ -817,6 +882,14 @@ export function SpriteWithHat({
     }
     
     if (fusion && fallbackLevel < 3) {
+      const candidates = getFusionCandidates();
+      if (fusionCandidateIndex + 1 < candidates.length) {
+        const next = fusionCandidateIndex + 1;
+        setFusionCandidateIndex(next);
+        setImgSrc(candidates[next]);
+        return;
+      }
+
       // Try alternative sprite modes for fusion
       if (currentMode === 'ai-generated' && fallbackLevel === 1) {
         setCurrentMode('two-step');
@@ -853,7 +926,7 @@ export function SpriteWithHat({
     // Fall back to regular species sprite
     setImgSrc(spriteOverride || spriteUrl(species, shiny, { setOverride: 'gen5', cosmetic: cosmeticForm, back: false }));
     setUseFlipFallback(back); // If we wanted back view, flip the fallback
-  }, [species, shiny, cosmeticForm, back, fallbackUsed, fallbackLevel, fusion, fusionSpriteBase, imgSrc, useFlipFallback, currentMode, getFusionUrl, getRegularUrl, spriteOverride, triedNonShinyFallback]);
+  }, [species, shiny, cosmeticForm, back, fallbackUsed, fallbackLevel, fusion, fusionSpriteBase, imgSrc, useFlipFallback, currentMode, getFusionUrl, getFusionCandidates, getRegularUrl, spriteOverride, triedNonShinyFallback, fusionCandidateIndex]);
   
   // ── Hat drag state ──
   const containerRef = useRef<HTMLDivElement>(null);
