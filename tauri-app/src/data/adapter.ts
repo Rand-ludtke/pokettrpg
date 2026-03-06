@@ -108,7 +108,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
     fetch(`${base}/abilities.json`).then(r => r.json()).catch(() => ({})),
     fetch(`${base}/items.json`).then(r => r.json()).catch(() => ({})),
     fetch(`${base}/learnsets.json`).then(r => r.json()).catch(() => ({})),
-    fetch(`${base}/aliases.json`).then(r => r.json()).catch(() => ({})),
+    Promise.resolve({}),
   ]);
 
   const [sagePokedex, sageLearnsets, sageMoves, sageAbilities, sageItems] = await Promise.all([

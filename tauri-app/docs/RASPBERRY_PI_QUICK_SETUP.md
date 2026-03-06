@@ -40,21 +40,39 @@ npm run start:server
 
 ---
 
-## 2) Pi backend + storage setup (`192.168.1.251`)
+## 2) Pi base setup (`192.168.1.251`)
 
-SSH to Pi and run this full block exactly:
+SSH to Pi and run this full block exactly (no GitHub clone):
 
 ```bash
 sudo apt update && sudo apt install -y git curl build-essential pkg-config libssl-dev caddy
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
-cd ~
-if [ ! -d ~/pokettrpg ]; then
-  git clone https://github.com/Rand-ludtke/pokettrpg.git ~/pokettrpg
-fi
-
+mkdir -p ~/pokettrpg
 mkdir -p ~/pokettrpg/.fusion-sprites-local
+```
+
+## 3) Copy project files from this Windows PC to Pi (no GitHub)
+
+Run in **Git Bash on this PC** (`192.168.1.17`):
+
+```bash
+cd /d/GitHub/pokettrpg
+rsync -av --delete --progress \
+  --exclude '.git' \
+  --exclude 'node_modules' \
+  --exclude '.venv' \
+  --exclude 'dist' \
+  --exclude 'target' \
+  --exclude '.fusion-sprites-local' \
+  /d/GitHub/pokettrpg/ \
+  randl@192.168.1.251:/home/randl/pokettrpg/
+```
+
+Then on **Pi**:
+
+```bash
 cd ~/pokettrpg/pokemonttrpg-backend
 npm ci
 npm run build
@@ -67,12 +85,12 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=pi
-WorkingDirectory=/home/pi/pokettrpg/pokemonttrpg-backend
+User=randl
+WorkingDirectory=/home/randl/pokettrpg/pokemonttrpg-backend
 Environment=NODE_ENV=production
 Environment=PORT=3000
-Environment=FUSION_SPRITES_DIR=/home/pi/pokettrpg/.fusion-sprites-local
-Environment=UNIFIED_SPRITES_ROOT=/home/pi/pokettrpg/.fusion-sprites-local/sprites
+Environment=FUSION_SPRITES_DIR=/home/randl/pokettrpg/.fusion-sprites-local
+Environment=UNIFIED_SPRITES_ROOT=/home/randl/pokettrpg/.fusion-sprites-local/sprites
 Environment=FUSION_GEN_REMOTE_BASE=http://192.168.1.17:3000
 ExecStart=/usr/bin/npm run start:server
 Restart=always
@@ -89,7 +107,7 @@ sudo systemctl status pokettrpg-backend --no-pager
 
 ---
 
-## 3) Caddy + HTTPS on Pi
+## 4) Caddy + HTTPS on Pi
 
 Run on Pi:
 
@@ -97,12 +115,6 @@ Run on Pi:
 sudo tee /etc/caddy/Caddyfile > /dev/null <<'EOF'
 pokettrpg.duckdns.org {
     reverse_proxy 127.0.0.1:3000
-
-    header {
-        Access-Control-Allow-Origin *
-        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-        Access-Control-Allow-Headers "Content-Type, Authorization"
-    }
 }
 
 :80 {
@@ -118,7 +130,7 @@ curl https://pokettrpg.duckdns.org/api/health
 
 ---
 
-## 4) App client setting
+## 5) App client setting
 
 In Tauri app Lobby on your client machine, set:
 
@@ -132,7 +144,7 @@ This makes the app use Pi backend endpoints:
 
 ---
 
-## 5) Destructive regenerate on worker (Sage 2-way + triple + SDXL 10-batch)
+## 6) Destructive regenerate on worker (Sage 2-way + triple + SDXL 10-batch)
 
 Run in **PowerShell** on worker (`D:\GitHub\pokettrpg`):
 
@@ -169,7 +181,7 @@ This Sage/triple flow does **not** delete or overwrite your existing large `.fus
 
 ---
 
-## 6) Sync worker sprites to Pi storage
+## 7) Sync worker sprites to Pi storage
 
 Run in **Git Bash** on worker (recommended for rsync):
 
@@ -177,13 +189,13 @@ Run in **Git Bash** on worker (recommended for rsync):
 cd /d/GitHub/pokettrpg
 rsync -av --progress \
   "/d/GitHub/pokettrpg/.fusion-sprites-local/" \
-  pi@192.168.1.251:"/home/pi/pokettrpg/.fusion-sprites-local/"
-ssh pi@192.168.1.251 "sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
+  randl@192.168.1.251:"/home/randl/pokettrpg/.fusion-sprites-local/"
+ssh randl@192.168.1.251 "sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
 ```
 
 ---
 
-## 7) Quick verification
+## 8) Quick verification
 
 Run on Pi:
 

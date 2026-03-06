@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './ui/AppMain';
+import { withPublicBase } from './utils/publicBase';
 import './styles/retro.css';
 import './styles/showdown-battle.css';
 import './styles/ps-authentic.css';
@@ -11,7 +12,7 @@ root.render(<App />);
 
 if ('serviceWorker' in navigator) {
 	window.addEventListener('load', () => {
-		navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+		navigator.serviceWorker.register(withPublicBase('sw.js')).catch(() => undefined);
 	});
 }
 
