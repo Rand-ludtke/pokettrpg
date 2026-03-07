@@ -62,8 +62,8 @@ function normalizeBaseUrl(base: string | null | undefined): string {
 function getSpriteBaseCandidates(preferredBase?: string): string[] {
   const explicit = normalizeBaseUrl(preferredBase);
   const defaults = [
-    normalizeBaseUrl(DEFAULT_SPRITE_BASE),
     '/sprites',
+    normalizeBaseUrl(DEFAULT_SPRITE_BASE),
     normalizeBaseUrl(withPublicBase('vendor/showdown/sprites')),
   ];
 
@@ -83,10 +83,15 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
     return [`${origin}/sprites`, `${origin}/vendor/showdown/sprites`];
   })();
 
-  const all = [explicit, ...defaults, ...fromApiBase, ...fromOrigin]
+  const all = [explicit, ...fromApiBase, ...defaults, ...fromOrigin]
     .map(normalizeBaseUrl)
     .filter((v): v is string => !!v);
   return Array.from(new Set(all));
+}
+
+export function getPreferredSpriteBase(preferredBase?: string): string {
+  const candidates = getSpriteBaseCandidates(preferredBase);
+  return candidates[0] || '/sprites';
 }
 
 function getShowdownDataBaseCandidates(preferredBase?: string): string[] {
@@ -508,8 +513,7 @@ function toAscii(s: string): string {
 }
 
 export function spriteUrl(speciesId: string, shiny = false, options?: { base?: string, setOverride?: SpriteSet, cosmetic?: string, back?: boolean, forceStatic?: boolean }) {
-  // Default to the vendor showdown sprites path (both Electron and Tauri serve from public/vendor/showdown)
-  const base = options?.base ?? DEFAULT_SPRITE_BASE;
+  const base = normalizeBaseUrl(options?.base) || getPreferredSpriteBase();
   const settings = getSpriteSettings();
   const chosen = options?.setOverride ?? settings.set;
   const useAni = !options?.forceStatic && settings.animated && chosen === 'gen5';
@@ -672,7 +676,7 @@ export async function listPokemonSpriteOptions(
   const shiny = !!options?.shiny;
   const allowFormVariants = !!options?.allowFormVariants;
   const strictExisting = !!options?.strictExisting;
-  const base = normalizeBaseUrl(options?.base ?? DEFAULT_SPRITE_BASE) || '/vendor/showdown/sprites';
+  const base = normalizeBaseUrl(options?.base) || getPreferredSpriteBase();
   const candidateIds = spriteIdCandidates(speciesName, options?.cosmetic);
   const preferredId = candidateIds[0] || normalizeName(speciesName);
 
@@ -793,7 +797,7 @@ export function speciesFormesInfo(name: string, dex: DexIndex) {
 }
 
 export function iconUrl(speciesId: string, options?: { base?: string }) {
-  const base = options?.base ?? DEFAULT_SPRITE_BASE;
+  const base = normalizeBaseUrl(options?.base) || getPreferredSpriteBase();
   return `${base}/gen5icons/${normalizeName(speciesId)}.png`;
 }
 
@@ -810,7 +814,7 @@ export function spriteUrlWithFallback(
   onError: (nextUrl: string) => void,
   options?: { shiny?: boolean; base?: string; setOverride?: SpriteSet; cosmetic?: string; back?: boolean }
 ) {
-  const spriteBases = getSpriteBaseCandidates(options?.base ?? DEFAULT_SPRITE_BASE);
+  const spriteBases = getSpriteBaseCandidates(options?.base);
   const shiny = !!options?.shiny;
   const back = !!options?.back;
   const settings = getSpriteSettings();
