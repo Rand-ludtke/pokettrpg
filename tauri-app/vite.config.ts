@@ -82,12 +82,30 @@ export default defineConfig(({ mode }) => {
           if (isTauri) {
             // For Tauri builds we disable Vite publicDir copy and sync only selected assets here.
             syncTauriPublicAssets();
+            // Keep only Gen 5 sprite folders in desktop bundles to reduce installer size.
+            try {
+              const spritesRoot = path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites');
+              const keepSpriteDirs = new Set([
+                'gen5',
+                'gen5-back',
+                'gen5-shiny',
+                'gen5-back-shiny',
+                'gen5icons',
+                'categories',
+                'types',
+                'trainers',
+              ]);
+              if (existsSync(spritesRoot)) {
+                const dirents = readdirSync(spritesRoot, { withFileTypes: true }).filter((d) => d.isDirectory());
+                for (const dirent of dirents) {
+                  if (keepSpriteDirs.has(dirent.name)) continue;
+                  const p = path.resolve(spritesRoot, dirent.name);
+                  try { rmSync(p, { recursive: true, force: true }); } catch {}
+                }
+              }
+            } catch {}
             const pruneDirs = [
               path.resolve(__dirname, 'dist', 'spliced-sprites'),
-              path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites', 'ani'),
-              path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites', 'ani-shiny'),
-              path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites', 'ani-back'),
-              path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites', 'ani-back-shiny'),
             ];
             for (const p of pruneDirs) {
               if (!existsSync(p)) continue;

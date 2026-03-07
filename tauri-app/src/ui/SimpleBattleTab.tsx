@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { withPublicBase } from '../utils/publicBase';
-import { spriteUrlWithFallback, normalizeName } from '../data/adapter';
+import { spriteUrlWithFallback, normalizeName, loadShowdownDataJson } from '../data/adapter';
 import { getClient, PromptActionPayload, RoomSummary, ChatMessage } from '../net/pokettrpgClient';
 
 // Move descriptions data loaded from moves.json at runtime
@@ -8,8 +8,9 @@ let cachedMovesData: Record<string, { desc?: string; shortDesc?: string }> | nul
 async function loadMovesData() {
   if (cachedMovesData) return cachedMovesData;
   try {
-    const resp = await fetch(withPublicBase('vendor/showdown/data/moves.json'));
-    cachedMovesData = await resp.json();
+    cachedMovesData = await loadShowdownDataJson<Record<string, { desc?: string; shortDesc?: string }>>('moves.json', {
+      defaultValue: {},
+    });
   } catch {
     cachedMovesData = {};
   }

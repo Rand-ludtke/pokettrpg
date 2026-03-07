@@ -50,9 +50,8 @@ export function normalizeName(id: string) {
   return id.replace(/[^a-z0-9]/gi, '').toLowerCase();
 }
 
-const ENV_ASSET_BASE = (import.meta as any)?.env?.VITE_ASSET_BASE || '';
-const DEFAULT_DATA_BASE = ENV_ASSET_BASE ? `${ENV_ASSET_BASE}/vendor/showdown/data` : withPublicBase('vendor/showdown/data').replace(/\/+$/, '');
-const DEFAULT_SPRITE_BASE = ENV_ASSET_BASE ? `${ENV_ASSET_BASE}/vendor/showdown/sprites` : withPublicBase('vendor/showdown/sprites').replace(/\/+$/, '');
+const DEFAULT_DATA_BASE = withPublicBase('vendor/showdown/data').replace(/\/+$/, '');
+const DEFAULT_SPRITE_BASE = withPublicBase('vendor/showdown/sprites').replace(/\/+$/, '');
 
 function normalizeBaseUrl(base: string | null | undefined): string {
   const value = String(base || '').trim();
@@ -90,8 +89,70 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
   return Array.from(new Set(all));
 }
 
+function getShowdownDataBaseCandidates(preferredBase?: string): string[] {
+  const explicit = normalizeBaseUrl(preferredBase);
+  const defaults = [
+    normalizeBaseUrl(DEFAULT_DATA_BASE),
+    normalizeBaseUrl(withPublicBase('vendor/showdown/data')),
+  ];
+
+  const fromApiBase = (() => {
+    try {
+      const apiBase = normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase'));
+      if (!apiBase) return [] as string[];
+      return [`${apiBase}/vendor/showdown/data`];
+    } catch {
+      return [] as string[];
+    }
+  })();
+
+  const fromOrigin = (() => {
+    if (typeof window === 'undefined' || !window.location?.origin) return [] as string[];
+    const origin = normalizeBaseUrl(window.location.origin);
+    return [`${origin}/vendor/showdown/data`];
+  })();
+
+  const all = [explicit, ...fromApiBase, ...defaults, ...fromOrigin]
+    .map(normalizeBaseUrl)
+    .filter((v): v is string => !!v);
+  return Array.from(new Set(all));
+}
+
+async function fetchJsonFromBaseCandidates<T>(relativePath: string, bases: string[]): Promise<T | null> {
+  for (const base of bases) {
+    const url = `${base}/${relativePath}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (!text || !text.trim()) continue;
+      try {
+        return JSON.parse(text) as T;
+      } catch {
+        // 404 pages can return HTML; ignore and continue to next candidate.
+        continue;
+      }
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+export async function loadShowdownDataJson<T = any>(
+  relativePath: string,
+  options?: { base?: string; required?: boolean; defaultValue?: T }
+): Promise<T> {
+  const bases = getShowdownDataBaseCandidates(options?.base);
+  const data = await fetchJsonFromBaseCandidates<T>(relativePath, bases);
+  if (data != null) return data;
+  if (options?.required) {
+    throw new Error(`Unable to load showdown data: ${relativePath}`);
+  }
+  return (options?.defaultValue ?? ({} as T));
+}
+
 export async function loadShowdownDex(options?: { base?: string }) {
-  const base = options?.base ?? DEFAULT_DATA_BASE;
   const fetchOptionalJson = async (path: string) => {
     try {
       const res = await fetch(path);
@@ -103,12 +164,12 @@ export async function loadShowdownDex(options?: { base?: string }) {
   };
   // prefer JSON if present for faster parse
   const [pokedex, moves, abilities, items, learnsets, aliases] = await Promise.all([
-    fetch(`${base}/pokedex.json`).then(r => r.json()),
-    fetch(`${base}/moves.json`).then(r => r.json()),
-    fetch(`${base}/abilities.json`).then(r => r.json()).catch(() => ({})),
-    fetch(`${base}/items.json`).then(r => r.json()).catch(() => ({})),
-    fetch(`${base}/learnsets.json`).then(r => r.json()).catch(() => ({})),
-    Promise.resolve({}),
+    loadShowdownDataJson<DexIndex>('pokedex.json', { base: options?.base, required: true }),
+    loadShowdownDataJson<MoveIndex>('moves.json', { base: options?.base, required: true }),
+    loadShowdownDataJson<AbilityIndex>('abilities.json', { base: options?.base, defaultValue: {} as AbilityIndex }),
+    loadShowdownDataJson<ItemIndex>('items.json', { base: options?.base, defaultValue: {} as ItemIndex }),
+    loadShowdownDataJson<LearnsetsIndex>('learnsets.json', { base: options?.base, defaultValue: {} as LearnsetsIndex }),
+    loadShowdownDataJson<AliasesIndex>('aliases.json', { base: options?.base, defaultValue: {} as AliasesIndex }),
   ]);
 
   const [sagePokedex, sageLearnsets, sageMoves, sageAbilities, sageItems] = await Promise.all([
@@ -119,13 +180,22 @@ export async function loadShowdownDex(options?: { base?: string }) {
     fetchOptionalJson(withPublicBase('data/sage/generated/items.custom.sage.json')),
   ]);
 
+  const [insPokedex, insLearnsets, insAbilities, insItems] = await Promise.all([
+    fetchOptionalJson(withPublicBase('data/insurgence/generated/pokedex.insurgence.json')),
+    fetchOptionalJson(withPublicBase('data/insurgence/generated/learnsets.insurgence.json')),
+    fetchOptionalJson(withPublicBase('data/insurgence/generated/abilities.custom.insurgence.json')),
+    fetchOptionalJson(withPublicBase('data/insurgence/generated/items.custom.insurgence.json')),
+  ]);
+
   const mergedBaseDex = {
     ...(pokedex as DexIndex),
     ...((sagePokedex || {}) as DexIndex),
+    ...((insPokedex || {}) as DexIndex),
   } as DexIndex;
   const mergedBaseLearnsets = {
     ...(learnsets as LearnsetsIndex),
     ...((sageLearnsets || {}) as LearnsetsIndex),
+    ...((insLearnsets || {}) as LearnsetsIndex),
   } as LearnsetsIndex;
   const mergedBaseMoves = {
     ...(moves as MoveIndex),
@@ -134,10 +204,12 @@ export async function loadShowdownDex(options?: { base?: string }) {
   const mergedBaseAbilities = {
     ...(abilities as AbilityIndex),
     ...((sageAbilities || {}) as AbilityIndex),
+    ...((insAbilities || {}) as AbilityIndex),
   } as AbilityIndex;
   const mergedBaseItems = {
     ...(items as ItemIndex),
     ...((sageItems || {}) as ItemIndex),
+    ...((insItems || {}) as ItemIndex),
   } as ItemIndex;
 
   // Merge custom overlays from local storage (local-only additions)
@@ -605,11 +677,20 @@ export async function listPokemonSpriteOptions(
   const preferredId = candidateIds[0] || normalizeName(speciesName);
 
   const variantIds = new Set<string>(candidateIds);
+  // Determine whether the species itself is a forme variant (has a dash like
+  // "vulpix-alola").  When it IS a forme, we must NOT add the stripped base
+  // ("vulpix") as a search root because that matches the wrong forme's sprites.
+  const preferredHasForme = preferredId.includes('-');
   const roots = new Set<string>();
   for (const id of candidateIds) {
     roots.add(id);
-    const dash = id.indexOf('-');
-    if (dash > 0) roots.add(id.slice(0, dash));
+    // Only strip to the base root when the preferred species is already the
+    // base form — this lets "charizard" also find "charizard-mega" sprites
+    // without letting "vulpix-alola" find "vulpix" sprites.
+    if (!preferredHasForme) {
+      const dash = id.indexOf('-');
+      if (dash > 0) roots.add(id.slice(0, dash));
+    }
   }
 
   const folderIndex = await loadSpriteFolderIndex(base);
@@ -1304,7 +1385,16 @@ export function fusionSpriteUrlWithFallback(
   options?: { base?: string },
 ) {
   const base = options?.base ?? '';
-  const filename = `${headNum}.${bodyNum}.png`;
+  const variantFilenames = [
+    `${headNum}.${bodyNum}v1.png`,
+    `${headNum}.${bodyNum}v2.png`,
+    `${headNum}.${bodyNum}.png`,
+    `${headNum}.${bodyNum}a.png`,
+    `${headNum}.${bodyNum}b.png`,
+    `${headNum}.${bodyNum}c.png`,
+    `${headNum}.${bodyNum}d.png`,
+    `${headNum}.${bodyNum}e.png`,
+  ];
   const customKey = `fusion:${headNum}.${bodyNum}`;
 
   const candidates: string[] = [];
@@ -1313,15 +1403,15 @@ export function fusionSpriteUrlWithFallback(
 
   const apiBases = getFusionApiBases();
   for (const apiBase of apiBases) {
-    // v1/v2 naming (new format)
-    candidates.push(`${apiBase}/fusion/sprites/${headNum}.${bodyNum}v1.png`);
-    candidates.push(`${apiBase}/fusion/sprites/${headNum}.${bodyNum}v2.png`);
-    // Legacy naming (old format)
-    candidates.push(`${apiBase}/fusion/sprites/${filename}`);
+    for (const filename of variantFilenames) {
+      candidates.push(`${apiBase}/fusion/sprites/${filename}`);
+    }
   }
 
   // Local fallback paths
-  candidates.push(`${base}/fusion-sprites/${filename}`);
+  for (const filename of variantFilenames) {
+    candidates.push(`${base}/fusion-sprites/${filename}`);
+  }
 
   const headName = gNumToName[headNum] || String(headNum);
   const bodyName = gNumToName[bodyNum] || String(bodyNum);
@@ -1380,8 +1470,21 @@ async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}
   }
 }
 
-async function requestFusionGenerateOnce(headNum: number, bodyNum: number): Promise<{ base: string } | null> {
-  const payload = { headNum, bodyNum, mode: 'splice' };
+async function requestFusionGenerateOnce(
+  headNum: number,
+  bodyNum: number,
+  options?: { guidancePrompt?: string },
+): Promise<{ base: string } | null> {
+  const guidancePrompt = options?.guidancePrompt?.trim();
+  const payload: Record<string, unknown> = {
+    headNum,
+    bodyNum,
+    mode: 'splice',
+  };
+  if (guidancePrompt) {
+    payload.guidancePrompt = guidancePrompt;
+    payload.prompt = guidancePrompt;
+  }
   for (const base of getFusionApiBases()) {
     try {
       const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
@@ -1414,13 +1517,18 @@ async function waitForFusionReady(headNum: number, bodyNum: number, base: string
   return null;
 }
 
-export function ensureFusionSpriteOnDemand(headNum: number, bodyNum: number): Promise<string | null> {
-  const key = `${headNum}.${bodyNum}`;
+export function ensureFusionSpriteOnDemand(
+  headNum: number,
+  bodyNum: number,
+  options?: { guidancePrompt?: string },
+): Promise<string | null> {
+  const promptKey = options?.guidancePrompt?.trim() || '';
+  const key = `${headNum}.${bodyNum}:${promptKey}`;
   const existing = gFusionEnsurePromises.get(key);
   if (existing) return existing;
 
   const task = (async () => {
-    const started = await requestFusionGenerateOnce(headNum, bodyNum);
+    const started = await requestFusionGenerateOnce(headNum, bodyNum, options);
     if (!started) return null;
     return waitForFusionReady(headNum, bodyNum, started.base);
   })().finally(() => {

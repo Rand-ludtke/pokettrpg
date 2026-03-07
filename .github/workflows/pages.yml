@@ -34,7 +34,6 @@ jobs:
         working-directory: tauri-app
         env:
           VITE_PUBLIC_BASE: "/${{ github.event.repository.name }}/"
-          VITE_ASSET_BASE: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/assets"
         run: npm run build
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

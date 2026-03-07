@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { withPublicBase } from '../utils/publicBase';
-import { spriteUrl } from '../data/adapter';
+import { spriteUrl, loadShowdownDataJson } from '../data/adapter';
 import { getClient } from '../net/pokettrpgClient';
 import { getCustomItems } from '../data/adapter';
 import { TRAINER_TRAITS } from '../data/trainerTraits';
@@ -210,8 +210,7 @@ export function CharacterSheet() {
 		let cancelled=false;
 		(async()=>{
 			try {
-				const res = await fetch(withPublicBase('vendor/showdown/data/items.json'));
-				if(!res.ok) return; const json = await res.json();
+				const json = await loadShowdownDataJson<Record<string, any>>('items.json', { defaultValue: {} });
 				if(cancelled) return;
 				// Normalize into id->entry map; id function replicates PS toID semantics
 				const toID = (s:string)=> s.toLowerCase().replace(/[^a-z0-9]+/g,'');
