@@ -301,12 +301,119 @@ app.post("/api/trainer-sprites/upload", (req: Request, res: Response) => {
 });
 
 // --- Fusion sprites (Infinite Fusion) ---
+function firstExistingPath(candidates: string[]): string {
+  for (const candidate of candidates) {
+    try {
+      if (candidate && fs.existsSync(candidate)) return candidate;
+    } catch {}
+  }
+  return "";
+}
+
+function parsePathList(raw: string | undefined): string[] {
+  if (!raw) return [];
+  return raw
+    .split(path.delimiter)
+    .map((segment) => segment.trim())
+    .filter((segment) => !!segment)
+    .map((segment) => path.resolve(segment));
+}
+
+const DEFAULT_FUSION_SPRITES_CANDIDATES = [
+  path.resolve(".fusion-sprites-local"),
+  path.resolve("../.fusion-sprites-local"),
+  path.resolve("Full Sprite pack 1-121 (December 2025)"),
+  path.resolve("../Full Sprite pack 1-121 (December 2025)"),
+  path.resolve("tauri-app/public/spliced-sprites"),
+  path.resolve("../tauri-app/public/spliced-sprites"),
+];
+
+const DEFAULT_VENDOR_SPRITES_CANDIDATES = [
+  path.resolve("tauri-app/public/vendor/showdown/sprites"),
+  path.resolve("../tauri-app/public/vendor/showdown/sprites"),
+  path.resolve("public/vendor/showdown/sprites"),
+];
+
+const DEFAULT_FULL_PACK_BASE_SPRITES_CANDIDATES = [
+  path.resolve("Full Sprite pack 1-121 (December 2025)/Other/BaseSprites"),
+  path.resolve("../Full Sprite pack 1-121 (December 2025)/Other/BaseSprites"),
+];
+
 const FUSION_SPRITES_DIR = process.env.FUSION_SPRITES_DIR
   ? path.resolve(process.env.FUSION_SPRITES_DIR)
-  : "";
+  : firstExistingPath(DEFAULT_FUSION_SPRITES_CANDIDATES);
+const FUSION_SPRITES_EXTRA_DIRS = parsePathList(process.env.FUSION_SPRITES_EXTRA_DIRS);
+const VENDOR_SPRITES_DIR = firstExistingPath(DEFAULT_VENDOR_SPRITES_CANDIDATES);
+const FULL_PACK_BASE_SPRITES_DIR = firstExistingPath(DEFAULT_FULL_PACK_BASE_SPRITES_CANDIDATES);
+const UNIFIED_SPRITES_ROOT = process.env.UNIFIED_SPRITES_ROOT
+  ? path.resolve(process.env.UNIFIED_SPRITES_ROOT)
+  : path.resolve(FUSION_SPRITES_DIR || ".fusion-sprites-local", "sprites");
 const FUSION_PACK_ZIP = process.env.FUSION_PACK_ZIP
   ? path.resolve(process.env.FUSION_PACK_ZIP)
   : "";
+
+function ensureParentDir(filePath: string) {
+  try {
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  } catch {}
+}
+
+function tryCacheSpriteToUnified(folder: string, filename: string): string {
+  const target = path.join(UNIFIED_SPRITES_ROOT, folder, filename);
+  if (fs.existsSync(target)) return target;
+
+  const sourceCandidates: string[] = [];
+  if (folder === "gen5" && FULL_PACK_BASE_SPRITES_DIR && /^-?\d+[a-z]*\.png$/i.test(filename)) {
+    sourceCandidates.push(path.join(FULL_PACK_BASE_SPRITES_DIR, filename));
+  }
+  if (VENDOR_SPRITES_DIR) {
+    sourceCandidates.push(path.join(VENDOR_SPRITES_DIR, folder, filename));
+  }
+
+  for (const source of sourceCandidates) {
+    if (!source || !fs.existsSync(source)) continue;
+    try {
+      ensureParentDir(target);
+      fs.copyFileSync(source, target);
+      return target;
+    } catch {}
+  }
+
+  return "";
+}
+
+app.get("/sprites/index.json", (_req: Request, res: Response) => {
+  const unifiedIndex = path.join(UNIFIED_SPRITES_ROOT, "index.json");
+  if (fs.existsSync(unifiedIndex)) return res.sendFile(unifiedIndex);
+
+  if (!VENDOR_SPRITES_DIR) return res.status(404).json({ error: "sprites index not configured" });
+  const sourceIndex = path.join(VENDOR_SPRITES_DIR, "index.json");
+  if (!fs.existsSync(sourceIndex)) return res.status(404).json({ error: "sprites index not found" });
+
+  try {
+    ensureParentDir(unifiedIndex);
+    fs.copyFileSync(sourceIndex, unifiedIndex);
+    return res.sendFile(unifiedIndex);
+  } catch {
+    return res.sendFile(sourceIndex);
+  }
+});
+
+app.get("/sprites/:folder/:filename", (req: Request, res: Response) => {
+  const folder = path.basename(String(req.params.folder || ""));
+  const filename = path.basename(String(req.params.filename || ""));
+  if (!folder || !filename) return res.status(400).json({ error: "missing sprite path" });
+  if (!/^[a-z0-9-]+$/i.test(folder)) return res.status(400).json({ error: "invalid folder" });
+  if (!/^[a-z0-9._-]+\.(png|gif)$/i.test(filename)) return res.status(400).json({ error: "invalid filename" });
+
+  const unifiedPath = path.join(UNIFIED_SPRITES_ROOT, folder, filename);
+  if (fs.existsSync(unifiedPath)) return res.sendFile(unifiedPath);
+
+  const cached = tryCacheSpriteToUnified(folder, filename);
+  if (cached && fs.existsSync(cached)) return res.sendFile(cached);
+
+  return res.status(404).json({ error: "sprite not found" });
+});
 
 // Fusion sprite serving
 let fusionGenService: FusionGenService | null = null;
@@ -314,9 +421,13 @@ let fusionGenService: FusionGenService | null = null;
 if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   registerFusionRoutes(app, {
     spritesDir: FUSION_SPRITES_DIR,
+    spritesDirs: FUSION_SPRITES_EXTRA_DIRS,
     packZipPath: FUSION_PACK_ZIP || undefined,
   });
   console.log(`[Fusion] Sprites directory enabled: ${FUSION_SPRITES_DIR}`);
+  if (FUSION_SPRITES_EXTRA_DIRS.length) {
+    console.log(`[Fusion] Extra sprite roots: ${FUSION_SPRITES_EXTRA_DIRS.join(", ")}`);
+  }
 
   // Fusion generation service (Pi 5 + AI HAT2)
   const FUSION_GEN_SCRIPTS = process.env.FUSION_GEN_SCRIPTS
@@ -330,8 +441,42 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   const FUSION_LORA = process.env.FUSION_LORA_PATH
     ? path.resolve(process.env.FUSION_LORA_PATH)
     : undefined;
+  const FUSION_GEN_REMOTE_BASE = (process.env.FUSION_GEN_REMOTE_BASE || "").trim().replace(/\/+$/, "");
+  const fetchFn = (globalThis as any).fetch as
+    | ((input: string, init?: any) => Promise<any>)
+    | undefined;
 
-  if (FUSION_GEN_SCRIPTS && FUSION_GEN_BASE) {
+  if (FUSION_GEN_REMOTE_BASE && fetchFn) {
+    const workerFetch = fetchFn;
+    async function proxyToFusionWorker(req: Request, res: Response, upstreamPath: string) {
+      try {
+        const upstream = await workerFetch(`${FUSION_GEN_REMOTE_BASE}${upstreamPath}`, {
+          method: req.method,
+          headers: { "Content-Type": "application/json" },
+          body: req.method === "GET" ? undefined : JSON.stringify(req.body ?? {}),
+        });
+        const text = await upstream.text();
+        let payload: any = null;
+        try {
+          payload = text ? JSON.parse(text) : null;
+        } catch {
+          payload = { raw: text };
+        }
+        return res.status(upstream.status).json(payload ?? {});
+      } catch (err: any) {
+        return res.status(502).json({ error: err?.message || "fusion worker proxy failed" });
+      }
+    }
+
+    app.post("/fusion/generate", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/fusion/generate"));
+    app.post("/fusion/generate-base", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/fusion/generate-base"));
+    app.post("/fusion/new-species", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/fusion/new-species"));
+    app.get("/fusion/gen-status", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/fusion/gen-status"));
+    app.get("/fusion/gen-check/:head/:body", (req: Request, res: Response) =>
+      proxyToFusionWorker(req, res, `/fusion/gen-check/${req.params.head}/${req.params.body}`)
+    );
+    console.log(`[FusionGen] Remote worker mode enabled: ${FUSION_GEN_REMOTE_BASE}`);
+  } else if (FUSION_GEN_SCRIPTS && FUSION_GEN_BASE) {
     fusionGenService = new FusionGenService({
       spritesDir: FUSION_SPRITES_DIR,
       scriptsDir: FUSION_GEN_SCRIPTS,
@@ -346,7 +491,7 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
     fusionGenService.start();
     console.log(`[FusionGen] Generation service started (mode=${FUSION_GEN_MODE})`);
   } else {
-    console.log("[FusionGen] Not configured. Set FUSION_GEN_SCRIPTS and FUSION_GEN_BASE_SPRITES.");
+    console.log("[FusionGen] Not configured. Set FUSION_GEN_REMOTE_BASE (recommended) or FUSION_GEN_SCRIPTS + FUSION_GEN_BASE_SPRITES.");
   }
 } else {
   console.log("[Fusion] Sprites directory not configured. Set FUSION_SPRITES_DIR to enable.");
@@ -848,7 +993,10 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
     return clone;
   });
 
-  const state = room.engine.initializeBattle(hydratedPlayers, { seed: battleSeed });
+  const state = room.engine.initializeBattle(hydratedPlayers, {
+    seed: battleSeed,
+    startConditions: rules?.startConditions,
+  });
   // Ensure clients treat this as turn 1 when prompting (no pre-start move UI)
   if (typeof state.turn === "number" && state.turn < 1) {
     state.turn = 1;
@@ -1313,8 +1461,16 @@ async function tryLoadExternalData() {
     if (localAbilities) mergeAbilities(convertShowdownAbilities(localAbilities));
   } catch {}
   try {
+    const sageAbilities = (await import(path.resolve("data/sage-abilities.ts"))).default as Record<string, any>;
+    if (sageAbilities) mergeAbilities(convertShowdownAbilities(sageAbilities));
+  } catch {}
+  try {
     const localItems = (await import(path.resolve("data/items.ts"))).default as Record<string, any>;
     if (localItems) mergeItems(convertShowdownItems(localItems));
+  } catch {}
+  try {
+    const sageItems = (await import(path.resolve("data/sage-items.ts"))).default as Record<string, any>;
+    if (sageItems) mergeItems(convertShowdownItems(sageItems));
   } catch {}
   try {
     const localSpecies = (await import(path.resolve("data/pokedex.ts"))).default as Record<string, any>;
@@ -1328,7 +1484,36 @@ async function tryLoadExternalData() {
     }
   } catch {}
 }
-tryLoadExternalData();
+
+function loadFusionDexNumsFromShowdownJson(): number[] {
+  const candidates = [
+    path.resolve("../tauri-app/public/vendor/showdown/data/pokedex.json"),
+    path.resolve("tauri-app/public/vendor/showdown/data/pokedex.json"),
+    path.resolve("public/vendor/showdown/data/pokedex.json"),
+  ];
+  for (const file of candidates) {
+    try {
+      if (!fs.existsSync(file)) continue;
+      const raw = JSON.parse(fs.readFileSync(file, "utf-8")) as Record<string, any>;
+      const nums = Array.from(new Set(
+        Object.values(raw || {})
+          .map((entry: any) => Number(entry?.num))
+          .filter((n) => Number.isFinite(n) && n !== 0)
+          .map((n) => Math.trunc(n))
+      ));
+      if (nums.length) return nums;
+    } catch {}
+  }
+  return [];
+}
+
+void (async () => {
+  await tryLoadExternalData();
+  if (fusionGenService) {
+    const nums = loadFusionDexNumsFromShowdownJson();
+    fusionGenService.setAllDexNums(nums);
+  }
+})();
 
 const rooms = new Map<string, Room>();
 rooms.set(DEFAULT_LOBBY_ID, createRoomRecord(DEFAULT_LOBBY_ID, DEFAULT_LOBBY_NAME));
@@ -1666,7 +1851,10 @@ io.on("connection", (socket: Socket) => {
       return clone;
     });
     
-    const state = room.engine.initializeBattle(hydratedPlayers, { seed: battleSeed });
+    const state = room.engine.initializeBattle(hydratedPlayers, {
+      seed: battleSeed,
+      startConditions: data.rules?.startConditions,
+    });
     if (typeof state.turn === "number" && state.turn < 1) {
       state.turn = 1;
     }
@@ -1735,7 +1923,7 @@ io.on("connection", (socket: Socket) => {
     
     // Handle team preview phase
     if (room.phase === "team-preview") {
-      if (data.action.type === "team" && Array.isArray((data.action as any).order)) {
+      if ((data.action as any).type === "team" && Array.isArray((data.action as any).order)) {
         console.log(`[Server] Team preview order received from ${data.playerId}:`, (data.action as any).order);
         if (!room.teamPreviewOrders) room.teamPreviewOrders = {};
         room.teamPreviewOrders[data.playerId] = (data.action as any).order;
@@ -1747,7 +1935,7 @@ io.on("connection", (socket: Socket) => {
         });
         checkTeamPreviewComplete(room);
         return;
-      } else if (data.action.type === "auto") {
+      } else if ((data.action as any).type === "auto") {
         // Auto-submit with default order
         if (!room.teamPreviewOrders) room.teamPreviewOrders = {};
         const playerData = room.teamPreviewPlayers?.find(p => p.id === data.playerId);

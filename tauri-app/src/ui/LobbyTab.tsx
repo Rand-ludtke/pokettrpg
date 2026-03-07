@@ -173,6 +173,43 @@ const CLAUSE_OPTIONS = [
   { id: 'unlimitedtera', label: 'Unlimited Terastallization', desc: 'Allow Terastallization every turn instead of once per battle' },
 ];
 
+type StartSideSetup = {
+  stealthRock: boolean;
+  spikesLayers: number;
+  toxicSpikesLayers: number;
+  stickyWeb: boolean;
+  reflectTurns: number;
+  lightScreenTurns: number;
+  tailwindTurns: number;
+};
+
+const DEFAULT_START_SIDE_SETUP: StartSideSetup = {
+  stealthRock: false,
+  spikesLayers: 0,
+  toxicSpikesLayers: 0,
+  stickyWeb: false,
+  reflectTurns: 0,
+  lightScreenTurns: 0,
+  tailwindTurns: 0,
+};
+
+const START_WEATHER_OPTIONS = [
+  { value: 'none', label: 'None' },
+  { value: 'sun', label: 'Sun' },
+  { value: 'rain', label: 'Rain' },
+  { value: 'sandstorm', label: 'Sandstorm' },
+  { value: 'snow', label: 'Snow' },
+  { value: 'hail', label: 'Hail' },
+];
+
+const START_TERRAIN_OPTIONS = [
+  { value: 'none', label: 'None' },
+  { value: 'electric', label: 'Electric Terrain' },
+  { value: 'grassy', label: 'Grassy Terrain' },
+  { value: 'misty', label: 'Misty Terrain' },
+  { value: 'psychic', label: 'Psychic Terrain' },
+];
+
 export function LobbyTab() {
   const client = useMemo(() => getClient(), []);
   const [status, setStatus] = useState<ClientStatus>(client.getStatus());
@@ -206,6 +243,12 @@ export function LobbyTab() {
   const [teamSize, setTeamSize] = useState<number>(6);
   const [teamPreviewEnabled, setTeamPreviewEnabled] = useState<boolean>(true);
   const [activeCount, setActiveCount] = useState<number>(1);
+  const [startWeather, setStartWeather] = useState<string>('none');
+  const [startWeatherTurns, setStartWeatherTurns] = useState<number>(5);
+  const [startTerrain, setStartTerrain] = useState<string>('none');
+  const [startTerrainTurns, setStartTerrainTurns] = useState<number>(5);
+  const [startSide1, setStartSide1] = useState<StartSideSetup>(DEFAULT_START_SIDE_SETUP);
+  const [startSide2, setStartSide2] = useState<StartSideSetup>(DEFAULT_START_SIDE_SETUP);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
@@ -578,6 +621,48 @@ export function LobbyTab() {
     return buildPlayerPayload(username, myId, members, trainerSprite);
   }
 
+  function clampInt(value: number, min: number, max: number): number {
+    if (!Number.isFinite(value)) return min;
+    return Math.max(min, Math.min(max, Math.trunc(value)));
+  }
+
+  function buildStartSidePayload(side: StartSideSetup) {
+    const hazards: Record<string, any> = {};
+    const sideConditions: Record<string, any> = {};
+
+    if (side.stealthRock) hazards.stealthRock = true;
+    if (side.stickyWeb) hazards.stickyWeb = true;
+    const spikesLayers = clampInt(side.spikesLayers, 0, 3);
+    if (spikesLayers > 0) hazards.spikesLayers = spikesLayers;
+    const toxicSpikesLayers = clampInt(side.toxicSpikesLayers, 0, 2);
+    if (toxicSpikesLayers > 0) hazards.toxicSpikesLayers = toxicSpikesLayers;
+
+    const reflectTurns = clampInt(side.reflectTurns, 0, 99);
+    if (reflectTurns > 0) sideConditions.reflectTurns = reflectTurns;
+    const lightScreenTurns = clampInt(side.lightScreenTurns, 0, 99);
+    if (lightScreenTurns > 0) sideConditions.lightScreenTurns = lightScreenTurns;
+    const tailwindTurns = clampInt(side.tailwindTurns, 0, 99);
+    if (tailwindTurns > 0) sideConditions.tailwindTurns = tailwindTurns;
+
+    if (!Object.keys(hazards).length && !Object.keys(sideConditions).length) return undefined;
+    return {
+      ...(Object.keys(hazards).length ? { sideHazards: hazards } : {}),
+      ...(Object.keys(sideConditions).length ? { sideConditions } : {}),
+    };
+  }
+
+  function summarizeStartSide(side: StartSideSetup): string {
+    const pieces: string[] = [];
+    if (side.stealthRock) pieces.push('Stealth Rock');
+    if (side.spikesLayers > 0) pieces.push(`Spikes x${clampInt(side.spikesLayers, 0, 3)}`);
+    if (side.toxicSpikesLayers > 0) pieces.push(`Toxic Spikes x${clampInt(side.toxicSpikesLayers, 0, 2)}`);
+    if (side.stickyWeb) pieces.push('Sticky Web');
+    if (side.reflectTurns > 0) pieces.push(`Reflect ${clampInt(side.reflectTurns, 0, 99)}t`);
+    if (side.lightScreenTurns > 0) pieces.push(`Light Screen ${clampInt(side.lightScreenTurns, 0, 99)}t`);
+    if (side.tailwindTurns > 0) pieces.push(`Tailwind ${clampInt(side.tailwindTurns, 0, 99)}t`);
+    return pieces.join(', ');
+  }
+
   async function handleCreateChallenge() {
     if (!currentRoom) return;
     if (!iAmPlayer) {
@@ -606,8 +691,32 @@ export function LobbyTab() {
     if (clauseLabels.length) rulesComponents.push(`Clauses: ${clauseLabels.join(', ')}`);
     if (playerCountFormat !== '1v1') rulesComponents.push(`Format: ${playerFormatLabel}`);
     if (teamSize !== 6) rulesComponents.push(`Team Size: ${teamSize}`);
+    if (startWeather !== 'none') rulesComponents.push(`Start Weather: ${startWeather} (${clampInt(startWeatherTurns, 1, 99)}t)`);
+    if (startTerrain !== 'none') rulesComponents.push(`Start Terrain: ${startTerrain} (${clampInt(startTerrainTurns, 1, 99)}t)`);
+    const side1Summary = summarizeStartSide(startSide1);
+    const side2Summary = summarizeStartSide(startSide2);
+    if (side1Summary) rulesComponents.push(`Start Side 1: ${side1Summary}`);
+    if (side2Summary) rulesComponents.push(`Start Side 2: ${side2Summary}`);
     if (challengeRules.trim()) rulesComponents.push(challengeRules.trim());
     const fullRulesDisplay = rulesComponents.join(' | ');
+
+    const startConditionsField: Record<string, any> = {};
+    if (startWeather !== 'none') {
+      startConditionsField.weather = { id: startWeather, turnsLeft: clampInt(startWeatherTurns, 1, 99) };
+    }
+    if (startTerrain !== 'none') {
+      startConditionsField.terrain = { id: startTerrain, turnsLeft: clampInt(startTerrainTurns, 1, 99) };
+    }
+    const side1Payload = buildStartSidePayload(startSide1);
+    const side2Payload = buildStartSidePayload(startSide2);
+    const startConditionsPayload =
+      Object.keys(startConditionsField).length || side1Payload || side2Payload
+        ? {
+            ...(Object.keys(startConditionsField).length ? { field: startConditionsField } : {}),
+            ...(side1Payload ? { side1: side1Payload } : {}),
+            ...(side2Payload ? { side2: side2Payload } : {}),
+          }
+        : undefined;
 
     // Build rules object for the backend
     const rulesObject: Record<string, any> = {
@@ -618,6 +727,7 @@ export function LobbyTab() {
       clauses: Array.from(selectedClauses),
       customRules: challengeRules.trim() || undefined,
       displayString: fullRulesDisplay || undefined,
+      startConditions: startConditionsPayload,
     };
 
     try {
@@ -973,6 +1083,127 @@ export function LobbyTab() {
                     <option value={3}>3 (Triples)</option>
                   </select>
                 </label>
+
+                <div className="dim" style={{ display: 'grid', gap: 8, borderTop: '1px solid #444', paddingTop: 8 }}>
+                  <span>Start Field Effects</span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px', gap: 8 }}>
+                    <label style={{ display: 'grid', gap: 4 }}>
+                      Weather
+                      <select
+                        value={startWeather}
+                        onChange={e => setStartWeather(e.target.value)}
+                        style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }}
+                      >
+                        {START_WEATHER_OPTIONS.map(opt => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label style={{ display: 'grid', gap: 4 }}>
+                      Turns
+                      <input
+                        type="number"
+                        min={1}
+                        max={99}
+                        value={startWeatherTurns}
+                        onChange={e => setStartWeatherTurns(clampInt(Number(e.target.value) || 1, 1, 99))}
+                        style={{ padding: '6px 8px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }}
+                      />
+                    </label>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px', gap: 8 }}>
+                    <label style={{ display: 'grid', gap: 4 }}>
+                      Terrain
+                      <select
+                        value={startTerrain}
+                        onChange={e => setStartTerrain(e.target.value)}
+                        style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }}
+                      >
+                        {START_TERRAIN_OPTIONS.map(opt => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label style={{ display: 'grid', gap: 4 }}>
+                      Turns
+                      <input
+                        type="number"
+                        min={1}
+                        max={99}
+                        value={startTerrainTurns}
+                        onChange={e => setStartTerrainTurns(clampInt(Number(e.target.value) || 1, 1, 99))}
+                        style={{ padding: '6px 8px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="dim" style={{ display: 'grid', gap: 8, borderTop: '1px solid #444', paddingTop: 8 }}>
+                  <span>Start Side Hazards / Screens</span>
+                  <div style={{ display: 'grid', gap: 8, border: '1px solid #444', borderRadius: 6, padding: 8 }}>
+                    <strong style={{ fontSize: '0.85em' }}>Side 1 (challenge creator)</strong>
+                    <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <input type="checkbox" checked={startSide1.stealthRock} onChange={e => setStartSide1(prev => ({ ...prev, stealthRock: e.target.checked }))} />
+                      Stealth Rock
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Spikes layers
+                      <input type="number" min={0} max={3} value={startSide1.spikesLayers} onChange={e => setStartSide1(prev => ({ ...prev, spikesLayers: clampInt(Number(e.target.value) || 0, 0, 3) }))} style={{ width: 50, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Toxic Spikes layers
+                      <input type="number" min={0} max={2} value={startSide1.toxicSpikesLayers} onChange={e => setStartSide1(prev => ({ ...prev, toxicSpikesLayers: clampInt(Number(e.target.value) || 0, 0, 2) }))} style={{ width: 50, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                    <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <input type="checkbox" checked={startSide1.stickyWeb} onChange={e => setStartSide1(prev => ({ ...prev, stickyWeb: e.target.checked }))} />
+                      Sticky Web
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Reflect turns
+                      <input type="number" min={0} max={99} value={startSide1.reflectTurns} onChange={e => setStartSide1(prev => ({ ...prev, reflectTurns: clampInt(Number(e.target.value) || 0, 0, 99) }))} style={{ width: 60, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Light Screen turns
+                      <input type="number" min={0} max={99} value={startSide1.lightScreenTurns} onChange={e => setStartSide1(prev => ({ ...prev, lightScreenTurns: clampInt(Number(e.target.value) || 0, 0, 99) }))} style={{ width: 60, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Tailwind turns
+                      <input type="number" min={0} max={99} value={startSide1.tailwindTurns} onChange={e => setStartSide1(prev => ({ ...prev, tailwindTurns: clampInt(Number(e.target.value) || 0, 0, 99) }))} style={{ width: 60, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                  </div>
+
+                  <div style={{ display: 'grid', gap: 8, border: '1px solid #444', borderRadius: 6, padding: 8 }}>
+                    <strong style={{ fontSize: '0.85em' }}>Side 2 (opponent)</strong>
+                    <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <input type="checkbox" checked={startSide2.stealthRock} onChange={e => setStartSide2(prev => ({ ...prev, stealthRock: e.target.checked }))} />
+                      Stealth Rock
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Spikes layers
+                      <input type="number" min={0} max={3} value={startSide2.spikesLayers} onChange={e => setStartSide2(prev => ({ ...prev, spikesLayers: clampInt(Number(e.target.value) || 0, 0, 3) }))} style={{ width: 50, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Toxic Spikes layers
+                      <input type="number" min={0} max={2} value={startSide2.toxicSpikesLayers} onChange={e => setStartSide2(prev => ({ ...prev, toxicSpikesLayers: clampInt(Number(e.target.value) || 0, 0, 2) }))} style={{ width: 50, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                    <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <input type="checkbox" checked={startSide2.stickyWeb} onChange={e => setStartSide2(prev => ({ ...prev, stickyWeb: e.target.checked }))} />
+                      Sticky Web
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Reflect turns
+                      <input type="number" min={0} max={99} value={startSide2.reflectTurns} onChange={e => setStartSide2(prev => ({ ...prev, reflectTurns: clampInt(Number(e.target.value) || 0, 0, 99) }))} style={{ width: 60, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Light Screen turns
+                      <input type="number" min={0} max={99} value={startSide2.lightScreenTurns} onChange={e => setStartSide2(prev => ({ ...prev, lightScreenTurns: clampInt(Number(e.target.value) || 0, 0, 99) }))} style={{ width: 60, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                    <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      Tailwind turns
+                      <input type="number" min={0} max={99} value={startSide2.tailwindTurns} onChange={e => setStartSide2(prev => ({ ...prev, tailwindTurns: clampInt(Number(e.target.value) || 0, 0, 99) }))} style={{ width: 60, padding: '4px 6px', borderRadius: 4, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }} />
+                    </label>
+                  </div>
+                </div>
 
                 {/* Clauses Multi-Select */}
                 <div className="dim" style={{ display: 'grid', gap: 6 }}>

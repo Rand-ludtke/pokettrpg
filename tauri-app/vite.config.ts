@@ -110,15 +110,19 @@ export default defineConfig(({ mode }) => {
               writeFileSync(manifestPath, JSON.stringify(files, null, 2));
             }
           } catch {}
-          // Mirror vendor/showdown assets into dist/assets for PWA hosting only
+          // Mirror vendor/showdown assets into dist/assets for external PWA hosting.
+          // This is expensive on Windows for very large sprite packs, so keep it opt-in.
+          const mirrorVendorAssets = (process.env.VITE_MIRROR_VENDOR_ASSETS === '1');
           // Skip for Tauri desktop builds to avoid doubling the dist size (~650MB)
           if (!isTauri) {
             try {
-              const srcVendor = path.resolve(__dirname, 'public', 'vendor', 'showdown');
-              const dstVendor = path.resolve(__dirname, 'dist', 'assets', 'vendor', 'showdown');
-              if (existsSync(srcVendor)) {
-                try { mkdirSync(dstVendor, { recursive: true }); } catch {}
-                try { cpSync(srcVendor, dstVendor, { recursive: true }); } catch {}
+              if (mirrorVendorAssets) {
+                const srcVendor = path.resolve(__dirname, 'public', 'vendor', 'showdown');
+                const dstVendor = path.resolve(__dirname, 'dist', 'assets', 'vendor', 'showdown');
+                if (existsSync(srcVendor)) {
+                  try { mkdirSync(dstVendor, { recursive: true }); } catch {}
+                  try { cpSync(srcVendor, dstVendor, { recursive: true }); } catch {}
+                }
               }
               const srcCustomSprites = path.resolve(__dirname, 'public', 'assets', 'custom-sprites');
               const dstCustomSprites = path.resolve(__dirname, 'dist', 'assets', 'custom-sprites');
@@ -161,8 +165,8 @@ export default defineConfig(({ mode }) => {
       // Skip automatic public/ copy for Tauri; plugin copies a curated subset.
       copyPublicDir: !isTauri,
       // Prevent Vite from rm-ing the massive dist/vendor tree (ENOTEMPTY on Windows).
-      // Our closeBundle plugin handles the assets.
-      emptyOutDir: true,
+      // Our closeBundle plugin handles asset syncing/pruning.
+      emptyOutDir: false,
       // don't minify for debug builds
       minify: !process.env.TAURI_DEBUG ? 'esbuild' : false,
       // produce sourcemaps for debug builds
