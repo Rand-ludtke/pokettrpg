@@ -101,27 +101,25 @@ function getShowdownDataBaseCandidates(preferredBase?: string): string[] {
     normalizeBaseUrl(withPublicBase('vendor/showdown/data')),
   ];
 
-  const fromApiBase = (() => {
-    try {
-      const apiBase = normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase'));
-      if (!apiBase) return [] as string[];
-      return [`${apiBase}/vendor/showdown/data`];
-    } catch {
-      return [] as string[];
-    }
-  })();
-
   const fromOrigin = (() => {
     if (typeof window === 'undefined' || !window.location?.origin) return [] as string[];
     const origin = normalizeBaseUrl(window.location.origin);
     return [`${origin}/vendor/showdown/data`];
   })();
 
-  const all = [explicit, ...fromApiBase, ...defaults, ...fromOrigin]
+  const all = [explicit, ...defaults, ...fromOrigin]
     .map(normalizeBaseUrl)
     .filter((v): v is string => !!v);
   return Array.from(new Set(all));
 }
+
+let gShowdownDexPromise: Promise<{
+  pokedex: DexIndex;
+  moves: MoveIndex;
+  abilities: AbilityIndex;
+  items: ItemIndex;
+  learnsets: LearnsetsIndex;
+}> | null = null;
 
 async function fetchJsonFromBaseCandidates<T>(relativePath: string, bases: string[]): Promise<T | null> {
   for (const base of bases) {
@@ -158,6 +156,9 @@ export async function loadShowdownDataJson<T = any>(
 }
 
 export async function loadShowdownDex(options?: { base?: string }) {
+  if (!options?.base && gShowdownDexPromise) return gShowdownDexPromise;
+
+  const task = (async () => {
   const fetchOptionalJson = async (path: string) => {
     try {
       const res = await fetch(path);
@@ -174,7 +175,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
     loadShowdownDataJson<AbilityIndex>('abilities.json', { base: options?.base, defaultValue: {} as AbilityIndex }),
     loadShowdownDataJson<ItemIndex>('items.json', { base: options?.base, defaultValue: {} as ItemIndex }),
     loadShowdownDataJson<LearnsetsIndex>('learnsets.json', { base: options?.base, defaultValue: {} as LearnsetsIndex }),
-    loadShowdownDataJson<AliasesIndex>('aliases.json', { base: options?.base, defaultValue: {} as AliasesIndex }),
+    Promise.resolve({} as AliasesIndex),
   ]);
 
   const [sagePokedex, sageLearnsets, sageMoves, sageAbilities, sageItems] = await Promise.all([
@@ -254,13 +255,23 @@ export async function loadShowdownDex(options?: { base?: string }) {
       gAliases[normalizeName(k)] = normalizeName(v);
     }
   } catch { gAliases = {}; }
-  return {
+  const result = {
     pokedex: mergedDex,
     moves: mergedMoves,
     abilities: mergedAbilities,
     items: mergedItems,
     learnsets: mergedLs,
   };
+  // Make dex number lookups available globally for sprite fallback IDs.
+  buildDexNumMaps(mergedDex);
+  return result;
+  })();
+
+  if (!options?.base) {
+    gShowdownDexPromise = task;
+  }
+
+  return task;
 }
 
 // Serialize a BattlePokemon into a Showdown set line (PS import/export format)
@@ -740,6 +751,22 @@ export async function listPokemonSpriteOptions(
       set: 'custom',
       front: customFront,
       back: customBack,
+    });
+  }
+
+  // Expose numeric BaseSprites option (from .fusion-sprites-local/Other/BaseSprites via backend /sprites cache)
+  // even when vendor index.json doesn't list numeric IDs.
+  const numericId = nameToDexNum(speciesName);
+  if (Number.isFinite(numericId) && numericId && numericId > 0) {
+    const numericSpriteId = String(Math.trunc(numericId));
+    out.push({
+      id: `gen5:numeric:${numericSpriteId}`,
+      label: `Gen 5 BaseSprites • #${numericSpriteId}`,
+      spriteId: numericSpriteId,
+      set: 'gen5',
+      front: `${base}/gen5/${numericSpriteId}.png`,
+      back: `${base}/gen5-back/${numericSpriteId}.png`,
+      animated: false,
     });
   }
 

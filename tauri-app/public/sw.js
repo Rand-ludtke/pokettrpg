@@ -1,9 +1,11 @@
-const CACHE_NAME = 'pokettrpg-pwa-v1';
+const CACHE_NAME = 'pokettrpg-pwa-v2';
+const scope = self?.registration?.scope || '/';
+const base = scope.endsWith('/') ? scope : `${scope}/`;
 const CORE_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/pwa-icon.svg',
+  base,
+  `${base}index.html`,
+  `${base}manifest.webmanifest`,
+  `${base}pwa-icon.svg`,
 ];
 
 self.addEventListener('install', event => {
