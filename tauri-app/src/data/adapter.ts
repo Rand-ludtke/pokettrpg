@@ -63,31 +63,25 @@ function normalizeBaseUrl(base: string | null | undefined): string {
 
 function getSpriteBaseCandidates(preferredBase?: string): string[] {
   const explicit = normalizeBaseUrl(preferredBase);
-  const defaults = [
-    '/sprites',
-    normalizeBaseUrl(DEFAULT_SPRITE_BASE),
-    normalizeBaseUrl(withPublicBase('vendor/showdown/sprites')),
-  ];
 
+  // Static vendor path — built by Vite with the correct base URL for the deploy target
+  // (e.g. '/pokettrpg/vendor/showdown/sprites' on GitHub Pages, './vendor/showdown/sprites' locally).
+  const staticBase = normalizeBaseUrl(DEFAULT_SPRITE_BASE);
+
+  // API backend sprite base (Pi server) — only available when backend is configured.
   const fromApiBase = (() => {
     try {
       const apiBase = normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase'));
       if (!apiBase) return [] as string[];
-      return [`${apiBase}/sprites`, `${apiBase}/vendor/showdown/sprites`];
+      return [`${apiBase}/sprites`];
     } catch {
       return [] as string[];
     }
   })();
 
-  const fromOrigin = (() => {
-    if (typeof window === 'undefined' || !window.location?.origin) return [] as string[];
-    const origin = normalizeBaseUrl(window.location.origin);
-    return [`${origin}/sprites`, `${origin}/vendor/showdown/sprites`];
-  })();
-
-  // Static vendor path first so named/delta sprites resolve to GitHub Pages,
-  // then API base for numeric BaseSprites that only exist on the backend.
-  const all = [explicit, ...defaults, ...fromApiBase, ...fromOrigin]
+  // Static vendor first (GitHub Pages / Tauri bundle), then API backend for
+  // numeric BaseSprites that only exist on the Pi server.
+  const all = [explicit, staticBase, ...fromApiBase]
     .map(normalizeBaseUrl)
     .filter((v): v is string => !!v);
   return Array.from(new Set(all));
@@ -95,7 +89,7 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
 
 export function getPreferredSpriteBase(preferredBase?: string): string {
   const candidates = getSpriteBaseCandidates(preferredBase);
-  return candidates[0] || '/sprites';
+  return candidates[0] || getStaticSpriteBase();
 }
 
 /** Static vendor sprite base — resolves to the deployed static file host (GitHub Pages / Tauri bundle). */
