@@ -22,7 +22,7 @@ export interface BugReport {
 
 const LS_KEY = 'ttrpg.bugReports';
 const MAX_LOG_LINES = 80;
-const APP_VERSION = '1.4.3';
+const APP_VERSION = '1.4.5';
 
 function safeSerialize(value: any): string {
   if (typeof value === 'string') return value;

@@ -397,6 +397,30 @@ function addSpritesFromDir(target: Set<string>, dirPath: string) {
   } catch {}
 }
 
+function addSpritesFromDirRecursive(target: Set<string>, dirPath: string, maxDepth = 3) {
+  function walk(current: string, depth: number) {
+    if (depth > maxDepth) return;
+    try {
+      if (!current || !fs.existsSync(current)) return;
+      const entries = fs.readdirSync(current, { withFileTypes: true });
+      for (const entry of entries) {
+        const next = path.join(current, entry.name);
+        if (entry.isDirectory()) {
+          walk(next, depth + 1);
+          continue;
+        }
+        if (!entry.isFile()) continue;
+        const parsed = path.parse(entry.name);
+        const ext = parsed.ext.toLowerCase();
+        if (ext !== ".png" && ext !== ".gif") continue;
+        if (!parsed.name) continue;
+        target.add(parsed.name);
+      }
+    } catch {}
+  }
+  walk(dirPath, 0);
+}
+
 function buildMergedSpriteIndex(): { folders: Record<string, string[]> } {
   const merged = readIndexFolders(path.join(VENDOR_SPRITES_DIR || "", "index.json"));
   const folders = new Set<string>(Object.keys(merged));
@@ -447,6 +471,12 @@ function buildMergedSpriteIndex(): { folders: Record<string, string[]> } {
   if (FULL_PACK_BASE_SPRITES_DIR) {
     addSpritesFromDir(merged["gen5"], FULL_PACK_BASE_SPRITES_DIR);
   }
+  if (FUSION_SPRITES_DIR) {
+    addSpritesFromDirRecursive(merged["gen5"], path.join(FUSION_SPRITES_DIR, "Other"), 4);
+    addSpritesFromDirRecursive(merged["gen5"], path.join(FUSION_SPRITES_DIR, "sprites", "Other"), 4);
+    addSpritesFromDirRecursive(merged["gen5"], path.join(FUSION_SPRITES_DIR, "sprites", "gen5"), 2);
+    addSpritesFromDirRecursive(merged["gen5"], path.join(FUSION_SPRITES_DIR, "gen5"), 2);
+  }
 
   const payloadFolders: Record<string, string[]> = {};
   for (const [folder, values] of Object.entries(merged)) {
@@ -461,12 +491,18 @@ function tryCacheSpriteToUnified(folder: string, filename: string): string {
   if (fs.existsSync(target)) return target;
 
   const sourceCandidates: string[] = [];
-  if (folder === "gen5" && /^-?\d+[a-z]*\.png$/i.test(filename)) {
+  if (folder === "gen5") {
     if (FUSION_OTHER_BASE_SPRITES_DIR) {
       sourceCandidates.push(path.join(FUSION_OTHER_BASE_SPRITES_DIR, filename));
     }
     if (FULL_PACK_BASE_SPRITES_DIR) {
       sourceCandidates.push(path.join(FULL_PACK_BASE_SPRITES_DIR, filename));
+    }
+    if (FUSION_SPRITES_DIR) {
+      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "sprites", "gen5", filename));
+      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "gen5", filename));
+      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "Other", filename));
+      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "sprites", "Other", filename));
     }
   }
 
