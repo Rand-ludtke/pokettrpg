@@ -8,7 +8,9 @@ cut-and-paste pixel manipulation.
 Supports three backends:
   1. CLOUD (Replicate API) — Best quality, ~$0.15/image
   2. LOCAL (Qwen-Image GGUF via stable-diffusion.cpp) — Free, runs on CPU/GPU
-  3. DIFFUSERS (HuggingFace diffusers pipeline) — Free, needs GPU (or slow CPU)
+  3. DIFFUSERS (SDXL-Turbo via HuggingFace diffusers) — Free, ~14s/image on GPU
+     Default model: stabilityai/sdxl-turbo (6GB, fits 8GB VRAM)
+     Supports img2img: blends two reference sprites as conditioning input
 
 For Raspberry Pi AI HAT+ 2 (Hailo-10H, 40 TOPS, 8GB):
   The Hailo NPU doesn't natively support diffusion model architectures yet.
@@ -386,63 +388,136 @@ def generate_with_diffusers(
     negative_prompt: str = "",
     width: int = 512,
     height: int = 512,
-    steps: int = 30,
-    cfg_scale: float = 4.0,
-    model_name: str = "Qwen/Qwen-Image-2512",
+    steps: int = 4,
+    cfg_scale: float = 0.0,
+    model_name: str = "stabilityai/sdxl-turbo",
     seed: int = -1,
+    reference_images: list = None,
+    img2img_strength: float = 0.5,
 ) -> Optional[Image.Image]:
     """Generate an image using HuggingFace diffusers pipeline.
 
-    Requires: pip install diffusers transformers torch
-    Needs GPU for reasonable speed with the 20B Qwen-Image model.
-    For CPU-only, consider using sd.cpp backend instead.
+    Default model: SDXL-Turbo (stabilityai/sdxl-turbo) — works on 8GB VRAM.
+    Supports both txt2img and img2img (when reference_images are provided).
+
+    For img2img mode, the two reference sprites are blended into a composite
+    that guides the AI generation while the prompt describes the fusion.
+
+    Requires: pip install diffusers transformers accelerate torch
     """
     try:
         import torch
-        from diffusers import DiffusionPipeline
     except ImportError:
-        print("  ERROR: Install diffusers: pip install diffusers transformers torch")
+        print("  ERROR: Install torch: pip install torch")
         return None
 
+    # Check for HF cache override
+    import os
+    hf_home = os.environ.get("HF_HOME", "")
+    if not hf_home:
+        # Default to project-local cache to avoid filling C: drive
+        project_cache = Path(__file__).parent.parent / ".hf_cache"
+        project_cache.mkdir(exist_ok=True)
+        os.environ["HF_HOME"] = str(project_cache)
+
+    is_sdxl_turbo = "sdxl-turbo" in model_name.lower()
+    use_img2img = reference_images and len(reference_images) >= 2
+
     print(f"  Loading diffusers pipeline: {model_name}")
-    print(f"  This may take a while on first run (downloading ~40GB)...")
+    if use_img2img:
+        print(f"  Mode: img2img (blending {len(reference_images)} reference sprites)")
+    else:
+        print(f"  Mode: txt2img")
 
     try:
         if torch.cuda.is_available():
-            torch_dtype = torch.bfloat16
+            torch_dtype = torch.float16
             device = "cuda"
         else:
             torch_dtype = torch.float32
             device = "cpu"
-            print("  WARNING: Running on CPU — expect VERY slow generation")
+            print("  WARNING: Running on CPU — expect slower generation")
 
-        pipe = DiffusionPipeline.from_pretrained(
-            model_name, torch_dtype=torch_dtype
-        ).to(device)
+        if use_img2img:
+            from diffusers import AutoPipelineForImage2Image
+            pipe = AutoPipelineForImage2Image.from_pretrained(
+                model_name, torch_dtype=torch_dtype, variant="fp16" if is_sdxl_turbo else None,
+            ).to(device)
 
-        generator = None
-        if seed >= 0:
-            generator = torch.Generator(device=device).manual_seed(seed)
+            # Blend the two reference sprites into a composite init image
+            base_img = Image.open(reference_images[0]).convert("RGBA")
+            donor_img = Image.open(reference_images[1]).convert("RGBA")
 
-        neg = negative_prompt or (
-            "blurry, low quality, deformed, text, watermark, "
-            "multiple creatures, split image, comparison"
-        )
+            # Resize both to target generation size
+            size = (width, height)
+            a = base_img.resize(size, Image.LANCZOS)
+            b = donor_img.resize(size, Image.LANCZOS)
 
-        image = pipe(
-            prompt=prompt,
-            negative_prompt=neg,
-            width=width,
-            height=height,
-            num_inference_steps=steps,
-            true_cfg_scale=cfg_scale,
-            generator=generator,
-        ).images[0]
+            # Create RGB composites on white bg
+            bg_a = Image.new("RGB", size, (255, 255, 255))
+            bg_a.paste(a, mask=a.split()[3])
+            bg_b = Image.new("RGB", size, (255, 255, 255))
+            bg_b.paste(b, mask=b.split()[3])
+
+            # Blend 50/50
+            init_image = Image.blend(bg_a, bg_b, 0.5)
+
+            generator = None
+            if seed >= 0:
+                generator = torch.Generator(device=device).manual_seed(seed)
+
+            # SDXL-Turbo: no guidance, few steps
+            effective_steps = max(2, int(steps / img2img_strength)) if is_sdxl_turbo else steps
+
+            kwargs = {
+                "prompt": prompt,
+                "image": init_image,
+                "num_inference_steps": effective_steps,
+                "strength": img2img_strength,
+                "generator": generator,
+            }
+            if is_sdxl_turbo:
+                kwargs["guidance_scale"] = 0.0
+            else:
+                kwargs["guidance_scale"] = cfg_scale
+                if negative_prompt:
+                    kwargs["negative_prompt"] = negative_prompt
+
+            image = pipe(**kwargs).images[0]
+
+        else:
+            from diffusers import AutoPipelineForText2Image
+            pipe = AutoPipelineForText2Image.from_pretrained(
+                model_name, torch_dtype=torch_dtype, variant="fp16" if is_sdxl_turbo else None,
+            ).to(device)
+
+            generator = None
+            if seed >= 0:
+                generator = torch.Generator(device=device).manual_seed(seed)
+
+            kwargs = {
+                "prompt": prompt,
+                "num_inference_steps": steps,
+                "generator": generator,
+            }
+            if is_sdxl_turbo:
+                kwargs["guidance_scale"] = 0.0
+            else:
+                kwargs["guidance_scale"] = cfg_scale
+                neg = negative_prompt or (
+                    "blurry, low quality, deformed, text, watermark, "
+                    "multiple creatures, split image, comparison"
+                )
+                kwargs["negative_prompt"] = neg
+
+            image = pipe(**kwargs).images[0]
 
         return image
 
     except Exception as e:
         print(f"  ERROR: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 
@@ -643,6 +718,7 @@ def generate_fusion(
     style: str = "pixel_art",
     n_colors: int = 16,
     save_raw: bool = True,
+    output_path: Optional[str] = None,
 ) -> Optional[Path]:
     """Generate a single AI fusion sprite.
 
@@ -654,6 +730,7 @@ def generate_fusion(
         style: Prompt style ("pixel_art", "concept", "minimal")
         n_colors: Palette size for post-processing
         save_raw: Also save the unprocessed AI output
+        output_path: If set, save the final sprite to this path instead of default
 
     Returns:
         Path to the generated sprite, or None on failure
@@ -714,7 +791,8 @@ def generate_fusion(
         )
     elif backend == "diffusers":
         raw_img = generate_with_diffusers(
-            prompt, width=512, height=512, steps=30,
+            prompt, width=512, height=512, steps=4,
+            reference_images=ref_images if ref_images else None,
         )
     else:
         print(f"  ERROR: Unknown backend '{backend}'")
@@ -741,7 +819,11 @@ def generate_fusion(
     sprite = postprocess_sprite(raw_img, n_colors)
 
     # Save final sprite
-    out_path = OUTPUT_DIR / f"{fusion_id}_{backend}_{model}.png"
+    if output_path:
+        out_path = Path(output_path)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        out_path = OUTPUT_DIR / f"{fusion_id}_{backend}_{model}.png"
     sprite.save(out_path, "PNG")
     print(f"  Final sprite: {out_path}")
 
@@ -870,6 +952,7 @@ def main():
     parser.add_argument("--style", default="pixel_art", choices=["pixel_art", "concept", "minimal"],
                         help="Prompt style")
     parser.add_argument("--colors", type=int, default=16, help="Palette size")
+    parser.add_argument("--output", help="Output file path (overrides default output location)")
     parser.add_argument("--defaults", action="store_true", help="Run default fusion pairs")
     parser.add_argument("--test", action="store_true", help="Test with 3 pairs only")
     parser.add_argument("--check", action="store_true", help="Check local setup status")
@@ -895,7 +978,8 @@ def main():
 
     if args.base and args.donor:
         generate_fusion(args.base, args.donor, args.model,
-                        backend=args.backend, style=args.style, n_colors=args.colors)
+                        backend=args.backend, style=args.style, n_colors=args.colors,
+                        output_path=args.output)
     elif args.batch:
         batch_generate(args.batch, args.model, backend=args.backend, style=args.style)
     elif args.defaults or args.test:
@@ -911,13 +995,16 @@ def main():
         print("BACKENDS:")
         print("  cloud     — Replicate API (best quality, ~$0.15/image)")
         print("  local     — stable-diffusion.cpp + Qwen-Image GGUF (free, CPU/GPU)")
-        print("  diffusers — HuggingFace diffusers pipeline (free, needs GPU)")
+        print("  diffusers — SDXL-Turbo via HuggingFace diffusers (free, ~14s/image)")
         print()
         print("EXAMPLES:")
         print("  # Cloud (needs REPLICATE_API_TOKEN)")
         print("  python ai_fusion_generator.py --base Charizard --donor Blastoise")
         print()
-        print("  # Local (needs sd.cpp + GGUF model)")
+        print("  # Local Diffusers (recommended — uses SDXL-Turbo, ~14s/image)")
+        print("  python ai_fusion_generator.py --base Pikachu --donor Eevee --backend diffusers")
+        print()
+        print("  # Local sd.cpp (needs sd.cpp + GGUF model)")
         print("  python ai_fusion_generator.py --base Pikachu --donor Eevee --backend local")
         print()
         print("  # Check local setup")

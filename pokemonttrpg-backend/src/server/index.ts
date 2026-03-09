@@ -646,7 +646,7 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   const FUSION_GEN_BASE = process.env.FUSION_GEN_BASE_SPRITES
     ? path.resolve(process.env.FUSION_GEN_BASE_SPRITES)
     : "";
-  const FUSION_GEN_MODE = (process.env.FUSION_GEN_MODE || "splice") as "splice" | "ai" | "splice+ai";
+  const FUSION_GEN_MODE = (process.env.FUSION_GEN_MODE || "ai") as "splice" | "ai" | "splice+ai";
   const FUSION_GEN_WORKERS = parseInt(process.env.FUSION_GEN_WORKERS || "2", 10);
   const FUSION_LORA = process.env.FUSION_LORA_PATH
     ? path.resolve(process.env.FUSION_LORA_PATH)
