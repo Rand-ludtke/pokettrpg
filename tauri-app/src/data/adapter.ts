@@ -85,7 +85,9 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
     return [`${origin}/sprites`, `${origin}/vendor/showdown/sprites`];
   })();
 
-  const all = [explicit, ...fromApiBase, ...defaults, ...fromOrigin]
+  // Static vendor path first so named/delta sprites resolve to GitHub Pages,
+  // then API base for numeric BaseSprites that only exist on the backend.
+  const all = [explicit, ...defaults, ...fromApiBase, ...fromOrigin]
     .map(normalizeBaseUrl)
     .filter((v): v is string => !!v);
   return Array.from(new Set(all));
@@ -94,6 +96,32 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
 export function getPreferredSpriteBase(preferredBase?: string): string {
   const candidates = getSpriteBaseCandidates(preferredBase);
   return candidates[0] || '/sprites';
+}
+
+/** Static vendor sprite base — resolves to the deployed static file host (GitHub Pages / Tauri bundle). */
+function getStaticSpriteBase(): string {
+  return normalizeBaseUrl(DEFAULT_SPRITE_BASE) || '/vendor/showdown/sprites';
+}
+
+/** API backend sprite base (Pi server). Returns null when no backend is configured. */
+function getApiSpriteBase(): string | null {
+  try {
+    const apiBase = normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase'));
+    return apiBase ? `${apiBase}/sprites` : null;
+  } catch { return null; }
+}
+
+/**
+ * Choose the best sprite base for a given sprite ID.
+ * Numeric IDs (from BaseSprites packs on the backend) use the API base.
+ * Named IDs (including deltas) use the static vendor path.
+ */
+function bestSpriteBaseForId(id: string, fallbackBase?: string): string {
+  if (/^\d/.test(id)) {
+    const api = getApiSpriteBase();
+    if (api) return api;
+  }
+  return fallbackBase || getStaticSpriteBase();
 }
 
 function getShowdownDataBaseCandidates(preferredBase?: string): string[] {
@@ -543,7 +571,6 @@ function toAscii(s: string): string {
 }
 
 export function spriteUrl(speciesId: string, shiny = false, options?: { base?: string, setOverride?: SpriteSet, cosmetic?: string, back?: boolean, forceStatic?: boolean }) {
-  const base = normalizeBaseUrl(options?.base) || getPreferredSpriteBase();
   const settings = getSpriteSettings();
   const chosen = options?.setOverride ?? settings.set;
   const useAni = !options?.forceStatic && settings.animated && chosen === 'gen5';
@@ -555,6 +582,8 @@ export function spriteUrl(speciesId: string, shiny = false, options?: { base?: s
     'gen5';
   const ext = folder.startsWith('ani') ? 'gif' : 'png';
   const ids = spriteIdCandidates(speciesId, options?.cosmetic);
+  // Pick best base: static vendor for named/delta sprites, API backend for numeric BaseSprites
+  const base = normalizeBaseUrl(options?.base) || bestSpriteBaseForId(ids[0] || normalizeName(speciesId));
   // Prefer locally stored custom sprite data URL if present (try each candidate id)
   const slotPriority = (() => {
     const slots: SpriteSlot[] = [];
@@ -705,6 +734,8 @@ async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex |
     }
     return foundAny ? out : null;
   })();
+  // If no index was found, allow retry on next call (e.g. after deploy or service restart)
+  gSpriteIndexPromise.then(result => { if (!result) gSpriteIndexPromise = null; });
   return gSpriteIndexPromise;
 }
 
@@ -847,18 +878,19 @@ export async function listPokemonSpriteOptions(
     });
   }
 
-  // Expose numeric BaseSprites option (from .fusion-sprites-local/Other/BaseSprites via backend /sprites cache)
-  // even when vendor index.json doesn't list numeric IDs.
+  // Expose numeric BaseSprites option (from .fusion-sprites-local/Other/BaseSprites via backend /sprites cache).
+  // Numeric sprites only exist on the API backend, so use that base explicitly.
   const numericId = nameToDexNum(speciesName);
   if (Number.isFinite(numericId) && numericId && numericId > 0) {
     const numericSpriteId = String(Math.trunc(numericId));
+    const numBase = getApiSpriteBase() || base;
     out.push({
       id: `gen5:numeric:${numericSpriteId}`,
       label: `Gen 5 BaseSprites • #${numericSpriteId}`,
       spriteId: numericSpriteId,
       set: 'gen5',
-      front: `${base}/gen5/${numericSpriteId}.png`,
-      back: `${base}/gen5-back/${numericSpriteId}.png`,
+      front: `${numBase}/gen5/${numericSpriteId}.png`,
+      back: `${numBase}/gen5-back/${numericSpriteId}.png`,
       animated: false,
     });
   }
@@ -871,9 +903,11 @@ export async function listPokemonSpriteOptions(
     if (strictExisting && !frontEntries) continue;
     for (const spriteId of sortedVariantIds) {
       if (frontEntries && !frontEntries.has(spriteId)) continue;
-      const front = `${base}/${def.front}/${spriteId}.${def.ext}`;
+      // Use API base for numeric sprites (from BaseSprites), static base for named/delta sprites
+      const optBase = bestSpriteBaseForId(spriteId, base);
+      const front = `${optBase}/${def.front}/${spriteId}.${def.ext}`;
       const back = def.back && (!backEntries || backEntries.has(spriteId))
-        ? `${base}/${def.back}/${spriteId}.${def.ext}`
+        ? `${optBase}/${def.back}/${spriteId}.${def.ext}`
         : undefined;
       const suffix = spriteId === preferredId ? 'Base' : spriteId.replace(`${preferredId}-`, '');
       out.push({
@@ -989,20 +1023,25 @@ export function spriteUrlWithFallback(
       if (custom) candidates.push(custom);
     }
   }
-  // Then add file paths for each folder × id combination (local paths first)
-  for (const base of spriteBases) {
-    for (const f of folders) {
-      const isAni = f.startsWith('ani');
-      const ext = isAni ? 'gif' : 'png';
-      for (const id of idList) candidates.push(`${base}/${f}/${id}.${ext}`);
+  // Try each ID across ALL bases before moving to the next ID.
+  // This ensures 'deltavenusaur' is found on the static host before 'venusaur' is tried.
+  for (const id of idList) {
+    for (const base of spriteBases) {
+      for (const f of folders) {
+        const isAni = f.startsWith('ani');
+        const ext = isAni ? 'gif' : 'png';
+        candidates.push(`${base}/${f}/${id}.${ext}`);
+      }
     }
   }
   // Add external fallback URLs (play.pokemonshowdown.com) for when local files are missing
   const extBase = 'https://play.pokemonshowdown.com/sprites';
-  for (const f of folders) {
-    const isAni = f.startsWith('ani');
-    const ext = isAni ? 'gif' : 'png';
-    for (const id of idList) candidates.push(`${extBase}/${f}/${id}.${ext}`);
+  for (const id of idList) {
+    for (const f of folders) {
+      const isAni = f.startsWith('ani');
+      const ext = isAni ? 'gif' : 'png';
+      candidates.push(`${extBase}/${f}/${id}.${ext}`);
+    }
   }
 
   let idx = 0;

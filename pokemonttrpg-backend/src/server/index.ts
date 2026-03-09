@@ -478,6 +478,12 @@ function buildMergedSpriteIndex(): { folders: Record<string, string[]> } {
     addSpritesFromDirRecursive(merged["gen5"], path.join(FUSION_SPRITES_DIR, "gen5"), 2);
   }
 
+  // Add delta name aliases (e.g. "deltavenusaur") so the index advertises them.
+  // The actual files are numeric (40003.png) but clients look up by name.
+  for (const deltaName of Object.keys(gDeltaNameToNum)) {
+    merged["gen5"].add(deltaName);
+  }
+
   const payloadFolders: Record<string, string[]> = {};
   for (const [folder, values] of Object.entries(merged)) {
     payloadFolders[folder] = Array.from(values).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
@@ -486,23 +492,65 @@ function buildMergedSpriteIndex(): { folders: Record<string, string[]> } {
   return { folders: payloadFolders };
 }
 
+// Build a map of delta sprite names → numeric dex IDs at startup (e.g. "deltavenusaur" → "40003").
+// This lets the backend serve delta sprites by name even though the actual files are numbered.
+const gDeltaNameToNum: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  const candidates = [
+    path.resolve("data/insurgence/generated/pokedex.insurgence.json"),
+    path.resolve("../data/insurgence/generated/pokedex.insurgence.json"),
+    path.resolve("tauri-app/public/data/insurgence/generated/pokedex.insurgence.json"),
+    path.resolve("../tauri-app/public/data/insurgence/generated/pokedex.insurgence.json"),
+  ];
+  for (const candidate of candidates) {
+    try {
+      if (!fs.existsSync(candidate)) continue;
+      const dex = JSON.parse(fs.readFileSync(candidate, "utf-8"));
+      for (const [key, entry] of Object.entries(dex)) {
+        const num = (entry as any)?.num;
+        if (typeof num === "number" && num >= 40001 && key.startsWith("delta")) {
+          map[key.toLowerCase()] = String(num);
+        }
+      }
+      if (Object.keys(map).length > 0) break;
+    } catch {}
+  }
+  return map;
+})();
+
 function tryCacheSpriteToUnified(folder: string, filename: string): string {
   const target = path.join(UNIFIED_SPRITES_ROOT, folder, filename);
   if (fs.existsSync(target)) return target;
 
   const sourceCandidates: string[] = [];
-  if (folder === "gen5") {
+  if (folder === "gen5" || folder === "gen5-shiny" || folder === "gen5-back" || folder === "gen5-back-shiny") {
     if (FUSION_OTHER_BASE_SPRITES_DIR) {
       sourceCandidates.push(path.join(FUSION_OTHER_BASE_SPRITES_DIR, filename));
     }
     if (FULL_PACK_BASE_SPRITES_DIR) {
       sourceCandidates.push(path.join(FULL_PACK_BASE_SPRITES_DIR, filename));
     }
-    if (FUSION_SPRITES_DIR) {
-      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "sprites", "gen5", filename));
-      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "gen5", filename));
-      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "Other", filename));
-      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "sprites", "Other", filename));
+    if (folder === "gen5") {
+      if (FUSION_SPRITES_DIR) {
+        sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "sprites", "gen5", filename));
+        sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "gen5", filename));
+        sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "Other", filename));
+        sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "sprites", "Other", filename));
+      }
+    }
+
+    // Delta name → numeric file fallback (e.g. "deltavenusaur.png" → "40003.png")
+    const parsed = path.parse(filename);
+    const baseName = parsed.name.toLowerCase();
+    const numericId = gDeltaNameToNum[baseName];
+    if (numericId) {
+      const numericFilename = `${numericId}${parsed.ext}`;
+      if (FUSION_OTHER_BASE_SPRITES_DIR) {
+        sourceCandidates.push(path.join(FUSION_OTHER_BASE_SPRITES_DIR, numericFilename));
+      }
+      if (FULL_PACK_BASE_SPRITES_DIR) {
+        sourceCandidates.push(path.join(FULL_PACK_BASE_SPRITES_DIR, numericFilename));
+      }
     }
   }
 
@@ -538,7 +586,13 @@ function tryCacheSpriteToUnified(folder: string, filename: string): string {
 
 app.get("/sprites/index.json", (_req: Request, res: Response) => {
   const unifiedIndex = path.join(UNIFIED_SPRITES_ROOT, "index.json");
-  if (fs.existsSync(unifiedIndex)) return res.sendFile(unifiedIndex);
+  // Serve cached index if it's less than 30 minutes old; otherwise rebuild.
+  if (fs.existsSync(unifiedIndex)) {
+    try {
+      const stat = fs.statSync(unifiedIndex);
+      if (Date.now() - stat.mtimeMs < 30 * 60 * 1000) return res.sendFile(unifiedIndex);
+    } catch {}
+  }
 
   try {
     const payload = buildMergedSpriteIndex();
