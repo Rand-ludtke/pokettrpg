@@ -66,8 +66,15 @@ rsync -av --delete --progress \
   --exclude 'dist' \
   --exclude 'target' \
   --exclude '.fusion-sprites-local' \
+  --exclude 'OneTrainer' \
+  --exclude '.hf_cache' \
   /d/GitHub/pokettrpg/ \
   randl@192.168.1.251:/home/randl/pokettrpg/
+ssh randl@192.168.1.251 "cd ~/pokettrpg/pokemonttrpg-backend && npm ci && npm run build && sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
+rsync -av --progress \
+  "/d/GitHub/pokettrpg/.fusion-sprites-local/" \
+  randl@192.168.1.251:"/home/randl/pokettrpg/.fusion-sprites-local/"
+ssh randl@192.168.1.251 "sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
 ```
 
 Then on **Pi**:
@@ -183,7 +190,7 @@ This Sage/triple flow does **not** delete or overwrite your existing large `.fus
 
 ## 7) Sync worker sprites to Pi storage
 
-Run in **Git Bash** on worker (recommended for rsync):
+### One-time full sync (Git Bash on worker):
 
 ```bash
 cd /d/GitHub/pokettrpg
@@ -192,6 +199,28 @@ rsync -av --progress \
   randl@192.168.1.251:"/home/randl/pokettrpg/.fusion-sprites-local/"
 ssh randl@192.168.1.251 "sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
 ```
+
+### Continuous real-time sync (RECOMMENDED — keeps Pi always up to date):
+
+**PowerShell (fastest on Windows):**
+```powershell
+cd D:\GitHub\pokettrpg
+.\scripts\fusion-watch-sync.ps1
+```
+
+**Git Bash alternative:**
+```bash
+cd /d/GitHub/pokettrpg
+bash scripts/fusion-watch-sync.sh
+```
+
+Both scripts watch `.fusion-sprites-local` for new/changed sprite files and push
+**only** the changed files to the Pi within seconds. Much faster than re-scanning
+the entire tree with `rsync -av`.
+
+Leave the script running in a terminal while generating sprites. It auto-syncs
+every 3 seconds when changes are detected. For initial run it does one full
+incremental sync (`--update` flag = only newer files), then switches to watching.
 
 ---
 

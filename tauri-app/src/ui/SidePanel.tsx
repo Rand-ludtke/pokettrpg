@@ -256,16 +256,101 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     name: string;
     id: string;
     method: string;
+    detail: string;
     canEvolve: boolean;
     reason?: string;
+    status: 'green' | 'gray' | 'red';
+    requiredItem?: string;
+    consumeItem?: boolean;
   }
+
+  type CharacterInventorySection = { key: string; label: string; lines: string };
+  type CharacterSheetData = { inventory?: CharacterInventorySection[] };
+
+  const parseInventoryLines = useCallback((lines: string): Array<{ name: string; count: number }> => {
+    const out: Array<{ name: string; count: number }> = [];
+    for (const raw of String(lines || '').split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line) continue;
+      let name = line;
+      let count = 1;
+      const m = line.match(/^(.*?)(?:\s*[\-–]\s*|\s*\(|\s+)x\s*(\d+)\)?\s*$/i);
+      if (m) {
+        name = m[1].trim().replace(/[()\-–]$/, '');
+        count = Math.max(1, Number(m[2]));
+      }
+      out.push({ name, count });
+    }
+    return out;
+  }, []);
+
+  const getCharacterInventory = useCallback((): CharacterInventorySection[] => {
+    try {
+      const raw = localStorage.getItem('ttrpg.character');
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as CharacterSheetData;
+      return Array.isArray(parsed.inventory) ? parsed.inventory : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const getInventoryItemCount = useCallback((itemName: string): number => {
+    const wanted = normalizeName(itemName || '');
+    if (!wanted) return 0;
+    let total = 0;
+    for (const section of getCharacterInventory()) {
+      const items = parseInventoryLines(section.lines);
+      for (const item of items) {
+        if (normalizeName(item.name) === wanted) total += Math.max(1, Number(item.count) || 1);
+      }
+    }
+    return total;
+  }, [getCharacterInventory, parseInventoryLines]);
+
+  const consumeInventoryItem = useCallback((itemName: string): boolean => {
+    const wanted = normalizeName(itemName || '');
+    if (!wanted) return false;
+    try {
+      const raw = localStorage.getItem('ttrpg.character');
+      if (!raw) return false;
+      const parsed = JSON.parse(raw) as CharacterSheetData;
+      if (!Array.isArray(parsed.inventory)) return false;
+
+      let consumed = false;
+      const nextInventory = parsed.inventory.map((section) => {
+        const items = parseInventoryLines(section.lines);
+        const nextItems: Array<{ name: string; count: number }> = [];
+        for (const item of items) {
+          if (!consumed && normalizeName(item.name) === wanted) {
+            const nextCount = Math.max(0, (Number(item.count) || 1) - 1);
+            consumed = true;
+            if (nextCount > 0) nextItems.push({ name: item.name, count: nextCount });
+            continue;
+          }
+          nextItems.push(item);
+        }
+        return {
+          ...section,
+          lines: nextItems.map((it) => `${it.name} x${Math.max(1, Number(it.count) || 1)}`).join('\n'),
+        };
+      });
+
+      if (!consumed) return false;
+      localStorage.setItem('ttrpg.character', JSON.stringify({ ...parsed, inventory: nextInventory }));
+      window.dispatchEvent(new Event('storage'));
+      return true;
+    } catch {
+      return false;
+    }
+  }, [parseInventoryLines]);
+
   const evolutionOptions = useMemo((): EvoOption[] => {
     if (!dex || !dex.pokedex) return [];
     const speciesId = normalizeName(resolveSpeciesName());
     const entry = dex.pokedex[speciesId];
     if (!entry?.evos || entry.evos.length === 0) return [];
 
-    const heldItem = (selected as any).item as string | undefined;
     const currentLevel = selected.level;
 
     return entry.evos.map((evoName: string) => {
@@ -274,8 +359,12 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       if (!evoEntry) return null;
 
       let method = '';
+      let detail = '';
       let canEvolve = false;
       let reason = '';
+      let status: 'green' | 'gray' | 'red' = 'red';
+      let requiredItem: string | undefined;
+      let consumeItem = false;
 
       // Check evolution type
       const evoType = evoEntry.evoType || (evoEntry.evoLevel ? 'levelUp' : 'other');
@@ -287,52 +376,79 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       if (evoType === 'levelUp' || evoType === undefined) {
         if (evoLevel) {
           method = `Level ${evoLevel}`;
+          detail = `Level to ${evoLevel} or higher`;
           canEvolve = currentLevel >= evoLevel;
           if (!canEvolve) reason = `Needs level ${evoLevel}`;
         } else {
           method = 'Level up';
+          detail = 'Level up once';
           canEvolve = true;
         }
+        status = canEvolve ? 'green' : 'red';
       } else if (evoType === 'useItem') {
         method = evoItem || 'Evolution Item';
-        const itemId = normalizeName(evoItem || '');
-        const heldId = normalizeName(heldItem || '');
-        canEvolve = !!itemId && heldId === itemId;
-        if (!canEvolve) reason = `Needs ${evoItem}`;
+        requiredItem = evoItem;
+        consumeItem = !!requiredItem;
+        const count = requiredItem ? getInventoryItemCount(requiredItem) : 0;
+        detail = requiredItem ? `Use ${requiredItem} (Bag: ${count})` : 'Use the required evolution item';
+        canEvolve = !!requiredItem && count > 0;
+        if (!canEvolve) reason = `Needs ${evoItem} in Character Sheet inventory`;
+        status = canEvolve ? 'green' : 'gray';
       } else if (evoType === 'levelFriendship') {
         method = 'Friendship';
+        detail = 'High friendship required';
         canEvolve = true; // TTRPG: assume friendship is met
+        status = 'green';
       } else if (evoType === 'trade') {
         method = evoItem ? `Trade with ${evoItem}` : 'Trade';
+        detail = evoItem ? `Trade while using ${evoItem}` : 'Trade this Pokemon';
         if (evoItem) {
-          const itemId = normalizeName(evoItem);
-          const heldId = normalizeName(heldItem || '');
-          canEvolve = heldId === itemId;
-          if (!canEvolve) reason = `Needs ${evoItem}`;
+          requiredItem = evoItem;
+          consumeItem = true;
+          const count = getInventoryItemCount(evoItem);
+          detail = `Trade with ${evoItem} (Bag: ${count})`;
+          canEvolve = count > 0;
+          if (!canEvolve) reason = `Needs ${evoItem} in Character Sheet inventory`;
         } else {
           canEvolve = true;
         }
+        status = canEvolve ? 'green' : 'gray';
       } else if (evoType === 'levelMove') {
         method = `Learn ${evoMove}`;
+        detail = evoMove ? `Know ${evoMove}` : 'Know required move';
         const moveId = normalizeName(evoMove || '');
         canEvolve = selected.moves.some(m => normalizeName(m.name) === moveId);
         if (!canEvolve) reason = `Needs move ${evoMove}`;
+        status = canEvolve ? 'green' : 'red';
       } else {
         method = evoCondition || evoType || 'Special';
-        canEvolve = true; // Allow manual evolution for special cases
+        detail = evoCondition || `Special method: ${evoType || 'unknown'}`;
+        canEvolve = false;
+        reason = detail;
+        status = 'gray';
       }
 
       if (evoCondition && evoType !== 'levelMove') {
         method += ` (${evoCondition})`;
+        if (!detail) detail = evoCondition;
       }
 
-      return { name: evoEntry.name, id: evoId, method, canEvolve, reason };
+      if (!detail) detail = method;
+
+      return { name: evoEntry.name, id: evoId, method, detail, canEvolve, reason, status, requiredItem, consumeItem };
     }).filter(Boolean) as EvoOption[];
-  }, [dex, selected]);
+  }, [dex, selected, getInventoryItemCount]);
 
   // Handle evolution
-  const handleEvolve = async (evoId: string) => {
+  const handleEvolve = async (evo: EvoOption) => {
     if (!dex) return;
+    if (!evo.canEvolve) return;
+    if (evo.requiredItem && evo.consumeItem) {
+      const consumed = consumeInventoryItem(evo.requiredItem);
+      if (!consumed) return;
+    }
+
+    const evoId = evo.id;
     const p0 = toPokemon(evoId, dex.pokedex, selected.level);
     if (!p0) return;
     
@@ -343,8 +459,8 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       p0.name = currentNickname;
     }
     
-    // Preserve item, shiny, moves
-    p0.item = (selected as any).item;
+    // Preserve shiny and moves; evolution items consumed from inventory are not held afterward
+    p0.item = evo.consumeItem ? undefined : (selected as any).item;
     p0.shiny = selected.shiny;
     // Keep current moves if legal, otherwise use evolved species defaults
     const evoLearnset = dex.learnsets[evoId];
@@ -1570,14 +1686,33 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                 {evolutionOptions.map(evo => (
                   <button
                     key={evo.id}
-                    onClick={() => handleEvolve(evo.id)}
+                    onClick={() => handleEvolve(evo)}
                     disabled={!evo.canEvolve}
                     className="mini"
-                    style={{opacity: evo.canEvolve ? 1 : 0.5}}
+                    style={{opacity: evo.canEvolve ? 1 : 0.8}}
                     title={evo.method + (evo.reason ? ` (${evo.reason})` : '')}
                   >
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        marginRight: 6,
+                        background: evo.status === 'green' ? '#38d66b' : evo.status === 'gray' ? '#9aa0a6' : '#e14949',
+                        border: '1px solid rgba(0,0,0,0.35)',
+                        verticalAlign: 'middle',
+                      }}
+                    />
                     → {evo.name}
                   </button>
+                ))}
+              </div>
+              <div style={{marginTop:6, display:'grid', gap:4}}>
+                {evolutionOptions.map(evo => (
+                  <div key={`${evo.id}-detail`} style={{fontSize:'0.75em', color:'var(--text-dim)'}}>
+                    {evo.name}: {evo.detail}{evo.reason && !evo.canEvolve ? ` - ${evo.reason}` : ''}
+                  </div>
                 ))}
               </div>
             </div>

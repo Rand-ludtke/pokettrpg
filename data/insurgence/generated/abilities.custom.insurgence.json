@@ -1,0 +1,170 @@
+{
+  "psychocall": {
+    "name": "Psycho Call",
+    "shortDesc": "Boosts Psychic moves in a pinch (1/3 HP or less). Acts like Blaze/Torrent/Overgrow but for Psychic type.",
+    "desc": "When this Pokémon has 1/3 or less of its maximum HP, rounded down, its attacking Psychic-type moves are boosted by 1.5x.",
+    "num": -101
+  },
+  "spiritcall": {
+    "name": "Spirit Call",
+    "shortDesc": "Boosts Ghost moves in a pinch (1/3 HP or less).",
+    "desc": "When this Pokémon has 1/3 or less of its maximum HP, rounded down, its attacking Ghost-type moves are boosted by 1.5x.",
+    "num": -102
+  },
+  "shadowcall": {
+    "name": "Shadow Call",
+    "shortDesc": "Boosts Dark moves in a pinch (1/3 HP or less).",
+    "desc": "When this Pokémon has 1/3 or less of its maximum HP, rounded down, its attacking Dark-type moves are boosted by 1.5x.",
+    "num": -103
+  },
+  "windforce": {
+    "name": "Wind Force",
+    "shortDesc": "Flying-type attacks do 1.3x damage when hit by wind moves.",
+    "desc": "This Pokémon's Flying-type attacks deal 1.3x damage.",
+    "num": -104
+  },
+  "noctem": {
+    "name": "Noctem",
+    "shortDesc": "Sets New Moon weather on switch-in, boosting Dark-type moves.",
+    "desc": "On switch-in, this Pokémon summons New Moon for 5 turns, boosting Dark-type moves by 1.5x and weakening Fairy-type moves.",
+    "num": -105
+  },
+  "shadowdance": {
+    "name": "Shadow Dance",
+    "shortDesc": "Speed is doubled in New Moon.",
+    "desc": "If New Moon is active, this Pokémon's Speed is doubled.",
+    "num": -106
+  },
+  "hubris": {
+    "name": "Hubris",
+    "shortDesc": "Special Attack rises by 1 stage when this Pokémon KOs another.",
+    "desc": "This Pokémon's Special Attack is raised by 1 stage when it knocks out another Pokémon.",
+    "num": -107
+  },
+  "shadowsynergy": {
+    "name": "Shadow Synergy",
+    "shortDesc": "Shadow Mewtwo Mega ability. Dark and Psychic moves gain 1.3x power.",
+    "desc": "This Pokémon's Dark-type and Psychic-type moves deal 1.3x damage.",
+    "num": -108
+  },
+  "proteanmaxima": {
+    "name": "Protean Maxima",
+    "shortDesc": "Changes to the type of every move used, and each move gets STAB.",
+    "desc": "Before using a move, this Pokémon's type changes to match that move. Every attack gets STAB.",
+    "num": -109
+  },
+  "unleafed": {
+    "name": "Unleafed",
+    "shortDesc": "Grass-type moves heal 1/4 HP instead of dealing damage to this Pokémon.",
+    "desc": "This Pokémon is healed by 1/4 of its max HP when hit by Grass-type moves.",
+    "num": -110
+  },
+  "spectraljaws": {
+    "name": "Spectral Jaws",
+    "shortDesc": "Biting moves deal Ghost-type damage in addition to normal damage.",
+    "desc": "This Pokémon's biting moves also deal Ghost-type damage.",
+    "num": -111
+  },
+  "foundry": {
+    "name": "Foundry",
+    "shortDesc": "Rock-type moves become Fire-type.",
+    "desc": "This Pokémon's Rock-type moves become Fire-type and gain 1.2x power.",
+    "num": -112
+  },
+  "vaporization": {
+    "name": "Vaporization",
+    "shortDesc": "Water-type moves used against this Pokémon evaporate and heal it.",
+    "desc": "This Pokémon is immune to Water-type moves and heals 1/4 HP when hit by them.",
+    "num": -113
+  },
+  "irrelephant": {
+    "name": "Irrelephant",
+    "shortDesc": "Ignores type-based immunities.",
+    "desc": "This Pokémon's moves can hit regardless of type-based immunities.",
+    "num": -114
+  },
+  "pendulum": {
+    "name": "Pendulum",
+    "shortDesc": "Using the same move consecutively increases power by 1.2x each time.",
+    "desc": "This Pokémon's moves increase in power by 1.2x each consecutive use (max 2x).",
+    "num": -115
+  },
+  "amplifier": {
+    "name": "Amplifier",
+    "shortDesc": "Sound-based moves get 1.3x power.",
+    "desc": "This Pokémon's sound-based moves deal 1.3x damage.",
+    "num": -116
+  },
+  "prismguard": {
+    "name": "Prism Guard",
+    "shortDesc": "Reflects 1/4 of damage taken from special attacks.",
+    "desc": "When this Pokémon is hit by a special attack, the attacker loses 1/4 of the damage dealt.",
+    "num": -117
+  },
+  "periodicorbit": {
+    "name": "Periodic Orbit",
+    "shortDesc": "Jirachi Mega ability. Type changes each turn cycling through all types.",
+    "desc": "At the end of each turn, this Pokémon's type changes to the next type in the type cycle.",
+    "num": -118
+  },
+  "etherealshroud": {
+    "name": "Ethereal Shroud",
+    "shortDesc": "Normal and Fighting moves pass through this Pokémon.",
+    "desc": "This Pokémon is immune to Normal-type and Fighting-type moves.",
+    "num": -119
+  },
+  "speedswap": {
+    "name": "Speed Swap",
+    "shortDesc": "On entry, swaps Speed stat with the opponent.",
+    "desc": "On switch-in, this Pokémon swaps its Speed stat with the opposing Pokémon.",
+    "num": -120
+  },
+  "sleet": {
+    "name": "Sleet",
+    "shortDesc": "Sets hail on switch-in. Ice-type moves boosted 1.3x in hail.",
+    "desc": "On switch-in, this Pokémon summons hail that lasts 5 turns. Its Ice-type moves deal 1.3x damage in hail.",
+    "num": -121
+  },
+  "lernean": {
+    "name": "Lernean",
+    "shortDesc": "Multi-hit moves always hit the maximum number of times.",
+    "desc": "This Pokémon's multi-hit moves always hit the maximum number of times.",
+    "num": -122
+  },
+  "athenian": {
+    "name": "Athenian",
+    "shortDesc": "Uses Special Attack for physical moves.",
+    "desc": "This Pokémon's physical moves use its Special Attack stat instead of Attack.",
+    "num": -123
+  },
+  "venomous": {
+    "name": "Venomous",
+    "shortDesc": "Contact moves poison the target.",
+    "desc": "This Pokémon's contact moves have a 30% chance to poison the target.",
+    "num": -124
+  },
+  "chlorofury": {
+    "name": "Chlorofury",
+    "shortDesc": "In Sun, Sp.Atk is boosted 1.5x and Fire moves gain STAB.",
+    "desc": "In Sun, this Pokémon's Special Attack is multiplied by 1.5 and its Fire-type moves receive STAB.",
+    "num": -125
+  },
+  "supercell": {
+    "name": "Supercell",
+    "shortDesc": "Electric and Steel moves boosted 1.3x in Rain or Electric Terrain.",
+    "desc": "In Rain or Electric Terrain, this Pokémon's Electric and Steel moves deal 1.3x damage.",
+    "num": -126
+  },
+  "absolution": {
+    "name": "Absolution",
+    "shortDesc": "Ghost moves boosted 1.3x in New Moon.",
+    "desc": "In New Moon, this Pokémon's Ghost-type moves deal 1.3x damage.",
+    "num": -127
+  },
+  "icecleats": {
+    "name": "Ice Cleats",
+    "shortDesc": "Speed doubled on Ice or in Hail.",
+    "desc": "This Pokémon's Speed is doubled during hail or when on icy terrain.",
+    "num": -128
+  }
+}

@@ -22,7 +22,34 @@ export interface BugReport {
 
 const LS_KEY = 'ttrpg.bugReports';
 const MAX_LOG_LINES = 80;
-const APP_VERSION = '1.3.10';
+const APP_VERSION = '1.4.0';
+
+function safeSerialize(value: any): string {
+  if (typeof value === 'string') return value;
+  try {
+    const seen = new WeakSet<object>();
+    return JSON.stringify(value, (_key, v) => {
+      if (typeof v === 'object' && v !== null) {
+        if (seen.has(v)) return '[Circular]';
+        seen.add(v);
+      }
+      if (v instanceof Error) {
+        return {
+          name: v.name,
+          message: v.message,
+          stack: v.stack,
+        };
+      }
+      return v;
+    });
+  } catch {
+    try {
+      return String(value);
+    } catch {
+      return '[Unserializable]';
+    }
+  }
+}
 
 /* ---------- console capture ring buffer ---------- */
 const logRing: string[] = [];
@@ -37,7 +64,7 @@ function captureConsole() {
     const orig = origConsole[level];
     (console as any)[level] = (...args: any[]) => {
       const ts = new Date().toISOString().slice(11,23);
-      const line = `[${ts}][${level}] ${args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ')}`;
+      const line = `[${ts}][${level}] ${args.map(a => safeSerialize(a)).join(' ')}`;
       logRing.push(line);
       if (logRing.length > MAX_LOG_LINES * 2) logRing.splice(0, logRing.length - MAX_LOG_LINES);
       orig.apply(console, args);

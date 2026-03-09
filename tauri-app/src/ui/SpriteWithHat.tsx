@@ -3,8 +3,8 @@
  * 
  * The hat is positioned relative to the sprite and can be offset for fine-tuning.
  */
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { spriteUrl, placeholderSpriteDataURL, getFusionApiBases } from '../data/adapter';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { spriteUrl, spriteUrlWithFallback, placeholderSpriteDataURL, getFusionApiBases } from '../data/adapter';
 import '../styles/sprite-with-hat.css';
 
 // Available hat options with their overlay images
@@ -52,6 +52,8 @@ interface SpriteWithHatProps {
   /** Explicit back sprite URL/data URL for this specific Pokemon instance */
   backSpriteOverride?: string;
   hatId?: HatId;
+  /** Use browser-native lazy loading (for grid/list contexts) */
+  lazy?: boolean;
   /** Fusion data for displaying fusion sprites */
   fusion?: {
     headId: number;
@@ -709,6 +711,7 @@ export function SpriteWithHat({
   spriteOverride,
   backSpriteOverride,
   hatId = 'none',
+  lazy = false,
   fusion,
   fusionSpriteBase = '/fusion-sprites',
   spriteMode = 'auto',
@@ -827,15 +830,29 @@ export function SpriteWithHat({
     if (preferBack && spriteOverride) return spriteOverride;
     return spriteUrl(species, shiny, { cosmetic: cosmeticForm, back: preferBack });
   }, [backSpriteOverride, spriteOverride, species, shiny, cosmeticForm]);
+
+  // Build a comprehensive multi-base candidate list for regular (non-fusion) sprites
+  const regularCandidates = useMemo(() => {
+    if (fusion) return [] as string[];
+    const chain = spriteUrlWithFallback(species, () => {}, { shiny, cosmetic: cosmeticForm, back });
+    const urls: string[] = [];
+    if (spriteOverride) urls.push(spriteOverride);
+    if (backSpriteOverride && back) urls.push(backSpriteOverride);
+    for (const c of chain.candidates) {
+      if (!urls.includes(c)) urls.push(c);
+    }
+    return urls;
+  }, [species, shiny, cosmeticForm, back, fusion, spriteOverride, backSpriteOverride]);
   
   const [imgSrc, setImgSrc] = useState(() => {
     const fusionUrl = getFusionUrl();
     if (fusionUrl) return fusionUrl;
-    return getRegularUrl(back);
+    return regularCandidates[0] || getRegularUrl(back);
   });
   const [fallbackUsed, setFallbackUsed] = useState(false);
   const [fallbackLevel, setFallbackLevel] = useState(0);
   const [triedNonShinyFallback, setTriedNonShinyFallback] = useState(false);
+  const regularIdxRef = useRef(0);
 
   useEffect(() => {
     const fusionUrl = getFusionUrl();
@@ -844,13 +861,14 @@ export function SpriteWithHat({
     setFallbackLevel(0);
     setTriedNonShinyFallback(false);
     setUseFlipFallback(false);
+    regularIdxRef.current = 0;
     if (fusionUrl) {
       setImgSrc(fusionUrl);
       return;
     }
-    setImgSrc(getRegularUrl(back));
+    setImgSrc(regularCandidates[0] || getRegularUrl(back));
     setUseFlipFallback(!!(back && !backSpriteOverride && spriteOverride));
-  }, [species, shiny, cosmeticForm, back, fusion, fusionSpriteBase, spriteMode, getFusionUrl, getRegularUrl, backSpriteOverride, spriteOverride]);
+  }, [species, shiny, cosmeticForm, back, fusion, fusionSpriteBase, spriteMode, getFusionUrl, getRegularUrl, backSpriteOverride, spriteOverride, regularCandidates]);
   
   // Reset zoom when sprite changes
   useEffect(() => {
@@ -860,27 +878,7 @@ export function SpriteWithHat({
   const handleError = useCallback(() => {
     setFallbackLevel(prev => prev + 1);
     
-    // Fallback chain:
-    // 1. If back sprite fails, try front sprite with flip
-    // 2. If fusion fails, try alternative mode (AI -> two-step -> auto)
-    // 3. Fall back to regular species sprite
-    // 4. Fall back to gen5 set
-    // 5. Use placeholder
-    
-    if (back && !useFlipFallback && fallbackLevel === 0) {
-      // Back sprite failed - use front sprite with horizontal flip
-      setUseFlipFallback(true);
-      if (fusion) {
-        const { headId, bodyId, spriteFile } = fusion;
-        const filename = spriteFile || `${headId}.${bodyId}.png`;
-        // Try front sprite (same filename, sprite provider should return front)
-        setImgSrc(`${fusionSpriteBase}/${filename}`);
-      } else {
-        setImgSrc(getRegularUrl(false));
-      }
-      return;
-    }
-    
+    // Fusion sprites: cycle through fusion candidates first
     if (fusion && fallbackLevel < 3) {
       const candidates = getFusionCandidates();
       if (fusionCandidateIndex + 1 < candidates.length) {
@@ -890,7 +888,6 @@ export function SpriteWithHat({
         return;
       }
 
-      // Try alternative sprite modes for fusion
       if (currentMode === 'ai-generated' && fallbackLevel === 1) {
         setCurrentMode('two-step');
         setImgSrc(getFusionUrl('two-step')!);
@@ -902,7 +899,6 @@ export function SpriteWithHat({
         return;
       }
       if (fallbackLevel === 2) {
-        // Try default fusion filename
         const defaultFusion = `${fusionSpriteBase}/${fusion.headId}.${fusion.bodyId}.png`;
         if (imgSrc !== defaultFusion) {
           setImgSrc(defaultFusion);
@@ -911,22 +907,21 @@ export function SpriteWithHat({
       }
     }
 
-    if (shiny && !triedNonShinyFallback && !fusion) {
-      setTriedNonShinyFallback(true);
-      setImgSrc(spriteOverride || spriteUrl(species, false, { setOverride: 'gen5', cosmetic: cosmeticForm, back: false }));
-      setUseFlipFallback(back);
-      return;
+    // Regular sprites: iterate through multi-base candidate list
+    if (!fusion && regularCandidates.length > 0) {
+      regularIdxRef.current++;
+      if (regularIdxRef.current < regularCandidates.length) {
+        const next = regularCandidates[regularIdxRef.current];
+        // Detect if we should flip (back requested but trying front URL)
+        setUseFlipFallback(back && !next.includes('-back'));
+        setImgSrc(next);
+        return;
+      }
     }
-    
-    if (fallbackUsed) {
-      setImgSrc(placeholderSpriteDataURL('?'));
-      return;
-    }
-    setFallbackUsed(true);
-    // Fall back to regular species sprite
-    setImgSrc(spriteOverride || spriteUrl(species, shiny, { setOverride: 'gen5', cosmetic: cosmeticForm, back: false }));
-    setUseFlipFallback(back); // If we wanted back view, flip the fallback
-  }, [species, shiny, cosmeticForm, back, fallbackUsed, fallbackLevel, fusion, fusionSpriteBase, imgSrc, useFlipFallback, currentMode, getFusionUrl, getFusionCandidates, getRegularUrl, spriteOverride, triedNonShinyFallback, fusionCandidateIndex]);
+
+    // Final placeholder
+    setImgSrc(placeholderSpriteDataURL('?'));
+  }, [species, shiny, cosmeticForm, back, fallbackLevel, fusion, fusionSpriteBase, imgSrc, useFlipFallback, currentMode, getFusionUrl, getFusionCandidates, getRegularUrl, spriteOverride, triedNonShinyFallback, fusionCandidateIndex, regularCandidates]);
   
   // ── Hat drag state ──
   const containerRef = useRef<HTMLDivElement>(null);
@@ -998,6 +993,7 @@ export function SpriteWithHat({
       <img
         src={imgSrc}
         alt={alt || species}
+        loading={lazy ? 'lazy' : undefined}
         style={{
           imageRendering: 'pixelated',
           maxWidth: size,

@@ -67,20 +67,14 @@ interface SpriteVariantSelectorProps {
  * Supports: 25.6.png, 25.6_alt1.png, 25.6a.png
  */
 function parseVariantFilename(filename: string): { headId: number; bodyId: number; variant?: string } | null {
-  // Underscore format: 25.6_alt1.png
-  const underscore = filename.match(/^(\d+)\.(\d+)_([A-Za-z0-9]+)\.png$/);
-  if (underscore) {
-    return { headId: Number(underscore[1]), bodyId: Number(underscore[2]), variant: underscore[3] };
-  }
-  // Suffix format: 25.6a.png
-  const suffix = filename.match(/^(\d+)\.(\d+)([A-Za-z]+)\.png$/);
-  if (suffix) {
-    return { headId: Number(suffix[1]), bodyId: Number(suffix[2]), variant: suffix[3] };
-  }
-  // Base format: 25.6.png
-  const base = filename.match(/^(\d+)\.(\d+)\.png$/);
-  if (base) {
-    return { headId: Number(base[1]), bodyId: Number(base[2]) };
+  // Generic format: 25.6.png, 25.6v1.png, 25.6_alt1.png, 25.6-custom-battler.png
+  const match = filename.match(/^(\d+)\.(\d+)(?:[_-]?([A-Za-z0-9-]+))?\.png$/i);
+  if (match) {
+    return {
+      headId: Number(match[1]),
+      bodyId: Number(match[2]),
+      variant: match[3] || undefined,
+    };
   }
   return null;
 }

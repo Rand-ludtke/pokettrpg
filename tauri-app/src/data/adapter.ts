@@ -46,6 +46,8 @@ export type ItemIndex = Record<string, ItemEntry>;
 export type LearnsetsIndex = Record<string, { learnset?: Record<string, any> }>;
 export type AliasesIndex = Record<string, string>;
 
+let gBundledSprites: Record<string, Partial<Record<string, string>>> = {};
+
 export function normalizeName(id: string) {
   return id.replace(/[^a-z0-9]/gi, '').toLowerCase();
 }
@@ -186,36 +188,53 @@ export async function loadShowdownDex(options?: { base?: string }) {
     fetchOptionalJson(withPublicBase('data/sage/generated/items.custom.sage.json')),
   ]);
 
-  const [insPokedex, insLearnsets, insAbilities, insItems] = await Promise.all([
+  const [insPokedex, insLearnsets, insAbilities, insItems, wylinPack] = await Promise.all([
     fetchOptionalJson(withPublicBase('data/insurgence/generated/pokedex.insurgence.json')),
     fetchOptionalJson(withPublicBase('data/insurgence/generated/learnsets.insurgence.json')),
     fetchOptionalJson(withPublicBase('data/insurgence/generated/abilities.custom.insurgence.json')),
     fetchOptionalJson(withPublicBase('data/insurgence/generated/items.custom.insurgence.json')),
+    fetchOptionalJson(withPublicBase('data/more-pokemon/generated/wylin-customs.generated.json')),
   ]);
+
+  const wylinDex = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).dex : null) || {};
+  const wylinLearnsets = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).learnsets : null) || {};
+  const wylinMoves = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).moves : null) || {};
+  const wylinAbilities = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).abilities : null) || {};
+  const wylinItems = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).items : null) || {};
+  const wylinSprites = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).sprites : null) || {};
+  gBundledSprites = {};
+  for (const key of Object.keys(wylinSprites)) {
+    gBundledSprites[normalizeName(key)] = (wylinSprites as Record<string, Partial<Record<string, string>>>)[key] || {};
+  }
 
   const mergedBaseDex = {
     ...(pokedex as DexIndex),
     ...((sagePokedex || {}) as DexIndex),
     ...((insPokedex || {}) as DexIndex),
+    ...((wylinDex || {}) as DexIndex),
   } as DexIndex;
   const mergedBaseLearnsets = {
     ...(learnsets as LearnsetsIndex),
     ...((sageLearnsets || {}) as LearnsetsIndex),
     ...((insLearnsets || {}) as LearnsetsIndex),
+    ...((wylinLearnsets || {}) as LearnsetsIndex),
   } as LearnsetsIndex;
   const mergedBaseMoves = {
     ...(moves as MoveIndex),
     ...((sageMoves || {}) as MoveIndex),
+    ...((wylinMoves || {}) as MoveIndex),
   } as MoveIndex;
   const mergedBaseAbilities = {
     ...(abilities as AbilityIndex),
     ...((sageAbilities || {}) as AbilityIndex),
     ...((insAbilities || {}) as AbilityIndex),
+    ...((wylinAbilities || {}) as AbilityIndex),
   } as AbilityIndex;
   const mergedBaseItems = {
     ...(items as ItemIndex),
     ...((sageItems || {}) as ItemIndex),
     ...((insItems || {}) as ItemIndex),
+    ...((wylinItems || {}) as ItemIndex),
   } as ItemIndex;
 
   // Merge custom overlays from local storage (local-only additions)
@@ -593,20 +612,40 @@ function toSpriteId(speciesName: string, cosmetic?: string): string {
 // Generate multiple plausible sprite id variants for robust fallback across naming quirks
 function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
   const ids: string[] = [];
+  const pushId = (value: string | null | undefined) => {
+    const v = String(value || '').trim();
+    if (!v) return;
+    if (!ids.includes(v)) ids.push(v);
+  };
   const preferred = toSpriteId(speciesName, cosmetic);
-  ids.push(preferred);
+  pushId(preferred);
   // Legacy pattern without hyphen (older code path); keep as a fallback
   const rawNorm = normalizeName(toAscii(speciesName));
-  if (!ids.includes(rawNorm)) ids.push(rawNorm);
-  // For Calyrex rider forms, ensure short variant is present explicitly
-  if (/calyrex/i.test(speciesName)) {
-    if (/ice/i.test(speciesName) && !ids.includes('calyrex-ice')) ids.push('calyrex-ice');
-    if (/shadow/i.test(speciesName) && !ids.includes('calyrex-shadow')) ids.push('calyrex-shadow');
-  }
+  pushId(rawNorm);
+  // Delta's own high dex number (40001+) should be tried before base species fallback
   const dexNum = gNameToNum?.[normalizeName(speciesName)];
   if (Number.isFinite(dexNum) && dexNum !== 0) {
     const numericId = String(Math.trunc(dexNum));
-    if (!ids.includes(numericId)) ids.push(numericId);
+    pushId(numericId);
+  }
+  // Delta forms: try base species sprite as last resort if a dedicated file is missing.
+  const deltaBaseName = String(speciesName || '')
+    .replace(/\bdelta\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^-+|-+$/g, '')
+    .trim();
+  if (deltaBaseName && normalizeName(deltaBaseName) !== normalizeName(speciesName)) {
+    pushId(toSpriteId(deltaBaseName, cosmetic));
+    pushId(normalizeName(toAscii(deltaBaseName)));
+    const deltaDexNum = gNameToNum?.[normalizeName(deltaBaseName)];
+    if (Number.isFinite(deltaDexNum) && deltaDexNum !== 0) {
+      pushId(String(Math.trunc(deltaDexNum)));
+    }
+  }
+  // For Calyrex rider forms, ensure short variant is present explicitly
+  if (/calyrex/i.test(speciesName)) {
+    if (/ice/i.test(speciesName)) pushId('calyrex-ice');
+    if (/shadow/i.test(speciesName)) pushId('calyrex-shadow');
   }
   return ids;
 }
@@ -620,22 +659,33 @@ async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex |
   if (gSpriteIndexPromise) return gSpriteIndexPromise;
   gSpriteIndexPromise = (async () => {
     const bases = getSpriteBaseCandidates(base ?? DEFAULT_SPRITE_BASE);
+    const out: SpriteFolderIndex = {};
+    let foundAny = false;
+
     for (const spriteBase of bases) {
+      const ctrl = new AbortController();
+      const timeoutId = setTimeout(() => ctrl.abort(), 1800);
       try {
-        const res = await fetch(`${spriteBase}/index.json`);
+        const res = await fetch(`${spriteBase}/index.json`, { signal: ctrl.signal });
         if (!res.ok) continue;
         const payload = (await res.json()) as SpriteIndexPayload;
         const rawFolders = payload?.folders || {};
-        const out: SpriteFolderIndex = {};
         for (const [folder, ids] of Object.entries(rawFolders)) {
-          out[folder] = new Set(Array.isArray(ids) ? ids : []);
+          if (!out[folder]) out[folder] = new Set<string>();
+          for (const id of (Array.isArray(ids) ? ids : [])) {
+            const v = String(id || '').trim();
+            if (!v) continue;
+            out[folder].add(v);
+          }
         }
-        return out;
+        foundAny = true;
       } catch {
         // Try next base.
+      } finally {
+        clearTimeout(timeoutId);
       }
     }
-    return null;
+    return foundAny ? out : null;
   })();
   return gSpriteIndexPromise;
 }
@@ -710,6 +760,7 @@ export async function listPokemonSpriteOptions(
 
   const folderIndex = await loadSpriteFolderIndex(base);
   const sourceSets: Array<PokemonSpriteOption['set']> = ['gen5', 'ani', 'home', 'gen6', 'gen4', 'gen3', 'gen2', 'gen1'];
+  const numericVariantCache = new Map<string, string[]>();
 
   if (folderIndex) {
     for (const setId of sourceSets) {
@@ -718,6 +769,30 @@ export async function listPokemonSpriteOptions(
       if (!entries) continue;
       for (const root of roots) {
         if (entries.has(root)) variantIds.add(root);
+
+        // BaseSprites packs often encode Pokemon variants as numeric suffixes (1a, 1b, 1ab, ...).
+        // Include those even when form variants are disabled so sprite pickers can show full packs.
+        if (/^\d+$/.test(root)) {
+          const cacheKey = `${def.front}:${root}`;
+          let matches = numericVariantCache.get(cacheKey);
+          if (!matches) {
+            const prefix = root.toLowerCase();
+            matches = [];
+            for (const spriteId of entries) {
+              const candidate = String(spriteId || '').toLowerCase();
+              if (!candidate || !candidate.startsWith(prefix)) continue;
+              const suffix = candidate.slice(prefix.length);
+              if (!suffix) continue;
+              if (!/^[a-z][a-z0-9]*$/i.test(suffix)) continue;
+              matches.push(spriteId);
+              // Guardrail: avoid pathological scans for very broad prefixes.
+              if (matches.length >= 200) break;
+            }
+            numericVariantCache.set(cacheKey, matches);
+          }
+          for (const spriteId of matches) variantIds.add(spriteId);
+        }
+
         if (!allowFormVariants) continue;
         for (const spriteId of entries) {
           if (spriteId.startsWith(`${root}-`)) variantIds.add(spriteId);
@@ -829,10 +904,21 @@ export function iconUrl(speciesId: string, options?: { base?: string }) {
 }
 
 export function iconUrlWithFallback(speciesId: string, onError: (nextUrl: string)=>void, options?: { base?: string }) {
-  const primary = iconUrl(speciesId, options);
-  // Currently only a single icon set. If it fails, try fallback to gen5 sprite as small icon.
-  const fallback = spriteUrl(speciesId, false, { setOverride: 'gen5' });
-  return { src: primary, handleError: () => onError(fallback) };
+  const id = normalizeName(speciesId);
+  const bases = getSpriteBaseCandidates(options?.base);
+  const candidates: string[] = [];
+  // Try gen5icons across all bases
+  for (const b of bases) candidates.push(`${b}/gen5icons/${id}.png`);
+  // Then try gen5 full sprites across all bases as small icon fallback
+  const idList = spriteIdCandidates(speciesId);
+  for (const b of bases) {
+    for (const sid of idList) candidates.push(`${b}/gen5/${sid}.png`);
+  }
+  // External fallback
+  candidates.push(`https://play.pokemonshowdown.com/sprites/gen5icons/${id}.png`);
+  for (const sid of idList) candidates.push(`https://play.pokemonshowdown.com/sprites/gen5/${sid}.png`);
+  let idx = 0;
+  return { src: candidates[0], handleError: () => { idx++; if (idx < candidates.length) onError(candidates[idx]); } };
 }
 
 // Sprite URL with graceful fallback chain (custom -> chosen set -> alternate set -> placeholder)
@@ -979,7 +1065,17 @@ export function getCustomSprites(): Record<string, Partial<Record<SpriteSlot, st
 }
 export function getCustomSprite(id: string, slot: SpriteSlot): string | undefined {
   const all = getCustomSprites();
-  return all[id]?.[slot];
+  const local = all[id]?.[slot];
+  if (local) return local;
+  const bundled = gBundledSprites[normalizeName(id)] || gBundledSprites[id];
+  if (!bundled) return undefined;
+  const bySlot = bundled[slot];
+  if (bySlot) return bySlot;
+  if (slot === 'front') return bundled.front || bundled.gen5 || bundled.home || bundled.ani;
+  if (slot === 'shiny') return bundled.shiny || bundled['gen5-shiny'] || bundled['home-shiny'] || bundled['ani-shiny'];
+  if (slot === 'back') return bundled.back || bundled['gen5-back'] || bundled['home-back'] || bundled['ani-back'];
+  if (slot === 'back-shiny') return bundled['back-shiny'] || bundled['gen5-back-shiny'] || bundled['home-back-shiny'] || bundled['ani-back-shiny'];
+  return undefined;
 }
 export function saveCustomSprite(id: string, slot: SpriteSlot, dataUrl: string) {
   const all = getCustomSprites();
@@ -1420,11 +1516,6 @@ export function fusionSpriteUrlWithFallback(
     `${headNum}.${bodyNum}v1.png`,
     `${headNum}.${bodyNum}v2.png`,
     `${headNum}.${bodyNum}.png`,
-    `${headNum}.${bodyNum}a.png`,
-    `${headNum}.${bodyNum}b.png`,
-    `${headNum}.${bodyNum}c.png`,
-    `${headNum}.${bodyNum}d.png`,
-    `${headNum}.${bodyNum}e.png`,
   ];
   const customKey = `fusion:${headNum}.${bodyNum}`;
 
@@ -1488,7 +1579,10 @@ export function getFusionApiBases(): string[] {
     DEFAULT_FUSION_API_BASE,
     EXTERNAL_HTTP_FUSION_API,
   ].filter((x): x is string => !!x);
-  return Array.from(new Set(ordered));
+  const unique = Array.from(new Set(ordered));
+  const onHttpsPage = typeof window !== 'undefined' && window.location?.protocol === 'https:';
+  if (!onHttpsPage) return unique;
+  return unique.filter(base => !/^http:\/\//i.test(base));
 }
 
 async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}, timeoutMs = 5000): Promise<Response> {
@@ -1571,7 +1665,38 @@ export function ensureFusionSpriteOnDemand(
 }
 
 export async function fetchFusionVariants(headNum: number, bodyNum: number): Promise<string[]> {
-  const fallback = [`${headNum}.${bodyNum}.png`];
+  const stem = `${headNum}.${bodyNum}`;
+  const fallback = [`${stem}v1.png`, `${stem}v2.png`, `${stem}.png`];
+  const normalizeVariant = (raw: unknown): string | null => {
+    const value = String(raw || '').trim();
+    if (!value) return null;
+    if (/^data:image\//i.test(value)) return value;
+
+    let file = value;
+    if (/^https?:\/\//i.test(file)) {
+      try {
+        const parsed = new URL(file);
+        file = parsed.pathname.split('/').pop() || '';
+      } catch {
+        return null;
+      }
+    } else {
+      file = file.split(/[?#]/)[0].split('/').pop() || file;
+    }
+    if (!file) return null;
+    if (!/\.(png|gif|webp)$/i.test(file)) return null;
+    if (!file.toLowerCase().startsWith(stem.toLowerCase())) return null;
+    return file;
+  };
+
+  const variantRank = (file: string): number => {
+    const lower = file.toLowerCase();
+    if (lower === `${stem}v1.png`) return 0;
+    if (lower === `${stem}v2.png`) return 1;
+    if (lower === `${stem}.png`) return 2;
+    if (/(custom|battler|trainer)/i.test(lower)) return 3;
+    return 4;
+  };
   for (const base of getFusionApiBases().slice(0, 3)) {
     try {
       const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
@@ -1579,10 +1704,19 @@ export async function fetchFusionVariants(headNum: number, bodyNum: number): Pro
       const res = await fetchWithTimeout(`${base}/fusion/variants/${headNum}/${bodyNum}`, {}, timeout);
       if (!res.ok) continue;
       const data = await res.json() as { variants?: unknown };
-      const variants = Array.isArray(data?.variants)
+      const variantsRaw = Array.isArray(data?.variants)
         ? data.variants.map(v => String(v || '').trim()).filter(Boolean)
         : [];
-      if (variants.length) return Array.from(new Set(variants));
+      const variants = variantsRaw
+        .map(normalizeVariant)
+        .filter((v): v is string => !!v);
+      if (variants.length) {
+        return Array.from(new Set(variants)).sort((a, b) => {
+          const rankDiff = variantRank(a) - variantRank(b);
+          if (rankDiff !== 0) return rankDiff;
+          return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+        });
+      }
     } catch {}
   }
   return fallback;

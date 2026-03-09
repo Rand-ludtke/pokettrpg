@@ -100,6 +100,7 @@ interface Item {
 
 type DexMode = 'search' | 'pokemon' | 'moves' | 'abilities' | 'items' | 'types' | 'pc' | 'custom';
 type CustomSeed = { key?: string; entry?: DexSpecies; learnset?: Record<string, any> };
+const MAX_UNFILTERED_POKEMON = 500;
 
 // PS-style type colors with gradients
 const TYPE_STYLE: Record<string, React.CSSProperties> = {
@@ -317,6 +318,7 @@ function PokemonIcon({ pokemon, style }: { pokemon: Species | string; style?: Re
       className="picon"
       src={src}
       alt=""
+      loading="lazy"
       onError={() => iconRef.current.handleError()}
       style={{
         display: 'inline-block',
@@ -353,16 +355,18 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
   
   // Get evolution method text
   const getEvoMethod = (evo: Species) => {
-    const condition = evo.evoCondition ? ` ${evo.evoCondition}` : '';
+    const condition = evo.evoCondition ? ` (${evo.evoCondition})` : '';
     switch (evo.evoType) {
-      case 'levelExtra': return 'level-up' + condition;
-      case 'levelFriendship': return 'level-up with high Friendship' + condition;
-      case 'levelHold': return `level-up holding ${evo.evoItem}` + condition;
-      case 'useItem': return (evo.evoItem || 'Evolution Item') + condition;
-      case 'levelMove': return evo.evoMove ? `level-up while knowing ${evo.evoMove}` + condition : 'level-up' + condition;
-      case 'trade': return 'trade' + condition;
-      case 'other': return evo.evoCondition || 'Special';
-      default: return evo.evoLevel ? `level ${evo.evoLevel}` + condition : 'level-up' + condition;
+      case 'levelExtra': return `Level up${condition}`;
+      case 'levelFriendship': return `Level up with high friendship${condition}`;
+      case 'levelHold': return `Level up while holding ${evo.evoItem || 'required item'}${condition}`;
+      case 'useItem': return `Use ${evo.evoItem || 'required evolution item'}${condition}`;
+      case 'levelMove': return evo.evoMove ? `Level up while knowing ${evo.evoMove}${condition}` : `Level up${condition}`;
+      case 'trade': return evo.evoItem
+        ? `Trade while using ${evo.evoItem}${condition}`
+        : `Trade${condition}`;
+      case 'other': return evo.evoCondition ? `Special: ${evo.evoCondition}` : 'Special evolution condition';
+      default: return evo.evoLevel ? `Reach level ${evo.evoLevel}${condition}` : `Level up${condition}`;
     }
   };
 
@@ -1604,8 +1608,8 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
           })()
         );
       }
-      
-      return list;
+
+      return query ? list : list.slice(0, MAX_UNFILTERED_POKEMON);
     }
     
     if (mode === 'moves') {

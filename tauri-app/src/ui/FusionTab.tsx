@@ -3,7 +3,7 @@ import {
   loadShowdownDex, normalizeName, toPokemon, prepareBattle, mapMoves,
   nameToDexNum, dexNumToName, fusionSpriteUrlWithFallback, buildDexNumMaps,
   speciesAbilityOptions, isMoveLegalForSpecies, placeholderSpriteDataURL,
-  spriteUrlWithFallback, ensureFusionSpriteOnDemand, saveCustomFusionSprite, fetchFusionVariants,
+  spriteUrlWithFallback, ensureFusionSpriteOnDemand, saveCustomFusionSprite, fetchFusionVariants, getFusionApiBases,
 } from '../data/adapter';
 import { SpritePainter } from './SpritePainter';
 import type { BattlePokemon, Pokemon, Move } from '../types';
@@ -124,6 +124,33 @@ interface FusionPreview {
   spriteChain: ReturnType<typeof fusionSpriteUrlWithFallback>;
 }
 
+function buildFusionVariantUrls(headNum: number, bodyNum: number, variants: string[]): string[] {
+  const out: string[] = [];
+  const push = (value: string) => {
+    if (!value) return;
+    if (!out.includes(value)) out.push(value);
+  };
+  const apiBases = getFusionApiBases();
+  for (const raw of variants) {
+    const file = String(raw || '').trim();
+    if (!file) continue;
+    if (/^data:image\//i.test(file) || /^https?:\/\//i.test(file) || file.startsWith('/')) {
+      push(file);
+      continue;
+    }
+    for (const base of apiBases) push(`${base}/fusion/sprites/${file}`);
+    push(`/fusion-sprites/${file}`);
+  }
+  // Always ensure at least the standard naming variants are in the list
+  const stem = `${headNum}.${bodyNum}`;
+  const defaultFiles = [`${stem}v1.png`, `${stem}v2.png`, `${stem}.png`];
+  for (const file of defaultFiles) {
+    for (const base of apiBases) push(`${base}/fusion/sprites/${file}`);
+    push(`/fusion-sprites/${file}`);
+  }
+  return out;
+}
+
 interface Props {
   onAddToPC?: (mons: BattlePokemon[]) => void;
   /** All PC boxes — needed so PC mode can list available Pokémon */
@@ -156,6 +183,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   // Combo choice & sprite pick
   const [chosenCombo, setChosenCombo] = useState<ComboSide>('ab');
   const [chosenSprite, setChosenSprite] = useState<string|null>(null);
+  const [variantCandidates, setVariantCandidates] = useState<{ ab: string[]; ba: string[] }>({ ab: [], ba: [] });
 
   // Move selection (for fuse step)
   const [selectedMoves, setSelectedMoves] = useState<string[]>(['', '', '', '']);
@@ -171,6 +199,9 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   const [showPainter, setShowPainter] = useState(false);
   const [painterGuideline, setPainterGuideline] = useState('');
   const [painterInitialSrc, setPainterInitialSrc] = useState<string | null>(null);
+  const [generationGuidance, setGenerationGuidance] = useState('');
+  const [generationBusy, setGenerationBusy] = useState(false);
+  const [generationStatus, setGenerationStatus] = useState('');
 
   // Load dex
   useEffect(() => {
@@ -312,6 +343,27 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
     if (activeCombo?.abilities.length) setChosenAbility(activeCombo.abilities[0]);
   }, [activeCombo]);
 
+  useEffect(() => {
+    if (!headNum || !bodyNum) {
+      setVariantCandidates({ ab: [], ba: [] });
+      return;
+    }
+
+    let cancelled = false;
+    Promise.all([
+      fetchFusionVariants(headNum, bodyNum).catch(() => [] as string[]),
+      fetchFusionVariants(bodyNum, headNum).catch(() => [] as string[]),
+    ]).then(([ab, ba]) => {
+      if (cancelled) return;
+      setVariantCandidates({
+        ab: buildFusionVariantUrls(headNum, bodyNum, ab),
+        ba: buildFusionVariantUrls(bodyNum, headNum, ba),
+      });
+    });
+
+    return () => { cancelled = true; };
+  }, [headNum, bodyNum]);
+
   // Swap head ↔ body
   const handleSwap = useCallback(() => {
     setHeadSpecies(bodySpecies);
@@ -328,10 +380,37 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
     const bName = bodyPokemon?.species || bodyPokemon?.name || '';
     const comboName = isAB ? `${hName} head + ${bName} body` : `${bName} head + ${hName} body`;
     const fusName = activeCombo?.name || 'Fusion';
-    setPainterGuideline(`Draw a fusion sprite for ${fusName} (${comboName}). The sprite should combine visual elements from both Pokémon in a 96×96 pixel art style.`);
+    const baseGuideline = `Draw a fusion sprite for ${fusName} (${comboName}). The sprite should combine visual elements from both Pokémon in a 96×96 pixel art style.`;
+    const extraGuidance = generationGuidance.trim();
+    setPainterGuideline(extraGuidance ? `${baseGuideline} Additional guidance: ${extraGuidance}` : baseGuideline);
     setPainterInitialSrc(fromSrc || null);
     setShowPainter(true);
-  }, [chosenCombo, headNum, bodyNum, headPokemon, bodyPokemon, activeCombo]);
+  }, [chosenCombo, headNum, bodyNum, headPokemon, bodyPokemon, activeCombo, generationGuidance]);
+
+  const handleGenerateOnWorker = useCallback(async () => {
+    const isAB = chosenCombo === 'ab';
+    const hNum = isAB ? headNum : bodyNum;
+    const bNum = isAB ? bodyNum : headNum;
+    if (!hNum || !bNum) return;
+
+    setGenerationBusy(true);
+    setGenerationStatus('Requesting worker generation…');
+    try {
+      const url = await ensureFusionSpriteOnDemand(hNum, bNum, {
+        guidancePrompt: generationGuidance.trim() || undefined,
+      });
+      if (url) {
+        setChosenSprite(url);
+        setGenerationStatus('Sprite generated and loaded.');
+      } else {
+        setGenerationStatus('Generation request failed or timed out.');
+      }
+    } catch {
+      setGenerationStatus('Generation request failed.');
+    } finally {
+      setGenerationBusy(false);
+    }
+  }, [chosenCombo, headNum, bodyNum, generationGuidance]);
 
   // Accept painted sprite
   const handleAcceptPaintedSprite = useCallback((dataUrl: string) => {
@@ -518,6 +597,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
                   bodyNum={bodyNum}
                   selected={chosenCombo === 'ab'}
                   chosenSprite={chosenCombo === 'ab' ? chosenSprite : null}
+                  variantCandidates={variantCandidates.ab}
                   onSelect={() => { setChosenCombo('ab'); setChosenSprite(null); }}
                   onSpriteSelect={setChosenSprite}
                 />
@@ -528,6 +608,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
                   bodyNum={headNum}
                   selected={chosenCombo === 'ba'}
                   chosenSprite={chosenCombo === 'ba' ? chosenSprite : null}
+                  variantCandidates={variantCandidates.ba}
                   onSelect={() => { setChosenCombo('ba'); setChosenSprite(null); }}
                   onSpriteSelect={setChosenSprite}
                 />
@@ -591,6 +672,31 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
                       }}
                     />
                   </label>
+                </div>
+
+                <label style={{ display: 'grid', gap: 4 }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.82em' }}>Additional Guidance Prompt</div>
+                  <textarea
+                    value={generationGuidance}
+                    onChange={e => setGenerationGuidance(e.target.value)}
+                    placeholder="Optional style/details prompt for worker generation and painter guidance"
+                    rows={2}
+                    style={{ width: '100%', resize: 'vertical' }}
+                  />
+                </label>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <button
+                    className="mini"
+                    onClick={handleGenerateOnWorker}
+                    disabled={generationBusy}
+                    style={{ padding: '6px 14px', fontSize: '0.85em' }}
+                  >
+                    {generationBusy ? '⏳ Generating…' : '⚙️ Generate via Worker'}
+                  </button>
+                  {!!generationStatus && (
+                    <span className="dim" style={{ fontSize: '0.78em' }}>{generationStatus}</span>
+                  )}
                 </div>
               </div>
 
@@ -805,16 +911,21 @@ function PokemonPicker({ label, sublabel, selected, search, onSearch, list, onSe
 }
 
 /** One side of the combo comparison */
-function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSprite, onSelect, onSpriteSelect }: {
+function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSprite, variantCandidates, onSelect, onSpriteSelect }: {
   label: string;
   preview: FusionPreview;
   headNum: number;
   bodyNum: number;
   selected: boolean;
   chosenSprite: string | null;
+  variantCandidates?: string[];
   onSelect: () => void;
   onSpriteSelect: (url: string) => void;
 }) {
+  const candidateUrls = variantCandidates && variantCandidates.length
+    ? variantCandidates
+    : preview.spriteChain.candidates;
+
   return (
     <div
       onClick={onSelect}
@@ -848,9 +959,9 @@ function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSpr
           <FusionSpriteImg chain={preview.spriteChain} size={80} alt={preview.name} overrideSrc={chosenSprite} headNum={headNum} bodyNum={bodyNum} />
         </div>
         {/* Variant thumbnails */}
-        {preview.spriteChain.candidates.length > 1 && (
+        {candidateUrls.length > 1 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'center' }}>
-            {preview.spriteChain.candidates.slice(0, 8).map((url: string, i: number) => (
+            {candidateUrls.map((url: string, i: number) => (
               <button
                 key={i}
                 className="mini"
@@ -861,7 +972,7 @@ function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSpr
                   background: chosenSprite === url ? 'rgba(34,197,94,0.1)' : 'transparent',
                 }}
               >
-                <img src={url} alt={`Variant ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'contain', imageRendering: 'pixelated' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                <img src={url} alt={`Variant ${i + 1}`} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'contain', imageRendering: 'pixelated' }} onError={e => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }} />
               </button>
             ))}
           </div>

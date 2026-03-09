@@ -13,6 +13,9 @@ import { ProtocolConverter, requestToPS } from './protocol-adapter';
 import type { PoketTRPGClient } from '../net/pokettrpgClient';
 import './ps-battle.css';
 
+/** Set to true to enable verbose console logging during battles. */
+const PS_DEBUG = false;
+
 // Types for PS Battle
 interface PSBattleRequest {
   requestType?: 'move' | 'switch' | 'team' | 'wait';
@@ -210,15 +213,15 @@ function generateTeamPreviewProtocol(
   localTrainerSprite?: string
 ): string[] {
   if (!state || !state.players) {
-    console.log('[PSBattlePanel] generateTeamPreviewProtocol - no state or players');
+    PS_DEBUG && console.log('[PSBattlePanel] generateTeamPreviewProtocol - no state or players');
     return [];
   }
   
   const lines: string[] = [];
   const previewCount = state?.rules?.activeCount ?? state?.rules?.active?.count ?? 1;
   
-  console.log('[PSBattlePanel] Generating team preview protocol for', state.players.length, 'players');
-  console.log('[DIAG-PROTOCOL] [generateTeamPreviewProtocol] CALLED - will generate local team preview lines');
+  PS_DEBUG && console.log('[PSBattlePanel] Generating team preview protocol for', state.players.length, 'players');
+  PS_DEBUG && console.log('[DIAG-PROTOCOL] [generateTeamPreviewProtocol] CALLED - will generate local team preview lines');
   
   // Game setup - use gen 9 for better sprite support
   lines.push('|gametype|singles');
@@ -249,7 +252,7 @@ function generateTeamPreviewProtocol(
   state.players.forEach((player: any, idx: number) => {
     const side = `p${idx + 1}`;
     const team = player.team || [];
-    console.log('[PSBattlePanel] Player', side, 'team:', team.map((p: any) => p.species || p.name));
+    PS_DEBUG && console.log('[PSBattlePanel] Player', side, 'team:', team.map((p: any) => p.species || p.name));
     team.forEach((poke: any) => {
       const species = poke.species || poke.name;
       const level = poke.level || 100;
@@ -265,8 +268,8 @@ function generateTeamPreviewProtocol(
   lines.push(`|teampreview|${previewCount}`);
   lines.push('|');
   
-  console.log('[PSBattlePanel] Generated', lines.length, 'protocol lines');
-  console.log('[DIAG-PROTOCOL] [generateTeamPreviewProtocol] FINISHED - generated lines:', lines.filter(l => l.startsWith('|teampreview') || l.startsWith('|start') || l.startsWith('|turn')));
+  PS_DEBUG && console.log('[PSBattlePanel] Generated', lines.length, 'protocol lines');
+  PS_DEBUG && console.log('[DIAG-PROTOCOL] [generateTeamPreviewProtocol] FINISHED - generated lines:', lines.filter(l => l.startsWith('|teampreview') || l.startsWith('|start') || l.startsWith('|turn')));
   
   return lines;
 }
@@ -304,7 +307,7 @@ function generateBattleProtocol(
   });
   
   if (isStart) {
-    console.log('[DIAG-PROTOCOL] [generateBattleProtocol] isStart=true - WILL GENERATE |start| and |turn|');
+    PS_DEBUG && console.log('[DIAG-PROTOCOL] [generateBattleProtocol] isStart=true - WILL GENERATE |start| and |turn|');
     lines.push('|start');
     // Switch in the active Pokemon for each side
     state.players.forEach((player: any, idx: number) => {
@@ -329,7 +332,7 @@ function generateBattleProtocol(
     // Turn announcement
     const turn = state.turn || 1;
     lines.push(`|turn|${turn}`);
-    console.log('[DIAG-PROTOCOL] [generateBattleProtocol] Generated |start| + |turn|' + turn + ' (state.turn=' + state.turn + ')');
+    PS_DEBUG && console.log('[DIAG-PROTOCOL] [generateBattleProtocol] Generated |start| + |turn|' + turn + ' (state.turn=' + state.turn + ')');
   }
   
   return lines;
@@ -590,29 +593,30 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   
   // DIAGNOSTIC: Track protocol events for debugging turn 1 / team preview issues
   const protocolEventLogRef = useRef<Array<{ time: number; source: string; event: string; battleTurn?: number }>>([]);
-  const diagLogProtocol = (source: string, event: string) => {
+  const diagLogProtocol = PS_DEBUG ? (source: string, event: string) => {
     const battle = battleRef.current;
     const entry = { time: Date.now(), source, event, battleTurn: battle?.turn };
     protocolEventLogRef.current.push(entry);
-    console.log(`[DIAG-PROTOCOL] [${source}] ${event} | battle.turn=${battle?.turn ?? 'N/A'} | startEventReceived=${startEventReceivedRef.current} | teamPreviewFed=${teamPreviewFedRef.current} | teamSubmitted=${teamSubmittedRef.current}`);
+    PS_DEBUG && console.log(`[DIAG-PROTOCOL] [${source}] ${event} | battle.turn=${battle?.turn ?? 'N/A'} | startEventReceived=${startEventReceivedRef.current} | teamPreviewFed=${teamPreviewFedRef.current} | teamSubmitted=${teamSubmittedRef.current}`);
     // Keep log bounded
     if (protocolEventLogRef.current.length > 200) protocolEventLogRef.current.shift();
-  };
+  } : (_source: string, _event: string) => {};
   
   // DIAGNOSTIC: Expose dump function for debugging
   useEffect(() => {
+    if (!PS_DEBUG) return;
     (window as any).dumpProtocolLog = () => {
-      console.log('=== PROTOCOL EVENT LOG ===');
+      PS_DEBUG && console.log('=== PROTOCOL EVENT LOG ===');
       const log = protocolEventLogRef.current;
       const startTime = log[0]?.time || 0;
       log.forEach((entry, i) => {
         const relTime = entry.time - startTime;
-        console.log(`[${i}] +${relTime}ms [${entry.source}] turn=${entry.battleTurn} | ${entry.event}`);
+        PS_DEBUG && console.log(`[${i}] +${relTime}ms [${entry.source}] turn=${entry.battleTurn} | ${entry.event}`);
       });
-      console.log('=== END LOG ===');
+      PS_DEBUG && console.log('=== END LOG ===');
       return log;
     };
-    console.log('[DIAG-PROTOCOL] To dump protocol log, run: dumpProtocolLog()');
+    PS_DEBUG && console.log('[DIAG-PROTOCOL] To dump protocol log, run: dumpProtocolLog()');
   }, []);
   
   const [localTrainerSprite, setLocalTrainerSprite] = useState<string | undefined>(() => getLocalTrainerSpriteId(client));
@@ -686,7 +690,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const newLines = replayProtocol.slice(lastReplayProtocolLengthRef.current);
     if (newLines.length === 0) return;
     
-    console.log(`[PSBattlePanel] Replay mode: feeding ${newLines.length} protocol lines`);
+    PS_DEBUG && console.log(`[PSBattlePanel] Replay mode: feeding ${newLines.length} protocol lines`);
     for (const line of newLines) {
       if (line && typeof line === 'string') {
         battle.add(line);
@@ -765,7 +769,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const forceAdvanceQueue = useCallback((battle: any, forceNextStep: boolean = false) => {
     if (!battle) return;
     try {
-      console.log('[PSBattlePanel] forceAdvanceQueue called', {
+      PS_DEBUG && console.log('[PSBattlePanel] forceAdvanceQueue called', {
         currentStep: battle.currentStep,
         queueLen: battle.stepQueue?.length,
         atQueueEnd: battle.atQueueEnd,
@@ -785,7 +789,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       
       // If queue thinks it's at end but has more items, reset
       if (battle.atQueueEnd && battle.currentStep < (battle.stepQueue?.length || 0)) {
-        console.log('[PSBattlePanel] Resetting atQueueEnd to continue processing');
+        PS_DEBUG && console.log('[PSBattlePanel] Resetting atQueueEnd to continue processing');
         battle.atQueueEnd = false;
       }
       
@@ -796,7 +800,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       
       // Only call nextStep directly if explicitly requested (e.g., queue is truly stuck with no pending animation)
       if (forceNextStep && typeof battle.nextStep === 'function') {
-        console.log('[PSBattlePanel] Force calling nextStep (forceNextStep=true)');
+        PS_DEBUG && console.log('[PSBattlePanel] Force calling nextStep (forceNextStep=true)');
         // Bump interruption count only when we're truly forcing
         if (battle.scene) {
           battle.scene.interruptionCount = (battle.scene.interruptionCount || 0) + 1;
@@ -808,7 +812,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // If stopAnimation bumped interruptionCount, the animation callback will refuse to advance.
       // In that case, manually advance without bumping again to avoid a deadlock.
       if (interruptionAfter !== interruptionBefore && typeof battle.nextStep === 'function') {
-        console.log('[PSBattlePanel] stopAnimation changed interruptionCount; advancing nextStep manually');
+        PS_DEBUG && console.log('[PSBattlePanel] stopAnimation changed interruptionCount; advancing nextStep manually');
         battle.nextStep();
       }
     } catch (e) {
@@ -877,7 +881,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // Check if queue is stuck: we have unprocessed items but queue processing stopped
       const isStuck = hasUnprocessedQueue && atQueueEnd && !waitingForAnims;
       
-      /* console.log('[PSBattlePanel] Animation check:', {
+      /* PS_DEBUG && console.log('[PSBattlePanel] Animation check:', {
         elapsed,
         animating,
         queueLen,
@@ -893,7 +897,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
       // Done if: no animations and queue fully processed
       if (!animating && !hasUnprocessedQueue && !waitingForAnims) {
-        console.log('[PSBattlePanel] Animation wait complete - queue processed');
+        PS_DEBUG && console.log('[PSBattlePanel] Animation wait complete - queue processed');
         setWaitingForAnimations(false);
         animationCheckRef.current = null;
         return;
@@ -971,32 +975,32 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     const init = async () => {
       try {
-        console.log('[PSBattlePanel] Starting initialization...');
+        PS_DEBUG && console.log('[PSBattlePanel] Starting initialization...');
         setLoading(true);
         setError(null);
         
         // Load PS client
-        console.log('[PSBattlePanel] Loading PS client...');
+        PS_DEBUG && console.log('[PSBattlePanel] Loading PS client...');
         await loadPokemonShowdown();
-        console.log('[PSBattlePanel] PS client loaded!');
+        PS_DEBUG && console.log('[PSBattlePanel] PS client loaded!');
 
         // Mute PS audio to avoid promise rejections from missing audio assets (can stall animations)
         if (window.PS?.prefs) {
           window.PS.prefs.mute = true;
           window.PS.prefs.musicvolume = 0;
           window.PS.prefs.effectvolume = 0;
-          console.log('[PSBattlePanel] PS audio muted');
+          PS_DEBUG && console.log('[PSBattlePanel] PS audio muted');
         }
         
         if (!mounted) {
-          console.log('[PSBattlePanel] Component unmounted during load');
+          PS_DEBUG && console.log('[PSBattlePanel] Component unmounted during load');
           return;
         }
         
         // Wait for refs to be available (they should be since we render hidden elements)
         let retries = 0;
         while ((!battleFrameRef.current || !logFrameRef.current) && retries < 20) {
-          console.log('[PSBattlePanel] Waiting for refs... attempt', retries + 1);
+          PS_DEBUG && console.log('[PSBattlePanel] Waiting for refs... attempt', retries + 1);
           await new Promise(resolve => setTimeout(resolve, 50));
           retries++;
         }
@@ -1009,7 +1013,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           throw new Error('Battle frame elements not available');
         }
         
-        console.log('[PSBattlePanel] Creating battle instance with refs:', {
+        PS_DEBUG && console.log('[PSBattlePanel] Creating battle instance with refs:', {
           battleFrame: battleFrameRef.current,
           logFrame: logFrameRef.current,
         });
@@ -1033,9 +1037,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             battle.scene.updateGen();
           }
         }
-        console.log('[PSBattlePanel] Battle instance created:', battle);
-        console.log('[PSBattlePanel] Battle waitForAnimations:', battle.waitForAnimations);
-        console.log('[PSBattlePanel] Battle scene details:', {
+        PS_DEBUG && console.log('[PSBattlePanel] Battle instance created:', battle);
+        PS_DEBUG && console.log('[PSBattlePanel] Battle waitForAnimations:', battle.waitForAnimations);
+        PS_DEBUG && console.log('[PSBattlePanel] Battle scene details:', {
           sceneType: battle.scene?.constructor?.name,
           $frame: battle.scene?.$frame ? 'exists' : 'missing',
           $battle: battle.scene?.$battle ? 'exists' : 'missing',
@@ -1048,7 +1052,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // After Battle constructor, scene.reset() should have been called which creates the DOM
         // If $battle is missing, we need to manually trigger reset
         if (battle.scene && !battle.scene.$battle) {
-          console.log('[PSBattlePanel] Scene $battle missing - calling scene.reset()');
+          PS_DEBUG && console.log('[PSBattlePanel] Scene $battle missing - calling scene.reset()');
           battle.scene.reset();
         }
         
@@ -1060,12 +1064,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // Set up tooltips
         if (window.BattleTooltips) {
           tooltipsRef.current = new window.BattleTooltips(battle);
-          console.log('[PSBattlePanel] Tooltips initialized');
+          PS_DEBUG && console.log('[PSBattlePanel] Tooltips initialized');
           
           // Bind tooltips to battle scene log element
           if (battle.scene?.log?.elem && tooltipsRef.current.listen) {
             tooltipsRef.current.listen(battle.scene.log.elem);
-            console.log('[PSBattlePanel] Tooltips bound to battle log');
+            PS_DEBUG && console.log('[PSBattlePanel] Tooltips bound to battle log');
           }
         }
         
@@ -1137,7 +1141,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // Only inject if we haven't received any server protocol yet to avoid duplicate init/turn 1
         if (pendingTeamPreviewLinesRef.current.length > 0) {
           if (!hasReceivedProtocolRef.current) {
-            console.log('[PSBattlePanel] Injecting pending team preview protocol:', pendingTeamPreviewLinesRef.current.length, {
+            PS_DEBUG && console.log('[PSBattlePanel] Injecting pending team preview protocol:', pendingTeamPreviewLinesRef.current.length, {
               sample: pendingTeamPreviewLinesRef.current.slice(0, 5),
             });
             diagLogProtocol('init-pendingTeamPreview', `Injecting ${pendingTeamPreviewLinesRef.current.length} pending team preview lines`);
@@ -1158,17 +1162,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               battle.scene.updateSidebars();
             }
           } else {
-            console.log('[PSBattlePanel] Skipping pending team preview injection (server protocol already received)');
+            PS_DEBUG && console.log('[PSBattlePanel] Skipping pending team preview injection (server protocol already received)');
           }
           pendingTeamPreviewLinesRef.current = [];
         }
         
         // Process any pending battleStarted events that arrived before battle was ready
         if (pendingEventsRef.current.length > 0) {
-          console.log('[PSBattlePanel] Processing', pendingEventsRef.current.length, 'pending events', pendingEventsRef.current.map(e => e.type));
+          PS_DEBUG && console.log('[PSBattlePanel] Processing', pendingEventsRef.current.length, 'pending events', pendingEventsRef.current.map(e => e.type));
           for (const event of pendingEventsRef.current) {
             if (event.type === 'battleStarted' && event.state && !initialProtocolFedRef.current) {
-              console.log('[PSBattlePanel] Processing queued battleStarted event');
+              PS_DEBUG && console.log('[PSBattlePanel] Processing queued battleStarted event');
               
               // Switch viewpoint if we're p2
               if (event.ourSide === 'p2') {
@@ -1182,7 +1186,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               /*
               console.warn('[PSBattlePanel] Generating initial protocol from queued battleStarted (debug only)');
               const protocolLines = generateBattleProtocol(event.state, true, myPlayerId, localTrainerSprite);
-              console.log('[PSBattlePanel] Queued battleStarted protocol lines:', protocolLines.length, protocolLines.slice(0, 8));
+              PS_DEBUG && console.log('[PSBattlePanel] Queued battleStarted protocol lines:', protocolLines.length, protocolLines.slice(0, 8));
               for (const line of protocolLines) {
                 battle.add(line);
               }
@@ -1217,20 +1221,20 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // Update the battle scene AFTER protocol is processed so gen/background is correct
         if (battle.scene) {
           battle.scene.updateGen();
-          console.log('[PSBattlePanel] Scene updated with gen:', battle.gen);
+          PS_DEBUG && console.log('[PSBattlePanel] Scene updated with gen:', battle.gen);
         }
         
         // Check for cached state/prompt that arrived before component mounted
         // DON'T generate protocol here - the server will send it in battleUpdate
         const cachedState = client?.getBattleState(roomId);
         const cachedPrompt = client?.getPrompt(roomId);
-        console.log('[PSBattlePanel] Checking cached data:', { 
+        PS_DEBUG && console.log('[PSBattlePanel] Checking cached data:', { 
           hasState: !!cachedState, 
           hasPrompt: !!cachedPrompt,
           cachedPrompt,
           alreadyFed: initialProtocolFedRef.current
         });
-        console.log('[PSBattlePanel] Cached state summary:', {
+        PS_DEBUG && console.log('[PSBattlePanel] Cached state summary:', {
           players: cachedState?.players?.length,
           logLength: cachedState?.log?.length,
           turn: cachedState?.turn,
@@ -1290,7 +1294,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             pokemon: pokemonData,
           };
           
-          console.log('[PSBattlePanel] Processing cached prompt with enriched data:', { sideData, prompt });
+          PS_DEBUG && console.log('[PSBattlePanel] Processing cached prompt with enriched data:', { sideData, prompt });
           
           const requestType = prompt?.requestType || (prompt?.forceSwitch ? 'switch' : (prompt?.teamPreview ? 'team' : 'move'));
           const effectiveTeamPreview = !!prompt?.teamPreview && requestType === 'team' && !teamSubmittedRef.current;
@@ -1302,7 +1306,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             teamPreview: effectiveTeamPreview,
             maxTeamSize: prompt?.maxTeamSize,
           };
-          console.log('[PSBattlePanel] Setting request from cached prompt:', {
+          PS_DEBUG && console.log('[PSBattlePanel] Setting request from cached prompt:', {
             requestType: psRequest.requestType,
             teamPreview: psRequest.teamPreview,
             activeCount: psRequest.active?.length,
@@ -1333,7 +1337,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             : (pendingProtocolRef.current.length > 0 ? pendingProtocolRef.current : cachedLog);
 
           if (protocolSource.length > 0) {
-            console.log('[PSBattlePanel] Feeding cached protocol/log:', protocolSource.length, {
+            PS_DEBUG && console.log('[PSBattlePanel] Feeding cached protocol/log:', protocolSource.length, {
               source: cachedState?.log?.length ? 'state.log' : (pendingProtocolRef.current.length > 0 ? 'pendingProtocol' : 'cachedLog'),
               sample: protocolSource.slice(0, 6),
             });
@@ -1378,9 +1382,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           }
         }
         
-        console.log('[PSBattlePanel] Setting loading to false');
+        PS_DEBUG && console.log('[PSBattlePanel] Setting loading to false');
         setLoading(false);
-        console.log('[PSBattlePanel] Battle initialized:', roomId);
+        PS_DEBUG && console.log('[PSBattlePanel] Battle initialized:', roomId);
         
       } catch (err) {
         console.error('[PSBattlePanel] Failed to initialize:', err);
@@ -1496,7 +1500,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const offUpdate = client.on('battleUpdate', (rawData) => {
       const data = rawData as any;
       if (data.roomId !== roomId) return;
-      console.log('[PSBattlePanel] Battle update:', data);
+      PS_DEBUG && console.log('[PSBattlePanel] Battle update:', data);
       
       const battle = battleRef.current;
       if (!battle || !battleReadyRef.current) {
@@ -1504,7 +1508,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const protocolLines: string[] = result?.events || [];
         if (protocolLines.length > 0) {
           pendingProtocolRef.current.push(...protocolLines);
-          console.log('[PSBattlePanel] Queued protocol events (battle not ready):', protocolLines.length, {
+          PS_DEBUG && console.log('[PSBattlePanel] Queued protocol events (battle not ready):', protocolLines.length, {
             pendingTotal: pendingProtocolRef.current.length,
             sample: protocolLines.slice(0, 4),
           });
@@ -1512,7 +1516,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           const newLines = result.state.log.slice(lastLogLengthRef.current);
           pendingProtocolRef.current.push(...newLines);
           lastLogLengthRef.current = result.state.log.length;
-          console.log('[PSBattlePanel] Queued log lines (battle not ready):', newLines.length, {
+          PS_DEBUG && console.log('[PSBattlePanel] Queued log lines (battle not ready):', newLines.length, {
             pendingTotal: pendingProtocolRef.current.length,
             logLength: result.state.log.length,
           });
@@ -1748,14 +1752,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             line.startsWith('|-item') ||
             line.startsWith('|-enditem')
           )) {
-            console.log('[PSBattlePanel] Skipping duplicate split line:', line);
+            PS_DEBUG && console.log('[PSBattlePanel] Skipping duplicate split line:', line);
             continue;
           }
           deduped.push(line);
           prevLine = line;
         }
         if (deduped.length !== protocolLines.length) {
-          console.log('[PSBattlePanel] Deduped protocol lines:', {
+          PS_DEBUG && console.log('[PSBattlePanel] Deduped protocol lines:', {
             before: protocolLines.length,
             after: deduped.length,
             removed: protocolLines.length - deduped.length,
@@ -1764,8 +1768,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         }
       }
 
-      console.log('[PSBattlePanel] Received', protocolLines.length, 'protocol events:', protocolLines);
-      console.log('[PSBattlePanel] Protocol filtering:', { 
+      PS_DEBUG && console.log('[PSBattlePanel] Received', protocolLines.length, 'protocol events:', protocolLines);
+      PS_DEBUG && console.log('[PSBattlePanel] Protocol filtering:', { 
         raw: rawLines.length, 
         logDelta: logDelta.length,
         rawFiltered: rawFiltered.length,
@@ -1778,7 +1782,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         teamPreviewFed: teamPreviewFedRef.current,
       });
       if (protocolLines.length > 0) {
-        console.log('[PSBattlePanel] Protocol sample:', protocolLines.slice(0, 6));
+        PS_DEBUG && console.log('[PSBattlePanel] Protocol sample:', protocolLines.slice(0, 6));
       }
 
       // Track active Pokemon from protocol (switch/drag/replace)
@@ -1791,7 +1795,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             lastActiveBySideRef.current[update.side] = update.name;
           }
           lastActiveUpdateRef.current = Date.now();
-          console.log('[PSBattlePanel] Updated last active from protocol:', {
+          PS_DEBUG && console.log('[PSBattlePanel] Updated last active from protocol:', {
             activeUpdates,
             lastActiveBySide: lastActiveBySideRef.current,
           });
@@ -1811,7 +1815,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         diagLogProtocol('battleUpdate', `KEY LINES: ${JSON.stringify(keyLines)}`);
       }
       
-      console.log('[PSBattlePanel] Start event check:', {
+      PS_DEBUG && console.log('[PSBattlePanel] Start event check:', {
         hasStartEvent,
         startLines: protocolLines.filter(line => line.includes('start')),
         startEventReceivedBefore: startEventReceivedRef.current,
@@ -1820,9 +1824,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         diagLogProtocol('battleUpdate', `|start| DETECTED - was startEventReceived=${startEventReceivedRef.current}, setting to true`);
         startEventReceivedRef.current = true;
         // Do not generate fallback start protocol; rely on battleUpdate events/log to avoid duplicate Turn 1.
-        console.log('[PSBattlePanel] Received |start| event - battle has begun, setting startEventReceivedRef=true');
+        PS_DEBUG && console.log('[PSBattlePanel] Received |start| event - battle has begun, setting startEventReceivedRef=true');
         if (pendingMovePromptRef.current) {
-          console.log('[PSBattlePanel] Applying deferred move prompt after |start| event');
+          PS_DEBUG && console.log('[PSBattlePanel] Applying deferred move prompt after |start| event');
           diagLogProtocol('battleUpdate', 'Applying deferred move prompt after |start|');
           const pending = pendingMovePromptRef.current;
           pendingMovePromptRef.current = null;
@@ -1841,7 +1845,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       if (turnLine) {
         const turnNum = parseInt(turnLine.split('|')[2] || '0', 10);
         if (!Number.isNaN(turnNum) && turnNum !== currentTurnRef.current) {
-          console.log('[PSBattlePanel] Turn update from protocol:', { turnNum, previous: currentTurnRef.current });
+          PS_DEBUG && console.log('[PSBattlePanel] Turn update from protocol:', { turnNum, previous: currentTurnRef.current });
           diagLogProtocol('battleUpdate', `|turn|${turnNum} - was currentTurn=${currentTurnRef.current}, battle.turn=${battle.turn}`);
           setCurrentTurn(turnNum);
           // Clear cancelled turns from previous turn since we're now on a new turn
@@ -1856,7 +1860,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const shouldFeed = protocolLines.length > 0;
       
       if (shouldFeed) {
-        console.log('[PSBattlePanel] Feeding new protocol events:', protocolLines.length);
+        PS_DEBUG && console.log('[PSBattlePanel] Feeding new protocol events:', protocolLines.length);
         diagLogProtocol('battleUpdate', `FEEDING ${protocolLines.length} lines to battle (battle.turn before=${battle.turn})`);
         try {
           // If we see teampreview protocol but don't have a team request, build one from state
@@ -1869,7 +1873,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             (!currentRequest || currentRequest.requestType !== 'team') &&
             !teamSubmittedRef.current
           );
-          console.log('[PSBattlePanel] Team preview check:', {
+          PS_DEBUG && console.log('[PSBattlePanel] Team preview check:', {
             hasTeamPreviewEvent,
             hasStartEvent,
             startEventReceivedRef: startEventReceivedRef.current,
@@ -1879,7 +1883,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           });
           if (shouldBuildTeamPreview) {
             if (!currentRequest || currentRequest.requestType !== 'team') {
-              console.log('[PSBattlePanel] Building team preview request (|teampreview| seen, team not submitted)');
+              PS_DEBUG && console.log('[PSBattlePanel] Building team preview request (|teampreview| seen, team not submitted)');
               const statePlayers = result.state.players as any[];
               const myIndex = myPlayerId
                 ? statePlayers.findIndex(p => p.id === myPlayerId || p.name === myPlayerId)
@@ -1907,7 +1911,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                   maxTeamSize: result?.state?.rules?.teamSize || 6,
                   side: sideData,
                 };
-                console.log('[PSBattlePanel] Built team preview request from battleUpdate state', {
+                PS_DEBUG && console.log('[PSBattlePanel] Built team preview request from battleUpdate state', {
                   hasStartEvent,
                   startEventReceived: startEventReceivedRef.current,
                   hasTeamPreviewEvent,
@@ -1924,7 +1928,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               }
             }
           } else if (hasTeamPreviewEvent && startEventReceivedRef.current) {
-            console.log('[PSBattlePanel] Skipping team preview request (|start| already received or team submitted)');
+            PS_DEBUG && console.log('[PSBattlePanel] Skipping team preview request (|start| already received or team submitted)');
           }
 
           for (const line of protocolLines) {
@@ -1978,7 +1982,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               const side = i === 0 ? battle.p1 : battle.p2;
               if (side && typeof side.setAvatar === 'function') {
                 side.setAvatar(avatar);
-                console.log(`[PSBattlePanel] Set avatar for p${i + 1}:`, avatar);
+                PS_DEBUG && console.log(`[PSBattlePanel] Set avatar for p${i + 1}:`, avatar);
               }
             }
             // Update sidebars to show new avatars
@@ -2067,7 +2071,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           });
           const droppedCount = newLines.length - filteredLines.length;
           if (droppedCount > 0) {
-            console.log('[PSBattlePanel] Filtered init/start lines from log-only batch', {
+            PS_DEBUG && console.log('[PSBattlePanel] Filtered init/start lines from log-only batch', {
               original: newLines.length,
               filtered: filteredLines.length,
               dropped: droppedCount,
@@ -2130,7 +2134,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           return;
         }
 
-        console.log('[PSBattlePanel] Feeding new log lines:', filteredLines.length, 'of', result.state.log.length);
+        PS_DEBUG && console.log('[PSBattlePanel] Feeding new log lines:', filteredLines.length, 'of', result.state.log.length);
         try {
           if (filteredLines.length > 0) {
             hasReceivedProtocolRef.current = true;
@@ -2161,7 +2165,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const offStart = client.on('battleStarted', (rawData) => {
       const data = rawData as any;
       if (data.roomId !== roomId) return;
-      console.log('[PSBattlePanel] Battle started:', data);
+      PS_DEBUG && console.log('[PSBattlePanel] Battle started:', data);
       diagLogProtocol('battleStarted', `EVENT RECEIVED - state.turn=${data.state?.turn}`);
       
       const state = data.state;
@@ -2182,7 +2186,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       
       // If battle not ready yet, queue the event for later
       if (!battle || !battleReadyRef.current) {
-        console.log('[PSBattlePanel] Battle not ready, queueing battleStarted event');
+        PS_DEBUG && console.log('[PSBattlePanel] Battle not ready, queueing battleStarted event');
         diagLogProtocol('battleStarted', 'Battle not ready - QUEUEING');
         pendingEventsRef.current.push({ type: 'battleStarted', state, isStart: true, ourSide });
         return;
@@ -2190,7 +2194,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       
       // Switch viewpoint if we're p2
       if (ourSide === 'p2' && battle) {
-        console.log('[PSBattlePanel] Switching viewpoint for p2');
+        PS_DEBUG && console.log('[PSBattlePanel] Switching viewpoint for p2');
         battle.setViewpoint?.('p2');
       }
       
@@ -2209,13 +2213,13 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // Handle "waiting for N players" notification - NOT a real prompt
       // Server sends { waitingFor: N } when waiting for other players
       if (data.waitingFor !== undefined && !data.prompt && !data.roomId) {
-        console.log('[PSBattlePanel] Waiting notification, ignoring:', data.waitingFor, 'players remaining');
+        PS_DEBUG && console.log('[PSBattlePanel] Waiting notification, ignoring:', data.waitingFor, 'players remaining');
         setWaitingForOpponent(true);
         return;
       }
       
       if (data.roomId !== roomId) return;
-      console.log('[PSBattlePanel] Prompt received:', data);
+      PS_DEBUG && console.log('[PSBattlePanel] Prompt received:', data);
       
       // DIAGNOSTIC: Log prompt arrival
       const promptType = data.prompt?.requestType || (data.prompt?.forceSwitch ? 'switch' : (data.prompt?.teamPreview ? 'team' : 'unknown'));
@@ -2226,7 +2230,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       
       // If this is just a waiting notification with a roomId, don't process it
       if (data.waitingFor !== undefined && !data.prompt) {
-        console.log('[PSBattlePanel] Waiting notification for room, not a prompt');
+        PS_DEBUG && console.log('[PSBattlePanel] Waiting notification for room, not a prompt');
         // Ensure UI stays in waiting state while the server is collecting other players' actions
         setWaitingForOpponent(true);
         return;
@@ -2236,14 +2240,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const prompt = data.prompt as any;
       const isWaitOnlyPrompt = !!prompt?.wait && !prompt?.requestType && !prompt?.forceSwitch && !prompt?.teamPreview;
       if (isWaitOnlyPrompt) {
-        console.log('[PSBattlePanel] Wait-only prompt received - keeping last request and waiting');
+        PS_DEBUG && console.log('[PSBattlePanel] Wait-only prompt received - keeping last request and waiting');
         diagLogProtocol('promptAction', 'WAIT-ONLY prompt - preserving last request');
         setWaitingForOpponent(true);
         return;
       }
       // Save battle state from prompt - critical for team preview to show opponent
       if (data.state) {
-        console.log('[PSBattlePanel] Saving battle state from prompt:', {
+        PS_DEBUG && console.log('[PSBattlePanel] Saving battle state from prompt:', {
           playersCount: data.state.players?.length,
           playerNames: data.state.players?.map((p: any) => p.name || p.id),
         });
@@ -2252,7 +2256,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // Try to get state from client cache if not in prompt
         const cachedState = client?.getBattleState(roomId);
         if (cachedState) {
-          console.log('[PSBattlePanel] Using cached state for team preview');
+          PS_DEBUG && console.log('[PSBattlePanel] Using cached state for team preview');
           lastBattleStateRef.current = cachedState;
         }
       }
@@ -2268,7 +2272,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const ourSide = playerIndex >= 0 ? (playerIndex === 0 ? 'p1' : 'p2') : null;
       const lastKnownActiveName = ourSide ? lastActiveBySideRef.current[ourSide] : undefined;
       if (lastKnownActiveName) {
-        console.log('[PSBattlePanel] Using last known active from protocol:', {
+        PS_DEBUG && console.log('[PSBattlePanel] Using last known active from protocol:', {
           ourSide,
           lastKnownActiveName,
         });
@@ -2283,7 +2287,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const activeIndexToUse = activeIndexFromPrompt >= 0
         ? activeIndexFromPrompt
         : (activeIndexFromProtocol >= 0 ? activeIndexFromProtocol : activeIndexFromState);
-      console.log('[PSBattlePanel] Building pokemonData with activeIndexFromState:', activeIndexFromState, {
+      PS_DEBUG && console.log('[PSBattlePanel] Building pokemonData with activeIndexFromState:', activeIndexFromState, {
         activeIndexFromProtocol,
         activeIndexToUse,
         lastKnownActiveName,
@@ -2324,7 +2328,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // Build complete Pokemon data with stats
         const isActive = idx === activeIndexToUse;
         if (isActive) {
-          console.log('[PSBattlePanel] Marking pokemon as active:', poke.name || poke.id, 'at index', idx);
+          PS_DEBUG && console.log('[PSBattlePanel] Marking pokemon as active:', poke.name || poke.id, 'at index', idx);
         }
         
         // Prioritize Client Battle state for volatile data (HP, Status)
@@ -2366,7 +2370,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         pokemon: pokemonData,
       };
       
-      console.log('[PSBattlePanel] Built sideData with enriched stats:', sideData);
+      PS_DEBUG && console.log('[PSBattlePanel] Built sideData with enriched stats:', sideData);
       
       // Determine requestType early for active rebuild check
       const requestType = prompt?.requestType || (prompt?.wait ? 'wait' : (prompt?.forceSwitch ? 'switch' : (prompt?.teamPreview ? 'team' : 'move')));
@@ -2396,7 +2400,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           id: correctActiveId,
           pokemonId: correctActiveId,
         }));
-        console.log('[PSBattlePanel] Enriched active with correct id:', {
+        PS_DEBUG && console.log('[PSBattlePanel] Enriched active with correct id:', {
           correctActiveId,
           activePokemonName: activePokemonFromSide?.name,
           moves: fixedActive[0]?.moves?.length,
@@ -2407,7 +2411,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       if (shouldRebuildActive) {
         const promptActiveId = fixedActive?.[0]?.id || fixedActive?.[0]?.pokemonId;
 
-        console.log('[PSBattlePanel] Checking active mismatch:', {
+        PS_DEBUG && console.log('[PSBattlePanel] Checking active mismatch:', {
           promptActiveId,
           correctActiveId,
           activeIndexFromState,
@@ -2464,7 +2468,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             canDynamax: promptActiveFlags.canDynamax,
             canTerastallize: promptActiveFlags.canTerastallize,
           }];
-          console.log('[PSBattlePanel] Rebuilt active with PP data:', fixedActive);
+          PS_DEBUG && console.log('[PSBattlePanel] Rebuilt active with PP data:', fixedActive);
         }
       }
       
@@ -2492,7 +2496,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const activeFromPrompt = psRequest.active?.[0]?.id || psRequest.active?.[0]?.pokemonId;
       const activePokemonForDebug = psRequest.side?.pokemon?.find((p: any) => p.active);
       const activeFromState = playerFromState?.team?.[playerFromState?.activeIndex];
-      console.log('[PSBattlePanel] PS request summary:', {
+      PS_DEBUG && console.log('[PSBattlePanel] PS request summary:', {
         requestType: psRequest.requestType,
         teamPreview: psRequest.teamPreview,
         forceSwitch: psRequest.forceSwitch,
@@ -2502,7 +2506,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         rqid: psRequest.rqid,
         promptTurn: data.state?.turn,
       });
-      console.log('[PSBattlePanel] Active Pokemon debug:', {
+      PS_DEBUG && console.log('[PSBattlePanel] Active Pokemon debug:', {
         activeIdFromPrompt: activeFromPrompt,
         activeFromSideData: activePokemonForDebug?.name || activePokemonForDebug?.id,
         activeIndexFromState: playerFromState?.activeIndex,
@@ -2515,7 +2519,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       if (window.BattleChoiceBuilder?.fixRequest && currentBattle) {
         try {
           window.BattleChoiceBuilder.fixRequest(psRequest, currentBattle);
-          console.log('[PSBattlePanel] Fixed request with BattleChoiceBuilder');
+          PS_DEBUG && console.log('[PSBattlePanel] Fixed request with BattleChoiceBuilder');
         } catch (e) {
           console.warn('[PSBattlePanel] Error fixing request:', e);
         }
@@ -2546,7 +2550,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       );
 
       if (psRequest.requestType === 'move' && alreadyActedThisPrompt && !isForceSwitchPrompt && waitingForOpponent) {
-        console.log('[PSBattlePanel] Ignoring move prompt for already-answered prompt while waiting:', {
+        PS_DEBUG && console.log('[PSBattlePanel] Ignoring move prompt for already-answered prompt while waiting:', {
           promptTurn,
           promptRqid,
           lastSentRqid: lastSentChoice?.rqid,
@@ -2564,14 +2568,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         promptRqid === lastRqidRef.current &&
         !isForceSwitchPrompt;
       if (isDuplicatePrompt) {
-        console.log('[PSBattlePanel] Ignoring duplicate prompt with same rqid while waiting:', promptRqid);
+        PS_DEBUG && console.log('[PSBattlePanel] Ignoring duplicate prompt with same rqid while waiting:', promptRqid);
         return;
       }
       
       // Force-switch prompts should reset action tracking so player can switch
       // This is needed because force-switch happens after a Pokemon faints mid-turn
       if (isForceSwitchPrompt) {
-        console.log('[PSBattlePanel] Force-switch prompt received - resetting action tracking');
+        PS_DEBUG && console.log('[PSBattlePanel] Force-switch prompt received - resetting action tracking');
         lastActionTurnRef.current = -1;
         lastSentChoiceRef.current = null;
         setWaitingForOpponent(false);
@@ -2580,12 +2584,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
       // Determine our side (p1 or p2) - we already computed playerIndex above
       if (playerIndex >= 0 && ourSide) {
-        console.log('[PSBattlePanel] Determined side from prompt:', ourSide, 'for player', playerId);
+        PS_DEBUG && console.log('[PSBattlePanel] Determined side from prompt:', ourSide, 'for player', playerId);
         setMySide(ourSide);
         
         // Switch viewpoint if we're p2
         if (ourSide === 'p2' && currentBattle && !currentBattle.viewpointSwitched) {
-          console.log('[PSBattlePanel] Switching viewpoint for p2 from prompt');
+          PS_DEBUG && console.log('[PSBattlePanel] Switching viewpoint for p2 from prompt');
           currentBattle.setViewpoint?.('p2');
         }
       }
@@ -2594,7 +2598,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // The server waits for BOTH players to submit before sending |start| + |switch| + |turn|1
       // So we MUST accept these prompts (not defer) otherwise the battle will be stuck
       if (psRequest.requestType === 'move' && !startEventReceivedRef.current) {
-        console.log('[PSBattlePanel] Accepting pre-start move prompt (server waits for both players before |start|)', {
+        PS_DEBUG && console.log('[PSBattlePanel] Accepting pre-start move prompt (server waits for both players before |start|)', {
           rqid: psRequest.rqid,
           promptTurn,
           activeMoves: psRequest.active?.[0]?.moves?.length,
@@ -2604,7 +2608,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       }
 
       if (psRequest.requestType === 'team' && teamSubmittedRef.current) {
-        console.log('[PSBattlePanel] Ignoring team preview prompt (already submitted)');
+        PS_DEBUG && console.log('[PSBattlePanel] Ignoring team preview prompt (already submitted)');
         diagLogProtocol('promptAction', 'Ignoring TEAM prompt (already submitted)');
         return;
       }
@@ -2616,7 +2620,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         !teamSubmittedRef.current &&
         (currentRequest?.requestType === 'team' || effectiveTeamPreview)
       ) {
-        console.log('[PSBattlePanel] Deferring move prompt until team preview is completed');
+        PS_DEBUG && console.log('[PSBattlePanel] Deferring move prompt until team preview is completed');
         diagLogProtocol('promptAction', `DEFERRING move prompt (teamSubmitted=false, currentRequest=${currentRequest?.requestType})`);
         pendingMovePromptRef.current = psRequest;
         return;
@@ -2627,7 +2631,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // Check if user has cancelled this turn - if so, don't override with wait request
       const turnWasCancelled = promptTurn && cancelledTurnsRef.current.has(promptTurn);
       if (isWaitRequest && turnWasCancelled) {
-        console.log('[PSBattlePanel] Ignoring wait request for cancelled turn:', promptTurn);
+        PS_DEBUG && console.log('[PSBattlePanel] Ignoring wait request for cancelled turn:', promptTurn);
         diagLogProtocol('promptAction', `IGNORING WAIT REQUEST (turn was cancelled) turn=${promptTurn}`);
         return;
       }
@@ -2635,7 +2639,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // If this is a wait prompt, keep the last actionable request and just show waiting state.
       // Overwriting the request with a wait payload forces users to cancel and re-select on turn 1.
       if (isWaitRequest) {
-        console.log('[PSBattlePanel] Wait request received - keeping last request and waiting');
+        PS_DEBUG && console.log('[PSBattlePanel] Wait request received - keeping last request and waiting');
         diagLogProtocol('promptAction', 'WAIT REQUEST - preserving last request');
         setWaitingForOpponent(true);
         return;
@@ -2652,7 +2656,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         cancelledTurnsRef.current.delete(promptTurn);
       }
 
-      console.log('[PSBattlePanel] Setting request:', {
+      PS_DEBUG && console.log('[PSBattlePanel] Setting request:', {
         requestType: psRequest.requestType,
         teamPreview: psRequest.teamPreview,
         activeMoves: psRequest.active?.[0]?.moves?.length,
@@ -2672,18 +2676,18 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const newChoices = new window.BattleChoiceBuilder(psRequest as any);
         setChoices(newChoices);
         setChoicesVersion(v => v + 1);
-        console.log('[PSBattlePanel] Built BattleChoiceBuilder choices');
+        PS_DEBUG && console.log('[PSBattlePanel] Built BattleChoiceBuilder choices');
       }
       
       // If battle not ready yet, queue the event for later (but DON'T generate protocol)
       if (!currentBattle || !battleReadyRef.current) {
-        console.log('[PSBattlePanel] Battle not ready, waiting for battleUpdate protocol');
+        PS_DEBUG && console.log('[PSBattlePanel] Battle not ready, waiting for battleUpdate protocol');
         diagLogProtocol('promptAction', 'Battle not ready - queueing for later');
         // Don't queue events anymore - let battleUpdate handle protocol
         if (effectiveTeamPreview && !teamPreviewFedRef.current && !startEventReceivedRef.current) {
           const previewState = data.state || client.getBattleState(roomId);
           const previewLines = generateTeamPreviewProtocol(previewState, prompt?.maxTeamSize || 6, myPlayerId, localTrainerSprite);
-          console.log('[PSBattlePanel] Stashing team preview protocol (battle not ready):', previewLines.length);
+          PS_DEBUG && console.log('[PSBattlePanel] Stashing team preview protocol (battle not ready):', previewLines.length);
           diagLogProtocol('promptAction', `Stashing ${previewLines.length} team preview lines`);
           pendingTeamPreviewLinesRef.current = previewLines;
         }
@@ -2696,7 +2700,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       if (effectiveTeamPreview && currentBattle && battleReadyRef.current && !teamPreviewFedRef.current && !startEventReceivedRef.current) {
         const previewState = data.state || client.getBattleState(roomId);
         const previewLines = generateTeamPreviewProtocol(previewState, prompt?.maxTeamSize || 6, myPlayerId, localTrainerSprite);
-        console.log('[PSBattlePanel] Injecting team preview protocol lines:', previewLines.length, { previewState });
+        PS_DEBUG && console.log('[PSBattlePanel] Injecting team preview protocol lines:', previewLines.length, { previewState });
         diagLogProtocol('promptAction-teamPreview', `Injecting ${previewLines.length} team preview lines (battle IS ready)`);
         for (const line of previewLines) {
           if (line && typeof line === 'string') {
@@ -2711,13 +2715,13 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         if (currentBattle.scene && typeof currentBattle.scene.updateGen === 'function') {
           currentBattle.scene.updateGen();
         }
-        console.log('[PSBattlePanel] Team preview protocol injected and scene updated');
+        PS_DEBUG && console.log('[PSBattlePanel] Team preview protocol injected and scene updated');
       }
       
       // Track that battle has started (moved past team preview)
       if (!prompt?.teamPreview && !battleStartedRef.current) {
         battleStartedRef.current = true;
-        console.log('[PSBattlePanel] Battle has started (past team preview)');
+        PS_DEBUG && console.log('[PSBattlePanel] Battle has started (past team preview)');
       }
       
       // IMPORTANT: Do NOT feed log from promptAction!
@@ -2760,7 +2764,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       try {
         tooltipsRef.current.listen($(controlsContainerRef.current));
         tooltipsListenedRef.current = true;
-        console.log('[PSBattlePanel] Tooltips bound to controls container');
+        PS_DEBUG && console.log('[PSBattlePanel] Tooltips bound to controls container');
       } catch (e) {
         console.warn('[PSBattlePanel] Error binding tooltips to controls:', e);
       }
@@ -2858,7 +2862,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     // Prevent sending if already waiting for opponent (but allow force-switch scenarios)
     if (waitingForOpponent && !isForceSwitchScenario) {
-      console.log('[PSBattlePanel] Already waiting for opponent, ignoring choice:', choiceString);
+      PS_DEBUG && console.log('[PSBattlePanel] Already waiting for opponent, ignoring choice:', choiceString);
       return;
     }
 
@@ -2874,7 +2878,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     );
 
     if (!isForceSwitchScenario && alreadySentForPrompt && !cancelledTurnsRef.current.has(latestPromptTurnRef.current)) {
-      console.log('[PSBattlePanel] Duplicate action blocked for prompt:', {
+      PS_DEBUG && console.log('[PSBattlePanel] Duplicate action blocked for prompt:', {
         turn: latestPromptTurnRef.current,
         rqid: latestPromptRqidRef.current,
         choiceString,
@@ -2893,7 +2897,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       if (moveBoosts.tera) resolvedChoice += ' terastallize';
     }
 
-    console.log('[PSBattlePanel] Sending choice:', resolvedChoice, {
+    PS_DEBUG && console.log('[PSBattlePanel] Sending choice:', resolvedChoice, {
       currentTurn,
       currentRqid,
       latestPromptTurn: latestPromptTurnRef.current,
@@ -2965,7 +2969,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     lastRqidRef.current = latestPromptRqidRef.current;
     
     // Send through client
-    console.log('[PSBattlePanel] Action payload:', action);
+    PS_DEBUG && console.log('[PSBattlePanel] Action payload:', action);
     client.sendAction(roomId, action, myPlayerId);
 
     // Reset move boosts after sending
@@ -2977,7 +2981,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const pending = pendingMovePromptRef.current;
       if (pending) {
         pendingMovePromptRef.current = null;
-        console.log('[PSBattlePanel] Applying deferred move prompt after team selection');
+        PS_DEBUG && console.log('[PSBattlePanel] Applying deferred move prompt after team selection');
         setRequest(pending);
         if (window.BattleChoiceBuilder) {
           const newChoices = new window.BattleChoiceBuilder(pending as any);
@@ -3016,7 +3020,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     // Restore the last valid move request and choices so the move selection UI is shown
     if (lastMoveRequestRef.current) {
-      console.log('[PSBattlePanel] Restoring last move request on cancel');
+      PS_DEBUG && console.log('[PSBattlePanel] Restoring last move request on cancel');
       setRequest(lastMoveRequestRef.current);
       if (lastMoveChoicesRef.current) {
         setChoices(lastMoveChoicesRef.current);
@@ -3044,7 +3048,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       if (waitStartTimeRef.current > 0 && waitTime > 5000 && currentTurnRef.current <= 1) {
         const lastChoice = lastSentChoiceRef.current;
         if (lastChoice && client && roomId && mySide) {
-          console.log('[PSBattlePanel] Auto-retrying action after', Math.round(waitTime / 1000), 'seconds wait:', lastChoice.choice);
+          PS_DEBUG && console.log('[PSBattlePanel] Auto-retrying action after', Math.round(waitTime / 1000), 'seconds wait:', lastChoice.choice);
           diagLogProtocol('autoRetry', `Retrying action after ${Math.round(waitTime / 1000)}s wait: ${lastChoice.choice}`);
           
           // Parse and re-send the choice
@@ -3364,7 +3368,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       return null;
     }
     
-    console.log('[PSBattlePanel] Rendering team preview with', request.side.pokemon.length, 'pokemon');
+    PS_DEBUG && console.log('[PSBattlePanel] Rendering team preview with', request.side.pokemon.length, 'pokemon');
     
     const pokemon = request.side.pokemon;
     const maxTeamSize = request.maxTeamSize || 6;
@@ -3386,17 +3390,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // Detect if opponent data is missing (player exists but no team)
         if (battleState.players[opponentIndex] && (!opponentTeam || opponentTeam.length === 0)) {
           opponentMissing = true;
-          console.log('[PSBattlePanel] Team preview: opponent player exists but team is empty, requesting refresh');
+          PS_DEBUG && console.log('[PSBattlePanel] Team preview: opponent player exists but team is empty, requesting refresh');
         }
       } else {
         // Opponent player not found at all
         opponentMissing = true;
-        console.log('[PSBattlePanel] Team preview: opponent player not found in state');
+        PS_DEBUG && console.log('[PSBattlePanel] Team preview: opponent player not found in state');
       }
     } else {
       // No players in state at all
       opponentMissing = true;
-      console.log('[PSBattlePanel] Team preview: no players in battle state');
+      PS_DEBUG && console.log('[PSBattlePanel] Team preview: no players in battle state');
     }
     
     // Request state refresh if opponent is missing and we haven't recently requested
@@ -3406,7 +3410,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // Try to get fresh state from client cache
       const freshState = client?.getBattleState(roomId);
       if (freshState && freshState !== battleState) {
-        console.log('[PSBattlePanel] Team preview: found fresh state in client cache');
+        PS_DEBUG && console.log('[PSBattlePanel] Team preview: found fresh state in client cache');
         lastBattleStateRef.current = freshState;
         // Re-extract opponent team from fresh state
         const freshPlayers = (freshState as any)?.players || [];
