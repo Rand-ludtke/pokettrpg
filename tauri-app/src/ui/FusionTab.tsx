@@ -143,7 +143,13 @@ function buildFusionVariantUrls(headNum: number, bodyNum: number, variants: stri
   }
   // Always ensure at least the standard naming variants are in the list
   const stem = `${headNum}.${bodyNum}`;
-  const defaultFiles = [`${stem}v1.png`, `${stem}v2.png`, `${stem}.png`];
+  const defaultFiles = [
+    `${stem}v1.png`,
+    `${stem}v2.png`,
+    `${stem}v3.png`,
+    `${stem}.png`,
+    ...Array.from({ length: 8 }, (_, i) => `${stem}${String.fromCharCode(97 + i)}.png`),
+  ];
   for (const file of defaultFiles) {
     for (const base of apiBases) push(`${base}/fusion/sprites/${file}`);
     push(`/fusion-sprites/${file}`);

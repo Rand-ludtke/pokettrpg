@@ -751,7 +751,11 @@ export function SpriteWithHat({
     for (const v of variants) addFile(v);
     addFile(`${headId}.${bodyId}v1.png`);
     addFile(`${headId}.${bodyId}v2.png`);
+    addFile(`${headId}.${bodyId}v3.png`);
     addFile(`${headId}.${bodyId}.png`);
+    for (const letter of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
+      addFile(`${headId}.${bodyId}${letter}.png`);
+    }
     
     // If specific file provided, use it
     if (spriteFile) {
@@ -794,7 +798,11 @@ export function SpriteWithHat({
     for (const v of variants) addFile(v);
     addFile(`${fusion.headId}.${fusion.bodyId}v1.png`);
     addFile(`${fusion.headId}.${fusion.bodyId}v2.png`);
+    addFile(`${fusion.headId}.${fusion.bodyId}v3.png`);
     addFile(`${fusion.headId}.${fusion.bodyId}.png`);
+    for (const letter of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
+      addFile(`${fusion.headId}.${fusion.bodyId}${letter}.png`);
+    }
 
     const out: string[] = [];
     const push = (value: string) => {

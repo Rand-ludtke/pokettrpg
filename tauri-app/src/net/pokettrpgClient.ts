@@ -249,6 +249,8 @@ function normalizeApiBase(raw: string | null | undefined): string {
   try {
     const url = new URL(value);
     let pathname = url.pathname.replace(/\/+$/, '');
+    // Users often paste endpoint URLs ending in /api; normalize to server root.
+    if (/\/api$/i.test(pathname)) pathname = pathname.replace(/\/api$/i, '');
     if (!pathname) pathname = '';
     const protocol = url.protocol === 'ws:' ? 'http:' : url.protocol === 'wss:' ? 'https:' : url.protocol;
     const normalized = `${protocol}//${url.host}${pathname}`;
@@ -545,7 +547,7 @@ export class PoketTRPGClient {
       endpoint = upgraded;
     }
     const socket = io(endpoint, {
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       path,
       forceNew: true,
       withCredentials: false,

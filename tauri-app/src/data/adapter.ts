@@ -622,6 +622,24 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
   // Legacy pattern without hyphen (older code path); keep as a fallback
   const rawNorm = normalizeName(toAscii(speciesName));
   pushId(rawNorm);
+  // Insurgence Delta forms are commonly named as deltaxxx (no hyphen) in sprite packs.
+  if (/\bdelta\b/i.test(speciesName) || /-delta/i.test(preferred) || rawNorm.startsWith('delta')) {
+    const cleaned = String(speciesName || '')
+      .replace(/\bdelta\b/gi, ' ')
+      .replace(/[-_]+/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    const baseNorm = normalizeName(toAscii(cleaned));
+    const preferredNorm = normalizeName(preferred);
+    if (baseNorm) {
+      pushId(`delta${baseNorm}`);
+      pushId(`${baseNorm}delta`);
+    }
+    if (preferredNorm) {
+      pushId(preferredNorm.replace(/-delta/i, 'delta'));
+      pushId(preferredNorm.replace(/-+/g, ''));
+    }
+  }
   // Delta's own high dex number (40001+) should be tried before base species fallback
   const dexNum = gNameToNum?.[normalizeName(speciesName)];
   if (Number.isFinite(dexNum) && dexNum !== 0) {
@@ -1512,10 +1530,13 @@ export function fusionSpriteUrlWithFallback(
   options?: { base?: string },
 ) {
   const base = options?.base ?? '';
+  const alphaVariantFilenames = Array.from({ length: 8 }, (_, i) => `${headNum}.${bodyNum}${String.fromCharCode(97 + i)}.png`);
   const variantFilenames = [
     `${headNum}.${bodyNum}v1.png`,
     `${headNum}.${bodyNum}v2.png`,
+    `${headNum}.${bodyNum}v3.png`,
     `${headNum}.${bodyNum}.png`,
+    ...alphaVariantFilenames,
   ];
   const customKey = `fusion:${headNum}.${bodyNum}`;
 
@@ -1666,7 +1687,13 @@ export function ensureFusionSpriteOnDemand(
 
 export async function fetchFusionVariants(headNum: number, bodyNum: number): Promise<string[]> {
   const stem = `${headNum}.${bodyNum}`;
-  const fallback = [`${stem}v1.png`, `${stem}v2.png`, `${stem}.png`];
+  const fallback = [
+    `${stem}v1.png`,
+    `${stem}v2.png`,
+    `${stem}v3.png`,
+    `${stem}.png`,
+    ...Array.from({ length: 8 }, (_, i) => `${stem}${String.fromCharCode(97 + i)}.png`),
+  ];
   const normalizeVariant = (raw: unknown): string | null => {
     const value = String(raw || '').trim();
     if (!value) return null;
@@ -1691,11 +1718,14 @@ export async function fetchFusionVariants(headNum: number, bodyNum: number): Pro
 
   const variantRank = (file: string): number => {
     const lower = file.toLowerCase();
+    const escapedStem = stem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     if (lower === `${stem}v1.png`) return 0;
     if (lower === `${stem}v2.png`) return 1;
-    if (lower === `${stem}.png`) return 2;
-    if (/(custom|battler|trainer)/i.test(lower)) return 3;
-    return 4;
+    if (lower === `${stem}v3.png`) return 2;
+    if (lower === `${stem}.png`) return 3;
+    if (new RegExp(`^${escapedStem}[a-z]\\.png$`, 'i').test(lower)) return 4;
+    if (/(custom|battler|trainer)/i.test(lower)) return 5;
+    return 6;
   };
   for (const base of getFusionApiBases().slice(0, 3)) {
     try {
