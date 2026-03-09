@@ -297,6 +297,12 @@ class Emitter {
 const DEFAULT_API_BASE = 'https://pokettrpg.duckdns.org';
 const LOBBY_ROOM_ID = 'global-lobby';
 
+function isGithubPagesRuntime(): boolean {
+  if (typeof window === 'undefined') return false;
+  const host = String(window.location?.hostname || '').toLowerCase();
+  return host.endsWith('.github.io');
+}
+
 export class PoketTRPGClient {
   private socket: Socket | null = null;
   private emitter = new Emitter();
@@ -546,8 +552,10 @@ export class PoketTRPGClient {
       });
       endpoint = upgraded;
     }
+    const preferPollingOnly = isGithubPagesRuntime();
     const socket = io(endpoint, {
-      transports: ['websocket', 'polling'],
+      transports: preferPollingOnly ? ['polling'] : ['websocket', 'polling'],
+      upgrade: !preferPollingOnly,
       path,
       forceNew: true,
       withCredentials: false,
