@@ -97,6 +97,19 @@ function parseAbility(raw) {
   };
 }
 
+function isLikelySpeciesHeader(rawName) {
+  const name = String(rawName || '').trim();
+  if (!name) return false;
+  if (name.length > 64) return false;
+  if (/[.!?]/.test(name)) return false;
+  if (!/^[a-z0-9()'\-\s]+$/i.test(name)) return false;
+  const words = name.split(/\s+/).filter(Boolean);
+  if (words.length > 7 && /\b(this|that|when|while|then|because|after|before)\b/i.test(name)) {
+    return false;
+  }
+  return true;
+}
+
 function parseSpeciesBlocks(text) {
   const lines = String(text || '').split(/\r?\n/);
   const blocks = [];
@@ -120,7 +133,7 @@ function parseSpeciesBlocks(text) {
     const numberedHeader = line.match(/^\d+\.\s+([^:]+):?$/);
     const megaHeader = line.match(/^Mega\s+(.+?)\s*:?$/i);
 
-    if (numberedHeader) {
+    if (numberedHeader && isLikelySpeciesHeader(numberedHeader[1])) {
       const cleanedName = numberedHeader[1].replace(/\s+\d+\s*$/g, '').trim();
       finalizeCurrent();
       current = {
@@ -135,7 +148,7 @@ function parseSpeciesBlocks(text) {
       continue;
     }
 
-    if (megaHeader && !line.startsWith('Mega Evolution')) {
+    if (megaHeader && !line.startsWith('Mega Evolution') && isLikelySpeciesHeader(megaHeader[1])) {
       finalizeCurrent();
       const base = megaHeader[1].replace(/\s+\d+\s*$/g, '').trim();
       current = {
@@ -300,8 +313,19 @@ function main() {
   for (const block of parsedBlocks) {
     const key = normalizeName(block.name);
     parsedByNormalizedName.set(key, block);
+
+    const parenFormMatch = String(block.name || '').match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+    if (parenFormMatch) {
+      const base = parenFormMatch[1].trim();
+      const rawForm = parenFormMatch[2].replace(/\s*form\s*$/i, '').trim();
+      const formAlias = normalizeName(`${base}-${rawForm}`);
+      if (formAlias) parsedByNormalizedName.set(formAlias, block);
+    }
+
     if (block.baseSpecies && block.forme === 'Mega') {
       const baseNorm = normalizeName(block.baseSpecies);
+      const megaAlias = normalizeName(`${block.baseSpecies}-Mega`);
+      if (megaAlias) parsedByNormalizedName.set(megaAlias, block);
       const baseBlock = parsedByNormalizedName.get(baseNorm);
       if (baseBlock?.megaItem) {
         block.requiredItem = baseBlock.megaItem;
@@ -348,6 +372,56 @@ function main() {
       baseToForms.get(baseNorm).forms.set(formNorm, {
         displayName: parsedName.fullName,
         forme: parsedName.forme,
+      });
+    }
+  }
+
+  // Ensure every parsed species/form block appears in dex even when a sprite file is missing.
+  for (const block of parsedBlocks) {
+    if (!block?.name) continue;
+
+    if (block.baseSpecies && /^mega$/i.test(String(block.forme || ''))) {
+      const baseNorm = normalizeName(block.baseSpecies);
+      const formNorm = normalizeName(`${block.baseSpecies}-Mega`);
+      if (!baseToForms.has(baseNorm)) {
+        baseToForms.set(baseNorm, {
+          displayName: block.baseSpecies,
+          forms: new Map(),
+        });
+      }
+      baseToForms.get(baseNorm).forms.set(formNorm, {
+        displayName: block.name,
+        forme: 'Mega',
+      });
+      continue;
+    }
+
+    const parenFormMatch = String(block.name).match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+    if (parenFormMatch) {
+      const baseName = parenFormMatch[1].trim();
+      const formeRaw = parenFormMatch[2].replace(/\s*form\s*$/i, '').trim();
+      const baseNorm = normalizeName(baseName);
+      const formNorm = normalizeName(`${baseName}-${formeRaw}`);
+      if (!baseToForms.has(baseNorm)) {
+        baseToForms.set(baseNorm, {
+          displayName: baseName,
+          forms: new Map(),
+        });
+      }
+      if (formNorm !== baseNorm) {
+        baseToForms.get(baseNorm).forms.set(formNorm, {
+          displayName: block.name,
+          forme: formeRaw,
+        });
+      }
+      continue;
+    }
+
+    const baseNorm = normalizeName(block.name);
+    if (!baseToForms.has(baseNorm)) {
+      baseToForms.set(baseNorm, {
+        displayName: block.name,
+        forms: new Map(),
       });
     }
   }

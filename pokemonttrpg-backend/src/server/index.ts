@@ -345,6 +345,13 @@ const FUSION_SPRITES_DIR = process.env.FUSION_SPRITES_DIR
 const FUSION_SPRITES_EXTRA_DIRS = parsePathList(process.env.FUSION_SPRITES_EXTRA_DIRS);
 const VENDOR_SPRITES_DIR = firstExistingPath(DEFAULT_VENDOR_SPRITES_CANDIDATES);
 const FULL_PACK_BASE_SPRITES_DIR = firstExistingPath(DEFAULT_FULL_PACK_BASE_SPRITES_CANDIDATES);
+const FUSION_OTHER_BASE_SPRITES_DIR = firstExistingPath([
+  path.resolve(FUSION_SPRITES_DIR || ".fusion-sprites-local", "Other/BaseSprites"),
+  path.resolve(".fusion-sprites-local/Other/BaseSprites"),
+  path.resolve("../.fusion-sprites-local/Other/BaseSprites"),
+  path.resolve("sprites/Other/BaseSprites"),
+  path.resolve("../sprites/Other/BaseSprites"),
+]);
 const UNIFIED_SPRITES_ROOT = process.env.UNIFIED_SPRITES_ROOT
   ? path.resolve(process.env.UNIFIED_SPRITES_ROOT)
   : path.resolve(FUSION_SPRITES_DIR || ".fusion-sprites-local", "sprites");
@@ -358,13 +365,124 @@ function ensureParentDir(filePath: string) {
   } catch {}
 }
 
+function readIndexFolders(indexPath: string): Record<string, Set<string>> {
+  const out: Record<string, Set<string>> = {};
+  try {
+    if (!indexPath || !fs.existsSync(indexPath)) return out;
+    const raw = JSON.parse(fs.readFileSync(indexPath, "utf-8"));
+    const folders = raw?.folders && typeof raw.folders === "object" ? raw.folders : {};
+    for (const [folder, values] of Object.entries(folders)) {
+      if (!out[folder]) out[folder] = new Set<string>();
+      for (const value of Array.isArray(values) ? values : []) {
+        const id = String(value || "").trim();
+        if (id) out[folder].add(id);
+      }
+    }
+  } catch {}
+  return out;
+}
+
+function addSpritesFromDir(target: Set<string>, dirPath: string) {
+  try {
+    if (!dirPath || !fs.existsSync(dirPath)) return;
+    const files = fs.readdirSync(dirPath, { withFileTypes: true });
+    for (const entry of files) {
+      if (!entry.isFile()) continue;
+      const parsed = path.parse(entry.name);
+      const ext = parsed.ext.toLowerCase();
+      if (ext !== ".png" && ext !== ".gif") continue;
+      if (!parsed.name) continue;
+      target.add(parsed.name);
+    }
+  } catch {}
+}
+
+function buildMergedSpriteIndex(): { folders: Record<string, string[]> } {
+  const merged = readIndexFolders(path.join(VENDOR_SPRITES_DIR || "", "index.json"));
+  const folders = new Set<string>(Object.keys(merged));
+
+  const knownFolders = [
+    "gen5",
+    "gen5-shiny",
+    "gen5-back",
+    "gen5-back-shiny",
+    "ani",
+    "ani-shiny",
+    "ani-back",
+    "ani-back-shiny",
+    "home",
+    "home-shiny",
+    "gen6",
+    "gen6-back",
+    "gen4",
+    "gen4-shiny",
+    "gen4-back",
+    "gen4-back-shiny",
+    "gen3",
+    "gen3-shiny",
+    "gen3-back",
+    "gen3-back-shiny",
+    "gen2",
+    "gen2-shiny",
+    "gen2-back",
+    "gen2-back-shiny",
+    "gen1",
+    "gen1-back",
+  ];
+  for (const folder of knownFolders) folders.add(folder);
+
+  for (const folder of folders) {
+    if (!merged[folder]) merged[folder] = new Set<string>();
+    addSpritesFromDir(merged[folder], path.join(UNIFIED_SPRITES_ROOT, folder));
+    if (VENDOR_SPRITES_DIR) {
+      addSpritesFromDir(merged[folder], path.join(VENDOR_SPRITES_DIR, folder));
+    }
+  }
+
+  // BaseSprites packs carry numeric+suffix variants (e.g. 1a, 1b) that are needed by the picker.
+  if (!merged["gen5"]) merged["gen5"] = new Set<string>();
+  if (FUSION_OTHER_BASE_SPRITES_DIR) {
+    addSpritesFromDir(merged["gen5"], FUSION_OTHER_BASE_SPRITES_DIR);
+  }
+  if (FULL_PACK_BASE_SPRITES_DIR) {
+    addSpritesFromDir(merged["gen5"], FULL_PACK_BASE_SPRITES_DIR);
+  }
+
+  const payloadFolders: Record<string, string[]> = {};
+  for (const [folder, values] of Object.entries(merged)) {
+    payloadFolders[folder] = Array.from(values).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  }
+
+  return { folders: payloadFolders };
+}
+
 function tryCacheSpriteToUnified(folder: string, filename: string): string {
   const target = path.join(UNIFIED_SPRITES_ROOT, folder, filename);
   if (fs.existsSync(target)) return target;
 
   const sourceCandidates: string[] = [];
-  if (folder === "gen5" && FULL_PACK_BASE_SPRITES_DIR && /^-?\d+[a-z]*\.png$/i.test(filename)) {
-    sourceCandidates.push(path.join(FULL_PACK_BASE_SPRITES_DIR, filename));
+  if (folder === "gen5" && /^-?\d+[a-z]*\.png$/i.test(filename)) {
+    if (FUSION_OTHER_BASE_SPRITES_DIR) {
+      sourceCandidates.push(path.join(FUSION_OTHER_BASE_SPRITES_DIR, filename));
+    }
+    if (FULL_PACK_BASE_SPRITES_DIR) {
+      sourceCandidates.push(path.join(FULL_PACK_BASE_SPRITES_DIR, filename));
+    }
+  }
+
+  // If a dedicated back sprite doesn't exist for numeric/base variants, use front as fallback.
+  if ((folder === "gen5-back" || folder === "gen5-back-shiny") && /^-?\d+[a-z]*\.png$/i.test(filename)) {
+    const siblingFolder = folder === "gen5-back-shiny" ? "gen5-shiny" : "gen5";
+    sourceCandidates.push(path.join(UNIFIED_SPRITES_ROOT, siblingFolder, filename));
+    if (VENDOR_SPRITES_DIR) {
+      sourceCandidates.push(path.join(VENDOR_SPRITES_DIR, siblingFolder, filename));
+    }
+    if (FUSION_OTHER_BASE_SPRITES_DIR) {
+      sourceCandidates.push(path.join(FUSION_OTHER_BASE_SPRITES_DIR, filename));
+    }
+    if (FULL_PACK_BASE_SPRITES_DIR) {
+      sourceCandidates.push(path.join(FULL_PACK_BASE_SPRITES_DIR, filename));
+    }
   }
   if (VENDOR_SPRITES_DIR) {
     sourceCandidates.push(path.join(VENDOR_SPRITES_DIR, folder, filename));
@@ -386,16 +504,18 @@ app.get("/sprites/index.json", (_req: Request, res: Response) => {
   const unifiedIndex = path.join(UNIFIED_SPRITES_ROOT, "index.json");
   if (fs.existsSync(unifiedIndex)) return res.sendFile(unifiedIndex);
 
-  if (!VENDOR_SPRITES_DIR) return res.status(404).json({ error: "sprites index not configured" });
-  const sourceIndex = path.join(VENDOR_SPRITES_DIR, "index.json");
-  if (!fs.existsSync(sourceIndex)) return res.status(404).json({ error: "sprites index not found" });
-
   try {
+    const payload = buildMergedSpriteIndex();
+    const hasAny = Object.values(payload.folders).some((list) => list.length > 0);
+    if (!hasAny) {
+      // Keep clients functional while sprites are still syncing.
+      payload.folders = { gen5: [] };
+    }
     ensureParentDir(unifiedIndex);
-    fs.copyFileSync(sourceIndex, unifiedIndex);
+    fs.writeFileSync(unifiedIndex, JSON.stringify(payload));
     return res.sendFile(unifiedIndex);
   } catch {
-    return res.sendFile(sourceIndex);
+    return res.json({ folders: { gen5: [] } });
   }
 });
 
