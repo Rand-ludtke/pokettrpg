@@ -3,36 +3,10 @@ import { io, Socket } from 'socket.io-client';
 export type RoomSummary = {
   id: string;
   name: string;
-  roomType?: 'battle' | 'map';
-  mapOwnerId?: string;
   players: Array<{ id: string; username?: string; name?: string; avatar?: string; trainerSprite?: string }>;
   spectCount: number;
   battleStarted: boolean;
   challengeCount?: number;
-};
-
-export type MapToken = {
-  id: string;
-  name: string;
-  x: number;
-  y: number;
-  size?: number;
-  color?: string;
-  sprite?: string;
-  ownerId?: string;
-};
-
-export type MapState = {
-  width: number;
-  height: number;
-  gridSize: number;
-  gridColor: string;
-  gridOpacity: number;
-  showGrid: boolean;
-  showLabels: boolean;
-  lockTokens: boolean;
-  background?: string;
-  tokens: MapToken[];
 };
 
 export type ChatMessage = {
@@ -167,8 +141,6 @@ export type ClientEvents = {
   challengeUpdated: { roomId: string; challenge: ChallengeSummary };
   challengeRemoved: { roomId: string; challengeId: string; reason?: ChallengeRemovedReason };
   trainerSpriteChanged: { trainerSprite: string | null };
-  actionCancelled: { playerId: string; roomId: string };
-  mapState: { roomId: string; state: MapState };
 };
 
 type EventKey = keyof ClientEvents;
@@ -203,17 +175,6 @@ function sanitizeTrainerSpriteId(raw: unknown): string {
   return candidate;
 }
 
-function resolveTrainerSpriteUrl(raw: unknown): string | undefined {
-  if (typeof raw !== 'string') return undefined;
-  const trimmed = raw.trim();
-  if (!trimmed) return undefined;
-  if (/^data:image\//i.test(trimmed)) return trimmed;
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  if (/^(asset|tauri):/i.test(trimmed)) return trimmed;
-  if (trimmed.startsWith('/')) return trimmed;
-  return undefined;
-}
-
 function normalizePlayerList(players: any, fallback: RoomSummary['players'] = []): RoomSummary['players'] {
   const arr = Array.isArray(players) ? players : [];
   const mapped = arr.map((pl: any) => {
@@ -225,9 +186,8 @@ function normalizePlayerList(players: any, fallback: RoomSummary['players'] = []
       if (typeof pl?.sprite?.id === 'string' && pl.sprite.id) return pl.sprite.id;
       return undefined;
     })();
-    const trainerSpriteUrl = resolveTrainerSpriteUrl(pl?.trainerSprite ?? avatar);
     const trainerSprite = sanitizeTrainerSpriteId(pl?.trainerSprite);
-    const effectiveTrainerSprite = trainerSpriteUrl || trainerSprite || sanitizeTrainerSpriteId(avatar);
+    const effectiveTrainerSprite = trainerSprite || sanitizeTrainerSpriteId(avatar);
     return {
       id: pl?.id ?? pl?.userid ?? pl?.userId ?? pl?.name ?? pl?.username ?? '',
       username: pl?.username ?? pl?.name ?? pl?.id ?? undefined,
@@ -249,8 +209,6 @@ function normalizeApiBase(raw: string | null | undefined): string {
   try {
     const url = new URL(value);
     let pathname = url.pathname.replace(/\/+$/, '');
-    // Users often paste endpoint URLs ending in /api; normalize to server root.
-    if (/\/api$/i.test(pathname)) pathname = pathname.replace(/\/api$/i, '');
     if (!pathname) pathname = '';
     const protocol = url.protocol === 'ws:' ? 'http:' : url.protocol === 'wss:' ? 'https:' : url.protocol;
     const normalized = `${protocol}//${url.host}${pathname}`;
@@ -297,12 +255,6 @@ class Emitter {
 const DEFAULT_API_BASE = 'https://pokettrpg.duckdns.org';
 const LOBBY_ROOM_ID = 'global-lobby';
 
-function isGithubPagesRuntime(): boolean {
-  if (typeof window === 'undefined') return false;
-  const host = String(window.location?.hostname || '').toLowerCase();
-  return host.endsWith('.github.io');
-}
-
 export class PoketTRPGClient {
   private socket: Socket | null = null;
   private emitter = new Emitter();
@@ -330,7 +282,6 @@ export class PoketTRPGClient {
   battlePrompts = new Map<string, PromptActionPayload>();
   battleNeedsSwitch = new Map<string, any>();
   roomChallenges = new Map<string, ChallengeSummary[]>();
-  mapStates = new Map<string, MapState>();
 
   on = this.emitter.on.bind(this.emitter);
   off = this.emitter.off.bind(this.emitter);
@@ -365,10 +316,6 @@ export class PoketTRPGClient {
 
   getServerEndpoint(): string {
     return this.apiBase;
-  }
-
-  getMapState(roomId: string): MapState | null {
-    return this.mapStates.get(roomId) || null;
   }
 
   getDefaultServerEndpoint(): string {
@@ -428,11 +375,6 @@ export class PoketTRPGClient {
     if (typeof window === 'undefined') return this.trainerSprite;
     try {
       const raw = window.localStorage?.getItem('ttrpg.trainerSprite');
-      const directUrl = resolveTrainerSpriteUrl(raw);
-      if (directUrl) {
-        this.trainerSpriteLocked = true;
-        return directUrl;
-      }
       const sanitized = sanitizeTrainerSpriteId(raw);
       if (sanitized) this.trainerSpriteLocked = true;
       return sanitized || null;
@@ -449,8 +391,7 @@ export class PoketTRPGClient {
   }
 
   setTrainerSprite(spriteId: string | null | undefined) {
-    const directUrl = resolveTrainerSpriteUrl(spriteId);
-    const sanitized = directUrl || sanitizeTrainerSpriteId(spriteId);
+    const sanitized = sanitizeTrainerSpriteId(spriteId);
     this.trainerSpriteLocked = !!sanitized;
     this.applyTrainerSprite(sanitized || null, { persist: true, notify: true, triggerIdentify: true, force: true });
   }
@@ -475,8 +416,7 @@ export class PoketTRPGClient {
   }
 
   private syncTrainerSpriteFromServer(value: unknown) {
-    const directUrl = resolveTrainerSpriteUrl(value);
-    const sanitized = directUrl || sanitizeTrainerSpriteId(value);
+    const sanitized = sanitizeTrainerSpriteId(value);
     // Don't sync from server if user has set their own sprite in character sheet
     if (this.trainerSpriteLocked && this.trainerSprite) return;
     if (!sanitized) return;
@@ -552,13 +492,11 @@ export class PoketTRPGClient {
       });
       endpoint = upgraded;
     }
-    const preferPollingOnly = isGithubPagesRuntime();
     const socket = io(endpoint, {
-      transports: preferPollingOnly ? ['polling'] : ['websocket', 'polling'],
-      upgrade: !preferPollingOnly,
+      transports: ['websocket', 'polling'],
       path,
       forceNew: true,
-      withCredentials: false,
+      withCredentials: true,
     });
     this.socket = socket;
 
@@ -607,8 +545,6 @@ export class PoketTRPGClient {
       const summary: RoomSummary = {
         id: room.id,
         name: room.name || 'Room',
-        roomType: room.roomType || room.type || 'battle',
-        mapOwnerId: room.mapOwnerId || room.ownerId,
         players: normalizePlayerList(room.players),
         spectCount: room.spectCount ?? 0,
         battleStarted: !!(room.battleStarted ?? room.started),
@@ -626,8 +562,6 @@ export class PoketTRPGClient {
       const summary: RoomSummary = {
         id: room.id,
         name: room.name || prev?.name || 'Room',
-        roomType: room.roomType || room.type || prev?.roomType || 'battle',
-        mapOwnerId: room.mapOwnerId || room.ownerId || prev?.mapOwnerId,
         players: normalizePlayerList(room.players, prev?.players),
         spectCount: room.spectCount ?? prev?.spectCount ?? 0,
         battleStarted: (room.battleStarted ?? room.started ?? prev?.battleStarted ?? false) as boolean,
@@ -781,18 +715,6 @@ export class PoketTRPGClient {
       this.removeChallenge(roomId, challengeId);
       this.emitter.emit('challengeRemoved', { roomId, challengeId, reason });
     });
-
-    // Handle action cancelled confirmation from server
-    socket.on('actionCancelled', ({ playerId, roomId }: { playerId: string; roomId: string }) => {
-      console.log('[Client] Action cancelled confirmed by server:', { playerId, roomId });
-      this.emitter.emit('actionCancelled', { playerId, roomId });
-    });
-
-    socket.on('mapState', (payload: { roomId: string; state: MapState }) => {
-      if (!payload?.roomId || !payload?.state) return;
-      this.mapStates.set(payload.roomId, payload.state);
-      this.emitter.emit('mapState', payload);
-    });
   }
 
   private appendChat(roomId: string, msg: ChatMessage) {
@@ -893,8 +815,8 @@ export class PoketTRPGClient {
     }
   }
 
-  createRoom(name: string, options?: { roomType?: 'battle' | 'map' }) {
-    this.socket?.emit('createRoom', { name, roomType: options?.roomType });
+  createRoom(name: string) {
+    this.socket?.emit('createRoom', { name });
   }
 
   joinRoom(roomId: string, role: 'player' | 'spectator' = 'player') {
@@ -909,14 +831,6 @@ export class PoketTRPGClient {
 
   leaveRoom(roomId: string) {
     this.socket?.emit('leaveRoom', { roomId });
-  }
-
-  updateMapState(roomId: string, state: Partial<MapState>) {
-    this.socket?.emit('mapUpdate', { roomId, state });
-  }
-
-  moveMapToken(roomId: string, tokenId: string, x: number, y: number) {
-    this.socket?.emit('mapTokenMove', { roomId, tokenId, x, y });
   }
 
   sendChat(roomId: string, text: string) {

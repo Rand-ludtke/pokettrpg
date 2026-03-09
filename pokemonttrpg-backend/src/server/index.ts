@@ -86,6 +86,8 @@ export interface Room {
   teamPreviewPlayers?: Player[];
   teamPreviewOrders?: Record<string, number[]>;
   teamPreviewRules?: any;
+  // Reconnection grace: players removed on disconnect but held for reconnection
+  disconnectedPlayers?: Map<string, { data: { id: string; username: string; socketId: string; trainerSprite?: string }; timestamp: number }>;
 }
 
 type ChallengeStatus = "pending" | "launching" | "cancelled" | "declined";
@@ -992,7 +994,12 @@ app.get("/api/bug-reports/:id", (req: Request, res: Response) => {
 });
 
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const RECONNECT_GRACE_MS = 15_000; // 15 seconds to reconnect before losing battle slot
+const io = new Server(server, {
+  cors: { origin: "*" },
+  pingInterval: 10_000,
+  pingTimeout: 5_000,
+});
 
 if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   attachFusionWebSocket(server, {
@@ -1922,7 +1929,11 @@ function processTurnWithBuffer(room: Room) {
 io.on("connection", (socket: Socket) => {
   let user: ClientInfo = { id: socket.id, username: `Guest-${socket.id.slice(0, 4)}` };
 
-  socket.on("identify", (data: { username?: string; trainerSprite?: string; avatar?: string }) => {
+  socket.on("identify", (data: { username?: string; trainerSprite?: string; avatar?: string; userId?: string }) => {
+    // Accept a persistent user ID from the client so reconnections can reclaim player slots
+    if (data?.userId && typeof data.userId === "string" && data.userId.trim()) {
+      user.id = data.userId.trim();
+    }
     if (data?.username) user.username = data.username;
     const nextTrainerSprite = coerceTrainerSprite(data?.trainerSprite ?? data?.avatar);
     if (nextTrainerSprite) user.trainerSprite = nextTrainerSprite;
@@ -1972,6 +1983,29 @@ io.on("connection", (socket: Socket) => {
     const room = rooms.get(data.roomId);
     if (!room) return socket.emit("error", { error: "room not found" });
     socket.join(room.id);
+
+    // Restore from disconnected players if this user was in grace period
+    if (room.disconnectedPlayers?.has(user.id)) {
+      const entry = room.disconnectedPlayers.get(user.id)!;
+      room.disconnectedPlayers.delete(user.id);
+      console.log(`[Server] Restoring disconnected player ${user.id} (${entry.data.username}) to room ${room.id}`);
+      room.players.push({
+        ...entry.data,
+        socketId: socket.id,
+        username: user.username || entry.data.username,
+        trainerSprite: user.trainerSprite || entry.data.trainerSprite,
+      });
+      io.emit("roomUpdate", summary(room));
+      socket.emit("challengeSync", { roomId: room.id, challenges: challengeSummaries(room) });
+      // If battle is in progress, send current state and re-prompt
+      if (room.battleStarted && room.engine) {
+        const state = room.engine.getState();
+        socket.emit("battleStarted", { roomId: room.id, state });
+        emitMovePrompts(room, state);
+      }
+      return;
+    }
+
     if (data.role === "player") {
       // De-duplicate any stale entries for this user/socket
       room.spectators = room.spectators.filter((s) => s.id !== user.id && s.socketId !== socket.id);
@@ -2432,8 +2466,37 @@ io.on("connection", (socket: Socket) => {
   });
 
   socket.on("disconnect", () => {
-    // Remove from any rooms
     for (const room of rooms.values()) {
+      // Find if this socket is a player in an active battle
+      const player = room.players.find((p) => p.socketId === socket.id);
+
+      if (player && room.battleStarted) {
+        // Battle in progress: move to grace period instead of removing
+        if (!room.disconnectedPlayers) room.disconnectedPlayers = new Map();
+        room.disconnectedPlayers.set(player.id, { data: { ...player }, timestamp: Date.now() });
+        room.players = room.players.filter((p) => p.socketId !== socket.id);
+        console.log(`[Server] Player ${player.id} (${player.username}) disconnected from battle room ${room.id} — grace period ${RECONNECT_GRACE_MS}ms`);
+
+        // After grace period, remove permanently if not reconnected
+        setTimeout(() => {
+          const entry = room.disconnectedPlayers?.get(player.id);
+          if (entry) {
+            room.disconnectedPlayers!.delete(player.id);
+            console.log(`[Server] Grace period expired for ${player.id} in room ${room.id}`);
+            broadcastRoomSummary(room);
+            const isEmpty = room.players.length === 0 && room.spectators.length === 0 && (!room.disconnectedPlayers || room.disconnectedPlayers.size === 0);
+            if (isEmpty && room.id !== DEFAULT_LOBBY_ID) {
+              rooms.delete(room.id);
+              io.emit("roomRemoved", { id: room.id });
+            }
+          }
+        }, RECONNECT_GRACE_MS);
+
+        broadcastRoomSummary(room);
+        continue;
+      }
+
+      // Not in active battle: remove immediately (original behavior)
       const removed = removeClientFromRoom(room, socket.id);
       if (removed) {
         // Clean up challenges involving this socket
@@ -2451,7 +2514,7 @@ io.on("connection", (socket: Socket) => {
         broadcastRoomSummary(room);
       }
 
-      const isEmpty = room.players.length === 0 && room.spectators.length === 0;
+      const isEmpty = room.players.length === 0 && room.spectators.length === 0 && (!room.disconnectedPlayers || room.disconnectedPlayers.size === 0);
       if (isEmpty && room.id !== DEFAULT_LOBBY_ID) {
         rooms.delete(room.id);
         io.emit("roomRemoved", { id: room.id });
