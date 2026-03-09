@@ -707,6 +707,12 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   console.log("[Fusion] Sprites directory not configured. Set FUSION_SPRITES_DIR to enable.");
 }
 
+// Always-available capability endpoint so the frontend knows whether
+// on-demand fusion generation is supported before attempting POSTs.
+app.get("/fusion/gen-available", (_req: Request, res: Response) => {
+  res.json({ available: !!fusionGenService });
+});
+
 // --- Custom Dex persistence & helpers ---
 type SpriteSlot = "front" | "shiny" | "back" | "back-shiny";
 type CustomSpritesData = Record<string, Partial<Record<SpriteSlot, string>>>;

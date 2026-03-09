@@ -61,6 +61,9 @@ function normalizeBaseUrl(base: string | null | undefined): string {
   return value.replace(/\/+$/, '');
 }
 
+/** Default backend URL for sprite index / BaseSprites (mirrored from fusion API). */
+const DEFAULT_BACKEND_SPRITE_BASE = 'https://pokettrpg.duckdns.org/sprites';
+
 function getSpriteBaseCandidates(preferredBase?: string): string[] {
   const explicit = normalizeBaseUrl(preferredBase);
 
@@ -68,20 +71,25 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
   // (e.g. '/pokettrpg/vendor/showdown/sprites' on GitHub Pages, './vendor/showdown/sprites' locally).
   const staticBase = normalizeBaseUrl(DEFAULT_SPRITE_BASE);
 
-  // API backend sprite base (Pi server) — only available when backend is configured.
+  // API backend sprite base (Pi server) — from user settings or hardcoded default.
+  // Needed so loadSpriteFolderIndex merges the backend's numeric BaseSprites (1a, 1b, …).
   const fromApiBase = (() => {
     try {
       const apiBase = normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase'));
-      if (!apiBase) return [] as string[];
-      return [`${apiBase}/sprites`];
-    } catch {
-      return [] as string[];
-    }
+      if (apiBase) return [`${apiBase}/sprites`];
+    } catch {}
+    return [] as string[];
   })();
+
+  // On HTTPS pages we can't fetch from HTTP backends.
+  const onHttps = typeof window !== 'undefined' && window.location?.protocol === 'https:';
+  const defaultBackend = onHttps && DEFAULT_BACKEND_SPRITE_BASE.startsWith('http://')
+    ? ''
+    : DEFAULT_BACKEND_SPRITE_BASE;
 
   // Static vendor first (GitHub Pages / Tauri bundle), then API backend for
   // numeric BaseSprites that only exist on the Pi server.
-  const all = [explicit, staticBase, ...fromApiBase]
+  const all = [explicit, staticBase, ...fromApiBase, defaultBackend]
     .map(normalizeBaseUrl)
     .filter((v): v is string => !!v);
   return Array.from(new Set(all));
@@ -705,7 +713,7 @@ async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex |
 
     for (const spriteBase of bases) {
       const ctrl = new AbortController();
-      const timeoutId = setTimeout(() => ctrl.abort(), 1800);
+      const timeoutId = setTimeout(() => ctrl.abort(), 5000);
       try {
         const res = await fetch(`${spriteBase}/index.json`, { signal: ctrl.signal });
         if (!res.ok) continue;
@@ -1649,11 +1657,33 @@ async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}
   }
 }
 
+/** Cached result of the /fusion/gen-available check. null = not yet checked. */
+let gFusionGenAvailable: boolean | null = null;
+
+async function isFusionGenAvailable(): Promise<boolean> {
+  if (gFusionGenAvailable !== null) return gFusionGenAvailable;
+  for (const base of getFusionApiBases()) {
+    try {
+      const res = await fetchWithTimeout(`${base}/fusion/gen-available`, {}, 3000);
+      if (res.ok) {
+        const data = await res.json() as { available?: boolean };
+        gFusionGenAvailable = !!data?.available;
+        return gFusionGenAvailable;
+      }
+    } catch {}
+  }
+  gFusionGenAvailable = false;
+  return false;
+}
+
 async function requestFusionGenerateOnce(
   headNum: number,
   bodyNum: number,
   options?: { guidancePrompt?: string },
 ): Promise<{ base: string } | null> {
+  // Skip all attempts if the backend doesn't support on-demand generation.
+  if (!(await isFusionGenAvailable())) return null;
+
   const guidancePrompt = options?.guidancePrompt?.trim();
   const payload: Record<string, unknown> = {
     headNum,
