@@ -1,7 +1,7 @@
 {
   "name": "pokettrpg",
   "private": true,
-  "version": "1.4.7",
+  "version": "1.4.8",
   "type": "module",
   "scripts": {
     "sync:sage-data": "node scripts/sync-sage-data.mjs",

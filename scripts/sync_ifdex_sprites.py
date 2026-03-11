@@ -4,7 +4,8 @@ Sync and normalize Infinite Fusion sprite assets.
 
 What this script does:
 1) Fetches pokemon_id -> nat_id mapping from Infinite Fusion Dex.
-2) Renames local sprite filenames that still use local dex IDs to national dex IDs.
+2) Renames local sprite filenames that still use local dex IDs to national dex IDs
+    using a safety rule: IDs that are already valid national IDs are never remapped.
 3) Optionally downloads missing custom/generated sprites from ifd-spaces CDN.
 
 Default mode is dry-run (no filesystem changes).
@@ -32,6 +33,7 @@ IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 
 FUSION_STEM_RE = re.compile(r"^(-?\d+)\.(-?\d+)(.*)$")
 BASE_STEM_RE = re.compile(r"^(-?\d+)(.*)$")
+BASE_NUMERIC_STEM_RE = re.compile(r"^(-?\d+)$")
 
 
 @dataclass
@@ -58,6 +60,9 @@ class SyncReport:
     downloads_planned: int
     downloads_applied: int
     download_misses: int
+    refresh_planned: int = 0
+    refresh_applied: int = 0
+    refresh_misses: int = 0
     backend_reindex_ok: Optional[bool] = None
     backend_reindex_detail: Optional[str] = None
 
@@ -219,7 +224,17 @@ def iter_relevant_dirs(sprites_root: Path) -> List[Path]:
     return [d for d in dirs if d.exists()]
 
 
-def remap_fusion_stem(stem: str, mapping: Dict[int, int]) -> Optional[str]:
+def remap_component_id(component_id: int, mapping: Dict[int, int], nat_ids: Set[int]) -> int:
+    # Safety rule: if an ID is already a valid national ID, never remap it.
+    if component_id in nat_ids:
+        return component_id
+    mapped = mapping.get(component_id, component_id)
+    if mapped in nat_ids:
+        return mapped
+    return component_id
+
+
+def remap_fusion_stem(stem: str, mapping: Dict[int, int], nat_ids: Set[int]) -> Optional[str]:
     m = FUSION_STEM_RE.match(stem)
     if not m:
         return None
@@ -228,8 +243,8 @@ def remap_fusion_stem(stem: str, mapping: Dict[int, int]) -> Optional[str]:
     body = int(m.group(2))
     suffix = m.group(3)
 
-    new_head = mapping.get(head, head)
-    new_body = mapping.get(body, body)
+    new_head = remap_component_id(head, mapping, nat_ids)
+    new_body = remap_component_id(body, mapping, nat_ids)
 
     if new_head == head and new_body == body:
         return None
@@ -237,26 +252,27 @@ def remap_fusion_stem(stem: str, mapping: Dict[int, int]) -> Optional[str]:
     return f"{new_head}.{new_body}{suffix}"
 
 
-def remap_base_stem(stem: str, mapping: Dict[int, int]) -> Optional[str]:
-    m = BASE_STEM_RE.match(stem)
+def remap_base_stem(stem: str, mapping: Dict[int, int], nat_ids: Set[int]) -> Optional[str]:
+    # Base remap is intentionally strict: only pure numeric stems are renamed.
+    m = BASE_NUMERIC_STEM_RE.match(stem)
     if not m:
         return None
 
     base_id = int(m.group(1))
-    suffix = m.group(2)
-    new_id = mapping.get(base_id, base_id)
+    new_id = remap_component_id(base_id, mapping, nat_ids)
     if new_id == base_id:
         return None
-    return f"{new_id}{suffix}"
+    return f"{new_id}"
 
 
 def plan_renames(sprites_root: Path, mapping: Dict[int, int]) -> List[RenameAction]:
     actions: List[RenameAction] = []
+    nat_ids: Set[int] = set(mapping.values())
 
     # BaseSprites: single-ID filenames.
     base_dir = sprites_root / "Other" / "BaseSprites"
     for path in iter_image_files(base_dir):
-        new_stem = remap_base_stem(path.stem, mapping)
+        new_stem = remap_base_stem(path.stem, mapping, nat_ids)
         if not new_stem:
             continue
         target = path.with_name(new_stem + path.suffix)
@@ -269,7 +285,7 @@ def plan_renames(sprites_root: Path, mapping: Dict[int, int]) -> List[RenameActi
         if d == base_dir:
             continue
         for path in iter_image_files(d):
-            new_stem = remap_fusion_stem(path.stem, mapping)
+            new_stem = remap_fusion_stem(path.stem, mapping, nat_ids)
             if not new_stem:
                 continue
             target = path.with_name(new_stem + path.suffix)
@@ -384,6 +400,55 @@ def try_download_sprite(sprite_id: str, out_dir: Path, apply: bool) -> Optional[
     return None
 
 
+def refresh_base_sprite_ids(
+    sprites_root: Path,
+    sprite_ids: Sequence[str],
+    apply: bool,
+) -> Tuple[int, int, int]:
+    base_dir = sprites_root / "Other" / "BaseSprites"
+    planned = 0
+    applied = 0
+    misses = 0
+
+    for raw_id in sprite_ids:
+        sprite_id = raw_id.strip()
+        if not sprite_id:
+            continue
+
+        custom_url = f"{CDN_BASE}/custom/{sprite_id}.png"
+        generated_url = f"{CDN_BASE}/generated/{sprite_id}.png"
+        out_path = base_dir / f"{sprite_id}.png"
+
+        found = False
+        for kind, url in (("custom", custom_url), ("generated", generated_url)):
+            if apply:
+                if http_download(url, out_path):
+                    found = True
+                    break
+            else:
+                req = urllib.request.Request(url, headers={"User-Agent": "pokettrpg-sync/1.0"})
+                try:
+                    with urllib.request.urlopen(req, timeout=15) as resp:
+                        if resp.status == 200:
+                            found = True
+                            break
+                except urllib.error.HTTPError as exc:
+                    if exc.code == 404:
+                        continue
+                    raise
+                except urllib.error.URLError:
+                    continue
+
+        if found:
+            planned += 1
+            if apply:
+                applied += 1
+        else:
+            misses += 1
+
+    return planned, applied, misses
+
+
 def sync_missing_downloads(
     sprites_root: Path,
     mapping: Dict[int, int],
@@ -431,6 +496,9 @@ def write_report(path: Path, report: SyncReport, renames: Sequence[RenameAction]
         "downloads_planned": report.downloads_planned,
         "downloads_applied": report.downloads_applied,
         "download_misses": report.download_misses,
+        "refresh_planned": report.refresh_planned,
+        "refresh_applied": report.refresh_applied,
+        "refresh_misses": report.refresh_misses,
         "backend_reindex_ok": report.backend_reindex_ok,
         "backend_reindex_detail": report.backend_reindex_detail,
         "sample_renames": [
@@ -500,6 +568,11 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         action="store_true",
         help="Call backend /api/fusion/reindex after local sync",
     )
+    p.add_argument(
+        "--refresh-base-ids",
+        default="",
+        help="Comma-separated base sprite IDs to force-refresh into Other/BaseSprites (e.g. 361,362,428,428a-i)",
+    )
     return p.parse_args(argv)
 
 
@@ -540,6 +613,17 @@ def main(argv: Sequence[str]) -> int:
             scope=args.download_scope,
         )
 
+    refresh_ids = [s.strip() for s in str(args.refresh_base_ids or "").split(",") if s.strip()]
+    refresh_planned = 0
+    refresh_applied = 0
+    refresh_misses = 0
+    if refresh_ids:
+        refresh_planned, refresh_applied, refresh_misses = refresh_base_sprite_ids(
+            sprites_root=sprites_root,
+            sprite_ids=refresh_ids,
+            apply=args.apply,
+        )
+
     backend_reindex_ok: Optional[bool] = None
     backend_reindex_detail: Optional[str] = None
     if args.reindex_backend:
@@ -554,6 +638,9 @@ def main(argv: Sequence[str]) -> int:
         downloads_planned=downloads_planned,
         downloads_applied=downloads_applied,
         download_misses=download_misses,
+        refresh_planned=refresh_planned,
+        refresh_applied=refresh_applied,
+        refresh_misses=refresh_misses,
         backend_reindex_ok=backend_reindex_ok,
         backend_reindex_detail=backend_reindex_detail,
     )
@@ -571,6 +658,11 @@ def main(argv: Sequence[str]) -> int:
         print(f"[{mode}] downloads found: {report.downloads_planned}")
         print(f"[{mode}] downloads applied: {report.downloads_applied}")
         print(f"[{mode}] download misses: {report.download_misses}")
+    if refresh_ids:
+        print(f"[{mode}] refresh requested: {len(refresh_ids)}")
+        print(f"[{mode}] refresh found: {report.refresh_planned}")
+        print(f"[{mode}] refresh applied: {report.refresh_applied}")
+        print(f"[{mode}] refresh misses: {report.refresh_misses}")
     if args.reindex_backend:
         print(f"[{mode}] backend reindex ok: {report.backend_reindex_ok}")
         print(f"[{mode}] backend reindex detail: {report.backend_reindex_detail}")
