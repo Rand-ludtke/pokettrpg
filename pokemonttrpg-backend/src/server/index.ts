@@ -14,6 +14,7 @@ import { convertShowdownAbilities, convertShowdownItems } from "../data/converte
 import { convertShowdownSpecies, convertShowdownMoves } from "../data/converters/showdown-species-moves";
 import { attachFusionWebSocket, registerFusionRoutes } from "./fusion-sync";
 import { FusionGenService, registerFusionGenRoutes } from "./fusion-gen";
+import { startIfdexDailySyncJob } from "./ifdex-daily-sync";
 
 // Configuration: Use Pokemon Showdown engine (true) or custom engine (false)
 const USE_PS_ENGINE = process.env.USE_PS_ENGINE !== "false"; // Default to PS engine
@@ -360,6 +361,9 @@ const UNIFIED_SPRITES_ROOT = process.env.UNIFIED_SPRITES_ROOT
 const FUSION_PACK_ZIP = process.env.FUSION_PACK_ZIP
   ? path.resolve(process.env.FUSION_PACK_ZIP)
   : "";
+const FUSION_REPORTS_DIR = process.env.FUSION_REPORTS_DIR
+  ? path.resolve(process.env.FUSION_REPORTS_DIR)
+  : path.resolve(process.cwd(), "data", "sprite-reports");
 
 function ensureParentDir(filePath: string) {
   try {
@@ -629,12 +633,14 @@ app.get("/sprites/:folder/:filename", (req: Request, res: Response) => {
 
 // Fusion sprite serving
 let fusionGenService: FusionGenService | null = null;
+const FUSION_GEN_REMOTE_BASE = (process.env.FUSION_GEN_REMOTE_BASE || "").trim().replace(/\/+$/, "");
 
 if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   registerFusionRoutes(app, {
     spritesDir: FUSION_SPRITES_DIR,
     spritesDirs: FUSION_SPRITES_EXTRA_DIRS,
     packZipPath: FUSION_PACK_ZIP || undefined,
+    reportsDir: FUSION_REPORTS_DIR,
   });
   console.log(`[Fusion] Sprites directory enabled: ${FUSION_SPRITES_DIR}`);
   if (FUSION_SPRITES_EXTRA_DIRS.length) {
@@ -653,7 +659,6 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   const FUSION_LORA = process.env.FUSION_LORA_PATH
     ? path.resolve(process.env.FUSION_LORA_PATH)
     : undefined;
-  const FUSION_GEN_REMOTE_BASE = (process.env.FUSION_GEN_REMOTE_BASE || "").trim().replace(/\/+$/, "");
   const fetchFn = (globalThis as any).fetch as
     | ((input: string, init?: any) => Promise<any>)
     | undefined;
@@ -712,7 +717,7 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
 // Always-available capability endpoint so the frontend knows whether
 // on-demand fusion generation is supported before attempting POSTs.
 app.get("/fusion/gen-available", (_req: Request, res: Response) => {
-  res.json({ available: !!fusionGenService });
+  res.json({ available: !!fusionGenService || !!FUSION_GEN_REMOTE_BASE });
 });
 
 // --- Custom Dex persistence & helpers ---
@@ -2550,7 +2555,10 @@ function saveReplay(room: Room) {
 }
 
 export function startServer(port = Number(process.env.PORT) || 3000) {
-  server.listen(port, () => console.log(`Server running on :${port}`));
+  server.listen(port, () => {
+    console.log(`Server running on :${port}`);
+    startIfdexDailySyncJob({ backendPort: port });
+  });
 }
 
 if (require.main === module) {
