@@ -1,5 +1,12 @@
 # PokeTTRPG - Tauri App
 
+## IMPORTANT: TAURI-ONLY WORKFLOW
+
+- Do not use or modify app(do not touch) for builds, fixes, or releases.
+- All active app work must happen in tauri-app.
+- Use release.ps1 for release automation (it targets tauri-app).
+- Read the release/build policy: ../docs/TAURI_ONLY_RELEASE_POLICY.md
+
 A Pokemon Tabletop RPG companion app built with Tauri 2.x, React, and TypeScript.
 
 ## 🚀 Features

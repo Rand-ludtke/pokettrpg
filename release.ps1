@@ -15,6 +15,10 @@ $AppDir = Join-Path $RepoRoot 'tauri-app'
 $TauriConfPath = Join-Path $AppDir 'src-tauri\tauri.conf.json'
 $PkgPath = Join-Path $AppDir 'package.json'
 
+Write-Warn 'TAURI-ONLY RELEASE FLOW: Do NOT build or modify app(do not touch).'
+Write-Warn 'All release/build changes must be made in tauri-app and backend/scripts as needed.'
+Write-Info 'Policy doc: docs/TAURI_ONLY_RELEASE_POLICY.md'
+
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
 	Write-Err 'GitHub CLI (gh) is required. Install from https://cli.github.com and login with: gh auth login'
 	exit 1
