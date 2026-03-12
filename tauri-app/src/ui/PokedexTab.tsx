@@ -60,6 +60,7 @@ interface Species {
   evoItem?: string;
   evoCondition?: string;
   evoMove?: string;
+  sourceTags?: string[];
 }
 
 interface Move {
@@ -99,6 +100,7 @@ interface Item {
 }
 
 type DexMode = 'search' | 'pokemon' | 'moves' | 'abilities' | 'items' | 'types' | 'pc' | 'custom';
+type FilterLogic = 'all' | 'any';
 type CustomSeed = { key?: string; entry?: DexSpecies; learnset?: Record<string, any> };
 const MAX_UNFILTERED_POKEMON = 500;
 
@@ -361,7 +363,7 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
       case 'levelFriendship': return `Level up with high friendship${condition}`;
       case 'levelHold': return `Level up while holding ${evo.evoItem || 'required item'}${condition}`;
       case 'useItem': return `Use ${evo.evoItem || 'required evolution item'}${condition}`;
-      case 'levelMove': return evo.evoMove ? `Level up while knowing ${evo.evoMove}${condition}` : `Level up${condition}`;
+      case 'levelMove': return evo.evoMove ? `Level up while knowing ${evo.evoMove}` : `Level up${condition}`;
       case 'trade': return evo.evoItem
         ? `Trade while using ${evo.evoItem}${condition}`
         : `Trade${condition}`;
@@ -379,16 +381,18 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
 
     const chain: Species[][] = [];
     let current: Species[] = [basic];
+    const allSeen = new Set<string>(); // cross-stage dedup
 
     while (current.length > 0) {
       chain.push(current);
+      for (const m of current) allSeen.add(m.id);
       const next: Species[] = [];
       const nextSeen = new Set<string>();
       for (const mon of current) {
         if (mon.evos) {
           for (const evo of mon.evos) {
             const evoMon = dexData.pokedex[toID(evo)];
-            if (evoMon && !nextSeen.has(evoMon.id)) {
+            if (evoMon && !nextSeen.has(evoMon.id) && !allSeen.has(evoMon.id)) {
               nextSeen.add(evoMon.id);
               next.push(evoMon);
             }
@@ -1138,6 +1142,7 @@ interface DexData {
   abilities: Record<string, Ability>;
   items: Record<string, Item>;
   learnsets: Record<string, any>;
+  sourceTags?: Record<string, string[]>;
 }
 
 type PcEntry = {
@@ -1151,6 +1156,12 @@ type PcEntry = {
 export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) => void }) {
   const [mode, setMode] = useState<DexMode>('search');
   const [search, setSearch] = useState('');
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [typeFilterMode, setTypeFilterMode] = useState<FilterLogic>('any');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagFilterMode, setTagFilterMode] = useState<FilterLogic>('any');
+  const [bstMin, setBstMin] = useState('');
+  const [bstMax, setBstMax] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dexData, setDexData] = useState<DexData | null>(null);
@@ -1200,6 +1211,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
         if (!mounted) return;
         
         const pokedex: Record<string, Species> = {};
+        const sourceTags = ((dex as any).sourceTags || {}) as Record<string, string[]>;
         for (const [id, entry] of Object.entries(dex.pokedex)) {
           const e = entry as any;
           pokedex[id] = {
@@ -1233,6 +1245,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
             evoItem: e.evoItem,
             evoCondition: e.evoCondition,
             evoMove: e.evoMove,
+            sourceTags: sourceTags[id] || sourceTags[adapter.normalizeName(id)] || [],
           };
         }
         
@@ -1290,6 +1303,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
           abilities,
           items,
           learnsets: dex.learnsets as Record<string, any>,
+          sourceTags,
         });
         setDataLoaded(true);
       } catch (err) {
@@ -1333,8 +1347,65 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
       evoItem: (entry as any).evoItem,
       evoCondition: entry.evoCondition,
       evoMove: (entry as any).evoMove,
+      sourceTags: ['custom'],
     } as Species));
   }, [customDex]);
+
+  const toggleFilterValue = useCallback((value: string, setter: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setter(prev => (prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]));
+  }, []);
+
+  const getBaseStatTotal = useCallback((p: Species) => {
+    const s = p.baseStats;
+    return (s?.hp || 0) + (s?.atk || 0) + (s?.def || 0) + (s?.spa || 0) + (s?.spd || 0) + (s?.spe || 0);
+  }, []);
+
+  const inferSpeciesTags = useCallback((p: Species) => {
+    const tags = new Set<string>();
+    const add = (tag?: string | null) => {
+      if (!tag) return;
+      const clean = tag.trim().toLowerCase();
+      if (clean) tags.add(clean);
+    };
+
+    add(p.tier);
+    add(p.isNonstandard);
+    if (p.isNonstandard) add('illegal');
+    if (p.isNonstandard === 'CAP') add('cap');
+    if (p.isNonstandard === 'Custom') add('custom');
+    if (p.forme?.toLowerCase() === 'mega' || p.name.toLowerCase().includes('-mega')) add('mega');
+    if (p.forme) add(`forme:${p.forme.toLowerCase()}`);
+
+    const explicitSources = p.sourceTags || dexData?.sourceTags?.[p.id] || dexData?.sourceTags?.[adapter.normalizeName(p.id)] || [];
+    for (const source of explicitSources) add(source);
+
+    if (p.id.includes('delta') || p.name.toLowerCase().includes('delta')) add('delta');
+    if (p.name.toLowerCase().includes('wylin')) add('wylin');
+    if (p.name.toLowerCase().includes('sage')) add('sage');
+    if (p.name.toLowerCase().includes('insurgence')) add('insurgence');
+
+    return Array.from(tags);
+  }, [dexData?.sourceTags]);
+
+  const availableTagOptions = useMemo(() => {
+    if (!dexData) return [] as string[];
+    const tags = new Set<string>();
+    for (const p of Object.values(dexData.pokedex)) {
+      inferSpeciesTags(p).forEach(t => tags.add(t));
+    }
+    return Array.from(tags).sort((a, b) => a.localeCompare(b));
+  }, [dexData, inferSpeciesTags]);
+
+  const hasAdvancedFilters = selectedTypes.length > 0 || selectedTags.length > 0 || bstMin.trim() !== '' || bstMax.trim() !== '';
+
+  const clearAdvancedFilters = useCallback(() => {
+    setSelectedTypes([]);
+    setTypeFilterMode('any');
+    setSelectedTags([]);
+    setTagFilterMode('any');
+    setBstMin('');
+    setBstMax('');
+  }, []);
 
   // Load PC list from localStorage
   const loadPc = useCallback(() => {
@@ -1598,15 +1669,39 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
           p.num.toString() === query ||
           (p.types && p.types.some(t => t.toLowerCase().includes(query))) ||
           (p.abilities && Object.values(p.abilities).some(a => a.toLowerCase().includes(query))) ||
-          (() => {
-            const tags: string[] = [];
-            if (p.tier) tags.push(p.tier);
-            if (p.isNonstandard) tags.push(p.isNonstandard);
-            if (p.isNonstandard) tags.push('illegal');
-            if (p.isNonstandard === 'CAP') tags.push('cap');
-            return tags.some(t => t.toLowerCase().includes(query));
-          })()
+          inferSpeciesTags(p).some(t => t.includes(query))
         );
+      }
+
+      if (selectedTypes.length > 0) {
+        list = list.filter(p => {
+          const pTypes = (p.types || []).map(t => t.toLowerCase());
+          const wanted = selectedTypes.map(t => t.toLowerCase());
+          return typeFilterMode === 'all'
+            ? wanted.every(t => pTypes.includes(t))
+            : wanted.some(t => pTypes.includes(t));
+        });
+      }
+
+      if (selectedTags.length > 0) {
+        list = list.filter(p => {
+          const pTags = inferSpeciesTags(p);
+          const wanted = selectedTags.map(t => t.toLowerCase());
+          return tagFilterMode === 'all'
+            ? wanted.every(t => pTags.includes(t))
+            : wanted.some(t => pTags.includes(t));
+        });
+      }
+
+      const min = bstMin.trim() === '' ? null : Number(bstMin);
+      const max = bstMax.trim() === '' ? null : Number(bstMax);
+      if (min != null || max != null) {
+        list = list.filter(p => {
+          const bst = getBaseStatTotal(p);
+          if (min != null && Number.isFinite(min) && bst < min) return false;
+          if (max != null && Number.isFinite(max) && bst > max) return false;
+          return true;
+        });
       }
 
       return query ? list : list.slice(0, MAX_UNFILTERED_POKEMON);
@@ -1686,12 +1781,13 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
     }
     
     return [];
-  }, [mode, search, dexData, pcList, customList]);
+  }, [mode, search, dexData, pcList, customList, selectedTypes, typeFilterMode, selectedTags, tagFilterMode, bstMin, bstMax, inferSpeciesTags, getBaseStatTotal]);
 
   // Render result row
   const renderResultRow = (item: any) => {
     if (mode === 'search' || mode === 'pokemon') {
       const p = item as Species;
+      const tags = inferSpeciesTags(p).slice(0, 3);
       return (
         <li 
           key={p.id}
@@ -1713,6 +1809,11 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
               {p.forme ? <>{p.baseSpecies}<small style={{ opacity: 0.7 }}>-{p.forme}</small></> : p.name}
             </div>
             <div>{p.types.map(t => <TypeBadge key={t} type={t} />)}</div>
+            {tags.length > 0 && (
+              <div style={{ marginTop: 2, fontSize: 10, color: '#666' }}>
+                {tags.map(t => <span key={t} style={{ marginRight: 6 }}>#{t}</span>)}
+              </div>
+            )}
           </div>
         </li>
       );
@@ -2072,6 +2173,107 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
             fontSize: 14,
           }}
         />
+        {(mode === 'search' || mode === 'pokemon') && (
+          <div style={{ width: '100%', maxWidth: 760, margin: '8px auto 0', textAlign: 'left' }}>
+            <details>
+              <summary style={{ cursor: 'pointer', fontSize: 12, color: '#444' }}>Advanced filters</summary>
+              <div style={{ border: '1px solid #ccc', borderRadius: 6, marginTop: 6, padding: 10, background: '#fff' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Type match
+                    <select value={typeFilterMode} onChange={e => setTypeFilterMode(e.target.value as FilterLogic)}>
+                      <option value="any">One of these types</option>
+                      <option value="all">Needs all selected types</option>
+                    </select>
+                  </label>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Tag match
+                    <select value={tagFilterMode} onChange={e => setTagFilterMode(e.target.value as FilterLogic)}>
+                      <option value="any">One of these tags</option>
+                      <option value="all">Needs all selected tags</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: 8, fontSize: 11, color: '#444', fontWeight: 'bold' }}>Types</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+                  {TYPE_OPTIONS.map(type => {
+                    const active = selectedTypes.includes(type);
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => toggleFilterValue(type, setSelectedTypes)}
+                        style={{
+                          padding: '4px 8px',
+                          border: '1px solid #bbb',
+                          borderRadius: 12,
+                          background: active ? '#4a9eff' : '#f2f2f2',
+                          color: active ? '#fff' : '#333',
+                          fontSize: 11,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {type}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ marginBottom: 8, fontSize: 11, color: '#444', fontWeight: 'bold' }}>Tags</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10, maxHeight: 92, overflowY: 'auto', paddingRight: 4 }}>
+                  {availableTagOptions.map(tag => {
+                    const active = selectedTags.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleFilterValue(tag, setSelectedTags)}
+                        style={{
+                          padding: '4px 8px',
+                          border: '1px solid #bbb',
+                          borderRadius: 12,
+                          background: active ? '#4a9eff' : '#f2f2f2',
+                          color: active ? '#fff' : '#333',
+                          fontSize: 11,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        #{tag}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10, alignItems: 'end' }}>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Min BST
+                    <input type="number" min={0} value={bstMin} onChange={e => setBstMin(e.target.value)} placeholder="e.g. 400" />
+                  </label>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Max BST
+                    <input type="number" min={0} value={bstMax} onChange={e => setBstMax(e.target.value)} placeholder="e.g. 650" />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={clearAdvancedFilters}
+                    disabled={!hasAdvancedFilters}
+                    style={{
+                      padding: '6px 10px',
+                      border: '1px solid #bbb',
+                      borderRadius: 4,
+                      background: '#e6e6e6',
+                      cursor: hasAdvancedFilters ? 'pointer' : 'not-allowed',
+                      fontSize: 11,
+                    }}
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+            </details>
+          </div>
+        )}
         {mode === 'custom' && (
           <div style={{ marginTop: 8 }}>
             <button

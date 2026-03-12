@@ -303,7 +303,31 @@ body {
   white-space: nowrap !important;
 }
 
-/* Fix Switch Menu and Controls Visibility */
+/* === Battle controls layout (cherry-picked from client.css, scoped to avoid global leaks) === */
+
+.ps-battle-panel .battle-controls {
+  position: absolute;
+  top: 370px;
+  left: 0;
+  width: 640px;
+  background: #EEF2F5;
+  z-index: 1000;
+  padding: 4px 0;
+}
+
+.ps-battle-panel .battle-controls p {
+  margin: 2px 0 8px 0;
+  padding: 0 8px;
+}
+
+.ps-battle-panel .battle-controls .whatdo {
+  margin-top: -2px;
+  padding: 4px 8px;
+  font-size: 9pt;
+  color: #555555;
+}
+
+/* Controls and switch/move menu containers */
 .ps-battle-panel .controls,
 .ps-battle-panel .switchmenu {
   position: relative;
@@ -311,6 +335,132 @@ body {
   pointer-events: auto;
 }
 
+.ps-battle-panel .movemenu,
+.ps-battle-panel .switchmenu {
+  display: block;
+  margin-right: -10px;
+  padding-left: 4px;
+}
+
+.ps-battle-panel .movemenu::after,
+.ps-battle-panel .switchmenu::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+/* Move buttons */
+.ps-battle-panel .movebutton {
+  float: left;
+  display: block;
+  width: 155px;
+  margin-right: 4px;
+  height: 40px;
+  font: 10pt/100% Verdana, sans-serif;
+  position: relative;
+  padding: 6px 4px 0 4px;
+}
+
+/* Switch buttons */
 .ps-battle-panel .switchmenu .switchbutton {
+  position: relative;
+  display: block;
+  float: left;
+  width: 102px;
+  min-height: 30px;
+  margin-right: 4px;
+  font: 9pt Verdana, sans-serif;
+  padding: 5px 5px 5px 0;
+  white-space: pre;
+  overflow: hidden;
   pointer-events: auto;
+}
+
+/* Button chrome (gradient borders, shadows) */
+.ps-battle-panel .switchmenu button,
+.ps-battle-panel .movebutton {
+  outline: none;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0 1px 0 rgba(255,255,255,.4);
+  border-radius: 5px;
+  margin-top: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2), inset 0 -1px 2px rgba(255,255,255,1);
+  color: #000;
+  border: solid 1px #AAA;
+  background: linear-gradient(to bottom, #f6f6f6, #e3e3e3);
+  cursor: pointer;
+}
+
+.ps-battle-panel .switchmenu button:hover,
+.ps-battle-panel .movebutton:hover {
+  background: linear-gradient(to bottom, #f2f2f2, #cfcfcf);
+  border-color: #606060;
+}
+
+.ps-battle-panel .switchmenu button.disabled,
+.ps-battle-panel .movebutton.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ps-battle-panel .switchmenu .picon {
+  float: left;
+  margin: -6px -3px -6px -4px;
+  opacity: 0.8;
+}
+
+.ps-battle-panel .movebutton small {
+  color: #777;
+}
+
+.ps-battle-panel .movebutton small.type,
+.ps-battle-panel .movebutton small.moveinfo {
+  padding-top: 3px;
+  float: left;
+  font-size: 8pt;
+}
+
+.ps-battle-panel .movebutton small.pp {
+  padding-top: 2px;
+  float: right;
+  font-size: 8pt;
+}
+
+.ps-battle-panel .movecontrols-extra {
+  clear: both;
+  padding: 4px 8px;
+}
+
+/* Waiting / switch controls layout */
+.ps-battle-panel .switchcontrols {
+  padding: 4px 8px;
+}
+
+.ps-battle-panel .switchcontrols .button,
+.ps-battle-panel .switchcontrols button.button {
+  cursor: pointer;
+  padding: 6px 12px;
+  border: 1px solid #AAA;
+  border-radius: 5px;
+  background: linear-gradient(to bottom, #f6f6f6, #e3e3e3);
+  color: #000;
+}
+
+.ps-battle-panel .switchcontrols .button:hover {
+  background: linear-gradient(to bottom, #f2f2f2, #cfcfcf);
+  border-color: #606060;
+}
+
+.ps-battle-panel .switchselect {
+  font-size: 9pt;
+  color: #555;
+  margin: 4px 0;
+}
+
+/* Waiting message */
+.ps-battle-panel .waiting {
+  padding: 12px 8px;
+  color: #555;
+  font-style: italic;
 }

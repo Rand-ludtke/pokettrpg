@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pokettrpg-pwa-v4';
+const CACHE_NAME = 'pokettrpg-pwa-v5';
 const scope = self?.registration?.scope || '/';
 const base = scope.endsWith('/') ? scope : `${scope}/`;
 const CORE_ASSETS = [

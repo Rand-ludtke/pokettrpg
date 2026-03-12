@@ -11,6 +11,7 @@ import { withPublicBase } from '../utils/publicBase';
 import { loadPokemonShowdown, createPSBattle, getDex, toID } from './ps-loader';
 import { ProtocolConverter, requestToPS } from './protocol-adapter';
 import type { PoketTRPGClient } from '../net/pokettrpgClient';
+import { getCustomSprite, normalizeName } from '../data/adapter';
 import './ps-battle.css';
 
 /** Set to true to enable verbose console logging during battles. */
@@ -1075,6 +1076,39 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         
         // Mark battle as ready
         battleReadyRef.current = true;
+
+        // Monkey-patch Dex.getSpriteData to use PC-chosen custom sprites
+        const dex = getDex();
+        if (dex && dex.getSpriteData && !(dex as any).__spritePatched) {
+          const origGetSpriteData = dex.getSpriteData.bind(dex);
+          dex.getSpriteData = function(pokemon: any, isFront: boolean, options?: any) {
+            const result = origGetSpriteData(pokemon, isFront, options);
+            try {
+              // Resolve species ID the same way the original does
+              let speciesName: string;
+              if (pokemon && typeof pokemon === 'object' && typeof pokemon.getSpeciesForme === 'function') {
+                speciesName = pokemon.getSpeciesForme();
+              } else if (typeof pokemon === 'string') {
+                speciesName = pokemon;
+              } else {
+                return result;
+              }
+              const speciesId = normalizeName(speciesName);
+              // Check for a locally-cached custom sprite matching this species
+              const slot = isFront ? 'front' as const : 'back' as const;
+              const custom = getCustomSprite(speciesId, slot);
+              if (custom) {
+                result.url = custom;
+                // Custom sprites are 96×96 pixel art
+                result.w = 96;
+                result.h = 96;
+                result.pixelated = true;
+              }
+            } catch { /* ignore lookup errors */ }
+            return result;
+          };
+          (dex as any).__spritePatched = true;
+        }
 
         // Ensure backdrop background resolves (fallback to remote if local asset missing)
         // IMPORTANT: PS calls scene.reset() which replaces .backdrop elements, so we need
@@ -3018,6 +3052,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     lastSentChoiceRef.current = null;
     lastActionTurnRef.current = 0;
     
+    // Notify server to clear our buffered action so the turn doesn't process
+    if (client && roomId && myPlayerId) {
+      PS_DEBUG && console.log('[PSBattlePanel] Sending cancel to server');
+      client.sendAction(roomId, { type: 'cancel' } as any, myPlayerId);
+    }
+    
     // Restore the last valid move request and choices so the move selection UI is shown
     if (lastMoveRequestRef.current) {
       PS_DEBUG && console.log('[PSBattlePanel] Restoring last move request on cancel');
@@ -3035,7 +3075,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     setWaitingForOpponent(false);
     waitStartTimeRef.current = 0;
-  }, []);
+  }, [client, roomId, myPlayerId]);
   
   // Auto-retry mechanism: If we've been waiting too long (5 seconds) for move/switch,
   // automatically re-send the action. This helps when server might have "lost" the first action.

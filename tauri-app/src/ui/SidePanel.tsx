@@ -97,6 +97,8 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   const [showdownFieldValue, setShowdownFieldValue] = useState<string>('');
   const [showdownEditMoveIndex, setShowdownEditMoveIndex] = useState<number | null>(null);
   const [showdownMoveValue, setShowdownMoveValue] = useState<string>('');
+  const [moveBrowserSlot, setMoveBrowserSlot] = useState<number | null>(null);
+  const [moveBrowserFilter, setMoveBrowserFilter] = useState<string>('');
   const [showdownEditStats, setShowdownEditStats] = useState<boolean>(false);
   const [showdownEvs, setShowdownEvs] = useState<{ hp: number; atk: number; def: number; spa: number; spd: number; spe: number }>({
     hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0,
@@ -109,6 +111,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   const [showFusePanel, setShowFusePanel] = useState<boolean>(false);
   const [showSecretTriplePanel, setShowSecretTriplePanel] = useState<boolean>(false);
   const prevLevelRef = React.useRef<number>(selected.level);
+  const prevSelectedRef = React.useRef<BattlePokemon>(selected);
   const basicsRef = React.useRef<HTMLDivElement|null>(null);
   const abilityRef = React.useRef<HTMLDivElement|null>(null);
   const mechanicsRef = React.useRef<HTMLDivElement|null>(null);
@@ -132,6 +135,15 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   }, [boxes, resolveSpeciesName]);
 
   useEffect(() => {
+    // Synchronously update refs and clear move-learn state BEFORE the async
+    // work below.  The level-detection effect (which depends on selected.level)
+    // fires on the same render, so these must be current before it runs.
+    prevLevelRef.current = selected.level;
+    prevSelectedRef.current = selected;
+    setLearnReplaceMove(null);
+    setLearnableMoves([]);
+    setShowMoveLearnPrompt(false);
+
     let mounted = true;
     (async () => {
       const d = await loadShowdownDex();
@@ -171,8 +183,6 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
         spe: (selected as any).evs?.spe || 0,
       });
       setShowdownNature((selected as any).nature || '');
-      prevLevelRef.current = selected.level;
-      setLearnReplaceMove(null);
     })();
     return () => { mounted = false; };
   }, [selected]);
@@ -180,7 +190,12 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   // Detect level-ups outside the editor (e.g., PC leveling) and surface learnable moves
   useEffect(() => {
     const prev = prevLevelRef.current;
-    if (selected.level > prev) {
+    // Only trigger move prompts for level increases on the SAME Pokemon;
+    // switching to a different Pokemon with a higher level is not a level-up.
+    // Use name identity (not reference equality) so re-renders don't break the check.
+    const sameIdentity = selected.name === prevSelectedRef.current?.name
+                      && selected.species === prevSelectedRef.current?.species;
+    if (sameIdentity && selected.level > prev) {
       checkLearnableMoves(prev, selected.level);
     }
     prevLevelRef.current = selected.level;
@@ -250,6 +265,77 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     // Legal moves first, then illegal
     return { legal, illegal, legalMoveIds };
   }, [dex, speciesInput, selected.species, selected.name]);
+
+  // Build detailed legal move list with learn methods for the move browser
+  const detailedLegalMoves = useMemo(() => {
+    if (!dex || !sortedMoves) return [];
+    const species = speciesInput || resolveSpeciesName();
+    const speciesId = normalizeName(species);
+
+    // Gather learnset sources from this species + prevo chain
+    const allSources: Record<string, string[]> = {};
+    const collectSources = (sid: string) => {
+      const ls = dex.learnsets[sid]?.learnset;
+      if (!ls) return;
+      for (const [moveId, sources] of Object.entries(ls)) {
+        if (!allSources[moveId]) allSources[moveId] = [];
+        for (const s of (sources as string[])) {
+          if (!allSources[moveId].includes(s)) allSources[moveId].push(s);
+        }
+      }
+    };
+    collectSources(speciesId);
+    const pokedexEntry = dex.pokedex[speciesId];
+    if (pokedexEntry?.prevo) {
+      let prevo = pokedexEntry.prevo;
+      while (prevo) {
+        collectSources(normalizeName(prevo));
+        prevo = dex.pokedex[normalizeName(prevo)]?.prevo;
+      }
+    }
+
+    const parseLearnMethod = (sources: string[]): string => {
+      const methods: string[] = [];
+      for (const s of sources) {
+        const levelMatch = s.match(/^\d+L(\d+)$/);
+        if (levelMatch) { methods.push(`Lv ${levelMatch[1]}`); continue; }
+        if (/^\d+M$/.test(s)) { methods.push('TM'); continue; }
+        if (/^\d+E$/.test(s)) { methods.push('Egg'); continue; }
+        if (/^\d+T$/.test(s)) { methods.push('Tutor'); continue; }
+        if (/^\d+S\d*$/.test(s)) { methods.push('Event'); continue; }
+        if (/^\d+R$/.test(s)) { methods.push('Reminder'); continue; }
+      }
+      // Deduplicate
+      return [...new Set(methods)].join(', ') || '?';
+    };
+
+    // Extract the lowest learn level for sorting
+    const getLowestLevel = (sources: string[]): number => {
+      let min = Infinity;
+      for (const s of sources) {
+        const m = s.match(/^\d+L(\d+)$/);
+        if (m) min = Math.min(min, parseInt(m[1], 10));
+      }
+      return min;
+    };
+
+    return sortedMoves.legal.map((move: any) => {
+      const moveId = normalizeName(move.name);
+      const sources = allSources[moveId] || [];
+      return {
+        ...move,
+        learnMethod: parseLearnMethod(sources),
+        lowestLevel: getLowestLevel(sources),
+        sources,
+      };
+    }).sort((a: any, b: any) => {
+      // Level-up moves first sorted by level, then TM, then Egg, then others
+      if (a.lowestLevel !== Infinity && b.lowestLevel !== Infinity) return a.lowestLevel - b.lowestLevel;
+      if (a.lowestLevel !== Infinity) return -1;
+      if (b.lowestLevel !== Infinity) return 1;
+      return a.name.localeCompare(b.name);
+    });
+  }, [dex, sortedMoves, speciesInput, selected.species, selected.name]);
 
   // Check for available evolutions
   interface EvoOption {
@@ -1080,7 +1166,13 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             compact
           />
           <VariantPicker
-            variants={(selected as any).fusion?.variants || ['default', 'a', 'b']}
+            variants={(selected as any).fusion?.variants || (
+              (selected as any).fusion?.headId && (selected as any).fusion?.bodyId
+                ? [`${(selected as any).fusion.headId}.${(selected as any).fusion.bodyId}.png`,
+                   `${(selected as any).fusion.headId}.${(selected as any).fusion.bodyId}a.png`,
+                   `${(selected as any).fusion.headId}.${(selected as any).fusion.bodyId}b.png`]
+                : ['default']
+            )}
             selectedVariant={(selected as any).fusion?.spriteFile || ''}
             onSelect={(variant) => {
               const fusion = { ...(selected as any).fusion, spriteFile: variant };
@@ -1517,23 +1609,175 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                 }
                 const moveInfo = dex?.moves?.[normalizeName(move)];
                 const tooltip = moveTooltip(moveInfo || { name: move, category: (selected.moves[idx] as any)?.category });
+                const isSelected = moveBrowserSlot === idx;
                 return (
                   <div key={idx}
                     style={{
                       padding:'4px 8px', 
-                      background:'rgba(255,255,255,0.05)', 
+                      background: isSelected ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255,255,255,0.05)', 
                       borderRadius:4,
                       borderLeft:`3px solid ${TYPE_COLORS[moveType?.toLowerCase()] || '#888'}`,
+                      border: isSelected ? '1px solid var(--accent-color, #6366f1)' : undefined,
                       cursor:'pointer',
                     }}
                     title={tooltip}
-                    onClick={()=> startShowdownMoveEdit(idx, move)}
+                    onClick={(e)=> {
+                      if (e.shiftKey || e.ctrlKey) {
+                        startShowdownMoveEdit(idx, move);
+                      } else {
+                        setMoveBrowserSlot(moveBrowserSlot === idx ? null : idx);
+                        setMoveBrowserFilter('');
+                      }
+                    }}
+                    onDoubleClick={()=> startShowdownMoveEdit(idx, move)}
                   >
                     <div style={{fontWeight:'bold', fontSize:'0.9em'}}>{move || '—'}</div>
                   </div>
                 );
               })}
             </div>
+
+            {/* Move Browser Panel - shown when a move slot is selected */}
+            {moveBrowserSlot !== null && (() => {
+              const currentMove = selected.moves[moveBrowserSlot];
+              const currentMoveInfo = currentMove ? dex?.moves?.[normalizeName(currentMove.name)] : null;
+              const filterLower = moveBrowserFilter.toLowerCase();
+              const filteredMoves = filterLower
+                ? detailedLegalMoves.filter((m: any) =>
+                    m.name.toLowerCase().includes(filterLower) ||
+                    (m.type || '').toLowerCase().includes(filterLower) ||
+                    (m.learnMethod || '').toLowerCase().includes(filterLower)
+                  )
+                : detailedLegalMoves;
+
+              return (
+                <div style={{marginTop:6, borderTop:'1px solid #444', paddingTop:6}}>
+                  {/* Selected move detail */}
+                  {currentMoveInfo && (
+                    <div style={{
+                      padding:8, marginBottom:6, background:'rgba(99, 102, 241, 0.08)',
+                      borderRadius:6, border:'1px solid rgba(99, 102, 241, 0.3)',
+                    }}>
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'baseline'}}>
+                        <strong style={{fontSize:'0.95em'}}>{currentMoveInfo.name}</strong>
+                        <span className="dim" style={{fontSize:'0.75em'}}>Slot {moveBrowserSlot + 1}</span>
+                      </div>
+                      <div style={{display:'flex', gap:8, flexWrap:'wrap', marginTop:4, fontSize:'0.8em'}}>
+                        <span style={{
+                          padding:'1px 6px', borderRadius:3, fontSize:'0.85em', fontWeight:'bold',
+                          background: TYPE_COLORS[currentMoveInfo.type?.toLowerCase()] || '#888', color:'#fff',
+                        }}>{currentMoveInfo.type}</span>
+                        <span className="dim">{currentMoveInfo.category}</span>
+                        {currentMoveInfo.basePower > 0 && <span>Power: <strong>{currentMoveInfo.basePower}</strong></span>}
+                        <span>Acc: <strong>{currentMoveInfo.accuracy === true ? '—' : `${currentMoveInfo.accuracy ?? '—'}%`}</strong></span>
+                        {currentMoveInfo.pp && <span>PP: <strong>{currentMoveInfo.pp}</strong></span>}
+                        {currentMoveInfo.priority !== undefined && currentMoveInfo.priority !== 0 && (
+                          <span>Priority: <strong>{currentMoveInfo.priority > 0 ? '+' : ''}{currentMoveInfo.priority}</strong></span>
+                        )}
+                      </div>
+                      {currentMoveInfo.multihit && (
+                        <div style={{fontSize:'0.8em', marginTop:2}}>
+                          Hits: <strong>{Array.isArray(currentMoveInfo.multihit) ? `${currentMoveInfo.multihit[0]}–${currentMoveInfo.multihit[1]}` : currentMoveInfo.multihit}×</strong>
+                        </div>
+                      )}
+                      {(currentMoveInfo.secondary || currentMoveInfo.secondaries) && (() => {
+                        const sec = currentMoveInfo.secondary || (currentMoveInfo.secondaries && currentMoveInfo.secondaries[0]);
+                        if (!sec) return null;
+                        const parts: string[] = [];
+                        if (sec.chance) parts.push(`${sec.chance}% chance`);
+                        if (sec.status) parts.push(`inflict ${sec.status.toUpperCase()}`);
+                        if (sec.boosts) {
+                          for (const [stat, val] of Object.entries(sec.boosts)) {
+                            parts.push(`${(val as number) > 0 ? '+' : ''}${val} ${stat}`);
+                          }
+                        }
+                        if (sec.volatileStatus) parts.push(sec.volatileStatus);
+                        return parts.length > 0 ? (
+                          <div style={{fontSize:'0.8em', marginTop:2, color:'#f0c040'}}>Effect: {parts.join(', ')}</div>
+                        ) : null;
+                      })()}
+                      {currentMoveInfo.drain && (
+                        <div style={{fontSize:'0.8em', marginTop:2}}>Drain: {Math.round((currentMoveInfo.drain[0] / currentMoveInfo.drain[1]) * 100)}%</div>
+                      )}
+                      {currentMoveInfo.recoil && (
+                        <div style={{fontSize:'0.8em', marginTop:2}}>Recoil: {Math.round((currentMoveInfo.recoil[0] / currentMoveInfo.recoil[1]) * 100)}%</div>
+                      )}
+                      {currentMoveInfo.flags?.contact && <div style={{fontSize:'0.75em', marginTop:2}} className="dim">Makes contact</div>}
+                      <div style={{fontSize:'0.8em', marginTop:4, color:'#ccc'}}>{currentMoveInfo.shortDesc || currentMoveInfo.desc || ''}</div>
+                    </div>
+                  )}
+
+                  {/* Search filter */}
+                  <div style={{display:'flex', gap:4, alignItems:'center', marginBottom:4}}>
+                    <input
+                      placeholder="Search moves..."
+                      value={moveBrowserFilter}
+                      onChange={e => setMoveBrowserFilter(e.target.value)}
+                      style={{flex:1, fontSize:'0.8em', padding:'3px 6px'}}
+                    />
+                    <span className="dim" style={{fontSize:'0.7em', whiteSpace:'nowrap'}}>
+                      {filteredMoves.length} move{filteredMoves.length !== 1 ? 's' : ''}
+                    </span>
+                    <span className="dim" style={{fontSize:'0.65em'}}>Double-click slot to type</span>
+                  </div>
+
+                  {/* Move list */}
+                  <div style={{maxHeight:280, overflowY:'auto', display:'grid', gap:2}}>
+                    {filteredMoves.map((m: any) => {
+                      const isEquipped = selected.moves.some(em => normalizeName(em.name) === normalizeName(m.name));
+                      return (
+                        <div
+                          key={m.name}
+                          style={{
+                            display:'grid', gridTemplateColumns:'1fr auto', gap:4, alignItems:'start',
+                            padding:'4px 6px', borderRadius:4, cursor: isEquipped ? 'default' : 'pointer',
+                            background: isEquipped ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.03)',
+                            borderLeft:`3px solid ${TYPE_COLORS[m.type?.toLowerCase()] || '#888'}`,
+                            opacity: isEquipped ? 0.6 : 1,
+                          }}
+                          onClick={() => {
+                            if (isEquipped) return;
+                            // Replace the move in the selected slot
+                            const newMoves = [...movesInput];
+                            newMoves[moveBrowserSlot!] = m.name;
+                            setMovesInput(newMoves);
+                            if (onReplaceSelected && dex) {
+                              const mapped = mapMoves(newMoves.filter(Boolean), dex.moves);
+                              onReplaceSelected({ ...selected, moves: mapped } as any);
+                            }
+                          }}
+                        >
+                          <div>
+                            <div style={{fontSize:'0.85em'}}>
+                              <strong>{m.name}</strong>{' '}
+                              <span style={{
+                                padding:'0 4px', borderRadius:2, fontSize:'0.75em', fontWeight:'bold',
+                                background: TYPE_COLORS[m.type?.toLowerCase()] || '#888', color:'#fff',
+                              }}>{m.type}</span>{' '}
+                              <span className="dim" style={{fontSize:'0.75em'}}>{m.category}</span>
+                              {isEquipped && <span style={{fontSize:'0.7em', marginLeft:4, color:'var(--accent-color, #6366f1)'}}>equipped</span>}
+                            </div>
+                            <div className="dim" style={{fontSize:'0.75em'}}>
+                              {m.basePower > 0 ? `Pow ${m.basePower}` : 'Status'}
+                              {m.accuracy != null && ` · Acc ${m.accuracy === true ? '—' : m.accuracy + '%'}`}
+                              {m.pp && ` · PP ${m.pp}`}
+                              {m.priority !== undefined && m.priority !== 0 && ` · Pri ${m.priority > 0 ? '+' : ''}${m.priority}`}
+                              {m.multihit && ` · ${Array.isArray(m.multihit) ? `${m.multihit[0]}–${m.multihit[1]}` : m.multihit}× hits`}
+                            </div>
+                            {(m.shortDesc || m.desc) && (
+                              <div style={{fontSize:'0.73em', color:'#aaa', marginTop:1}}>{m.shortDesc || m.desc}</div>
+                            )}
+                          </div>
+                          <div style={{fontSize:'0.7em', color:'#8b8', whiteSpace:'nowrap', textAlign:'right'}}>
+                            {m.learnMethod}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           {learnableMoves.length > 0 && (

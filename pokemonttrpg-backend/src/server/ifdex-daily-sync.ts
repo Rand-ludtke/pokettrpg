@@ -60,6 +60,10 @@ export function startIfdexDailySyncJob(options: DailySyncOptions): void {
   const initialDelayMs = parsePositiveInt(process.env.FUSION_SYNC_INITIAL_DELAY_SECONDS, 30) * 1000;
   const maxDownloads = Number(process.env.FUSION_SYNC_MAX_DOWNLOADS || "0");
   const backendUrl = (process.env.FUSION_BACKEND_URL || `http://127.0.0.1:${options.backendPort}`).trim();
+  const skipRemap = toBool(process.env.FUSION_SYNC_SKIP_REMAP, false);
+  const downloadMissing = toBool(process.env.FUSION_SYNC_DOWNLOAD_MISSING, true);
+  const downloadScope = (process.env.FUSION_SYNC_DOWNLOAD_SCOPE || "nat").trim().toLowerCase();
+  const mappingSource = (process.env.FUSION_SYNC_MAPPING_SOURCE || "markdown").trim().toLowerCase();
 
   let running = false;
 
@@ -75,14 +79,20 @@ export function startIfdexDailySyncJob(options: DailySyncOptions): void {
       "--workspace-root",
       workspaceRoot,
       "--apply",
-      "--skip-remap",
-      "--download-missing",
-      "--download-scope",
-      "nat",
+      "--mapping-source",
+      mappingSource,
       "--backend-url",
       backendUrl,
       "--reindex-backend",
     ];
+
+    if (skipRemap) {
+      args.push("--skip-remap");
+    }
+
+    if (downloadMissing) {
+      args.push("--download-missing", "--download-scope", downloadScope === "all" ? "all" : "nat");
+    }
 
     if (Number.isFinite(maxDownloads) && maxDownloads > 0) {
       args.push("--max-downloads", String(Math.trunc(maxDownloads)));
@@ -125,6 +135,6 @@ export function startIfdexDailySyncJob(options: DailySyncOptions): void {
   setInterval(runOnce, intervalMs);
 
   console.log(
-    `[IFDexSync] Scheduled every ${intervalHours}h (initial delay ${Math.round(initialDelayMs / 1000)}s). Script: ${scriptPath}`
+    `[IFDexSync] Scheduled every ${intervalHours}h (initial delay ${Math.round(initialDelayMs / 1000)}s). Script: ${scriptPath}. skipRemap=${skipRemap} downloadMissing=${downloadMissing} downloadScope=${downloadScope} mappingSource=${mappingSource}`
   );
 }

@@ -740,13 +740,29 @@ export function SpriteWithHat({
     if (!fusion) return null;
     const { headId, bodyId, spriteFile } = fusion;
 
+    // Normalize spriteFile: if it's a bare variant key (e.g. 'a', 'b', 'default'),
+    // expand it to a proper filename using headId.bodyId
+    let normalizedSpriteFile = spriteFile;
+    if (normalizedSpriteFile && headId && bodyId) {
+      const sf = normalizedSpriteFile.trim();
+      if (sf === 'default' || sf === '') {
+        normalizedSpriteFile = `${headId}.${bodyId}.png`;
+      } else if (/^[a-zA-Z]$/.test(sf)) {
+        // Single letter variant key → expand to full filename
+        normalizedSpriteFile = `${headId}.${bodyId}${sf}.png`;
+      } else if (/^v\d+$/.test(sf)) {
+        // Version variant like 'v1', 'v2' → expand
+        normalizedSpriteFile = `${headId}.${bodyId}${sf}.png`;
+      }
+    }
+
     const files: string[] = [];
     const addFile = (value: unknown) => {
       const v = String(value || '').trim();
       if (!v) return;
       if (!files.includes(v)) files.push(v);
     };
-    addFile(spriteFile);
+    addFile(normalizedSpriteFile);
     const variants = Array.isArray(fusion.variants) ? fusion.variants : [];
     for (const v of variants) addFile(v);
     addFile(`${headId}.${bodyId}v1.png`);
@@ -793,7 +809,19 @@ export function SpriteWithHat({
       if (!v) return;
       if (!files.includes(v)) files.push(v);
     };
-    addFile(fusion.spriteFile);
+    // Normalize bare variant keys the same way as getFusionUrl
+    let normalizedSF = fusion.spriteFile;
+    if (normalizedSF && fusion.headId && fusion.bodyId) {
+      const sf = normalizedSF.trim();
+      if (sf === 'default' || sf === '') {
+        normalizedSF = `${fusion.headId}.${fusion.bodyId}.png`;
+      } else if (/^[a-zA-Z]$/.test(sf)) {
+        normalizedSF = `${fusion.headId}.${fusion.bodyId}${sf}.png`;
+      } else if (/^v\d+$/.test(sf)) {
+        normalizedSF = `${fusion.headId}.${fusion.bodyId}${sf}.png`;
+      }
+    }
+    addFile(normalizedSF);
     const variants = Array.isArray(fusion.variants) ? fusion.variants : [];
     for (const v of variants) addFile(v);
     addFile(`${fusion.headId}.${fusion.bodyId}v1.png`);

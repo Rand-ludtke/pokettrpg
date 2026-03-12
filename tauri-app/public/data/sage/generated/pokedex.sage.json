@@ -27,8 +27,7 @@
       "Flying"
     ],
     "evos": [
-      "Florabri",
-      "Floressum"
+      "Florabri"
     ]
   },
   "florabri": {
@@ -94,7 +93,7 @@
       "Grass",
       "Flying"
     ],
-    "prevo": "Foliat",
+    "prevo": "Florabri",
     "evoType": "levelExtra",
     "evoLevel": 16
   },
@@ -125,8 +124,7 @@
       "Field"
     ],
     "evos": [
-      "Pyroat",
-      "Flairees"
+      "Pyroat"
     ]
   },
   "pyroat": {
@@ -147,7 +145,7 @@
     "abilities": {
       "0": "Blaze"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 33.1,
     "color": "Brown",
     "gen": 9,
@@ -190,7 +188,7 @@
     "eggGroups": [
       "Field"
     ],
-    "prevo": "Kidling",
+    "prevo": "Pyroat",
     "evoType": "levelExtra",
     "evoLevel": 17
   },
@@ -222,8 +220,7 @@
       "Monster"
     ],
     "evos": [
-      "Iguadium",
-      "Aguanaut"
+      "Iguadium"
     ]
   },
   "iguadium": {
@@ -245,7 +242,7 @@
       "0": "Torrent"
     },
     "heightm": 1.1,
-    "weightkg": 29.0,
+    "weightkg": 29,
     "color": "Blue",
     "gen": 9,
     "tier": "Illegal",
@@ -289,7 +286,7 @@
       "Water 1",
       "Monster"
     ],
-    "prevo": "Aguade",
+    "prevo": "Iguadium",
     "evoType": "levelExtra",
     "evoLevel": 18
   },
@@ -322,8 +319,7 @@
       "Flying"
     ],
     "evos": [
-      "Aquilor",
-      "Warquila"
+      "Aquilor"
     ]
   },
   "aquilor": {
@@ -389,7 +385,7 @@
     "eggGroups": [
       "Flying"
     ],
-    "prevo": "Harpee",
+    "prevo": "Aquilor",
     "evoType": "levelExtra",
     "evoLevel": 18
   },
@@ -545,8 +541,7 @@
       "Field"
     ],
     "evos": [
-      "Llamarsh",
-      "Buckston"
+      "Llamarsh"
     ]
   },
   "llamarsh": {
@@ -610,7 +605,7 @@
     "eggGroups": [
       "Field"
     ],
-    "prevo": "Fawning",
+    "prevo": "Llamarsh",
     "evoType": "levelExtra",
     "evoLevel": 18
   },
@@ -865,8 +860,7 @@
       "Mineral"
     ],
     "evos": [
-      "Terratetra",
-      "Gigaard"
+      "Terratetra"
     ]
   },
   "terratetra": {
@@ -888,7 +882,7 @@
       "0": "Solid Rock",
       "1": "Sturdy"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 66.2,
     "color": "Brown",
     "gen": 9,
@@ -934,7 +928,7 @@
       "Field",
       "Mineral"
     ],
-    "prevo": "Pebblosa",
+    "prevo": "Terratetra",
     "evoType": "levelExtra",
     "evoLevel": 24
   },
@@ -1015,7 +1009,7 @@
       "0": "Sheer Force"
     },
     "heightm": 1.8,
-    "weightkg": 148.0,
+    "weightkg": 148,
     "color": "Light blue",
     "gen": 9,
     "tier": "Illegal",
@@ -1045,7 +1039,7 @@
       "0": "Content"
     },
     "heightm": 0.7,
-    "weightkg": 10.0,
+    "weightkg": 10,
     "color": "Brown",
     "gen": 9,
     "tier": "Illegal",
@@ -1076,7 +1070,7 @@
       "0": "Content"
     },
     "heightm": 1.6,
-    "weightkg": 100.0,
+    "weightkg": 100,
     "color": "Brown",
     "gen": 9,
     "tier": "Illegal",
@@ -1370,7 +1364,6 @@
     ],
     "prevo": "Growmeo",
     "evoType": "levelMove",
-    "evoCondition": "while knowing a specific move",
     "evoMove": "Attract"
   },
   "tuliep": {
@@ -1392,7 +1385,7 @@
       "1": "Natural Cure"
     },
     "heightm": 0.5,
-    "weightkg": 1.0,
+    "weightkg": 1,
     "color": "Green",
     "gen": 9,
     "tier": "Illegal",
@@ -1434,7 +1427,6 @@
     ],
     "prevo": "Tuliep",
     "evoType": "levelMove",
-    "evoCondition": "while knowing a specific move",
     "evoMove": "Attract"
   },
   "dreamdery": {
@@ -1580,7 +1572,7 @@
       "1": "Volt Absorb"
     },
     "heightm": 1.5,
-    "weightkg": 71.0,
+    "weightkg": 71,
     "color": "Light blue",
     "gen": 9,
     "tier": "Illegal",
@@ -1644,7 +1636,7 @@
       "1": "Sturdy"
     },
     "heightm": 0.4,
-    "weightkg": 34.0,
+    "weightkg": 34,
     "color": "Gray",
     "gen": 9,
     "tier": "Illegal",
@@ -1653,8 +1645,7 @@
       "Mineral"
     ],
     "evos": [
-      "Volcaroc",
-      "Volcoalder"
+      "Volcaroc"
     ]
   },
   "volcaroc": {
@@ -1677,7 +1668,7 @@
       "1": "Sturdy"
     },
     "heightm": 0.9,
-    "weightkg": 127.0,
+    "weightkg": 127,
     "color": "Gray",
     "gen": 9,
     "tier": "Illegal",
@@ -1720,7 +1711,7 @@
     "eggGroups": [
       "Mineral"
     ],
-    "prevo": "Rocano",
+    "prevo": "Volcaroc",
     "evoType": "levelExtra",
     "evoLevel": 25
   },
@@ -1878,8 +1869,7 @@
       "Grass"
     ],
     "evos": [
-      "Hoppanero",
-      "Scovalope"
+      "Hoppanero"
     ]
   },
   "hoppanero": {
@@ -1937,7 +1927,7 @@
       "0": "Chlorophyll",
       "1": "Flame Body"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 22.4,
     "color": "Green",
     "gen": 9,
@@ -1947,7 +1937,7 @@
       "Field",
       "Grass"
     ],
-    "prevo": "Peppit",
+    "prevo": "Hoppanero",
     "evoType": "levelExtra",
     "evoLevel": 27
   },
@@ -2043,8 +2033,7 @@
       "Bug"
     ],
     "evos": [
-      "Maskoon",
-      "Mortasque"
+      "Maskoon"
     ]
   },
   "maskoon": {
@@ -2066,7 +2055,7 @@
       "1": "Malice"
     },
     "heightm": 0.5,
-    "weightkg": 8.0,
+    "weightkg": 8,
     "color": "Brown",
     "gen": 9,
     "tier": "Illegal",
@@ -2109,7 +2098,7 @@
     "eggGroups": [
       "Bug"
     ],
-    "prevo": "Skullarva",
+    "prevo": "Maskoon",
     "evoType": "levelExtra",
     "evoLevel": 13
   },
@@ -2240,7 +2229,6 @@
     ],
     "prevo": "Bouwee",
     "evoType": "levelMove",
-    "evoCondition": "while knowing a specific move",
     "evoMove": "Dive"
   },
   "totter": {
@@ -2271,8 +2259,7 @@
       "Water 1"
     ],
     "evos": [
-      "Cascotta",
-      "Lutrajet"
+      "Cascotta"
     ]
   },
   "cascotta": {
@@ -2336,7 +2323,7 @@
     "eggGroups": [
       "Water 1"
     ],
-    "prevo": "Totter",
+    "prevo": "Cascotta",
     "evoType": "levelExtra",
     "evoLevel": 24
   },
@@ -2358,7 +2345,7 @@
       "0": "Anger Point",
       "1": "Sunbathe"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 39.6,
     "color": "Brown",
     "gen": 9,
@@ -2797,7 +2784,7 @@
       "1": "Sniper"
     },
     "heightm": 0.2,
-    "weightkg": 2.0,
+    "weightkg": 2,
     "color": "Gray",
     "gen": 9,
     "tier": "Illegal",
@@ -2830,7 +2817,7 @@
       "1": "Sniper"
     },
     "heightm": 0.9,
-    "weightkg": 20.0,
+    "weightkg": 20,
     "color": "Orange",
     "gen": 9,
     "tier": "Illegal",
@@ -2939,8 +2926,7 @@
       "Flying"
     ],
     "evos": [
-      "Fowattle",
-      "Turkistador"
+      "Fowattle"
     ]
   },
   "fowattle": {
@@ -3008,7 +2994,7 @@
       "Field",
       "Flying"
     ],
-    "prevo": "Quibble",
+    "prevo": "Fowattle",
     "evoType": "levelExtra",
     "evoLevel": 25
   },
@@ -3229,7 +3215,6 @@
       "Amorphous"
     ],
     "evos": [
-      "Fumighast",
       "Noxial"
     ]
   },
@@ -3296,7 +3281,7 @@
     "eggGroups": [
       "Amorphous"
     ],
-    "prevo": "Phlask",
+    "prevo": "Noxial",
     "evoType": "levelExtra",
     "evoLevel": 42
   },
@@ -3541,8 +3526,8 @@
       "0": "Motor Drive",
       "1": "Heatproof"
     },
-    "heightm": 3.0,
-    "weightkg": 455.0,
+    "heightm": 3,
+    "weightkg": 455,
     "color": "Gray",
     "gen": 9,
     "tier": "Illegal",
@@ -3601,7 +3586,7 @@
       "0": "Arena Trap"
     },
     "heightm": 1.1,
-    "weightkg": 23.0,
+    "weightkg": 23,
     "color": "Brown",
     "gen": 9,
     "tier": "Illegal",
@@ -3643,8 +3628,7 @@
       "Monster"
     ],
     "evos": [
-      "Trikotta",
-      "Terrorcotta"
+      "Trikotta"
     ]
   },
   "trikotta": {
@@ -3702,7 +3686,7 @@
       "0": "Weak Armor",
       "1": "Water Absorb"
     },
-    "heightm": 2.0,
+    "heightm": 2,
     "weightkg": 293.7,
     "color": "Orange",
     "gen": 9,
@@ -3712,7 +3696,7 @@
       "Grass",
       "Monster"
     ],
-    "prevo": "Pottle",
+    "prevo": "Trikotta",
     "evoType": "levelExtra",
     "evoLevel": 38
   },
@@ -3799,7 +3783,7 @@
       "0": "Synchronize",
       "1": "Sturdy"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 5.2,
     "color": "Brown",
     "gen": 9,
@@ -3898,7 +3882,7 @@
       "1": "Conundrum"
     },
     "heightm": 1.4,
-    "weightkg": 57.0,
+    "weightkg": 57,
     "color": "Brown",
     "gen": 9,
     "tier": "Illegal",
@@ -3962,7 +3946,7 @@
       "0": "Levitate",
       "1": "Feedback"
     },
-    "heightm": 2.0,
+    "heightm": 2,
     "weightkg": 305.3,
     "color": "Black",
     "gen": 9,
@@ -4027,7 +4011,7 @@
       "0": "Iron Barbs",
       "1": "Sand Force"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 86.5,
     "color": "Green",
     "gen": 9,
@@ -4068,8 +4052,7 @@
       "Monster"
     ],
     "evos": [
-      "Shelosene",
-      "Flarrapin"
+      "Shelosene"
     ]
   },
   "shelosene": {
@@ -4091,7 +4074,7 @@
       "0": "Shell Armor",
       "1": "Sturdy"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 42.9,
     "color": "Orange",
     "gen": 9,
@@ -4135,7 +4118,7 @@
     "eggGroups": [
       "Monster"
     ],
-    "prevo": "Ignishell",
+    "prevo": "Shelosene",
     "evoType": "levelExtra",
     "evoLevel": 30
   },
@@ -4168,8 +4151,7 @@
       "Flying"
     ],
     "evos": [
-      "Necrow",
-      "Vultergyst"
+      "Necrow"
     ]
   },
   "necrow": {
@@ -4235,7 +4217,7 @@
     "eggGroups": [
       "Flying"
     ],
-    "prevo": "Desoula",
+    "prevo": "Necrow",
     "evoType": "levelExtra",
     "evoLevel": 28
   },
@@ -4486,7 +4468,7 @@
       "1": "Leaf Guard"
     },
     "heightm": 1.4,
-    "weightkg": 29.0,
+    "weightkg": 29,
     "color": "Black",
     "gen": 9,
     "tier": "Illegal",
@@ -4615,7 +4597,7 @@
       "1": "Limber"
     },
     "heightm": 1.1,
-    "weightkg": 23.0,
+    "weightkg": 23,
     "color": "White",
     "gen": 9,
     "tier": "Illegal",
@@ -4807,8 +4789,7 @@
       "Human-Like"
     ],
     "evos": [
-      "Pompagoon",
-      "Hyekuza"
+      "Pompagoon"
     ]
   },
   "pompagoon": {
@@ -4876,7 +4857,7 @@
       "Field",
       "Human-Like"
     ],
-    "prevo": "Pomparunt",
+    "prevo": "Pompagoon",
     "evoType": "levelExtra",
     "evoLevel": 24
   },
@@ -5035,8 +5016,7 @@
       "Dragon"
     ],
     "evos": [
-      "Anvelid",
-      "Magroplex"
+      "Anvelid"
     ]
   },
   "anvelid": {
@@ -5092,7 +5072,7 @@
       "0": "Shed Skin",
       "1": "Battle Armor"
     },
-    "heightm": 5.0,
+    "heightm": 5,
     "weightkg": 553.4,
     "color": "Gray",
     "gen": 9,
@@ -5102,7 +5082,7 @@
       "Mineral",
       "Dragon"
     ],
-    "prevo": "Orett",
+    "prevo": "Anvelid",
     "evoType": "levelExtra",
     "evoLevel": 23
   },
@@ -5346,7 +5326,6 @@
     ],
     "prevo": "Fortifry",
     "evoType": "levelMove",
-    "evoCondition": "while knowing a specific move",
     "evoMove": "Wish"
   },
   "smashiary": {
@@ -5407,8 +5386,7 @@
       "Dragon"
     ],
     "evos": [
-      "Telsion",
-      "Chameleohm"
+      "Telsion"
     ]
   },
   "telsion": {
@@ -5474,7 +5452,7 @@
       "Field",
       "Dragon"
     ],
-    "prevo": "Slatic",
+    "prevo": "Telsion",
     "evoType": "levelExtra",
     "evoLevel": 30
   },
@@ -5571,8 +5549,7 @@
       "Fairy"
     ],
     "evos": [
-      "Silkinder",
-      "Paramoth"
+      "Silkinder"
     ]
   },
   "silkinder": {
@@ -5628,7 +5605,7 @@
       "0": "Serene Grace",
       "1": "Allure"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 18.8,
     "color": "White",
     "gen": 9,
@@ -5638,7 +5615,7 @@
       "Bug",
       "Fairy"
     ],
-    "prevo": "Lintle",
+    "prevo": "Silkinder",
     "evoType": "levelExtra",
     "evoLevel": 10
   },
@@ -5737,8 +5714,7 @@
       "Human-Like"
     ],
     "evos": [
-      "Simayan",
-      "Monkezuma"
+      "Simayan"
     ]
   },
   "simayan": {
@@ -5760,7 +5736,7 @@
       "1": "Conditioning"
     },
     "heightm": 1.1,
-    "weightkg": 31.0,
+    "weightkg": 31,
     "color": "Gray",
     "gen": 9,
     "tier": "Illegal",
@@ -5794,7 +5770,7 @@
       "0": "Sheer Force",
       "1": "Conditioning"
     },
-    "heightm": 2.0,
+    "heightm": 2,
     "weightkg": 190.8,
     "color": "Blue",
     "gen": 9,
@@ -5804,7 +5780,7 @@
       "Field",
       "Human-Like"
     ],
-    "prevo": "Chimpoca",
+    "prevo": "Simayan",
     "evoType": "levelExtra",
     "evoLevel": 25
   },
@@ -5983,7 +5959,7 @@
       "0": "Scavenger",
       "1": "Iron Jaw"
     },
-    "heightm": 2.0,
+    "heightm": 2,
     "weightkg": 100.7,
     "color": "Blue",
     "gen": 9,
@@ -6213,8 +6189,7 @@
       "Monster"
     ],
     "evos": [
-      "Hornizard",
-      "Ankillosore"
+      "Hornizard"
     ]
   },
   "hornizard": {
@@ -6250,7 +6225,6 @@
     "prevo": "Gilla",
     "evoType": "levelExtra",
     "evoLevel": 27,
-    "evoCondition": "while knowing a specific move",
     "evoMove": "Ancient Power"
   },
   "ankillosore": {
@@ -6281,10 +6255,9 @@
     "eggGroups": [
       "Monster"
     ],
-    "prevo": "Gilla",
+    "prevo": "Hornizard",
     "evoType": "levelMove",
     "evoLevel": 27,
-    "evoCondition": "while knowing a specific move",
     "evoMove": "Ancient Power"
   },
   "bazilisk": {
@@ -6316,8 +6289,7 @@
       "Dragon"
     ],
     "evos": [
-      "Ornitherb",
-      "Dilophlora"
+      "Ornitherb"
     ]
   },
   "ornitherb": {
@@ -6338,7 +6310,7 @@
       "0": "Unnerve",
       "1": "Chlorophyll"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 26.4,
     "color": "Green",
     "gen": 9,
@@ -6354,7 +6326,6 @@
     "prevo": "Bazilisk",
     "evoType": "levelExtra",
     "evoLevel": 27,
-    "evoCondition": "while knowing a specific move",
     "evoMove": "Ancient Power"
   },
   "dilophlora": {
@@ -6386,10 +6357,9 @@
       "Grass",
       "Dragon"
     ],
-    "prevo": "Bazilisk",
+    "prevo": "Ornitherb",
     "evoType": "levelMove",
     "evoLevel": 27,
-    "evoCondition": "while knowing a specific move",
     "evoMove": "Ancient Power"
   },
   "baboom": {
@@ -6412,7 +6382,7 @@
       "1": "Adrenaline"
     },
     "heightm": 1.3,
-    "weightkg": 37.0,
+    "weightkg": 37,
     "color": "Black",
     "gen": 9,
     "tier": "Illegal",
@@ -6705,8 +6675,7 @@
       "Dragon"
     ],
     "evos": [
-      "Dracoon",
-      "Basilect"
+      "Dracoon"
     ]
   },
   "dracoon": {
@@ -6761,7 +6730,7 @@
     "abilities": {
       "0": "Swarm"
     },
-    "heightm": 2.0,
+    "heightm": 2,
     "weightkg": 162.8,
     "color": "Red",
     "gen": 9,
@@ -6771,7 +6740,7 @@
       "Bug",
       "Dragon"
     ],
-    "prevo": "Larvyn",
+    "prevo": "Dracoon",
     "evoType": "levelExtra",
     "evoLevel": 30
   },
@@ -6794,7 +6763,7 @@
       "H": "Conditioning"
     },
     "heightm": 0.7,
-    "weightkg": 72.0,
+    "weightkg": 72,
     "color": "Gray",
     "gen": 9,
     "tier": "Illegal",
@@ -6804,8 +6773,7 @@
       "Mineral"
     ],
     "evos": [
-      "Pressaur",
-      "Diamat"
+      "Pressaur"
     ]
   },
   "pressaur": {
@@ -6827,7 +6795,7 @@
       "0": "Pressure",
       "H": "Conditioning"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 152.1,
     "color": "Black",
     "gen": 9,
@@ -6864,7 +6832,7 @@
       "1": "Sheer Force",
       "H": "Conditioning"
     },
-    "heightm": 2.0,
+    "heightm": 2,
     "weightkg": 482.5,
     "color": "Blue",
     "gen": 9,
@@ -6874,7 +6842,7 @@
       "Dragon",
       "Mineral"
     ],
-    "prevo": "Carbite",
+    "prevo": "Pressaur",
     "evoType": "levelExtra",
     "evoLevel": 30
   },
@@ -6930,7 +6898,7 @@
       "1": "Overgrow"
     },
     "heightm": 2.9,
-    "weightkg": 59.0,
+    "weightkg": 59,
     "color": "Gold",
     "gen": 9,
     "tier": "Illegal",
@@ -6961,7 +6929,7 @@
       "0": "Aftermath",
       "1": "Blaze"
     },
-    "heightm": 1.0,
+    "heightm": 1,
     "weightkg": 20.4,
     "color": "Red",
     "gen": 9,
@@ -7176,7 +7144,7 @@
       "0": "Solar Power"
     },
     "heightm": 1.5,
-    "weightkg": 72.0,
+    "weightkg": 72,
     "color": "Green",
     "gen": 9,
     "tier": "Illegal",
@@ -7204,7 +7172,7 @@
       "0": "Sand Veil"
     },
     "heightm": 1.5,
-    "weightkg": 85.0,
+    "weightkg": 85,
     "color": "White",
     "gen": 9,
     "tier": "Illegal",
@@ -7232,7 +7200,7 @@
       "0": "Hydration"
     },
     "heightm": 1.5,
-    "weightkg": 39.0,
+    "weightkg": 39,
     "color": "Light blue",
     "gen": 9,
     "tier": "Illegal",
@@ -7259,7 +7227,7 @@
     "abilities": {
       "0": "Pressure"
     },
-    "heightm": 6.0,
+    "heightm": 6,
     "weightkg": 718.6,
     "color": "Brown",
     "gen": 9,
@@ -7288,7 +7256,7 @@
       "0": "Magic Guard"
     },
     "heightm": 0.7,
-    "weightkg": 14.0,
+    "weightkg": 14,
     "color": "Red",
     "gen": 9,
     "tier": "Illegal",

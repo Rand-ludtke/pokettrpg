@@ -151,6 +151,7 @@ let gShowdownDexPromise: Promise<{
   abilities: AbilityIndex;
   items: ItemIndex;
   learnsets: LearnsetsIndex;
+  sourceTags?: Record<string, string[]>;
 }> | null = null;
 
 async function fetchJsonFromBaseCandidates<T>(relativePath: string, bases: string[]): Promise<T | null> {
@@ -267,6 +268,19 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((wylinItems || {}) as ItemIndex),
   } as ItemIndex;
 
+  const sourceTags: Record<string, Set<string>> = {};
+  const addSourceTags = (collection: Record<string, any>, tag: string) => {
+    for (const key of Object.keys(collection || {})) {
+      const id = normalizeName(key);
+      sourceTags[id] = sourceTags[id] || new Set<string>();
+      sourceTags[id].add(tag);
+    }
+  };
+  addSourceTags(pokedex as Record<string, any>, 'base');
+  addSourceTags((sagePokedex || {}) as Record<string, any>, 'sage');
+  addSourceTags((insPokedex || {}) as Record<string, any>, 'insurgence');
+  addSourceTags((wylinDex || {}) as Record<string, any>, 'wylin');
+
   // Merge custom overlays from local storage (local-only additions)
   const customDex = getCustomDex();
   const customLearnsets = getCustomLearnsets();
@@ -274,6 +288,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
   const customMoves = getCustomMoves();
   const customAbilities = getCustomAbilities();
   const mergedDex = { ...mergedBaseDex, ...customDex } as DexIndex;
+  addSourceTags(customDex as Record<string, any>, 'custom');
   // Built-in overlay tweaks
   try {
     // Ensure Chatot can have Prankster as an additional ability option
@@ -310,6 +325,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
     abilities: mergedAbilities,
     items: mergedItems,
     learnsets: mergedLs,
+    sourceTags: Object.fromEntries(Object.entries(sourceTags).map(([id, tags]) => [id, Array.from(tags)])),
   };
   // Make dex number lookups available globally for sprite fallback IDs.
   buildDexNumMaps(mergedDex);
@@ -1659,20 +1675,25 @@ async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}
 
 /** Cached result of the /fusion/gen-available check. null = not yet checked. */
 let gFusionGenAvailable: boolean | null = null;
+let gFusionGenAvailableTs = 0;
 
 async function isFusionGenAvailable(): Promise<boolean> {
-  if (gFusionGenAvailable !== null) return gFusionGenAvailable;
+  // Re-check every 30 seconds if previously unavailable, cache indefinitely if true
+  if (gFusionGenAvailable === true) return true;
+  if (gFusionGenAvailable === false && Date.now() - gFusionGenAvailableTs < 30_000) return false;
   for (const base of getFusionApiBases()) {
     try {
       const res = await fetchWithTimeout(`${base}/fusion/gen-available`, {}, 3000);
       if (res.ok) {
         const data = await res.json() as { available?: boolean };
         gFusionGenAvailable = !!data?.available;
+        gFusionGenAvailableTs = Date.now();
         return gFusionGenAvailable;
       }
     } catch {}
   }
   gFusionGenAvailable = false;
+  gFusionGenAvailableTs = Date.now();
   return false;
 }
 
