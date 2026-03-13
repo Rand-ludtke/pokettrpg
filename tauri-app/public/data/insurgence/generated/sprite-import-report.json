@@ -1,0 +1,2017 @@
+{
+  "generatedAt": "2026-03-09T02:54:52Z",
+  "pokemon": {
+    "ok": [
+      {
+        "key": "deltabulbasaur",
+        "name": "Delta Bulbasaur",
+        "image": "existing",
+        "output": "deltabulbasaur.png"
+      },
+      {
+        "key": "deltaivysaur",
+        "name": "Delta Ivysaur",
+        "image": "existing",
+        "output": "deltaivysaur.png"
+      },
+      {
+        "key": "deltavenusaur",
+        "name": "Delta Venusaur",
+        "image": "existing",
+        "output": "deltavenusaur.png"
+      },
+      {
+        "key": "deltacharmander",
+        "name": "Delta Charmander",
+        "image": "existing",
+        "output": "deltacharmander.png"
+      },
+      {
+        "key": "deltacharmeleon",
+        "name": "Delta Charmeleon",
+        "image": "existing",
+        "output": "deltacharmeleon.png"
+      },
+      {
+        "key": "deltacharizard",
+        "name": "Delta Charizard",
+        "image": "existing",
+        "output": "deltacharizard.png"
+      },
+      {
+        "key": "deltasquirtle",
+        "name": "Delta Squirtle",
+        "image": "existing",
+        "output": "deltasquirtle.png"
+      },
+      {
+        "key": "deltawartortle",
+        "name": "Delta Wartortle",
+        "image": "existing",
+        "output": "deltawartortle.png"
+      },
+      {
+        "key": "deltablastoise",
+        "name": "Delta Blastoise",
+        "image": "existing",
+        "output": "deltablastoise.png"
+      },
+      {
+        "key": "deltapawniard",
+        "name": "Delta Pawniard",
+        "image": "existing",
+        "output": "deltapawniard.png"
+      },
+      {
+        "key": "deltabisharp",
+        "name": "Delta Bisharp",
+        "image": "existing",
+        "output": "deltabisharp.png"
+      },
+      {
+        "key": "deltaralts",
+        "name": "Delta Ralts",
+        "image": "existing",
+        "output": "deltaralts.png"
+      },
+      {
+        "key": "deltakirlia",
+        "name": "Delta Kirlia",
+        "image": "existing",
+        "output": "deltakirlia.png"
+      },
+      {
+        "key": "deltagardevoir",
+        "name": "Delta Gardevoir",
+        "image": "existing",
+        "output": "deltagardevoir.png"
+      },
+      {
+        "key": "deltagallade",
+        "name": "Delta Gallade",
+        "image": "existing",
+        "output": "deltagallade.png"
+      },
+      {
+        "key": "deltasunkern",
+        "name": "Delta Sunkern",
+        "image": "existing",
+        "output": "deltasunkern.png"
+      },
+      {
+        "key": "deltasunflora",
+        "name": "Delta Sunflora",
+        "image": "existing",
+        "output": "deltasunflora.png"
+      },
+      {
+        "key": "deltabergmite",
+        "name": "Delta Bergmite",
+        "image": "existing",
+        "output": "deltabergmite.png"
+      },
+      {
+        "key": "deltaavalugg",
+        "name": "Delta Avalugg",
+        "image": "existing",
+        "output": "deltaavalugg.png"
+      },
+      {
+        "key": "deltascyther",
+        "name": "Delta Scyther",
+        "image": "existing",
+        "output": "deltascyther.png"
+      },
+      {
+        "key": "deltascizor",
+        "name": "Delta Scizor",
+        "image": "existing",
+        "output": "deltascizor.png"
+      },
+      {
+        "key": "deltascraggy",
+        "name": "Delta Scraggy",
+        "image": "existing",
+        "output": "deltascraggy.png"
+      },
+      {
+        "key": "deltascrafty",
+        "name": "Delta Scrafty",
+        "image": "existing",
+        "output": "deltascrafty.png"
+      },
+      {
+        "key": "deltacombee",
+        "name": "Delta Combee",
+        "image": "existing",
+        "output": "deltacombee.png"
+      },
+      {
+        "key": "deltavespiquen",
+        "name": "Delta Vespiquen",
+        "image": "existing",
+        "output": "deltavespiquen.png"
+      },
+      {
+        "key": "deltakoffing",
+        "name": "Delta Koffing",
+        "image": "existing",
+        "output": "deltakoffing.png"
+      },
+      {
+        "key": "deltaweezing",
+        "name": "Delta Weezing",
+        "image": "existing",
+        "output": "deltaweezing.png"
+      },
+      {
+        "key": "deltapurrloin",
+        "name": "Delta Purrloin",
+        "image": "existing",
+        "output": "deltapurrloin.png"
+      },
+      {
+        "key": "deltaliepard",
+        "name": "Delta Liepard",
+        "image": "existing",
+        "output": "deltaliepard.png"
+      },
+      {
+        "key": "deltaphantump",
+        "name": "Delta Phantump",
+        "image": "existing",
+        "output": "deltaphantump.png"
+      },
+      {
+        "key": "deltatrevenant",
+        "name": "Delta Trevenant",
+        "image": "existing",
+        "output": "deltatrevenant.png"
+      },
+      {
+        "key": "deltasnorunt",
+        "name": "Delta Snorunt",
+        "image": "existing",
+        "output": "deltasnorunt.png"
+      },
+      {
+        "key": "deltaglalie",
+        "name": "Delta Glalie",
+        "image": "existing",
+        "output": "deltaglalie.png"
+      },
+      {
+        "key": "deltafroslass",
+        "name": "Delta Froslass",
+        "image": "existing",
+        "output": "deltafroslass.png"
+      },
+      {
+        "key": "deltashinx",
+        "name": "Delta Shinx",
+        "image": "existing",
+        "output": "deltashinx.png"
+      },
+      {
+        "key": "deltaluxio",
+        "name": "Delta Luxio",
+        "image": "existing",
+        "output": "deltaluxio.png"
+      },
+      {
+        "key": "deltaluxray",
+        "name": "Delta Luxray",
+        "image": "existing",
+        "output": "deltaluxray.png"
+      },
+      {
+        "key": "deltanoibat",
+        "name": "Delta Noibat",
+        "image": "existing",
+        "output": "deltanoibat.png"
+      },
+      {
+        "key": "deltanoivern",
+        "name": "Delta Noivern",
+        "image": "existing",
+        "output": "deltanoivern.png"
+      },
+      {
+        "key": "deltabudew",
+        "name": "Delta Budew",
+        "image": "existing",
+        "output": "deltabudew.png"
+      },
+      {
+        "key": "deltaroselia",
+        "name": "Delta Roselia",
+        "image": "existing",
+        "output": "deltaroselia.png"
+      },
+      {
+        "key": "deltaroserade",
+        "name": "Delta Roserade",
+        "image": "existing",
+        "output": "deltaroserade.png"
+      },
+      {
+        "key": "deltadrifloon",
+        "name": "Delta Drifloon",
+        "image": "existing",
+        "output": "deltadrifloon.png"
+      },
+      {
+        "key": "deltadrifblim",
+        "name": "Delta Drifblim",
+        "image": "existing",
+        "output": "deltadrifblim.png"
+      },
+      {
+        "key": "deltagrimer",
+        "name": "Delta Grimer",
+        "image": "existing",
+        "output": "deltagrimer.png"
+      },
+      {
+        "key": "deltamuk",
+        "name": "Delta Muk",
+        "image": "existing",
+        "output": "deltamuk.png"
+      },
+      {
+        "key": "deltawooper",
+        "name": "Delta Wooper",
+        "image": "existing",
+        "output": "deltawooper.png"
+      },
+      {
+        "key": "deltaquagsire",
+        "name": "Delta Quagsire",
+        "image": "existing",
+        "output": "deltaquagsire.png"
+      },
+      {
+        "key": "deltamunchlax",
+        "name": "Delta Munchlax",
+        "image": "existing",
+        "output": "deltamunchlax.png"
+      },
+      {
+        "key": "deltasnorlax",
+        "name": "Delta Snorlax",
+        "image": "existing",
+        "output": "deltasnorlax.png"
+      },
+      {
+        "key": "deltamisdreavus",
+        "name": "Delta Misdreavus",
+        "image": "existing",
+        "output": "deltamisdreavus.png"
+      },
+      {
+        "key": "deltamismagius",
+        "name": "Delta Mismagius",
+        "image": "existing",
+        "output": "deltamismagius.png"
+      },
+      {
+        "key": "deltacyndaquil",
+        "name": "Delta Cyndaquil",
+        "image": "existing",
+        "output": "deltacyndaquil.png"
+      },
+      {
+        "key": "deltaquilava",
+        "name": "Delta Quilava",
+        "image": "existing",
+        "output": "deltaquilava.png"
+      },
+      {
+        "key": "deltatyphlosion",
+        "name": "Delta Typhlosion",
+        "image": "existing",
+        "output": "deltatyphlosion.png"
+      },
+      {
+        "key": "deltatreecko",
+        "name": "Delta Treecko",
+        "image": "existing",
+        "output": "deltatreecko.png"
+      },
+      {
+        "key": "deltagrovyle",
+        "name": "Delta Grovyle",
+        "image": "existing",
+        "output": "deltagrovyle.png"
+      },
+      {
+        "key": "deltasceptile",
+        "name": "Delta Sceptile",
+        "image": "existing",
+        "output": "deltasceptile.png"
+      },
+      {
+        "key": "deltatorchic",
+        "name": "Delta Torchic",
+        "image": "existing",
+        "output": "deltatorchic.png"
+      },
+      {
+        "key": "deltacombusken",
+        "name": "Delta Combusken",
+        "image": "existing",
+        "output": "deltacombusken.png"
+      },
+      {
+        "key": "deltablaziken",
+        "name": "Delta Blaziken",
+        "image": "existing",
+        "output": "deltablaziken.png"
+      },
+      {
+        "key": "deltaturtwig",
+        "name": "Delta Turtwig",
+        "image": "existing",
+        "output": "deltaturtwig.png"
+      },
+      {
+        "key": "deltagrotle",
+        "name": "Delta Grotle",
+        "image": "existing",
+        "output": "deltagrotle.png"
+      },
+      {
+        "key": "deltatorterra",
+        "name": "Delta Torterra",
+        "image": "existing",
+        "output": "deltatorterra.png"
+      },
+      {
+        "key": "deltasnivy",
+        "name": "Delta Snivy",
+        "image": "existing",
+        "output": "deltasnivy.png"
+      },
+      {
+        "key": "deltaservine",
+        "name": "Delta Servine",
+        "image": "existing",
+        "output": "deltaservine.png"
+      },
+      {
+        "key": "deltaserperior",
+        "name": "Delta Serperior",
+        "image": "existing",
+        "output": "deltaserperior.png"
+      },
+      {
+        "key": "deltafroakie",
+        "name": "Delta Froakie",
+        "image": "existing",
+        "output": "deltafroakie.png"
+      },
+      {
+        "key": "deltafrogadier",
+        "name": "Delta Frogadier",
+        "image": "existing",
+        "output": "deltafrogadier.png"
+      },
+      {
+        "key": "deltagreninja",
+        "name": "Delta Greninja",
+        "image": "existing",
+        "output": "deltagreninja.png"
+      },
+      {
+        "key": "deltapidgey",
+        "name": "Delta Pidgey",
+        "image": "existing",
+        "output": "deltapidgey.png"
+      },
+      {
+        "key": "deltapidgeotto",
+        "name": "Delta Pidgeotto",
+        "image": "existing",
+        "output": "deltapidgeotto.png"
+      },
+      {
+        "key": "deltapidgeot",
+        "name": "Delta Pidgeot",
+        "image": "existing",
+        "output": "deltapidgeot.png"
+      },
+      {
+        "key": "deltadiglett",
+        "name": "Delta Diglett",
+        "image": "existing",
+        "output": "deltadiglett.png"
+      },
+      {
+        "key": "deltadugtrio",
+        "name": "Delta Dugtrio",
+        "image": "existing",
+        "output": "deltadugtrio.png"
+      },
+      {
+        "key": "deltagrowlithe",
+        "name": "Delta Growlithe",
+        "image": "existing",
+        "output": "deltagrowlithe.png"
+      },
+      {
+        "key": "deltaarcanine",
+        "name": "Delta Arcanine",
+        "image": "existing",
+        "output": "deltaarcanine.png"
+      },
+      {
+        "key": "deltageodude",
+        "name": "Delta Geodude",
+        "image": "existing",
+        "output": "deltageodude.png"
+      },
+      {
+        "key": "deltagraveler",
+        "name": "Delta Graveler",
+        "image": "existing",
+        "output": "deltagraveler.png"
+      },
+      {
+        "key": "deltagolem",
+        "name": "Delta Golem",
+        "image": "existing",
+        "output": "deltagolem.png"
+      },
+      {
+        "key": "deltatentacool",
+        "name": "Delta Tentacool",
+        "image": "existing",
+        "output": "deltatentacool.png"
+      },
+      {
+        "key": "deltatentacruel",
+        "name": "Delta Tentacruel",
+        "image": "existing",
+        "output": "deltatentacruel.png"
+      },
+      {
+        "key": "deltadoduo",
+        "name": "Delta Doduo",
+        "image": "existing",
+        "output": "deltadoduo.png"
+      },
+      {
+        "key": "deltadodrio",
+        "name": "Delta Dodrio",
+        "image": "existing",
+        "output": "deltadodrio.png"
+      },
+      {
+        "key": "deltatangela",
+        "name": "Delta Tangela",
+        "image": "existing",
+        "output": "deltatangela.png"
+      },
+      {
+        "key": "deltatangrowth",
+        "name": "Delta Tangrowth",
+        "image": "existing",
+        "output": "deltatangrowth.png"
+      },
+      {
+        "key": "deltaditto",
+        "name": "Delta Ditto",
+        "image": "existing",
+        "output": "deltaditto.png"
+      },
+      {
+        "key": "deltakabuto",
+        "name": "Delta Kabuto",
+        "image": "existing",
+        "output": "deltakabuto.png"
+      },
+      {
+        "key": "deltakabutops",
+        "name": "Delta Kabutops",
+        "image": "existing",
+        "output": "deltakabutops.png"
+      },
+      {
+        "key": "deltadratini",
+        "name": "Delta Dratini",
+        "image": "existing",
+        "output": "deltadratini.png"
+      },
+      {
+        "key": "deltadragonair",
+        "name": "Delta Dragonair",
+        "image": "existing",
+        "output": "deltadragonair.png"
+      },
+      {
+        "key": "deltadragonite",
+        "name": "Delta Dragonite",
+        "image": "existing",
+        "output": "deltadragonite.png"
+      },
+      {
+        "key": "deltahoothoot",
+        "name": "Delta Hoothoot",
+        "image": "existing",
+        "output": "deltahoothoot.png"
+      },
+      {
+        "key": "deltanoctowl",
+        "name": "Delta Noctowl",
+        "image": "existing",
+        "output": "deltanoctowl.png"
+      },
+      {
+        "key": "deltachinchou",
+        "name": "Delta Chinchou",
+        "image": "existing",
+        "output": "deltachinchou.png"
+      },
+      {
+        "key": "deltalanturn",
+        "name": "Delta Lanturn",
+        "image": "existing",
+        "output": "deltalanturn.png"
+      },
+      {
+        "key": "deltapichu",
+        "name": "Delta Pichu",
+        "image": "existing",
+        "output": "deltapichu.png"
+      },
+      {
+        "key": "deltapikachu",
+        "name": "Delta Pikachu",
+        "image": "existing",
+        "output": "deltapikachu.png"
+      },
+      {
+        "key": "deltaraichu",
+        "name": "Delta Raichu",
+        "image": "existing",
+        "output": "deltaraichu.png"
+      },
+      {
+        "key": "deltaaipom",
+        "name": "Delta Aipom",
+        "image": "existing",
+        "output": "deltaaipom.png"
+      },
+      {
+        "key": "deltaambipom",
+        "name": "Delta Ambipom",
+        "image": "existing",
+        "output": "deltaambipom.png"
+      },
+      {
+        "key": "deltayanma",
+        "name": "Delta Yanma",
+        "image": "existing",
+        "output": "deltayanma.png"
+      },
+      {
+        "key": "deltayanmega",
+        "name": "Delta Yanmega",
+        "image": "existing",
+        "output": "deltayanmega.png"
+      },
+      {
+        "key": "deltagirafarig",
+        "name": "Delta Girafarig",
+        "image": "existing",
+        "output": "deltagirafarig.png"
+      },
+      {
+        "key": "deltadunsparce",
+        "name": "Delta Dunsparce",
+        "image": "existing",
+        "output": "deltadunsparce.png"
+      },
+      {
+        "key": "deltashuckle",
+        "name": "Delta Shuckle",
+        "image": "existing",
+        "output": "deltashuckle.png"
+      },
+      {
+        "key": "deltaremoraid",
+        "name": "Delta Remoraid",
+        "image": "existing",
+        "output": "deltaremoraid.png"
+      },
+      {
+        "key": "deltaoctillery",
+        "name": "Delta Octillery",
+        "image": "existing",
+        "output": "deltaoctillery.png"
+      },
+      {
+        "key": "deltaelekid",
+        "name": "Delta Elekid",
+        "image": "existing",
+        "output": "deltaelekid.png"
+      },
+      {
+        "key": "deltaelectabuzz",
+        "name": "Delta Electabuzz",
+        "image": "existing",
+        "output": "deltaelectabuzz.png"
+      },
+      {
+        "key": "deltaelectivire",
+        "name": "Delta Electivire",
+        "image": "existing",
+        "output": "deltaelectivire.png"
+      },
+      {
+        "key": "deltamagby",
+        "name": "Delta Magby",
+        "image": "existing",
+        "output": "deltamagby.png"
+      },
+      {
+        "key": "deltamagmar",
+        "name": "Delta Magmar",
+        "image": "existing",
+        "output": "deltamagmar.png"
+      },
+      {
+        "key": "deltamagmortar",
+        "name": "Delta Magmortar",
+        "image": "existing",
+        "output": "deltamagmortar.png"
+      },
+      {
+        "key": "deltalotad",
+        "name": "Delta Lotad",
+        "image": "existing",
+        "output": "deltalotad.png"
+      },
+      {
+        "key": "deltalombre",
+        "name": "Delta Lombre",
+        "image": "existing",
+        "output": "deltalombre.png"
+      },
+      {
+        "key": "deltaludicolo",
+        "name": "Delta Ludicolo",
+        "image": "existing",
+        "output": "deltaludicolo.png"
+      },
+      {
+        "key": "deltaseedot",
+        "name": "Delta Seedot",
+        "image": "existing",
+        "output": "deltaseedot.png"
+      },
+      {
+        "key": "deltanuzleaf",
+        "name": "Delta Nuzleaf",
+        "image": "existing",
+        "output": "deltanuzleaf.png"
+      },
+      {
+        "key": "deltashiftry",
+        "name": "Delta Shiftry",
+        "image": "existing",
+        "output": "deltashiftry.png"
+      },
+      {
+        "key": "deltasableye",
+        "name": "Delta Sableye",
+        "image": "existing",
+        "output": "deltasableye.png"
+      },
+      {
+        "key": "deltamawile",
+        "name": "Delta Mawile",
+        "image": "existing",
+        "output": "deltamawile.png"
+      },
+      {
+        "key": "deltaaron",
+        "name": "Delta Aron",
+        "image": "existing",
+        "output": "deltaaron.png"
+      },
+      {
+        "key": "deltalairon",
+        "name": "Delta Lairon",
+        "image": "existing",
+        "output": "deltalairon.png"
+      },
+      {
+        "key": "deltaaggron",
+        "name": "Delta Aggron",
+        "image": "existing",
+        "output": "deltaaggron.png"
+      },
+      {
+        "key": "deltameditite",
+        "name": "Delta Meditite",
+        "image": "existing",
+        "output": "deltameditite.png"
+      },
+      {
+        "key": "deltamedicham",
+        "name": "Delta Medicham",
+        "image": "existing",
+        "output": "deltamedicham.png"
+      },
+      {
+        "key": "deltanumel",
+        "name": "Delta Numel",
+        "image": "existing",
+        "output": "deltanumel.png"
+      },
+      {
+        "key": "deltacamerupt",
+        "name": "Delta Camerupt",
+        "image": "existing",
+        "output": "deltacamerupt.png"
+      },
+      {
+        "key": "deltaplusle",
+        "name": "Delta Plusle",
+        "image": "existing",
+        "output": "deltaplusle.png"
+      },
+      {
+        "key": "deltaminun",
+        "name": "Delta Minun",
+        "image": "existing",
+        "output": "deltaminun.png"
+      },
+      {
+        "key": "deltawailmer",
+        "name": "Delta Wailmer",
+        "image": "existing",
+        "output": "deltawailmer.png"
+      },
+      {
+        "key": "deltawailord",
+        "name": "Delta Wailord",
+        "image": "existing",
+        "output": "deltawailord.png"
+      },
+      {
+        "key": "deltafeebas",
+        "name": "Delta Feebas",
+        "image": "existing",
+        "output": "deltafeebas.png"
+      },
+      {
+        "key": "deltamilotic",
+        "name": "Delta Milotic",
+        "image": "existing",
+        "output": "deltamilotic.png"
+      },
+      {
+        "key": "deltaclamperl",
+        "name": "Delta Clamperl",
+        "image": "existing",
+        "output": "deltaclamperl.png"
+      },
+      {
+        "key": "deltahuntail",
+        "name": "Delta Huntail",
+        "image": "existing",
+        "output": "deltahuntail.png"
+      },
+      {
+        "key": "deltagorebyss",
+        "name": "Delta Gorebyss",
+        "image": "existing",
+        "output": "deltagorebyss.png"
+      },
+      {
+        "key": "deltabeldumspider",
+        "name": "Delta Beldum (Spider)",
+        "image": "existing",
+        "output": "deltabeldumspider.png"
+      },
+      {
+        "key": "deltametangspider",
+        "name": "Delta Metang (Spider)",
+        "image": "existing",
+        "output": "deltametangspider.png"
+      },
+      {
+        "key": "deltametagrossspider",
+        "name": "Delta Metagross (Spider)",
+        "image": "existing",
+        "output": "deltametagrossspider.png"
+      },
+      {
+        "key": "deltabeldumruin",
+        "name": "Delta Beldum (Ruin)",
+        "image": "existing",
+        "output": "deltabeldumruin.png"
+      },
+      {
+        "key": "deltametangruin",
+        "name": "Delta Metang (Ruin)",
+        "image": "existing",
+        "output": "deltametangruin.png"
+      },
+      {
+        "key": "deltametagrossruin",
+        "name": "Delta Metagross (Ruin)",
+        "image": "existing",
+        "output": "deltametagrossruin.png"
+      },
+      {
+        "key": "deltabuneary",
+        "name": "Delta Buneary",
+        "image": "existing",
+        "output": "deltabuneary.png"
+      },
+      {
+        "key": "deltalopunny",
+        "name": "Delta Lopunny",
+        "image": "existing",
+        "output": "deltalopunny.png"
+      },
+      {
+        "key": "deltariolu",
+        "name": "Delta Riolu",
+        "image": "existing",
+        "output": "deltariolu.png"
+      },
+      {
+        "key": "deltalucario",
+        "name": "Delta Lucario",
+        "image": "existing",
+        "output": "deltalucario.png"
+      },
+      {
+        "key": "deltacroagunk",
+        "name": "Delta Croagunk",
+        "image": "existing",
+        "output": "deltacroagunk.png"
+      },
+      {
+        "key": "deltatoxicroak",
+        "name": "Delta Toxicroak",
+        "image": "existing",
+        "output": "deltatoxicroak.png"
+      },
+      {
+        "key": "deltavenipede",
+        "name": "Delta Venipede",
+        "image": "existing",
+        "output": "deltavenipede.png"
+      },
+      {
+        "key": "deltawhirlipede",
+        "name": "Delta Whirlipede",
+        "image": "existing",
+        "output": "deltawhirlipede.png"
+      },
+      {
+        "key": "deltascolipede",
+        "name": "Delta Scolipede",
+        "image": "existing",
+        "output": "deltascolipede.png"
+      },
+      {
+        "key": "deltapetililwater",
+        "name": "Delta Petilil (Water)",
+        "image": "existing",
+        "output": "deltapetililwater.png"
+      },
+      {
+        "key": "deltalilligantwater",
+        "name": "Delta Lilligant (Water)",
+        "image": "existing",
+        "output": "deltalilligantwater.png"
+      },
+      {
+        "key": "deltapetililfairy",
+        "name": "Delta Petilil (Fairy)",
+        "image": "existing",
+        "output": "deltapetililfairy.png"
+      },
+      {
+        "key": "deltalilligantfairy",
+        "name": "Delta Lilligant (Fairy)",
+        "image": "existing",
+        "output": "deltalilligantfairy.png"
+      },
+      {
+        "key": "deltasolosis",
+        "name": "Delta Solosis",
+        "image": "existing",
+        "output": "deltasolosis.png"
+      },
+      {
+        "key": "deltaduosion",
+        "name": "Delta Duosion",
+        "image": "existing",
+        "output": "deltaduosion.png"
+      },
+      {
+        "key": "deltareuniclus",
+        "name": "Delta Reuniclus",
+        "image": "existing",
+        "output": "deltareuniclus.png"
+      },
+      {
+        "key": "deltadarumaka",
+        "name": "Delta Darumaka",
+        "image": "existing",
+        "output": "deltadarumaka.png"
+      },
+      {
+        "key": "deltadarmanitan",
+        "name": "Delta Darmanitan",
+        "image": "existing",
+        "output": "deltadarmanitan.png"
+      },
+      {
+        "key": "deltamaractus",
+        "name": "Delta Maractus",
+        "image": "existing",
+        "output": "deltamaractus.png"
+      },
+      {
+        "key": "deltadwebbleberry",
+        "name": "Delta Dwebble (Berry)",
+        "image": "existing",
+        "output": "deltadwebbleberry.png"
+      },
+      {
+        "key": "deltacrustleberry",
+        "name": "Delta Crustle (Berry)",
+        "image": "existing",
+        "output": "deltacrustleberry.png"
+      },
+      {
+        "key": "deltadwebblecake",
+        "name": "Delta Dwebble (Cake)",
+        "image": "existing",
+        "output": "deltadwebblecake.png"
+      },
+      {
+        "key": "deltacrustlecake",
+        "name": "Delta Crustle (Cake)",
+        "image": "existing",
+        "output": "deltacrustlecake.png"
+      },
+      {
+        "key": "deltayamask",
+        "name": "Delta Yamask",
+        "image": "existing",
+        "output": "deltayamask.png"
+      },
+      {
+        "key": "deltacofagrigus",
+        "name": "Delta Cofagrigus",
+        "image": "existing",
+        "output": "deltacofagrigus.png"
+      },
+      {
+        "key": "deltaemolga",
+        "name": "Delta Emolga",
+        "image": "existing",
+        "output": "deltaemolga.png"
+      },
+      {
+        "key": "deltakarrablast",
+        "name": "Delta Karrablast",
+        "image": "existing",
+        "output": "deltakarrablast.png"
+      },
+      {
+        "key": "deltaescavalier",
+        "name": "Delta Escavalier",
+        "image": "existing",
+        "output": "deltaescavalier.png"
+      },
+      {
+        "key": "deltafoongus",
+        "name": "Delta Foongus",
+        "image": "existing",
+        "output": "deltafoongus.png"
+      },
+      {
+        "key": "deltaamoonguss",
+        "name": "Delta Amoonguss",
+        "image": "existing",
+        "output": "deltaamoonguss.png"
+      },
+      {
+        "key": "deltalitwick",
+        "name": "Delta Litwick",
+        "image": "existing",
+        "output": "deltalitwick.png"
+      },
+      {
+        "key": "deltalampent",
+        "name": "Delta Lampent",
+        "image": "existing",
+        "output": "deltalampent.png"
+      },
+      {
+        "key": "deltachandelure",
+        "name": "Delta Chandelure",
+        "image": "existing",
+        "output": "deltachandelure.png"
+      },
+      {
+        "key": "deltaaxew",
+        "name": "Delta Axew",
+        "image": "existing",
+        "output": "deltaaxew.png"
+      },
+      {
+        "key": "deltafraxure",
+        "name": "Delta Fraxure",
+        "image": "existing",
+        "output": "deltafraxure.png"
+      },
+      {
+        "key": "deltahaxorus",
+        "name": "Delta Haxorus",
+        "image": "existing",
+        "output": "deltahaxorus.png"
+      },
+      {
+        "key": "deltagolett",
+        "name": "Delta Golett",
+        "image": "existing",
+        "output": "deltagolett.png"
+      },
+      {
+        "key": "deltagolurk",
+        "name": "Delta Golurk",
+        "image": "existing",
+        "output": "deltagolurk.png"
+      },
+      {
+        "key": "deltaheatmor",
+        "name": "Delta Heatmor",
+        "image": "existing",
+        "output": "deltaheatmor.png"
+      },
+      {
+        "key": "deltadeino",
+        "name": "Delta Deino",
+        "image": "existing",
+        "output": "deltadeino.png"
+      },
+      {
+        "key": "deltazweilous",
+        "name": "Delta Zweilous",
+        "image": "existing",
+        "output": "deltazweilous.png"
+      },
+      {
+        "key": "deltahydreigon",
+        "name": "Delta Hydreigon",
+        "image": "existing",
+        "output": "deltahydreigon.png"
+      },
+      {
+        "key": "deltalarvesta",
+        "name": "Delta Larvesta",
+        "image": "existing",
+        "output": "deltalarvesta.png"
+      },
+      {
+        "key": "deltavolcarona",
+        "name": "Delta Volcarona",
+        "image": "existing",
+        "output": "deltavolcarona.png"
+      },
+      {
+        "key": "deltaamaura",
+        "name": "Delta Amaura",
+        "image": "existing",
+        "output": "deltaamaura.png"
+      },
+      {
+        "key": "deltaaurorus",
+        "name": "Delta Aurorus",
+        "image": "existing",
+        "output": "deltaaurorus.png"
+      },
+      {
+        "key": "deltagoomy",
+        "name": "Delta Goomy",
+        "image": "existing",
+        "output": "deltagoomy.png"
+      },
+      {
+        "key": "deltasliggoo",
+        "name": "Delta Sliggoo",
+        "image": "existing",
+        "output": "deltasliggoo.png"
+      },
+      {
+        "key": "deltagoodra",
+        "name": "Delta Goodra",
+        "image": "existing",
+        "output": "deltagoodra.png"
+      },
+      {
+        "key": "deltaregirock",
+        "name": "Delta Regirock",
+        "image": "existing",
+        "output": "deltaregirock.png"
+      },
+      {
+        "key": "deltaregice",
+        "name": "Delta Regice",
+        "image": "existing",
+        "output": "deltaregice.png"
+      },
+      {
+        "key": "deltaregisteel",
+        "name": "Delta Registeel",
+        "image": "existing",
+        "output": "deltaregisteel.png"
+      },
+      {
+        "key": "deltameloetta",
+        "name": "Delta Meloetta",
+        "image": "existing",
+        "output": "deltameloetta.png"
+      },
+      {
+        "key": "deltahoopa",
+        "name": "Delta Hoopa",
+        "image": "existing",
+        "output": "deltahoopa.png"
+      },
+      {
+        "key": "poliwrathmega",
+        "name": "Poliwrath-Mega",
+        "image": "existing",
+        "output": "poliwrathmega.png"
+      },
+      {
+        "key": "marowakmega",
+        "name": "Marowak-Mega",
+        "image": "existing",
+        "output": "marowakmega.png"
+      },
+      {
+        "key": "eeveemega",
+        "name": "Eevee-Mega",
+        "image": "existing",
+        "output": "eeveemega.png"
+      },
+      {
+        "key": "meganiummega",
+        "name": "Meganium-Mega",
+        "image": "existing",
+        "output": "meganiummega.png"
+      },
+      {
+        "key": "typhlosionmega",
+        "name": "Typhlosion-Mega",
+        "image": "existing",
+        "output": "typhlosionmega.png"
+      },
+      {
+        "key": "feraligatrmega",
+        "name": "Feraligatr-Mega",
+        "image": "existing",
+        "output": "feraligatrmega.png"
+      },
+      {
+        "key": "sudowoodomega",
+        "name": "Sudowoodo-Mega",
+        "image": "existing",
+        "output": "sudowoodomega.png"
+      },
+      {
+        "key": "politoedmega",
+        "name": "Politoed-Mega",
+        "image": "existing",
+        "output": "politoedmega.png"
+      },
+      {
+        "key": "sunfloramega",
+        "name": "Sunflora-Mega",
+        "image": "existing",
+        "output": "sunfloramega.png"
+      },
+      {
+        "key": "girafarigmega",
+        "name": "Girafarig-Mega",
+        "image": "existing",
+        "output": "girafarigmega.png"
+      },
+      {
+        "key": "magcargomega",
+        "name": "Magcargo-Mega",
+        "image": "existing",
+        "output": "magcargomega.png"
+      },
+      {
+        "key": "donphanmega",
+        "name": "Donphan-Mega",
+        "image": "existing",
+        "output": "donphanmega.png"
+      },
+      {
+        "key": "miltankmega",
+        "name": "Miltank-Mega",
+        "image": "existing",
+        "output": "miltankmega.png"
+      },
+      {
+        "key": "shiftrymega",
+        "name": "Shiftry-Mega",
+        "image": "existing",
+        "output": "shiftrymega.png"
+      },
+      {
+        "key": "flygonmega",
+        "name": "Flygon-Mega",
+        "image": "existing",
+        "output": "flygonmega.png"
+      },
+      {
+        "key": "cacturnemega",
+        "name": "Cacturne-Mega",
+        "image": "existing",
+        "output": "cacturnemega.png"
+      },
+      {
+        "key": "crawdauntmega",
+        "name": "Crawdaunt-Mega",
+        "image": "existing",
+        "output": "crawdauntmega.png"
+      },
+      {
+        "key": "miloticmega",
+        "name": "Milotic-Mega",
+        "image": "existing",
+        "output": "miloticmega.png"
+      },
+      {
+        "key": "jirachimega",
+        "name": "Jirachi-Mega",
+        "image": "existing",
+        "output": "jirachimega.png"
+      },
+      {
+        "key": "chatotmega",
+        "name": "Chatot-Mega",
+        "image": "existing",
+        "output": "chatotmega.png"
+      },
+      {
+        "key": "spiritombmega",
+        "name": "Spiritomb-Mega",
+        "image": "existing",
+        "output": "spiritombmega.png"
+      },
+      {
+        "key": "froslassmega",
+        "name": "Froslass-Mega",
+        "image": "existing",
+        "output": "froslassmega.png"
+      },
+      {
+        "key": "zebstrikamega",
+        "name": "Zebstrika-Mega",
+        "image": "existing",
+        "output": "zebstrikamega.png"
+      },
+      {
+        "key": "zoroarkmega",
+        "name": "Zoroark-Mega",
+        "image": "existing",
+        "output": "zoroarkmega.png"
+      },
+      {
+        "key": "gothitellemega",
+        "name": "Gothitelle-Mega",
+        "image": "existing",
+        "output": "gothitellemega.png"
+      },
+      {
+        "key": "reuniclusmega",
+        "name": "Reuniclus-Mega",
+        "image": "existing",
+        "output": "reuniclusmega.png"
+      },
+      {
+        "key": "cryogonalmega",
+        "name": "Cryogonal-Mega",
+        "image": "existing",
+        "output": "cryogonalmega.png"
+      },
+      {
+        "key": "haxorusmega",
+        "name": "Haxorus-Mega",
+        "image": "existing",
+        "output": "haxorusmega.png"
+      },
+      {
+        "key": "stunfiskmega",
+        "name": "Stunfisk-Mega",
+        "image": "existing",
+        "output": "stunfiskmega.png"
+      },
+      {
+        "key": "bisharpmega",
+        "name": "Bisharp-Mega",
+        "image": "existing",
+        "output": "bisharpmega.png"
+      },
+      {
+        "key": "hydreigonmega",
+        "name": "Hydreigon-Mega",
+        "image": "existing",
+        "output": "hydreigonmega.png"
+      },
+      {
+        "key": "deltavenusaurmega",
+        "name": "Delta Venusaur (Mega)",
+        "image": "existing",
+        "output": "deltavenusaurmega.png"
+      },
+      {
+        "key": "deltacharizardmega",
+        "name": "Delta Charizard (Mega)",
+        "image": "existing",
+        "output": "deltacharizardmega.png"
+      },
+      {
+        "key": "deltablastoisemega",
+        "name": "Delta Blastoise (Mega)",
+        "image": "existing",
+        "output": "deltablastoisemega.png"
+      },
+      {
+        "key": "deltabisharpmega",
+        "name": "Delta Bisharp (Mega)",
+        "image": "existing",
+        "output": "deltabisharpmega.png"
+      },
+      {
+        "key": "deltagardevoirmega",
+        "name": "Delta Gardevoir (Mega)",
+        "image": "existing",
+        "output": "deltagardevoirmega.png"
+      },
+      {
+        "key": "deltagallademega",
+        "name": "Delta Gallade (Mega)",
+        "image": "existing",
+        "output": "deltagallademega.png"
+      },
+      {
+        "key": "deltasunfloramega",
+        "name": "Delta Sunflora (Mega)",
+        "image": "existing",
+        "output": "deltasunfloramega.png"
+      },
+      {
+        "key": "deltascizormega",
+        "name": "Delta Scizor (Mega)",
+        "image": "existing",
+        "output": "deltascizormega.png"
+      },
+      {
+        "key": "deltaglaliemega",
+        "name": "Delta Glalie (Mega)",
+        "image": "existing",
+        "output": "deltaglaliemega.png"
+      },
+      {
+        "key": "deltafroslassmega",
+        "name": "Delta Froslass (Mega)",
+        "image": "existing",
+        "output": "deltafroslassmega.png"
+      },
+      {
+        "key": "deltatyphlosionmega",
+        "name": "Delta Typhlosion (Mega)",
+        "image": "existing",
+        "output": "deltatyphlosionmega.png"
+      },
+      {
+        "key": "deltapidgeotmega",
+        "name": "Delta Pidgeot (Mega)",
+        "image": "existing",
+        "output": "deltapidgeotmega.png"
+      },
+      {
+        "key": "deltagirafarigmega",
+        "name": "Delta Girafarig (Mega)",
+        "image": "existing",
+        "output": "deltagirafarigmega.png"
+      },
+      {
+        "key": "deltasableyemega",
+        "name": "Delta Sableye (Mega)",
+        "image": "existing",
+        "output": "deltasableyemega.png"
+      },
+      {
+        "key": "deltamawilemega",
+        "name": "Delta Mawile (Mega)",
+        "image": "existing",
+        "output": "deltamawilemega.png"
+      },
+      {
+        "key": "deltamedichammega",
+        "name": "Delta Medicham (Mega)",
+        "image": "existing",
+        "output": "deltamedichammega.png"
+      },
+      {
+        "key": "deltacameruptmega",
+        "name": "Delta Camerupt (Mega)",
+        "image": "existing",
+        "output": "deltacameruptmega.png"
+      },
+      {
+        "key": "deltamiloticmega",
+        "name": "Delta Milotic (Mega)",
+        "image": "existing",
+        "output": "deltamiloticmega.png"
+      },
+      {
+        "key": "deltametagrossspidermega",
+        "name": "Delta Metagross (Spider) (Mega)",
+        "image": "existing",
+        "output": "deltametagrossspidermega.png"
+      },
+      {
+        "key": "deltametagrossruinmega",
+        "name": "Delta Metagross (Ruin) (Mega)",
+        "image": "existing",
+        "output": "deltametagrossruinmega.png"
+      },
+      {
+        "key": "deltametagrossruincrystal",
+        "name": "Delta Metagross (Ruin) (Crystal)",
+        "image": "fallback:deltametagrossruin.png",
+        "output": "deltametagrossruincrystal.png"
+      },
+      {
+        "key": "deltalopunnymega",
+        "name": "Delta Lopunny (Mega)",
+        "image": "existing",
+        "output": "deltalopunnymega.png"
+      },
+      {
+        "key": "deltalucariomega",
+        "name": "Delta Lucario (Mega)",
+        "image": "existing",
+        "output": "deltalucariomega.png"
+      },
+      {
+        "key": "meganiummegaza",
+        "name": "Meganium (Mega)",
+        "image": "existing",
+        "output": "meganiummegaza.png"
+      },
+      {
+        "key": "feraligatrmegaza",
+        "name": "Feraligatr (Mega)",
+        "image": "existing",
+        "output": "feraligatrmegaza.png"
+      },
+      {
+        "key": "froslassmegaza",
+        "name": "Froslass (Mega)",
+        "image": "existing",
+        "output": "froslassmegaza.png"
+      },
+      {
+        "key": "flygonmegaza",
+        "name": "Flygon (Mega)",
+        "image": "existing",
+        "output": "flygonmegaza.png"
+      },
+      {
+        "key": "kingambitmega",
+        "name": "Kingambit (Mega)",
+        "image": "existing",
+        "output": "kingambitmega.png"
+      },
+      {
+        "key": "toucannonmega",
+        "name": "Toucannon (Mega)",
+        "image": "existing",
+        "output": "toucannonmega.png"
+      },
+      {
+        "key": "luxraymega",
+        "name": "Luxray (Mega)",
+        "image": "existing",
+        "output": "luxraymega.png"
+      },
+      {
+        "key": "talonflamemega",
+        "name": "Talonflame (Mega)",
+        "image": "existing",
+        "output": "talonflamemega.png"
+      },
+      {
+        "key": "chandeluremega",
+        "name": "Chandelure (Mega)",
+        "image": "existing",
+        "output": "chandeluremega.png"
+      },
+      {
+        "key": "arcaninemega",
+        "name": "Arcanine (Mega)",
+        "image": "existing",
+        "output": "arcaninemega.png"
+      },
+      {
+        "key": "dragonitemega",
+        "name": "Dragonite (Mega)",
+        "image": "existing",
+        "output": "dragonitemega.png"
+      },
+      {
+        "key": "laprasmega",
+        "name": "Lapras (Mega)",
+        "image": "existing",
+        "output": "laprasmega.png"
+      },
+      {
+        "key": "floetteeternalmega",
+        "name": "Floette-Eternal (Mega)",
+        "image": "existing",
+        "output": "floetteeternalmega.png"
+      }
+    ],
+    "failed": []
+  },
+  "items": {
+    "ok": [
+      {
+        "key": "poliwrathite",
+        "name": "Poliwrathite",
+        "image": "existing",
+        "output": "poliwrathite.png"
+      },
+      {
+        "key": "marowite",
+        "name": "Marowite",
+        "image": "existing",
+        "output": "marowite.png"
+      },
+      {
+        "key": "eevite",
+        "name": "Eevite",
+        "image": "existing",
+        "output": "eevite.png"
+      },
+      {
+        "key": "meganiumite",
+        "name": "Meganiumite",
+        "image": "existing",
+        "output": "meganiumite.png"
+      },
+      {
+        "key": "typhlosionite",
+        "name": "Typhlosionite",
+        "image": "existing",
+        "output": "typhlosionite.png"
+      },
+      {
+        "key": "feraligatite",
+        "name": "Feraligatite",
+        "image": "existing",
+        "output": "feraligatite.png"
+      },
+      {
+        "key": "sudowoodite",
+        "name": "Sudowoodite",
+        "image": "existing",
+        "output": "sudowoodite.png"
+      },
+      {
+        "key": "politoedite",
+        "name": "Politoedite",
+        "image": "existing",
+        "output": "politoedite.png"
+      },
+      {
+        "key": "sunflorite",
+        "name": "Sunflorite",
+        "image": "existing",
+        "output": "sunflorite.png"
+      },
+      {
+        "key": "etigirafarigite",
+        "name": "Etigirafarigite",
+        "image": "existing",
+        "output": "etigirafarigite.png"
+      },
+      {
+        "key": "steelixitefire",
+        "name": "Steelixite (Fire)",
+        "image": "existing",
+        "output": "steelixitefire.png"
+      },
+      {
+        "key": "magcargonite",
+        "name": "Magcargonite",
+        "image": "existing",
+        "output": "magcargonite.png"
+      },
+      {
+        "key": "donphanite",
+        "name": "Donphanite",
+        "image": "existing",
+        "output": "donphanite.png"
+      },
+      {
+        "key": "miltankite",
+        "name": "Miltankite",
+        "image": "existing",
+        "output": "miltankite.png"
+      },
+      {
+        "key": "shiftrite",
+        "name": "Shiftrite",
+        "image": "existing",
+        "output": "shiftrite.png"
+      },
+      {
+        "key": "flygonite",
+        "name": "Flygonite",
+        "image": "existing",
+        "output": "flygonite.png"
+      },
+      {
+        "key": "cacturnite",
+        "name": "Cacturnite",
+        "image": "existing",
+        "output": "cacturnite.png"
+      },
+      {
+        "key": "crawdite",
+        "name": "Crawdite",
+        "image": "existing",
+        "output": "crawdite.png"
+      },
+      {
+        "key": "milotite",
+        "name": "Milotite",
+        "image": "existing",
+        "output": "milotite.png"
+      },
+      {
+        "key": "jirachite",
+        "name": "Jirachite",
+        "image": "existing",
+        "output": "jirachite.png"
+      },
+      {
+        "key": "chatotite",
+        "name": "Chatotite",
+        "image": "existing",
+        "output": "chatotite.png"
+      },
+      {
+        "key": "spiritombite",
+        "name": "Spiritombite",
+        "image": "existing",
+        "output": "spiritombite.png"
+      },
+      {
+        "key": "froslassite",
+        "name": "Froslassite",
+        "image": "existing",
+        "output": "froslassite.png"
+      },
+      {
+        "key": "zebstrikite",
+        "name": "Zebstrikite",
+        "image": "existing",
+        "output": "zebstrikite.png"
+      },
+      {
+        "key": "zoronite",
+        "name": "Zoronite",
+        "image": "existing",
+        "output": "zoronite.png"
+      },
+      {
+        "key": "gothitite",
+        "name": "Gothitite",
+        "image": "existing",
+        "output": "gothitite.png"
+      },
+      {
+        "key": "reuniclite",
+        "name": "Reuniclite",
+        "image": "existing",
+        "output": "reuniclite.png"
+      },
+      {
+        "key": "cryogonite",
+        "name": "Cryogonite",
+        "image": "existing",
+        "output": "cryogonite.png"
+      },
+      {
+        "key": "haxorite",
+        "name": "Haxorite",
+        "image": "existing",
+        "output": "haxorite.png"
+      },
+      {
+        "key": "stunfiskite",
+        "name": "Stunfiskite",
+        "image": "existing",
+        "output": "stunfiskite.png"
+      },
+      {
+        "key": "bisharpite",
+        "name": "Bisharpite",
+        "image": "existing",
+        "output": "bisharpite.png"
+      },
+      {
+        "key": "hydreigonite",
+        "name": "Hydreigonite",
+        "image": "existing",
+        "output": "hydreigonite.png"
+      },
+      {
+        "key": "mewtwonitex",
+        "name": "Mewtwonite X",
+        "image": "existing",
+        "output": "mewtwonitex.png"
+      },
+      {
+        "key": "deltavenusaurite",
+        "name": "Delta Venusaurite",
+        "image": "existing",
+        "output": "deltavenusaurite.png"
+      },
+      {
+        "key": "deltacharizardite",
+        "name": "Delta Charizardite",
+        "image": "existing",
+        "output": "deltacharizardite.png"
+      },
+      {
+        "key": "deltablastoisinite",
+        "name": "Delta Blastoisinite",
+        "image": "existing",
+        "output": "deltablastoisinite.png"
+      },
+      {
+        "key": "deltabisharpite",
+        "name": "Delta Bisharpite",
+        "image": "existing",
+        "output": "deltabisharpite.png"
+      },
+      {
+        "key": "deltagardevoirite",
+        "name": "Delta Gardevoirite",
+        "image": "existing",
+        "output": "deltagardevoirite.png"
+      },
+      {
+        "key": "deltagalladite",
+        "name": "Delta Galladite",
+        "image": "existing",
+        "output": "deltagalladite.png"
+      },
+      {
+        "key": "deltasunflorite",
+        "name": "Delta Sunflorite",
+        "image": "existing",
+        "output": "deltasunflorite.png"
+      },
+      {
+        "key": "deltascizorite",
+        "name": "Delta Scizorite",
+        "image": "existing",
+        "output": "deltascizorite.png"
+      },
+      {
+        "key": "deltaglalitite",
+        "name": "Delta Glalitite",
+        "image": "existing",
+        "output": "deltaglalitite.png"
+      },
+      {
+        "key": "deltafroslassite",
+        "name": "Delta Froslassite",
+        "image": "existing",
+        "output": "deltafroslassite.png"
+      },
+      {
+        "key": "deltatyphlosionite",
+        "name": "Delta Typhlosionite",
+        "image": "existing",
+        "output": "deltatyphlosionite.png"
+      },
+      {
+        "key": "deltapidgeotite",
+        "name": "Delta Pidgeotite",
+        "image": "existing",
+        "output": "deltapidgeotite.png"
+      },
+      {
+        "key": "deltaetigirafarigite",
+        "name": "Delta Etigirafarigite",
+        "image": "existing",
+        "output": "deltaetigirafarigite.png"
+      },
+      {
+        "key": "deltasablenite",
+        "name": "Delta Sablenite",
+        "image": "existing",
+        "output": "deltasablenite.png"
+      },
+      {
+        "key": "deltamawilite",
+        "name": "Delta Mawilite",
+        "image": "existing",
+        "output": "deltamawilite.png"
+      },
+      {
+        "key": "deltamedichamite",
+        "name": "Delta Medichamite",
+        "image": "existing",
+        "output": "deltamedichamite.png"
+      },
+      {
+        "key": "deltacameruptite",
+        "name": "Delta Cameruptite",
+        "image": "existing",
+        "output": "deltacameruptite.png"
+      },
+      {
+        "key": "deltamilotite",
+        "name": "Delta Milotite",
+        "image": "existing",
+        "output": "deltamilotite.png"
+      },
+      {
+        "key": "deltametagrossitespider",
+        "name": "Delta Metagrossite (Spider)",
+        "image": "existing",
+        "output": "deltametagrossitespider.png"
+      },
+      {
+        "key": "deltametagrossiteruin",
+        "name": "Delta Metagrossite (Ruin)",
+        "image": "existing",
+        "output": "deltametagrossiteruin.png"
+      },
+      {
+        "key": "crystalfragment",
+        "name": "Crystal Fragment",
+        "image": "existing",
+        "output": "crystalfragment.png"
+      },
+      {
+        "key": "deltalopunnite",
+        "name": "Delta Lopunnite",
+        "image": "existing",
+        "output": "deltalopunnite.png"
+      },
+      {
+        "key": "deltalucarionite",
+        "name": "Delta Lucarionite",
+        "image": "existing",
+        "output": "deltalucarionite.png"
+      },
+      {
+        "key": "meganiumiteza",
+        "name": "Meganiumite ZA",
+        "image": "existing",
+        "output": "meganiumiteza.png"
+      },
+      {
+        "key": "feraligatiteza",
+        "name": "Feraligatite ZA",
+        "image": "existing",
+        "output": "feraligatiteza.png"
+      },
+      {
+        "key": "froslassiteza",
+        "name": "Froslassite ZA",
+        "image": "existing",
+        "output": "froslassiteza.png"
+      },
+      {
+        "key": "flygoniteza",
+        "name": "Flygonite ZA",
+        "image": "existing",
+        "output": "flygoniteza.png"
+      },
+      {
+        "key": "kingambitite",
+        "name": "Kingambitite",
+        "image": "existing",
+        "output": "kingambitite.png"
+      },
+      {
+        "key": "toucannonite",
+        "name": "Toucannonite",
+        "image": "existing",
+        "output": "toucannonite.png"
+      },
+      {
+        "key": "luxraynite",
+        "name": "Luxraynite",
+        "image": "existing",
+        "output": "luxraynite.png"
+      },
+      {
+        "key": "talonflamite",
+        "name": "Talonflamite",
+        "image": "existing",
+        "output": "talonflamite.png"
+      },
+      {
+        "key": "chandelurite",
+        "name": "Chandelurite",
+        "image": "existing",
+        "output": "chandelurite.png"
+      },
+      {
+        "key": "arcaninite",
+        "name": "Arcaninite",
+        "image": "existing",
+        "output": "arcaninite.png"
+      },
+      {
+        "key": "dragonitite",
+        "name": "Dragonitite",
+        "image": "existing",
+        "output": "dragonitite.png"
+      },
+      {
+        "key": "laprsite",
+        "name": "Laprsite",
+        "image": "existing",
+        "output": "laprsite.png"
+      },
+      {
+        "key": "floettite",
+        "name": "Floettite",
+        "image": "existing",
+        "output": "floettite.png"
+      }
+    ],
+    "failed": []
+  }
+}

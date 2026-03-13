@@ -9,6 +9,21 @@ app/dist/
 release/
 app/release/
 app/release-*/
+tauri-app/release-*/
+
+# Rust / Tauri build artifacts
+target/
+target-build/
+tauri-app/src-tauri/target/
+tauri-app/src-tauri/target-build/
+
+# Build log files
+build_output*.txt
+
+# Installers (too large for git)
+*.msi
+*.exe
+!*.exe.meta
 
 # Logs and caches
 *.log
@@ -17,6 +32,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .vite/
+*.tsbuildinfo
 
 # OS/Junk
 .DS_Store
@@ -25,8 +41,32 @@ Thumbs.db
 # Env
 .env
 .env.*
+!.env.tauri
 
 # Editor
 .vscode/
 .idea/
 
+# Large directories (not part of the app)
+_backup/
+Full Sprite pack */
+OneTrainer/
+training_output/
+training_dataset_*/
+output/
+mac-build-src-*/
+Pokemon-Showdown-Dex-master/
+pokemon-showdown-client/
+pokemonttrpg-backend-backup-*/
+dreamo_test_results/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# HuggingFace model cache (very large)
+.hf_cache/
+
+# Fusion sprites (junction to sprite pack — too large for git)
+app/public/fusion-sprites/

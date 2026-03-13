@@ -1,10 +1,12 @@
-name: Release Windows build
+name: Release Windows build (Tauri)
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release tag (e.g. v1.3.2)
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -12,57 +14,51 @@ permissions:
 jobs:
   build_windows:
     runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: app
     steps:
-      - name: Checkout (full history)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
-          lfs: true
+          node-version: 20
 
-      - name: Enable Git LFS
-        run: git lfs install
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Pull LFS files
-        run: git lfs pull
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: app/package-lock.json
+          workspaces: tauri-app/src-tauri
 
       - name: Install dependencies
-        run: npm ci
+        working-directory: tauri-app
+        run: npm install
 
-      - name: Build app (Vite + TS)
-        run: npm run build
+      - name: Sync Sage dex data into app public assets
+        working-directory: tauri-app
+        run: npm run sync:sage-data
 
-      - name: Package Windows artifacts (no publish)
-        run: npx electron-builder -c electron-builder.yml -w --publish never
-
-      - name: Upload Windows artifacts to GitHub Release (clobber)
+      - name: Determine release tag
+        id: tag
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $ErrorActionPreference = 'Stop'
-          $tag = "$env:GITHUB_REF_NAME"
-          if (-not $tag -and $env:GITHUB_REF) { $tag = $env:GITHUB_REF -replace '^refs/tags/', '' }
-          if (-not $tag) { throw "Cannot determine tag name" }
-          gh release view $tag 2>$null | Out-Null
-          if ($LASTEXITCODE -ne 0) { gh release create $tag -t $tag -n "" }
-          Get-ChildItem -LiteralPath "release" -File | ForEach-Object {
-            gh release upload $tag $_.FullName --clobber
+          if ("${{ github.event.inputs.release_tag }}") {
+            "tag=${{ github.event.inputs.release_tag }}" >> $env:GITHUB_OUTPUT
+            "draft=false" >> $env:GITHUB_OUTPUT
+          } else {
+            $ts = Get-Date -Format "yyyyMMdd-HHmmss"
+            "tag=dev-$ts" >> $env:GITHUB_OUTPUT
+            "draft=true" >> $env:GITHUB_OUTPUT
           }
 
-      - name: Upload artifacts (optional)
-        if: always()
-        uses: actions/upload-artifact@v4
+      - name: Build Tauri Windows
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: windows-dist
-          path: app/release/**
-          if-no-files-found: ignore
+          projectPath: tauri-app
+          tagName: ${{ steps.tag.outputs.tag }}
+          releaseName: Pokettrpg ${{ steps.tag.outputs.tag }}
+          releaseDraft: ${{ steps.tag.outputs.draft }}
+          args: >
+            --config src-tauri/tauri.conf.json
+            --bundles nsis,msi

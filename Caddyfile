@@ -1,0 +1,50 @@
+# Caddy reverse proxy for pokettrpg backend
+# - localhost uses internal/self-signed TLS for local testing
+# - pokettrpg.duckdns.org uses public ACME TLS on :443
+
+localhost {
+	tls internal
+
+	reverse_proxy localhost:3000
+
+	# CORS headers
+	header {
+		Access-Control-Allow-Origin *
+		Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+		Access-Control-Allow-Headers "Content-Type, Authorization"
+	}
+
+	# Immutable cache for sprite assets (they never change once written)
+	header /fusion/sprites/* Cache-Control "public, max-age=31536000, immutable"
+	header /sprites/* Cache-Control "public, max-age=31536000, immutable"
+
+	log {
+		output file D:/GitHub/pokettrpg/caddy-access.log
+		format console
+	}
+}
+
+pokettrpg.duckdns.org {
+	# Automatic public cert (Let's Encrypt/ZeroSSL via ACME)
+	reverse_proxy localhost:3000
+
+	header {
+		Access-Control-Allow-Origin *
+		Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+		Access-Control-Allow-Headers "Content-Type, Authorization"
+	}
+
+	# Immutable cache for sprite assets
+	header /fusion/sprites/* Cache-Control "public, max-age=31536000, immutable"
+	header /sprites/* Cache-Control "public, max-age=31536000, immutable"
+
+	log {
+		output file D:/GitHub/pokettrpg/caddy-access.log
+		format console
+	}
+}
+
+# HTTP redirect to HTTPS
+:80 {
+	redir https://{host}{uri} permanent
+}
