@@ -54,8 +54,7 @@ tauri-app/src-tauri/target/
 tauri-app/dist/
 tauri-app/node_modules/
 
-## Large vendored sprite/data assets (tracked separately or downloaded at build)
-tauri-app/public/vendor/
+## Large spliced sprite assets (local-only)
 tauri-app/public/spliced-sprites/
 
 ## Backend build artifacts

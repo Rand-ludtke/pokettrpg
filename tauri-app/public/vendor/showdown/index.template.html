@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+                      ,///////,
+      +#########+     ///////,
+   +###############+  ///////
+  +#################+,//////,
+ +###################,/////,
+ ########+   +########////
+                     ////,  PokemonShowdown.com
+ ########+   +########///
+ +###################+//
+  +#################+
+   +###############+
+      +#########+///////,
+                ///////,
+
+Viewing source? We're open source! Check us out on GitHub!
+https://github.com/smogon/pokemon-showdown
+https://github.com/smogon/pokemon-showdown-client (you are here)
+
+Also visit us in the Dev chatroom:
+https://psim.us/dev
+
+-->
+<meta charset="UTF-8" />
+<meta id="viewport" name="viewport" content="width=device-width" />
+<title>Showdown!</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<!-- Use explicit www host for favicons to avoid pulling from battle server host -->
+<link rel="shortcut icon" href="https://www.pokemondnd.xyz/favicon.ico" id="dynamic-favicon" />
+<link rel="icon" sizes="256x256" href="https://www.pokemondnd.xyz/favicon-256.png" />
+<link rel="stylesheet" href="./style/battle.css?v1" />
+<link rel="stylesheet" href="./style/client.css?v1" />
+<link rel="stylesheet" href="./style/sim-types.css?v1" />
+<link rel="stylesheet" href="./style/utilichart.css?v1" />
+<link rel="stylesheet" href="./style/font-awesome.css?v1" />
+<!-- Additional style bundles needed for full Teambuilder UI -->
+<link rel="stylesheet" href="./style/teambuilder.css?v1" />
+<link rel="stylesheet" href="./style/battle-search.css?v1" />
+<link rel="stylesheet" href="./style/battle-log.css?v1" />
+<!-- client2.css contains some shared layout refinements (optional but helps spacing) -->
+<link rel="stylesheet" href="./style/client2.css?v1" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="/manifest.json" />
+<!--[if lte IE 8]><script>document.location.replace('http://pokemonshowdown.com/autodownload/win');</script><![endif]-->
+
+<!-- head custom -->
+</head>
+<body>
+<style>
+/* Prevent a blank main menu from intercepting clicks/taps (mobile + desktop)
+	The container doesn't handle events; only real content inside does. */
+#mainmenu { pointer-events: none !important; }
+#mainmenu .mainmenu, #mainmenu .mainmenuwrapper, #mainmenu .panel, #mainmenu .ps-room { pointer-events: auto !important; }
+/* Hide completely if detected empty */
+#mainmenu.ps-empty { display: none !important; }
+/* Do NOT globally disable pointer events on wrappers; if you need to disable a temp placeholder, add data-ps-placeholder */
+.mainmenuwrapper[data-ps-placeholder] { pointer-events: none; }
+/* Hide loading message cleanly when hidden */
+#loading-message.hidden { display: none !important; }
+/* Force-hide friends disabled banner if text still slips through */
+[data-ps-hide-friends] { display: none !important; }
+/* Teambuilder: let clicks fall through empty parts of the filter bar to the input */
+.searchboxwrapper .dexlist-filters { pointer-events: none; }
+.searchboxwrapper .dexlist-filters * { pointer-events: auto; }
+</style>
+<div id="header" class="header">
+	<img class="logo" src="./pokemonshowdownbeta.png" srcset="./pokemonshowdownbeta@2x.png 2x" alt="Pok&eacute;mon Showdown! (beta)" width="146" height="44" /><div class="maintabbarbottom"></div>
+</div>
+<!-- Simplified mainmenu container: dynamic client will populate. -->
+<div id="mainmenu" class="ps-room scrollable">
+  <div id="loading-message" class="mainmessage">Initializing... <noscript>FAILED<br /><br />Pok&eacute;mon Showdown requires JavaScript.</noscript></div>
+</div>
+<script>
+	var LM = document.getElementById('loading-message');
+	LM.innerHTML += ' DONE<br />Loading libraries...';
+	// Failsafe + placeholder cleanup (rewritten to fix malformed earlier version)
+	(function(){
+		function dismissIfStuck(){
+			try {
+				// Legacy news embed removal if still failed
+				var newsWin = document.querySelector('.pm-window.news-embed');
+				if (newsWin) {
+					var log = newsWin.querySelector('.pm-log');
+					var failed = log && /failed to retrieve news/i.test(log.textContent || '');
+					if (failed) {
+						newsWin.remove();
+						if (localStorage.getItem('ps_debug_connect')==='1') console.warn('[PS][news-failsafe] Removed stale news embed');
+					}
+				}
+			} catch(e) {}
+			// Ensure main menu state does not force the container to catch clicks
+			var mm = document.getElementById('mainmenu');
+			if (mm) mm.style.removeProperty('pointer-events');
+		}
+		function cleanupPlaceholder(){
+			try {
+				if(!window.PS || !window.PS.rooms) return;
+				const home = window.PS.rooms[''];
+				if(!home || home.isPlaceholder) return;
+				const mm = document.getElementById('mainmenu');
+				if(!mm) return;
+				mm.querySelectorAll('.mainmenuwrapper').forEach(w => { if(!w.hasAttribute('data-ps-bound')) w.remove(); });
+				// Let CSS control pointer-events gating; don't force container to intercept
+				mm.style.removeProperty('pointer-events');
+				if(!mm.innerHTML.trim()) mm.classList.add('ps-empty'); else mm.classList.remove('ps-empty');
+			} catch(e){}
+		}
+		setTimeout(dismissIfStuck,1800);
+		setTimeout(dismissIfStuck,4000);
+		setTimeout(cleanupPlaceholder,1200);
+		setTimeout(cleanupPlaceholder,3000);
+		setTimeout(cleanupPlaceholder,6000);
+	})();
+</script>
+<script>
+// Safety net: if TeamEditor failed to load before teambuilder panels tried to render, attempt deferred load.
+(function(){
+	function ensureTeamEditor(){
+		try {
+			if (window.TeamEditor || (window.PS && window.PS.TeamEditor)) return; // already present
+			if (document.querySelector('script[data-loaded-teameditor]')) return; // already retried
+			var s = document.createElement('script');
+			s.src = './js/battle-team-editor.js?v1';
+			s.async = true;
+			s.dataset.loadedTeameditor = '1';
+			s.onload = function(){ if(localStorage.getItem('ps_debug_connect')==='1') console.debug('[PS][teambuilder] Deferred TeamEditor loaded'); };
+			s.onerror = function(){ console.warn('[PS][teambuilder] Failed to load battle-team-editor.js in safety net'); };
+			document.head.appendChild(s);
+		} catch(e) {}
+	}
+	setTimeout(ensureTeamEditor, 2500);
+	setTimeout(ensureTeamEditor, 6000);
+})();
+</script>
+<script>
+// Suppress friends list feature disabled banner
+(function(){
+	const HIDE_PAT = /friends list feature is currently disabled/i;
+	function hideWithin(root){
+		try {
+			root.querySelectorAll('*').forEach(el=>{ if(HIDE_PAT.test(el.textContent||'')) { el.style.display='none'; el.setAttribute('data-ps-hide-friends','1'); } });
+		} catch(e){}
+	}
+	// Initial sweep
+	setTimeout(()=>hideWithin(document.body), 500);
+	// A few periodic rescans in case injected late (especially after login or room change)
+	[1500, 3000, 6000, 10000].forEach(t=>setTimeout(()=>hideWithin(document.body), t));
+	const observer = new MutationObserver(muts => {
+		for(const m of muts){
+			m.addedNodes && m.addedNodes.forEach(n=>{ if(n.nodeType===1) hideWithin(n); });
+		}
+	});
+	try { observer.observe(document.body,{childList:true,subtree:true}); } catch(e) {}
+	// Disconnect after 30s to be safer for slower loads
+	setTimeout(()=>observer.disconnect(),30000);
+})();
+</script>
+<script nomodule src="./js/lib/ps-polyfill.js"></script>
+<!-- Removed legacy jQuery-era libraries to avoid 404s on custom host -->
+<script src="./config/config.js?v1"></script>
+<script>
+window.PS = window.PS || {
+	startTime: Date.now(),
+	rooms: {},
+	isOffline: true,
+	server: (window.Config && (Config.server || Config.defaultserver)) || {protocol:'https',host:location.hostname,port:443,prefix:'/showdown'},
+	update() {},
+	confirm(msg){ return Promise.resolve(false); },
+	alert(msg){ console.warn('[PS alert]', msg); },
+};
+// Crossdomain iframe enabled (PS_SKIP_CROSSDOMAIN removed)
+</script>
+<!-- Use CDN SockJS directly to avoid local 404 race (removed incorrect integrity that blocked load) -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js" crossorigin="anonymous"></script>
+<!-- jQuery is required by the battle engine/animations and tooltips code; load local vendored copy to avoid CDN/CSP issues -->
+<script src="./js/jquery-1.9.1.min.js?v1"></script>
+<script src="./js/client-core.js?v1"></script>
+<script src="./js/client-connection.js?v1"></script>
+<script>
+// Poll for connection state to update loading UI (temporary until mainmenu renders)
+(function pollConnected(){
+	try {
+		if (window.PS && window.PS.connection && window.PS.connection.connected) {
+			var lm=document.getElementById('loading-message');
+			if (lm && !/Connected\!/.test(lm.innerHTML)) lm.innerHTML='Connected! Loading lobby...';
+			return;
+		}
+	} catch(e){}
+	setTimeout(pollConnected,400);
+})();
+</script>
+<!-- Modern bundle supplies its own module system; legacy libs omitted. -->
+
+<script>
+	LM.innerHTML += ' DONE<br />Loading data...';
+</script>
+
+<script src="./js/battledata.js?v1"></script>
+<!-- Ensure battle engine and related helpers are present globally before any panels that depend on them -->
+<!-- Provide minimal PS.prefs so battle-sound can safely subscribe even before client-main initializes prefs -->
+<script>
+window.PS = window.PS || {};
+PS.prefs = PS.prefs || {
+	effectvolume: 50,
+	musicvolume: 50,
+	mute: false,
+	subscribeAndRun: function(cb){ try { cb(); } catch(e) {} }
+};
+</script>
+<!-- Sound helper used by animations (requires PS.prefs) -->
+<script src="./js/battle-sound.js?v1"></script>
+<!-- BattleScene core and other animations (defines BattleOtherAnims and runtime) -->
+<script src="./js/battle-animations.js?v1"></script>
+<!-- Move animations registry (defines global BattleMoveAnims used by BattleScene) -->
+<script src="./js/battle-animations-moves.js?v1"></script>
+<!-- Watchdog: if BattleMoveAnims didn't register (404/caching), try fallbacks dynamically -->
+<script>
+(function(){
+	function dbg(){ try { return localStorage.getItem('ps_debug_connect') === '1'; } catch(e){ return false; } }
+	function loadScript(url, next){
+		var s=document.createElement('script'); s.src=url; s.async=false; s.onload=next; s.onerror=next; document.head.appendChild(s);
+	}
+	function ensureBattleMoveAnims(){
+		try{
+			if (typeof window.BattleMoveAnims === 'object' && window.BattleMoveAnims) return;
+			var tried=[];
+			var candidates=[
+				'./js/battle-animations-moves.js?v1',
+				'./js/battle-animations-moves.js?v='+Date.now(),
+				'./js/battle-animations-moves.js',
+				'/js/battle-animations-moves.js',
+				'https://play.pokemonshowdown.com/js/battle-animations-moves.js'
+			];
+			function next(){
+				if (typeof window.BattleMoveAnims === 'object' && window.BattleMoveAnims) {
+					if (dbg()) console.debug('[PS][moves] BattleMoveAnims loaded via', tried[tried.length-1]||'initial');
+					return;
+				}
+				var u=candidates.shift();
+				if(!u){ console.warn('[PS][moves] BattleMoveAnims unavailable after fallbacks:', tried.join(', ')); return; }
+				tried.push(u); if(dbg()) console.debug('[PS][moves] trying', u); loadScript(u,function(){ setTimeout(next,0); });
+			}
+			next();
+		}catch(e){ console.warn('[PS][moves] ensureBattleMoveAnims error', e); }
+	}
+	// queue immediately after initial tag is parsed
+	setTimeout(ensureBattleMoveAnims, 0);
+})();
+</script>
+<!-- Core battle engine (defines global Battle) -->
+<script src="./js/battle.js?v1"></script>
+<!-- Tooltips and move calculators (used by panel-battle UI) -->
+<script src="./js/battle-tooltips.js?v1"></script>
+<!-- Choice builder used by chat and battle panels -->
+<script src="./js/battle-choices.js?v1"></script>
+<!-- Removed color-thief (optional feature) for minimal deployment -->
+<!-- Minimal HTML sanitizer shim (caja substitute) so BattleLog.sanitizeHTML doesn't throw. -->
+<script>
+if(!window.html4){
+	window.html4 = { ELEMENTS:{}, ATTRIBS:{}, eflags:{'OPTIONAL_ENDTAG':1,'EMPTY':2,'UNSAFE':4}, atype:{'GLOBAL':0}, ATTRIBS_GLOBAL:{} };
+	['a','b','i','u','small','br','span','div','em','strong','p','ul','ol','li','table','tbody','tr','td','th','code','pre']
+		.forEach(t=>{ html4.ELEMENTS[t]=0; });
+	['script','style','iframe'].forEach(t=>{ html4.ELEMENTS[t]=html4.eflags['UNSAFE']; });
+	window.html = window.html || {};
+	window.html.sanitizeWithPolicy = function(html, policy){
+		try {
+			html = html.replace(/<\/(script|style|iframe)>/gi,'')
+								 .replace(/<(script|style|iframe)[^>]*>[\s\S]*?<\/\1>/gi,'')
+								 .replace(/ on[a-z]+="[^"]*"/gi,'');
+		} catch(e) { return ''; }
+		return html;
+	};
+}
+</script>
+
+<script>
+	LM.innerHTML += ' DONE<br />Loading modern client bundle...';
+</script>
+
+<!-- Legacy client script block replaced by modern modular build -->
+<!-- If rollback needed, restore the commented block below -->
+<!--
+<script src="./data/commands.js?v1"></script>
+<script src="./js/client.js?v1"></script>
+<script src="./js/client-topbar.js?v1"></script>
+<script src="./js/client-mainmenu.js?v1"></script>
+<script src="./js/client-teambuilder.js?v1"></script>
+<script src="./js/client-ladder.js?v1"></script>
+<script src="./js/client-chat.js?v1"></script>
+<script src="./js/client-chat-tournament.js?v1"></script>
+<script src="./js/battle-tooltips.js?v1"></script>
+<script src="./js/client-battle.js?v1"></script>
+<script src="./js/client-rooms.js?v1"></script>
+<script src="./data/graphics.js?v1"></script>
+-->
+
+<!-- Modern entrypoint (generated from TypeScript). Depends on client-core & client-connection above. -->
+<!-- Load preact FIRST so that panel bundles which expect global `preact` don't race it -->
+<script src="https://cdn.jsdelivr.net/npm/preact@10/dist/preact.min.js" crossorigin="anonymous"></script>
+<!-- Main client entrypoint (after preact so any immediate panel evaluation has runtime) -->
+<script src="./js/client-main.js?v1" type="text/javascript" onload="(function(){try{var lm=document.getElementById('loading-message'); if(lm && !/Connected/.test(lm.innerHTML)) lm.innerHTML='Client loaded. Connecting...';}catch(e){}})();"></script>
+<!-- Dynamic panel bundle loader to guarantee sequential order and then upgrade placeholder -->
+<script>
+ (function(){
+	 const panelScripts = [
+		 'panels','panel-mainmenu','panel-rooms',
+		 // MiniEdit must load before chat entry mounts
+		 'miniedit',
+		 // Popups (user popup, options, etc.) are needed by chat/mainmenu interactions (e.g. Challenge)
+		 'panel-popups',
+		 'panel-chat','panel-chat-tournament','panel-battle',
+		 // Teambuilder deps: search backend, tooltips (BattleStatGuesser), searchresults, then team editor
+		 'battle-dex-search',
+		 'battle-searchresults',
+		 'battle-team-editor',
+		 'panel-teambuilder','panel-teambuilder-team','panel-teamdropdown','panel-ladder','panel-page',
+		 'panel-resources','panel-topbar'
+	 ];
+	 function loadNext(){
+		 if(!panelScripts.length){
+			 try {
+				 if(window.PS && window.PS.rooms && window.PS.rooms[''] && window.PS.rooms[''].isPlaceholder){
+					 if(localStorage.getItem('ps_debug_connect')==='1') console.debug('[PS][dynamic] Upgrading placeholder after panels loaded');
+					 window.PS.updateRoomTypes();
+				 }
+				 // Remove loading message once main menu is a real room
+				 const home = window.PS && window.PS.rooms && window.PS.rooms[''];
+				 if (home && !home.isPlaceholder) {
+					 const lm = document.getElementById('loading-message');
+					 if (lm) {
+						 lm.classList.add('hidden');
+						 // also clear text to avoid screen readers announcing stale status
+						 lm.textContent = '';
+						 lm.style.display = 'none';
+					 }
+					 // Ensure pointer events on main menu
+					 const mm = document.getElementById('mainmenu');
+					 if (mm) mm.style.pointerEvents = 'auto';
+				 }
+			 } catch(e){ console.warn('[PS][dynamic] upgrade failed', e); }
+			 return;
+		 }
+		 const name = panelScripts.shift();
+		 const s = document.createElement('script');
+		 s.src = './js/' + name + '.js?v1';
+		 s.onload = loadNext;
+		 s.onerror = function(){ console.error('[PS][dynamic] Failed to load panel script', name); loadNext(); };
+		 document.head.appendChild(s);
+	 }
+	 if(window.preact){ loadNext(); } else {
+		 console.warn('[PS][dynamic] preact not present before panel load; panels may fail.');
+		 loadNext();
+	 }
+	 // Early force-clear of any static wrappers before panel load begins
+	 try { const mm=document.getElementById('mainmenu'); if(mm){ mm.querySelectorAll('.mainmenuwrapper').forEach(w=>{ if(!w.hasAttribute('data-ps-bound')) w.remove(); }); mm.style.pointerEvents='auto'; } } catch(e) {}
+ })();
+ </script>
+
+<script>
+// Hard fallback: after full panel chain + 4s, if mainmenu still placeholder or empty, force updateRoomTypes
+setTimeout(function(){
+	try {
+		if(window.PS && window.PS.rooms && window.PS.rooms['']){
+			var home = window.PS.rooms[''];
+			var needsUpgrade = home.isPlaceholder || !document.querySelector('#mainmenu .ps-room') && !document.querySelector('#mainmenu .mainmenuwrapper[data-ps-bound]');
+			if(needsUpgrade && typeof window.PS.updateRoomTypes === 'function') {
+				console.warn('[PS][fallback] Forcing mainmenu upgrade');
+				window.PS.updateRoomTypes();
+			}
+			var mm=document.getElementById('mainmenu');
+			if(mm) mm.style.pointerEvents='auto';
+		}
+	} catch(e) {}
+}, 4000);
+</script>
+<script>
+(function(){
+	let attempts=0;
+	function ensureUpgraded(){
+		attempts++;
+		try {
+			const mm=document.getElementById('mainmenu'); if(mm) mm.style.pointerEvents='auto';
+			if(window.PS && window.PS.updateRoomTypes){
+				const home=window.PS.rooms && window.PS.rooms[''];
+				if(!home || home.isPlaceholder){ window.PS.updateRoomTypes(); }
+				else return;
+			}
+		} catch(e) {}
+		if(attempts<8) setTimeout(ensureUpgraded,1000);
+	}
+	setTimeout(ensureUpgraded,1500);
+})();
+</script>
+
+<script>
+// Fallback: if room types failed to register before client-main ran (rare), try upgrading placeholder.
+// Reduced fallback: dynamic loader already upgrades; keep minimal watchdog
+setTimeout(function(){
+	try {
+		if(window.PS && window.PS.rooms && window.PS.rooms[''] && window.PS.rooms[''].isPlaceholder) {
+			console.warn('[PS][watchdog] Main menu still placeholder after 3s; check panel network errors.');
+		}
+	} catch(e) {}
+}, 3000);
+</script>
+
+<script>
+// Provide a lightweight shim for old global expectations while new client initializes
+window.app = window.app || {}; // some legacy scripts or extensions may expect this
+// Debug flags can be set before load: localStorage.ps_debug_connect = '1';
+if (localStorage.getItem('ps_debug_connect') === '1') {
+  console.debug('[index] Modern client-main.js requested at', Date.now());
+}
+// Failsafe: if main bundle fails to update loading text within 5s, note it
+setTimeout(() => { try { var lm=document.getElementById('loading-message'); if(lm && /Loading modern client bundle/.test(lm.innerHTML)) lm.innerHTML += '<br/><small>(Still loading... check console for errors)</small>'; } catch(e){} }, 5000);
+</script>
+
+<!-- Retained only essential data; remove if duplicated by modern bundle after validation -->
+<script src="./data/pokedex.js?v1"></script>
+<script src="./data/moves.js?v1"></script>
+<script src="./data/items.js?v1"></script>
+<script src="./data/abilities.js?v1"></script>
+<!-- Required for DexSearch: provides BattleSearchIndex and BattleSearchIndexOffset -->
+<script src="./data/search-index.js?v1"></script>
+<script src="./data/teambuilder-tables.js?v1"></script>
+<!-- Removed: legacy dex-search/search scripts (not present on this host) -->
+<script src="./data/aliases.js?v1"></script>
+<!-- Removed battle-dex-search.js, search.js, aliases.js (legacy script files) -->
+<!--<script src="./js/clean-cookies.php" async></script>-->
+</body>
+</html>
