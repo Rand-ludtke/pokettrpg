@@ -411,7 +411,7 @@ export function App() {
         </div>
       )}
       <header className="topbar">
-          <div className="brand">&gt; POKÉMON TTRPG v1.4.8</div>
+          <div className="brand">&gt; POKÉMON TTRPG v1.4.9</div>
         <nav className="tabs">
           <button className={tab === 'pc' ? 'active' : ''} onClick={() => setTab('pc')}>PC</button>
           <button className={tab === 'team' ? 'active' : ''} onClick={() => setTab('team')}>Team</button>
