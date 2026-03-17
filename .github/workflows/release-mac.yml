@@ -14,7 +14,7 @@ jobs:
     runs-on: macos-latest
     defaults:
       run:
-        working-directory: app
+        working-directory: tauri-app
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@v4
@@ -33,43 +33,44 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: app/package-lock.json
+          cache-dependency-path: tauri-app/package-lock.json
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: tauri-app/src-tauri
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build app (Vite + TS)
-        run: npm run build
+      - name: Build macOS app (unsigned)
+        env:
+          APPLE_SIGNING_IDENTITY: '-'
+        run: npx tauri build --bundles dmg
 
-      - name: Ensure 512x512 app icon for mac
+      - name: Upload macOS artifacts to GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          mkdir -p build
-          # If we only have ICO, convert to PNG 512 using sips (will scale up if smaller)
-          if [ -f build/icon.png ]; then
-            echo "icon.png present"
-          elif [ -f build/icon.ico ]; then
-            # extract first frame via sips (mac has sips; ico may not be readable, so fallback to a generated square)
-            echo "ICO present; generating PNG"
-            /usr/bin/sips -s format png build/icon.ico --out build/icon.png || /usr/bin/sips -s format png /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarAdvanced.icns --out build/icon.png
-          else
-            # generate a placeholder if neither exists
-            echo "No icon found; generating placeholder"
-            /usr/bin/sips -s format png /System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarAdvanced.icns --out build/icon.png
+          tag="${GITHUB_REF_NAME}"
+          if [ -z "$tag" ] && [ -n "$GITHUB_REF" ]; then
+            tag="${GITHUB_REF#refs/tags/}"
           fi
-          # Resize to 512x512 minimum
-          /usr/bin/sips -Z 512 build/icon.png
-
-      - name: Build macOS artifacts (unsigned)
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder -c electron-builder.yml -m --publish always
+          [ -n "$tag" ] || { echo "Cannot determine tag"; exit 1; }
+          gh release view "$tag" 2>/dev/null || gh release create "$tag" -t "$tag" -n ""
+          for f in src-tauri/target/release/bundle/dmg/*.dmg; do
+            [ -f "$f" ] && gh release upload "$tag" "$f" --clobber
+          done
 
       - name: Upload artifacts (optional)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: mac-dist
-          path: app/release/**
+          path: tauri-app/src-tauri/target/release/bundle/dmg/**
           if-no-files-found: ignore

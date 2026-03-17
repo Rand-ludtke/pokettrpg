@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>LAN Networking: NAT loopback and quick fixes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; line-height: 1.5; }
+    code, pre { background: #f5f5f5; padding: 2px 4px; border-radius: 4px; }
+    pre { padding: 12px; overflow: auto; }
+    h1, h2 { margin-top: 1.2em; }
+    .tip { background: #eef9ff; border: 1px solid #bfe8ff; padding: 12px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Connecting from your LAN to your public server (NAT loopback)</h1>
+  <p>Some home routers do not support NAT loopback (hairpin NAT). When a device inside your network tries to reach your public domain (e.g. <code>pokettrpg.duckdns.org</code>), the connection may time out even though the server works from the internet.</p>
+
+  <h2>Quick fixes</h2>
+  <ol>
+    <li>
+      <p><strong>Windows hosts override (best for LAN dev)</strong></p>
+      <ul>
+        <li>Find your server's LAN IP (e.g. <code>192.168.1.50</code>).</li>
+        <li>Edit <code>C:\\Windows\\System32\\drivers\\etc\\hosts</code> as Administrator and add:</li>
+      </ul>
+      <pre><code>192.168.1.50  pokettrpg.duckdns.org</code></pre>
+      <ul>
+        <li>Use the same hostname with HTTPS/WSS:</li>
+        <li>API: <code>https://pokettrpg.duckdns.org/api/rooms</code></li>
+        <li>Socket: <code>wss://pokettrpg.duckdns.org</code></li>
+      </ul>
+      <p>Why it works: you keep the correct SNI/host for TLS, but route directly to the Pi on your LAN.</p>
+    </li>
+    <li>
+      <p><strong>Tunnel for development (no router changes)</strong></p>
+      <ul>
+        <li>Cloudflare quick tunnel (on the Pi):</li>
+      </ul>
+      <pre><code>cloudflared tunnel --url http://localhost:3000</code></pre>
+      <ul>
+        <li>Use the printed <code>https://…trycloudflare.com</code> URL with WSS.</li>
+        <li>Or use ngrok: <code>ngrok http 3000</code> (after installing and logging in).</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h2>Local validation</h2>
+  <ul>
+    <li>From the Pi, force SNI to the hostname while targeting localhost:</li>
+  </ul>
+  <pre><code>curl -vk --resolve pokettrpg.duckdns.org:443:127.0.0.1 https://pokettrpg.duckdns.org/api/rooms</code></pre>
+  <ul>
+    <li>From Windows after the hosts entry:</li>
+  </ul>
+  <pre><code>Test-NetConnection pokettrpg.duckdns.org -Port 443
+Invoke-WebRequest https://pokettrpg.duckdns.org/api/rooms -UseBasicParsing</code></pre>
+
+  <h2>Client notes</h2>
+  <ul>
+    <li>Use <code>wss://</code> (not <code>ws://</code>) when connecting to your public hostname.</li>
+    <li>Prefer WebSocket-only transport for best behavior.</li>
+    <li>If your router supports it, enabling "NAT loopback"/"NAT reflection" will also fix LAN access without a hosts file.</li>
+  </ul>
+
+  <div class="tip">If you still have trouble, check server logs and verify your reverse proxy (e.g. Caddy) is configured for your hostname and using a valid certificate.</div>
+</body>
+</html>

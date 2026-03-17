@@ -1,0 +1,67 @@
+import React from 'react';
+import { BattlePokemon } from '../types';
+import { SpriteWithHat, HatId } from './SpriteWithHat';
+
+export function TeamView({ team, onRemove, onMove }: {
+  team: BattlePokemon[];
+  onRemove: (name: string) => void;
+  onMove?: (from: number, to: number) => void;
+}) {
+  return (
+    <section className="panel">
+      <h2>Active Team</h2>
+      {team.length === 0 && <p>No Pokémon yet. Add from PC.</p>}
+      <ul className="team">
+        {team.map((p, idx) => {
+          const onDragStart = (e: React.DragEvent) => {
+            e.dataTransfer.setData('text/plain', String(idx));
+            e.dataTransfer.effectAllowed = 'move';
+          };
+          const onDragOver = (e: React.DragEvent) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
+          const onDrop = (e: React.DragEvent) => {
+            e.preventDefault();
+            const fromStr = e.dataTransfer.getData('text/plain');
+            const from = fromStr ? parseInt(fromStr, 10) : NaN;
+            if (onMove && Number.isFinite(from) && from !== idx) onMove(from, idx);
+          };
+          return (
+            <li key={p.name}
+                draggable={!!onMove}
+                onDragStart={onDragStart}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
+                style={{display:'grid',gridTemplateColumns:'auto 1fr auto',gap:8,alignItems:'center'}}>
+              <div style={{width:96,height:96,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <SpriteWithHat
+                  species={p.species || p.name}
+                  shiny={!!p.shiny}
+                  spriteOverride={(p as any).sprite}
+                  backSpriteOverride={(p as any).backSprite}
+                  cosmeticForm={(p as any).cosmeticForm}
+                  hatId={((p as any).hatId as HatId) || 'none'}
+                  hatYOffset={((p as any).hatYOffset as number) ?? 10}
+                  hatXOffset={((p as any).hatXOffset as number) ?? 0}
+                  fusion={(p as any).fusion}
+                  size={96}
+                />
+              </div>
+              <div>
+                <div><strong>{p.name}</strong> <span className="dim">Lv{p.level}</span></div>
+                <div className="hpbar mini"><span style={{width: `${(p.currentHp/p.maxHp)*100}%`}} /></div>
+              </div>
+              <div>
+                <div style={{display:'flex', gap:6}}>
+                  {onMove && <>
+                    <button className="secondary" onClick={()=> onMove(idx, Math.max(0, idx-1))} disabled={idx===0}>↑</button>
+                    <button className="secondary" onClick={()=> onMove(idx, Math.min(team.length-1, idx+1))} disabled={idx===team.length-1}>↓</button>
+                  </>}
+                  <button onClick={() => onRemove(p.name)}>- Remove</button>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}

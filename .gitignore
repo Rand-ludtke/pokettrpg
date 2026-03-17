@@ -1,32 +1,89 @@
-
-# Node
+## Node/Electron common ignores
 node_modules/
-app/node_modules/
-
-# Build outputs
-dist/
-app/dist/
-release/
-app/release/
-app/release-*/
-
-# Logs and caches
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-.vite/
 
-# OS/Junk
+## Editor/OS
 .DS_Store
 Thumbs.db
-
-# Env
-.env
-.env.*
-
-# Editor
 .vscode/
 .idea/
 
+## Build outputs (frontend)
+dist/
+build/
+out/
+
+## Electron build artifacts
+app/dist/
+app/out/
+app/build/
+app/win-unpacked/
+app/release/
+app/*.asar
+app/**/*.asar
+
+## Large binaries from packaging
+app/release/**/*.exe
+app/release/**/*.zip
+app/release/**/*.7z
+
+## Do not commit vendored electron binaries
+app/node_modules/
+
+## Logs
+app/*.log
+app/**/*.log
+
+## Fusion sprite packs & generated sprites (large local-only assets)
+.fusion-sprites-local/
+fusion-sprites-local/
+Full Sprite pack*/
+spliced-sprites/
+backup-fusions/
+
+## Training / AI / OneTrainer workspace data
+OneTrainer/
+training_dataset*/
+training_output/
+
+## Tauri build artifacts
+tauri-app/src-tauri/target/
+tauri-app/dist/
+tauri-app/node_modules/
+
+## Large vendored sprite/data assets (tracked separately or downloaded at build)
+tauri-app/public/vendor/
+tauri-app/public/spliced-sprites/
+
+## Backend build artifacts
+pokemonttrpg-backend/dist/
+pokemonttrpg-backend/node_modules/
+
+## Backup directories
+_backup/
+pokemonttrpg-backend-backup*/
+
+## Showdown client vendored (submodule/large)
+pokemon-showdown-client/
+
+## Workspace temp
+.tmp/
+*.pyc
+__pycache__/
+.venv/
+
+## Output / test / log dirs
+output/
+logs/
+dreamo_test_results/
+fusion_test_gallery/
+
+## Mac build artifacts
+mac-build-src*/
+
+## Misc large dirs
+more pokemon/
+code/
