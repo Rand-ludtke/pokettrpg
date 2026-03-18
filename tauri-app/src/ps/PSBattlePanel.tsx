@@ -349,7 +349,9 @@ function generatePSRequest(prompt: any, state: any, side: 'p1' | 'p2'): any {
   if (!player) return null;
   
   // Build the request object in PS format
-  const requestType = prompt.requestType || (prompt.forceSwitch ? 'switch' : (prompt.teamPreview ? 'team' : 'move'));
+  const requestType = prompt.teamPreview
+    ? 'team'
+    : (prompt.requestType || (prompt.forceSwitch ? 'switch' : 'move'));
   const request: any = {
     requestType,
     rqid: Date.now(),
@@ -1330,7 +1332,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           
           PS_DEBUG && console.log('[PSBattlePanel] Processing cached prompt with enriched data:', { sideData, prompt });
           
-          const requestType = prompt?.requestType || (prompt?.forceSwitch ? 'switch' : (prompt?.teamPreview ? 'team' : 'move'));
+          const requestType = (!teamSubmittedRef.current && !!prompt?.teamPreview)
+            ? 'team'
+            : (prompt?.requestType || (prompt?.wait ? 'wait' : (prompt?.forceSwitch ? 'switch' : 'move')));
           const effectiveTeamPreview = !!prompt?.teamPreview && requestType === 'team' && !teamSubmittedRef.current;
           const psRequest: PSBattleRequest = {
             requestType,
@@ -2256,7 +2260,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       PS_DEBUG && console.log('[PSBattlePanel] Prompt received:', data);
       
       // DIAGNOSTIC: Log prompt arrival
-      const promptType = data.prompt?.requestType || (data.prompt?.forceSwitch ? 'switch' : (data.prompt?.teamPreview ? 'team' : 'unknown'));
+      const promptType = (!teamSubmittedRef.current && !!data.prompt?.teamPreview)
+        ? 'team'
+        : (data.prompt?.requestType || (data.prompt?.forceSwitch ? 'switch' : 'unknown'));
       diagLogProtocol('promptAction', `Received prompt: type=${promptType} turn=${data.state?.turn} rqid=${data.prompt?.rqid}`);
 
       // New prompt means we should exit animation wait state
@@ -2407,7 +2413,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       PS_DEBUG && console.log('[PSBattlePanel] Built sideData with enriched stats:', sideData);
       
       // Determine requestType early for active rebuild check
-      const requestType = prompt?.requestType || (prompt?.wait ? 'wait' : (prompt?.forceSwitch ? 'switch' : (prompt?.teamPreview ? 'team' : 'move')));
+      const requestType = (!teamSubmittedRef.current && !!prompt?.teamPreview)
+        ? 'team'
+        : (prompt?.requestType || (prompt?.wait ? 'wait' : (prompt?.forceSwitch ? 'switch' : 'move')));
       const effectiveTeamPreview = !!prompt?.teamPreview && requestType === 'team' && !teamSubmittedRef.current;
       
       // FIX: Rebuild active array using correct Pokemon from protocol/state (server sometimes sends wrong or missing active)
@@ -2490,6 +2498,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           const promptActiveFlags = fixedActive?.[0] || prompt?.active?.[0] || {};
           const isTrapped = promptActiveFlags.trapped || false;
           const isMaybeTrapped = promptActiveFlags.maybeTrapped || false;
+          const canMegaEvo = promptActiveFlags.canMegaEvo ?? activePokemonFromSide?.canMegaEvo ?? statePokeForActive?.canMegaEvo;
+          const canZMove = promptActiveFlags.canZMove ?? activePokemonFromSide?.canZMove ?? statePokeForActive?.canZMove;
+          const canDynamax = promptActiveFlags.canDynamax ?? activePokemonFromSide?.canDynamax ?? statePokeForActive?.canDynamax;
+          const canTerastallize = promptActiveFlags.canTerastallize ?? promptActiveFlags.canTera ?? activePokemonFromSide?.canTerastallize ?? activePokemonFromSide?.canTera ?? statePokeForActive?.canTerastallize ?? statePokeForActive?.canTera;
           fixedActive = [{
             id: correctActiveId,
             pokemonId: correctActiveId,
@@ -2497,10 +2509,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             canSwitch: !isTrapped,
             trapped: isTrapped,
             maybeTrapped: isMaybeTrapped,
-            canMegaEvo: promptActiveFlags.canMegaEvo,
-            canZMove: promptActiveFlags.canZMove,
-            canDynamax: promptActiveFlags.canDynamax,
-            canTerastallize: promptActiveFlags.canTerastallize,
+            canMegaEvo,
+            canZMove,
+            canDynamax,
+            canTerastallize,
           }];
           PS_DEBUG && console.log('[PSBattlePanel] Rebuilt active with PP data:', fixedActive);
         }
@@ -2825,51 +2837,69 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       battle.scene.updateSidebar(battle.p2);
     }
 
-    // Ensure our team icons are fully revealed (do not override existing tooltips)
+    // Ensure team icons are fully revealed on both trainer panels
     const sidePokemon = request.side?.pokemon ?? [];
-    if (sidePokemon.length > 0 && battleFrameRef.current) {
+    const battleStatePlayers = lastBattleStateRef.current?.players ?? [];
+    const mySideId = mySideRef.current || mySide || request.side?.id;
+    let opponentTeam: any[] = [];
+    if (battleStatePlayers.length > 1) {
+      let localIndex = mySideId === 'p2' ? 1 : (mySideId === 'p1' ? 0 : -1);
+      if (localIndex < 0 && myPlayerId) {
+        localIndex = battleStatePlayers.findIndex((p: any) => p?.id === myPlayerId || p?.name === myPlayerId);
+      }
+      if (localIndex >= 0) {
+        const opponentIndex = localIndex === 0 ? 1 : 0;
+        opponentTeam = battleStatePlayers[opponentIndex]?.team || [];
+      }
+    }
+
+    if ((sidePokemon.length > 0 || opponentTeam.length > 0) && battleFrameRef.current) {
       const applyTeamIcons = () => {
-        const trainerEl = battleFrameRef.current?.querySelector('.trainer-near') as HTMLElement | null;
-        if (!trainerEl) return;
-        const iconContainers = Array.from(trainerEl.querySelectorAll('.teamicons')) as HTMLElement[];
-        const existingIcons = Array.from(trainerEl.querySelectorAll('.teamicons .picon')) as HTMLElement[];
-        const totalNeeded = sidePokemon.length;
+        const applyToTrainer = (trainerSelector: '.trainer-near' | '.trainer-far', pokemonList: any[], tooltipSideIndex: number) => {
+          const trainerEl = battleFrameRef.current?.querySelector(trainerSelector) as HTMLElement | null;
+          if (!trainerEl || !pokemonList.length) return;
+          const iconContainers = Array.from(trainerEl.querySelectorAll('.teamicons')) as HTMLElement[];
+          const existingIcons = Array.from(trainerEl.querySelectorAll('.teamicons .picon')) as HTMLElement[];
+          const totalNeeded = pokemonList.length;
 
-        // Ensure enough icon elements exist
-        if (iconContainers.length > 0 && existingIcons.length < totalNeeded) {
-          const targetContainer = iconContainers[iconContainers.length - 1];
-          for (let i = existingIcons.length; i < totalNeeded; i++) {
-            const span = document.createElement('span');
-            span.className = 'picon has-tooltip';
-            targetContainer.appendChild(span);
-            existingIcons.push(span);
+          if (iconContainers.length > 0 && existingIcons.length < totalNeeded) {
+            const targetContainer = iconContainers[iconContainers.length - 1];
+            for (let i = existingIcons.length; i < totalNeeded; i++) {
+              const span = document.createElement('span');
+              span.className = 'picon has-tooltip';
+              targetContainer.appendChild(span);
+              existingIcons.push(span);
+            }
           }
-        }
 
-        sidePokemon.forEach((poke: any, index: number) => {
-          const iconEl = existingIcons[index];
-          if (!iconEl) return;
-          const speciesForIcon = poke.speciesForme || poke.species || poke.name || poke.details?.split(',')[0];
-          const style = getPokemonIconStyle(speciesForIcon);
-          Object.assign(iconEl.style, style);
-          iconEl.classList.add('has-tooltip');
-          if (!iconEl.getAttribute('data-tooltip')) {
-            const sideIndex = mySide === 'p2' ? 0 : 1;
-            iconEl.setAttribute('data-tooltip', `pokemon|${sideIndex}|${index}`);
-          }
-          const label = poke.name || poke.ident?.split(': ')[1] || poke.details?.split(',')[0] || poke.species || 'Pokemon';
-          iconEl.setAttribute('aria-label', label);
-          const condition = typeof poke.condition === 'string' ? poke.condition : '';
-          const isFainted = !!poke.fainted || (typeof poke.hp === 'number' && poke.hp <= 0) || condition.includes('fnt');
-          iconEl.classList.toggle('fainted', isFainted);
-          iconEl.style.opacity = isFainted ? '0.3' : (style.opacity ? String(style.opacity) : '1');
-          iconEl.style.filter = isFainted ? 'grayscale(1)' : (style.filter || '');
-        });
+          pokemonList.forEach((poke: any, index: number) => {
+            const iconEl = existingIcons[index];
+            if (!iconEl) return;
+            const speciesForIcon = poke.speciesForme || poke.species || poke.name || poke.details?.split(',')[0];
+            const style = getPokemonIconStyle(speciesForIcon);
+            Object.assign(iconEl.style, style);
+            iconEl.classList.add('has-tooltip');
+            iconEl.setAttribute('data-tooltip', `pokemon|${tooltipSideIndex}|${index}`);
+            const label = poke.name || poke.nickname || poke.ident?.split(': ')[1] || poke.details?.split(',')[0] || poke.species || 'Pokemon';
+            iconEl.setAttribute('aria-label', label);
+            const condition = typeof poke.condition === 'string' ? poke.condition : '';
+            const hp = typeof poke.hp === 'number' ? poke.hp : poke.currentHP;
+            const isFainted = !!poke.fainted || (typeof hp === 'number' && hp <= 0) || condition.includes('fnt');
+            iconEl.classList.toggle('fainted', isFainted);
+            iconEl.style.opacity = isFainted ? '0.3' : (style.opacity ? String(style.opacity) : '1');
+            iconEl.style.filter = isFainted ? 'grayscale(1)' : (style.filter || '');
+          });
+        };
+
+        const localTooltipSideIndex = mySideId === 'p2' ? 0 : 1;
+        const opponentTooltipSideIndex = localTooltipSideIndex === 0 ? 1 : 0;
+        applyToTrainer('.trainer-near', sidePokemon, localTooltipSideIndex);
+        applyToTrainer('.trainer-far', opponentTeam, opponentTooltipSideIndex);
       };
 
       window.setTimeout(applyTeamIcons, 0);
     }
-  }, [request]);
+  }, [request, mySide, myPlayerId]);
 
   useEffect(() => {
     const battle = battleRef.current;
@@ -2924,7 +2954,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const parts = choiceString.split(' ');
     const actionType = parts[0];
 
-    if (actionType === 'move') {
+    const isStruggleChoice = actionType === 'move' && parts[1] === 'struggle';
+    if (actionType === 'move' && !isStruggleChoice) {
       if (moveBoosts.mega) resolvedChoice += ' mega';
       if (moveBoosts.z) resolvedChoice += ' zmove';
       if (moveBoosts.max) resolvedChoice += ' dynamax';
@@ -2952,14 +2983,20 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     // PS format: "move 1", "switch 2", "team 123456"
     const actionTypeResolved = parts[0];
     
-    let action: any;
-    let shouldWait = true;
-    switch (actionTypeResolved) {
+      let action: any;
+      let shouldWait = true;
+      switch (actionTypeResolved) {
       case 'move': {
-        const moveIndex = parseInt(parts[1], 10) - 1;
+        const isStruggle = parts[1] === 'struggle';
+        const parsedMoveIndex = parseInt(parts[1], 10);
+        const moveIndex = isStruggle ? 0 : (parsedMoveIndex - 1);
+        if (!isStruggle && (!Number.isFinite(parsedMoveIndex) || moveIndex < 0)) {
+          console.warn('[PSBattlePanel] Invalid move choice:', choiceString);
+          return;
+        }
         const activeMoves = requestRef.current?.active?.[0]?.moves || [];
         const selectedMove = activeMoves[moveIndex];
-        const moveId = selectedMove?.id || toID(selectedMove?.name || selectedMove?.move || '');
+        const moveId = isStruggle ? 'struggle' : (selectedMove?.id || toID(selectedMove?.name || selectedMove?.move || ''));
 
         action = {
           type: 'move',
@@ -3097,13 +3134,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           let action: any;
           
           if (actionType === 'move') {
-            const moveIndex = parseInt(parts[1], 10) - 1;
+            const isStruggle = parts[1] === 'struggle';
+            const moveIndex = isStruggle ? 0 : (parseInt(parts[1], 10) - 1);
             const activeMoves = requestRef.current?.active?.[0]?.moves || [];
             const selectedMove = activeMoves[moveIndex];
             action = {
               type: 'move',
               moveIndex,
-              moveId: selectedMove?.id || '',
+              moveId: isStruggle ? 'struggle' : (selectedMove?.id || ''),
               mega: lastChoice.choice.includes('mega'),
               zmove: lastChoice.choice.includes('zmove'),
               dynamax: lastChoice.choice.includes('dynamax'),
@@ -3134,9 +3172,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   
   // Render move buttons
   const renderMoveButtons = useMemo(() => {
-    if (!request?.active?.[0]?.moves) return null;
+    if (!request?.active?.[0]) return null;
     
-    const moves = request.active[0].moves;
+    const moves = Array.isArray(request.active[0].moves) ? request.active[0].moves : [];
     const activeId = request.active?.[0]?.pokemonId || request.active?.[0]?.id;
     const activePokemonIndex = request.side?.pokemon?.findIndex((p: any) =>
       p.active || (activeId && (p.pokemonId === activeId || p.id === activeId))
@@ -3145,10 +3183,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
     const activeSpeciesLabel = activePokemon?.speciesForme || activePokemon?.species || activePokemon?.name || '';
     const alreadyMega = /\bmega\b/i.test(activeSpeciesLabel);
-    const canMega = !alreadyMega && (request.active[0].canMegaEvo || (!!activePokemon?.item && /ite/i.test(activePokemon.item)));
-    const canZMove = request.active[0].canZMove;
-    const canDynamax = request.active[0].canDynamax;
-    const canTera = request.active[0].canTerastallize || request.active[0].canTera;
+    const megaAvailability = request.active[0].canMegaEvo ?? request.active[0].canMega ?? activePokemon?.canMegaEvo;
+    const canMega = !alreadyMega && (
+      (Array.isArray(megaAvailability) ? megaAvailability.length > 0 : !!megaAvailability) ||
+      (!!activePokemon?.item && /(ite|redorb|blueorb)/i.test(activePokemon.item))
+    );
+    const zMoveAvailability = request.active[0].canZMove;
+    const canZMove = Array.isArray(zMoveAvailability) ? zMoveAvailability.length > 0 : !!zMoveAvailability;
+    const canDynamax = !!request.active[0].canDynamax;
+    const canTera = !!(request.active[0].canTerastallize ?? request.active[0].canTera ?? activePokemon?.canTerastallize ?? activePokemon?.canTera);
     
     // Get the active Pokemon's index for tooltips
     const fullMoveData = activePokemon?.moves || [];
@@ -3159,13 +3202,38 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const paddedMoves = Array.from({ length: 4 }, (_, i) =>
       moves[i] || { id: `empty-${i}`, name: '—', disabled: true, isPlaceholder: true }
     );
+    const hasUsableMove = moves.some((move: any) => {
+      if (!move || move.disabled) return false;
+      const pp = move.pp;
+      if (typeof pp === 'number') return pp > 0;
+      return true;
+    });
+    const needsStruggle = moves.length === 0 || !hasUsableMove;
     
     // Disable all moves during animations (but still show them as preview)
     const animationsBlocking = waitingForAnimations;
 
     return (
       <div className="movemenu">
-        {paddedMoves.map((move: any, i: number) => {
+        {needsStruggle ? (
+          <button
+            className={`movebutton has-tooltip type-Normal${animationsBlocking ? ' disabled' : ''}`}
+            disabled={animationsBlocking}
+            onClick={() => sendChoice('move struggle')}
+            data-tooltip={`move|Struggle|${activePokemonIndex}`}
+            title={'Struggle\nType: Normal\nCategory: Physical\nPower: 50\nAccuracy: 100%\nPP: -/-'}
+            aria-disabled={animationsBlocking}
+          >
+            <span className="movename">Struggle</span>
+            <small className="pp">-/-</small>
+            <small className="moveinfo">
+              <span className="type">Normal</span>
+              <span className="category-icon physical" aria-hidden="true" />
+              <span className="power"> 50</span>
+              <span className="accuracy"> 100%</span>
+            </small>
+          </button>
+        ) : paddedMoves.map((move: any, i: number) => {
           const moveId = move.id || toID(move.name || move.move);
           const moveName = move.name || move.move || moveId;
           
@@ -3238,7 +3306,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         
         {/* Mega/Z-Move/Dynamax toggles */}
         <div className="movecontrols-extra">
-          {canMega && (
+          {!needsStruggle && canMega && (
             <label className="checkbox">
               <input
                 type="checkbox"
@@ -3248,7 +3316,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               /> Mega Evolution
             </label>
           )}
-          {canZMove && (
+          {!needsStruggle && canZMove && (
             <label className="checkbox">
               <input
                 type="checkbox"
@@ -3258,7 +3326,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               /> Z-Move
             </label>
           )}
-          {canDynamax && (
+          {!needsStruggle && canDynamax && (
             <label className="checkbox">
               <input
                 type="checkbox"
@@ -3268,7 +3336,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               /> Dynamax
             </label>
           )}
-          {canTera && (
+          {!needsStruggle && canTera && (
             <label className="checkbox">
               <input
                 type="checkbox"
@@ -3401,7 +3469,6 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const renderTeamPreview = useMemo(() => {
     if (
       !request?.teamPreview ||
-      request.requestType !== 'team' ||
       !request?.side?.pokemon ||
       request.side.pokemon.length === 0
     ) {
@@ -3573,7 +3640,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         id={`room-${roomId}`}
         role="tabpanel"
         aria-labelledby={`roomtab-${roomId}`}
-        style={{ width: '100%', right: 'auto', overflow: 'hidden', visibility: loading || error ? 'hidden' : 'visible' }}
+        style={{ width: '100%', right: 'auto', overflow: 'visible', visibility: loading || error ? 'hidden' : 'visible' }}
       >
         {/* Battle animation frame - PS will create innerbattle content via scene.reset() */}
         <div className="battle" ref={battleFrameRef} />
@@ -3698,9 +3765,6 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           </div>
         )}
 
-        <button className="battle-chat-toggle button" name="showChat" type="button">
-          <i className="fa fa-caret-left" aria-hidden="true" /> Chat
-        </button>
       </div>
     </div>
   );

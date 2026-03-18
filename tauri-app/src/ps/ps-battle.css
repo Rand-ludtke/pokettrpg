@@ -313,6 +313,7 @@ body {
   background: #EEF2F5;
   z-index: 1000;
   padding: 4px 0;
+  overflow: visible !important;
 }
 
 .ps-battle-panel .battle-controls p {
@@ -333,6 +334,7 @@ body {
   position: relative;
   z-index: 1000 !important;
   pointer-events: auto;
+  overflow: visible !important;
 }
 
 .ps-battle-panel .movemenu,
@@ -340,6 +342,7 @@ body {
   display: block;
   margin-right: -10px;
   padding-left: 4px;
+  overflow: visible !important;
 }
 
 .ps-battle-panel .movemenu::after,
@@ -359,6 +362,7 @@ body {
   font: 10pt/100% Verdana, sans-serif;
   position: relative;
   padding: 6px 4px 0 4px;
+  overflow: visible !important;
 }
 
 /* Switch buttons */
@@ -372,8 +376,16 @@ body {
   font: 9pt Verdana, sans-serif;
   padding: 5px 5px 5px 0;
   white-space: pre;
-  overflow: hidden;
+  overflow: visible !important;
   pointer-events: auto;
+}
+
+.ps-battle-panel .switchmenu .switchbutton .pokemonname {
+  display: inline-block;
+  max-width: 58px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Button chrome (gradient borders, shadows) */

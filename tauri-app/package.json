@@ -1,7 +1,7 @@
 {
   "name": "pokettrpg",
   "private": true,
-  "version": "1.4.9",
+  "version": "1.5.0",
   "type": "module",
   "scripts": {
     "sync:sage-data": "node scripts/sync-sage-data.mjs",
@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "worker:start": "powershell -ExecutionPolicy Bypass -File scripts/start-fusion-worker.ps1"
   },
   "devDependencies": {
     "@tauri-apps/api": "^2.9.1",
