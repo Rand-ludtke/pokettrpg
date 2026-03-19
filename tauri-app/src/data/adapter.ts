@@ -47,6 +47,7 @@ export type LearnsetsIndex = Record<string, { learnset?: Record<string, any> }>;
 export type AliasesIndex = Record<string, string>;
 
 let gBundledSprites: Record<string, Partial<Record<string, string>>> = {};
+let gPreferBackendSpriteIds = new Set<string>();
 
 export function normalizeName(id: string) {
   return id.replace(/[^a-z0-9]/gi, '').toLowerCase();
@@ -87,7 +88,7 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
   const fromApiBase = (() => {
     try {
       const apiBase = normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase'));
-      if (apiBase) return [`${apiBase}/sprites`];
+      if (apiBase) return [ensureSpritesPath(apiBase)];
     } catch {}
     return [] as string[];
   })();
@@ -115,12 +116,21 @@ function getStaticSpriteBase(): string {
   return normalizeBaseUrl(DEFAULT_SPRITE_BASE) || '/vendor/showdown/sprites';
 }
 
+function ensureSpritesPath(base: string): string {
+  return /\/sprites$/i.test(base) ? base : `${base}/sprites`;
+}
+
 /** API backend sprite base (Pi server). Returns null when no backend is configured. */
 function getApiSpriteBase(): string | null {
   try {
     const apiBase = normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase'));
-    return apiBase ? `${apiBase}/sprites` : null;
-  } catch { return null; }
+    if (apiBase) return ensureSpritesPath(apiBase);
+  } catch {}
+
+  const fallback = normalizeBaseUrl(DEFAULT_BACKEND_SPRITE_BASE);
+  if (!fallback) return null;
+  if (isStrictHttpsContext() && /^http:\/\//i.test(fallback)) return null;
+  return fallback;
 }
 
 /**
@@ -129,7 +139,8 @@ function getApiSpriteBase(): string | null {
  * Named IDs (including deltas) use the static vendor path.
  */
 function bestSpriteBaseForId(id: string, fallbackBase?: string): string {
-  if (/^\d/.test(id)) {
+  const normalized = normalizeName(id);
+  if (/^\d/.test(id) || gPreferBackendSpriteIds.has(normalized)) {
     const api = getApiSpriteBase();
     if (api) return api;
   }
@@ -244,8 +255,17 @@ export async function loadShowdownDex(options?: { base?: string }) {
   const wylinItems = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).items : null) || {};
   const wylinSprites = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).sprites : null) || {};
   gBundledSprites = {};
+  gPreferBackendSpriteIds = new Set<string>();
   for (const key of Object.keys(wylinSprites)) {
     gBundledSprites[normalizeName(key)] = (wylinSprites as Record<string, Partial<Record<string, string>>>)[key] || {};
+  }
+  for (const [key, entry] of Object.entries(wylinDex as Record<string, any>)) {
+    const normalizedKey = normalizeName(key);
+    if (normalizedKey) gPreferBackendSpriteIds.add(normalizedKey);
+    const entryName = normalizeName(String(entry?.name || ''));
+    if (entryName) gPreferBackendSpriteIds.add(entryName);
+    const num = Number(entry?.num);
+    if (Number.isFinite(num) && num > 0) gPreferBackendSpriteIds.add(String(Math.trunc(num)));
   }
 
   const mergedBaseDex = {
@@ -1172,9 +1192,12 @@ export function getCustomSprites(): Record<string, Partial<Record<SpriteSlot, st
 }
 export function getCustomSprite(id: string, slot: SpriteSlot): string | undefined {
   const all = getCustomSprites();
-  const local = all[id]?.[slot];
+  const normalizedId = normalizeName(id);
+  const local = all[id]?.[slot] || all[normalizedId]?.[slot];
   if (local) return local;
-  const bundled = gBundledSprites[normalizeName(id)] || gBundledSprites[id];
+  // Wylin/custom region sprites should prefer backend-hosted updates over bundled snapshots.
+  if (gPreferBackendSpriteIds.has(normalizedId) && getApiSpriteBase()) return undefined;
+  const bundled = gBundledSprites[normalizedId] || gBundledSprites[id];
   if (!bundled) return undefined;
   const bySlot = bundled[slot];
   if (bySlot) return bySlot;
@@ -1733,47 +1756,79 @@ async function requestFusionGenerateOnce(
   bodyNum: number,
   options?: { guidancePrompt?: string },
 ): Promise<{ base: string } | null> {
-  // Skip all attempts if the backend doesn't support on-demand generation.
-  if (!(await isFusionGenAvailable())) return null;
+  // Warm capability cache, but do not hard-gate generation on this endpoint.
+  // Some proxies/workers can return false here while generation still works.
+  void isFusionGenAvailable();
 
   const guidancePrompt = options?.guidancePrompt?.trim();
-  const payload: Record<string, unknown> = {
+  const basePayload: Record<string, unknown> = {
     headNum,
     bodyNum,
-    mode: 'splice',
   };
   if (guidancePrompt) {
-    payload.guidancePrompt = guidancePrompt;
-    payload.prompt = guidancePrompt;
+    basePayload.guidancePrompt = guidancePrompt;
+    basePayload.prompt = guidancePrompt;
   }
+
+  const configuredMode = normalizeName(String(safeGetLocalStorage('ttrpg.fusionGenMode') || ''));
+  const modeCandidates = Array.from(new Set(
+    [configuredMode, 'spliceai', 'ai', 'splice']
+      .filter(Boolean)
+      .map((m) => (m === 'spliceai' ? 'splice+ai' : m))
+  ));
+  const endpointCandidates = ['/fusion/generate', '/fusion/generate-base'];
+
   for (const base of getFusionApiBases()) {
-    try {
-      const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
-      const timeout = isLocal ? 2500 : 6000;
-      const res = await fetchWithTimeout(`${base}/fusion/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      }, timeout);
-      if (res.ok) return { base };
-    } catch {}
+    const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
+    const timeout = isLocal ? 12_000 : 25_000;
+    for (const endpoint of endpointCandidates) {
+      for (const mode of modeCandidates) {
+        const payload = { ...basePayload, mode };
+        try {
+          const res = await fetchWithTimeout(`${base}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }, timeout);
+          if (res.ok) return { base };
+        } catch {}
+      }
+      // Last attempt: let backend choose its default mode.
+      try {
+        const res = await fetchWithTimeout(`${base}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(basePayload),
+        }, timeout);
+        if (res.ok) return { base };
+      } catch {}
+    }
   }
   return null;
 }
 
-async function waitForFusionReady(headNum: number, bodyNum: number, base: string, maxMs = 30000): Promise<string | null> {
+async function waitForFusionReady(headNum: number, bodyNum: number, base: string, maxMs = 180000): Promise<string | null> {
   const started = Date.now();
+  const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
+  const checkTimeout = isLocal ? 4_000 : 8_000;
   while (Date.now() - started < maxMs) {
     try {
-      const res = await fetchWithTimeout(`${base}/fusion/gen-check/${headNum}/${bodyNum}`, {}, 3000);
+      const res = await fetchWithTimeout(`${base}/fusion/gen-check/${headNum}/${bodyNum}`, {}, checkTimeout);
       if (res.ok) {
         const data = await res.json() as { exists?: boolean };
         if (data?.exists) {
+          const variants = await fetchFusionVariants(headNum, bodyNum).catch(() => [] as string[]);
+          const preferred = variants[0];
+          if (preferred) {
+            if (/^https?:\/\//i.test(preferred)) return `${preferred}${preferred.includes('?') ? '&' : '?'}t=${Date.now()}`;
+            if (/^data:image\//i.test(preferred)) return preferred;
+            return `${base}/fusion/sprites/${preferred}?t=${Date.now()}`;
+          }
           return `${base}/fusion/sprites/${headNum}.${bodyNum}v1.png?t=${Date.now()}`;
         }
       }
     } catch {}
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 2000));
   }
   return null;
 }
