@@ -252,7 +252,48 @@ app.use((_req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "25mb" }));
+// NOTE: In some deployed environments (notably long-lived worker processes),
+// express.json() can stall indefinitely on non-empty JSON request bodies.
+// Use a small custom JSON parser to keep fusion POST endpoints responsive.
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+    return next();
+  }
+  const ctype = String(req.headers["content-type"] || "").toLowerCase();
+  if (!ctype.includes("application/json")) {
+    return next();
+  }
+
+  let raw = "";
+  let tooLarge = false;
+  const maxBytes = 25 * 1024 * 1024; // 25mb
+  req.setEncoding("utf8");
+  req.on("data", (chunk: string) => {
+    if (tooLarge) return;
+    raw += chunk;
+    if (Buffer.byteLength(raw, "utf8") > maxBytes) {
+      tooLarge = true;
+      res.status(413).json({ error: "request body too large" });
+      req.destroy();
+    }
+  });
+  req.on("end", () => {
+    if (tooLarge) return;
+    if (!raw.trim()) {
+      (req as any).body = {};
+      return next();
+    }
+    try {
+      (req as any).body = JSON.parse(raw);
+      return next();
+    } catch {
+      return res.status(400).json({ error: "invalid JSON body" });
+    }
+  });
+  req.on("error", () => {
+    if (!res.headersSent) res.status(400).json({ error: "invalid request body" });
+  });
+});
 
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
