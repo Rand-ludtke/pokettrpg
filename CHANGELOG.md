@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2026-03-19
+
+### Fusion Generation
+- Enforced SDXL Diffusers pipeline for on-demand fusion generation.
+- Removed splice-only behavior from worker generator path.
+- Improved img2img conditioning to favor single fused creature outputs.
+
+### Worker Reliability
+- Added startup self-check for Python fusion dependencies and compatibility.
+- Added startup guardrails for incompatible worker mode and stale build fallback.
+
+### Release
+- Aligned PWA + desktop app versions and visible UI version labels to 1.5.1.
+
 ## [1.2.5] - 2025-11-10
 
 ### UI/UX
@@ -34,3 +48,4 @@ All notable changes to this project will be documented in this file.
 - If you see stale styling, clear cache or reset user settings from the app menu.
 
 [1.2.5]: https://github.com/Rand-ludtke/pokettrpg/releases/tag/v1.2.5
+[1.5.1]: https://github.com/Rand-ludtke/pokettrpg/releases/tag/v1.5.1

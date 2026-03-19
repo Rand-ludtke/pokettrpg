@@ -53,6 +53,12 @@ if (-not (Get-Command $PythonBin -ErrorAction SilentlyContinue)) {
   throw "Python executable not found: $PythonBin"
 }
 
+# The on-demand generator is SDXL diffusers only.
+if ($Mode -ne "ai") {
+  Write-Warning "Requested mode '$Mode' is not supported by the SDXL worker; forcing mode 'ai'."
+  $Mode = "ai"
+}
+
 New-Item -ItemType Directory -Force -Path $SpritesDir | Out-Null
 $spritesRoot = Resolve-Path $SpritesDir
 $baseSpritesRoot = Resolve-Path $BaseSpritesDir
@@ -77,13 +83,74 @@ Write-Host "[Worker] Base sprites: $($env:FUSION_GEN_BASE_SPRITES)"
 Write-Host "[Worker] Scripts: $($env:FUSION_GEN_SCRIPTS)"
 Write-Host "[Worker] Fusion mode: $($env:FUSION_GEN_MODE) workers=$($env:FUSION_GEN_WORKERS)"
 
+Write-Host "[Worker] Running Python fusion environment self-check..."
+$checkCode = @'
+import sys
+issues = []
+
+try:
+  import torch
+except Exception as e:
+  issues.append(f"torch import failed: {e}")
+else:
+  print(f"python={sys.version.split()[0]} torch={torch.__version__} cuda={torch.cuda.is_available()}")
+
+try:
+  import diffusers
+except Exception as e:
+  issues.append(f"diffusers import failed: {e}")
+else:
+  print(f"diffusers={diffusers.__version__}")
+
+try:
+  import transformers
+except Exception as e:
+  issues.append(f"transformers import failed: {e}")
+else:
+  print(f"transformers={transformers.__version__}")
+  major = int(str(transformers.__version__).split('.')[0])
+  if major >= 5:
+    issues.append("transformers>=5 detected; use transformers==4.49.0 for current diffusers pipeline compatibility")
+
+try:
+  from diffusers.pipelines.auto_pipeline import AutoPipelineForImage2Image, AutoPipelineForText2Image
+  _ = (AutoPipelineForImage2Image, AutoPipelineForText2Image)
+except Exception as e:
+  issues.append(f"diffusers auto_pipeline import failed: {e}")
+
+if issues:
+  print("SELF_CHECK_ERRORS")
+  for item in issues:
+    print(item)
+  sys.exit(2)
+
+print("SELF_CHECK_OK")
+'@
+
+$checkOut = & $PythonBin -c $checkCode 2>&1
+$checkText = ($checkOut | Out-String).Trim()
+if ($checkText) { Write-Host $checkText }
+if ($LASTEXITCODE -ne 0) {
+  throw "Fusion environment self-check failed. Fix Python dependencies and retry."
+}
+Write-Host "[Worker] Self-check passed."
+
 Push-Location $backendDir
 try {
   if (-not $SkipInstall) {
     npm ci
   }
   if (-not $SkipBuild) {
-    npm run build
+    try {
+      npm run build
+    } catch {
+      $distIndex = Join-Path $backendDir "dist\server\index.js"
+      if (Test-Path $distIndex) {
+        Write-Warning "Backend build failed, but existing dist found at $distIndex. Continuing startup with existing build output."
+      } else {
+        throw
+      }
+    }
   } else {
     Write-Host "[Worker] Skipping backend build (-SkipBuild)."
   }
