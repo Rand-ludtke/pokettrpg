@@ -1,1 +1,152 @@
-{}
+{
+  "adrenaline": {
+    "name": "Adrenaline",
+    "shortDesc": "At 1/2 or less max HP, this Pokemon's Speed is 1.5x.",
+    "desc": "This Pokemon's Speed is multiplied by 1.5 while it has 1/2 or less of its maximum HP."
+  },
+  "allure": {
+    "name": "Allure",
+    "shortDesc": "On switch-in, lowers opposite-gender adjacent foes' evasiveness by 1.",
+    "desc": "On switch-in, this Pokemon lowers the evasiveness of adjacent opposing Pokemon of the opposite gender by 1 stage."
+  },
+  "braveheart": {
+    "name": "Brave Heart",
+    "shortDesc": "When a foe raises its stats, this Pokemon's Attack rises.",
+    "desc": "When an opposing Pokemon raises one of its stats, this Pokemon's Attack is raised."
+  },
+  "conditioning": {
+    "name": "Conditioning",
+    "shortDesc": "Repeated hits in succession deal progressively less damage to this Pokemon.",
+    "desc": "Successive uses of moves against this Pokemon deal reduced damage, decreasing by 25% each successive hit in the chain."
+  },
+  "content": {
+    "name": "Content",
+    "shortDesc": "Heals 1/16 max HP at end of turn if this Pokemon did not use a damaging move.",
+    "desc": "At the end of each turn in which this Pokemon did not use a Physical or Special move, it restores 1/16 of its maximum HP."
+  },
+  "conundrum": {
+    "name": "Conundrum",
+    "shortDesc": "30% chance to confuse a Pokemon that makes contact with this Pokemon.",
+    "desc": "If this Pokemon is hit by a contact move, the attacker has a 30% chance to become confused."
+  },
+  "discretion": {
+    "name": "Discretion",
+    "shortDesc": "This Pokemon does not lose PP when its move misses.",
+    "desc": "If this Pokemon's move misses, that move does not consume PP."
+  },
+  "eccentric": {
+    "name": "Eccentric",
+    "shortDesc": "Special Attack is 1.5x, but the accuracy of this Pokemon's special moves is reduced.",
+    "desc": "This Pokemon's Special Attack is multiplied by 1.5, but the accuracy of its Special moves is reduced by 20%."
+  },
+  "eventide": {
+    "name": "Eventide",
+    "shortDesc": "At night: Sp. Atk is 1.5x. During day: Defense is 1.5x.",
+    "desc": "At night, this Pokemon's Special Attack is multiplied by 1.5. During the day, its Defense is multiplied by 1.5."
+  },
+  "feedback": {
+    "name": "Feedback",
+    "shortDesc": "When hit by a non-contact move, attacker loses 1/8 max HP.",
+    "desc": "If this Pokemon is hit by a non-contact Physical or Special move, the attacker loses 1/8 of its maximum HP."
+  },
+  "feisty": {
+    "name": "Feisty",
+    "shortDesc": "Attack is 1.5x while facing a higher-level foe.",
+    "desc": "This Pokemon's Attack is multiplied by 1.5 when facing a higher-level opposing Pokemon."
+  },
+  "forage": {
+    "name": "Forage",
+    "shortDesc": "After battle, may generate a held Berry if not already holding an item.",
+    "desc": "After winning a battle, this Pokemon has a chance to generate a held Berry if it is not already holding an item."
+  },
+  "fullforce": {
+    "name": "Full Force",
+    "shortDesc": "Variable-power moves always use their maximum Base Power.",
+    "desc": "This Pokemon's moves with variable Base Power always use their highest possible Base Power."
+  },
+  "iceslick": {
+    "name": "Ice Slick",
+    "shortDesc": "In snow, this Pokemon's Speed is doubled and it is immune to weather chip.",
+    "desc": "In snow/hail-like weather, this Pokemon's Speed is doubled and it does not take weather damage."
+  },
+  "ironjaw": {
+    "name": "Iron Jaw",
+    "shortDesc": "Biting moves used by this Pokemon have 1.5x power.",
+    "desc": "This Pokemon's biting moves have their power multiplied by 1.5."
+  },
+  "malice": {
+    "name": "Malice",
+    "shortDesc": "Opponents take 1.5x secondary/indirect damage while this Pokemon is active.",
+    "desc": "Secondary and indirect damage received by opposing Pokemon is multiplied by 1.5 while this Pokemon is active."
+  },
+  "mooch": {
+    "name": "Mooch",
+    "shortDesc": "Can consume Berries held by other active Pokemon.",
+    "desc": "This Pokemon can consume held Berries from foes or allies, prioritizing foe Berries first."
+  },
+  "orbitaltide": {
+    "name": "Orbital Tide",
+    "shortDesc": "Gravity is active while this Pokemon is on the field.",
+    "desc": "While this Pokemon is active, Gravity is applied."
+  },
+  "overshadow": {
+    "name": "Overshadow",
+    "shortDesc": "Shorter opposing Pokemon have their Attack and Sp. Atk halved.",
+    "desc": "While this Pokemon is active, opposing Pokemon shorter than it have their Attack and Special Attack multiplied by 0.5."
+  },
+  "perforate": {
+    "name": "Perforate",
+    "shortDesc": "User's same-type moves ignore target immunities.",
+    "desc": "This Pokemon's same-type attacks ignore type immunities and treat those interactions as neutral effectiveness."
+  },
+  "permafrost": {
+    "name": "Permafrost",
+    "shortDesc": "In snow, this Pokemon's Defense is 1.5x and it is immune to weather chip.",
+    "desc": "In snow/hail-like weather, this Pokemon's Defense is multiplied by 1.5 and it does not take weather damage."
+  },
+  "pollution": {
+    "name": "Pollution",
+    "shortDesc": "Summons acid rain that chips non-Poison/Steel Pokemon each turn.",
+    "desc": "On switch-in, summons acid rain that damages Pokemon each turn except Poison- and Steel-types; this Pokemon is immune to that weather damage."
+  },
+  "psychout": {
+    "name": "Psych Out",
+    "shortDesc": "On switch-in, lowers adjacent foes' Sp. Atk by 1.",
+    "desc": "On switch-in, this Pokemon lowers the Special Attack of adjacent opposing Pokemon by 1 stage."
+  },
+  "reactiveshielding": {
+    "name": "Reactive Shielding",
+    "shortDesc": "When hit, raises the corresponding defense and lowers the other.",
+    "desc": "When this Pokemon is hit, it raises the defensive stat corresponding to the move category and lowers the other defensive stat."
+  },
+  "scavenger": {
+    "name": "Scavenger",
+    "shortDesc": "Restores 1/4 max HP when this Pokemon KOes a foe.",
+    "desc": "When this Pokemon knocks out an opposing Pokemon, it restores 25% of its maximum HP."
+  },
+  "siphon": {
+    "name": "Siphon",
+    "shortDesc": "Contact moves may drain HP from target.",
+    "desc": "Contact moves used by this Pokemon that do not already drain HP have a chance to restore HP equal to half the damage dealt."
+  },
+  "spectrum": {
+    "name": "Spectrum",
+    "shortDesc": "May change this Pokemon's primary type based on the target.",
+    "desc": "This Pokemon's primary type changes depending on the opposing Pokemon's color."
+  },
+  "stubborn": {
+    "name": "Stubborn",
+    "shortDesc": "At 1/2 or less max HP, this Pokemon's Defense is 1.5x.",
+    "desc": "This Pokemon's Defense is multiplied by 1.5 while it has 1/2 or less of its maximum HP."
+  },
+  "sunbathe": {
+    "name": "Sunbathe",
+    "shortDesc": "In sun, this Pokemon heals 1/16 max HP each turn.",
+    "desc": "During intense sunlight, this Pokemon restores 1/16 of its maximum HP at the end of each turn."
+  },
+  "teamplayer": {
+    "name": "Team Player",
+    "shortDesc": "In doubles, stat boosts for this side are increased by +1 stage.",
+    "desc": "In double battles, stat stage increases affecting this Pokemon or its ally are increased by an additional 1 stage."
+  }
+}

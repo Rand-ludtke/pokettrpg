@@ -17,13 +17,14 @@ import { PokedexTab } from './PokedexTab';
 import { DiceLevelingPanel } from './DiceLevelingPanel';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { RulesTab } from './RulesTab';
+import { NotesTab } from './NotesTab';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
 import { BugReporter } from './BugReporter';
 
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
-type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | { kind: 'psbattle'; id: string; title: string };
+type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | 'notes' | { kind: 'psbattle'; id: string; title: string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -411,7 +412,7 @@ export function App() {
         </div>
       )}
       <header className="topbar">
-          <div className="brand">&gt; POKÉMON TTRPG v1.4.9</div>
+          <div className="brand">&gt; POKÉMON TTRPG v1.5.0</div>
         <nav className="tabs">
           <button className={tab === 'pc' ? 'active' : ''} onClick={() => setTab('pc')}>PC</button>
           <button className={tab === 'team' ? 'active' : ''} onClick={() => setTab('team')}>Team</button>
@@ -419,6 +420,7 @@ export function App() {
           <button className={tab === 'lobby' ? 'active' : ''} onClick={() => setTab('lobby')}>Lobby</button>
           <button className={tab === 'fusion' ? 'active' : ''} onClick={() => setTab('fusion')}>Fusion</button>
           <button className={tab === 'dex' ? 'active' : ''} onClick={() => setTab('dex')}>Dex</button>
+          <button className={tab === 'notes' ? 'active' : ''} onClick={() => setTab('notes')}>Notes</button>
           <button className={tab === 'sheet' ? 'active' : ''} onClick={() => setTab('sheet')}>Character</button>
           <button className={tab === 'rules' ? 'active' : ''} onClick={() => setTab('rules')}>Rules</button>
           <button className={tab === 'badges' ? 'active' : ''} onClick={() => setTab('badges')}>Badges</button>
@@ -759,6 +761,9 @@ export function App() {
       )}
       {tab === 'dex' && (
         <PokedexTab onAddToPC={(mons) => addAcrossBoxes(mons)} />
+      )}
+      {tab === 'notes' && (
+        <NotesTab />
       )}
 
       {Object.values(mountedBattles).map(b => (
