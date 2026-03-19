@@ -6,7 +6,8 @@ param(
   [string]$PythonBin = "python",
   [ValidateSet("ai", "splice", "splice+ai")][string]$Mode = "ai",
   [int]$Workers = 2,
-  [switch]$SkipInstall
+  [switch]$SkipInstall,
+  [switch]$SkipBuild
 )
 
 $target = Join-Path $RepoRoot "tauri-app\scripts\start-fusion-worker.ps1"
@@ -16,4 +17,3 @@ if (-not (Test-Path $target)) {
 
 # Backward-compatible root scripts entry point.
 & $target @PSBoundParameters
-

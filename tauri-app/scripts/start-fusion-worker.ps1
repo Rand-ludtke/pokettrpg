@@ -6,7 +6,8 @@ param(
   [string]$PythonBin = "python",
   [ValidateSet("ai", "splice", "splice+ai")][string]$Mode = "ai",
   [int]$Workers = 2,
-  [switch]$SkipInstall
+  [switch]$SkipInstall,
+  [switch]$SkipBuild
 )
 
 $ErrorActionPreference = "Stop"
@@ -81,7 +82,11 @@ try {
   if (-not $SkipInstall) {
     npm ci
   }
-  npm run build
+  if (-not $SkipBuild) {
+    npm run build
+  } else {
+    Write-Host "[Worker] Skipping backend build (-SkipBuild)."
+  }
   npm run start:server
 } finally {
   Pop-Location
