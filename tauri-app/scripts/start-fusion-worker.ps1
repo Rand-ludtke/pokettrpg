@@ -39,6 +39,19 @@ if ([string]::IsNullOrWhiteSpace($BaseSpritesDir)) {
   }
 }
 
+# Prefer the repo venv python when available (has fusion deps like numpy/torch),
+# unless caller explicitly passed a different -PythonBin.
+if ($PythonBin -eq "python") {
+  $venvPython = Join-Path $RepoRoot ".venv\Scripts\python.exe"
+  if (Test-Path $venvPython) {
+    $PythonBin = $venvPython
+  }
+}
+
+if (-not (Get-Command $PythonBin -ErrorAction SilentlyContinue)) {
+  throw "Python executable not found: $PythonBin"
+}
+
 New-Item -ItemType Directory -Force -Path $SpritesDir | Out-Null
 $spritesRoot = Resolve-Path $SpritesDir
 $baseSpritesRoot = Resolve-Path $BaseSpritesDir
