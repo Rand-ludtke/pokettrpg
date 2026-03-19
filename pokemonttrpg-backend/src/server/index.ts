@@ -633,20 +633,10 @@ app.get("/sprites/:folder/:filename", (req: Request, res: Response) => {
 
 // Fusion sprite serving
 let fusionGenService: FusionGenService | null = null;
+let fusionRemoteProxyEnabled = false;
 const FUSION_GEN_REMOTE_BASE = (process.env.FUSION_GEN_REMOTE_BASE || "").trim().replace(/\/+$/, "");
 
 if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
-  registerFusionRoutes(app, {
-    spritesDir: FUSION_SPRITES_DIR,
-    spritesDirs: FUSION_SPRITES_EXTRA_DIRS,
-    packZipPath: FUSION_PACK_ZIP || undefined,
-    reportsDir: FUSION_REPORTS_DIR,
-  });
-  console.log(`[Fusion] Sprites directory enabled: ${FUSION_SPRITES_DIR}`);
-  if (FUSION_SPRITES_EXTRA_DIRS.length) {
-    console.log(`[Fusion] Extra sprite roots: ${FUSION_SPRITES_EXTRA_DIRS.join(", ")}`);
-  }
-
   // Fusion generation service (Pi 5 + AI HAT2)
   const FUSION_GEN_SCRIPTS = process.env.FUSION_GEN_SCRIPTS
     ? path.resolve(process.env.FUSION_GEN_SCRIPTS)
@@ -662,6 +652,22 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   const fetchFn = (globalThis as any).fetch as
     | ((input: string, init?: any) => Promise<any>)
     | undefined;
+  const remoteMode = !!FUSION_GEN_REMOTE_BASE && !!fetchFn;
+
+  if (!remoteMode) {
+    registerFusionRoutes(app, {
+      spritesDir: FUSION_SPRITES_DIR,
+      spritesDirs: FUSION_SPRITES_EXTRA_DIRS,
+      packZipPath: FUSION_PACK_ZIP || undefined,
+      reportsDir: FUSION_REPORTS_DIR,
+    });
+    console.log(`[Fusion] Sprites directory enabled: ${FUSION_SPRITES_DIR}`);
+    if (FUSION_SPRITES_EXTRA_DIRS.length) {
+      console.log(`[Fusion] Extra sprite roots: ${FUSION_SPRITES_EXTRA_DIRS.join(", ")}`);
+    }
+  } else {
+    console.log(`[Fusion] Remote worker mode; proxying fusion sprite/variant endpoints to ${FUSION_GEN_REMOTE_BASE}`);
+  }
 
   if (FUSION_GEN_REMOTE_BASE && fetchFn) {
     const workerFetch = fetchFn;
@@ -685,6 +691,43 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
       }
     }
 
+    async function proxyToFusionWorkerRaw(req: Request, res: Response, upstreamPath: string) {
+      try {
+        const upstream = await workerFetch(`${FUSION_GEN_REMOTE_BASE}${upstreamPath}`, {
+          method: req.method,
+          headers: req.method === "GET" ? undefined : { "Content-Type": "application/json" },
+          body: req.method === "GET" ? undefined : JSON.stringify(req.body ?? {}),
+        });
+        const ctype = upstream.headers.get("content-type");
+        const cdisp = upstream.headers.get("content-disposition");
+        const cache = upstream.headers.get("cache-control");
+        if (ctype) res.setHeader("Content-Type", ctype);
+        if (cdisp) res.setHeader("Content-Disposition", cdisp);
+        if (cache) res.setHeader("Cache-Control", cache);
+        const body = Buffer.from(await upstream.arrayBuffer());
+        return res.status(upstream.status).send(body);
+      } catch (err: any) {
+        return res.status(502).json({ error: err?.message || "fusion worker proxy failed" });
+      }
+    }
+
+    // In remote mode, serve generated sprites/variants from worker as source-of-truth.
+    app.get("/fusion/variants/:head/:body", (req: Request, res: Response) =>
+      proxyToFusionWorker(req, res, `/fusion/variants/${req.params.head}/${req.params.body}`)
+    );
+    app.get("/fusion/variants", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/fusion/variants"));
+    app.get("/fusion/sprites/:filename", (req: Request, res: Response) =>
+      proxyToFusionWorkerRaw(req, res, `/fusion/sprites/${encodeURIComponent(req.params.filename)}`)
+    );
+    app.get("/fusion/pack", (req: Request, res: Response) => proxyToFusionWorkerRaw(req, res, "/fusion/pack"));
+    app.post("/api/fusion/reindex", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/api/fusion/reindex"));
+    app.post("/api/fusion/upload-sprite", (req: Request, res: Response) =>
+      proxyToFusionWorker(req, res, "/api/fusion/upload-sprite")
+    );
+    app.post("/api/fusion/report-wrong-sprite", (req: Request, res: Response) =>
+      proxyToFusionWorker(req, res, "/api/fusion/report-wrong-sprite")
+    );
+
     app.post("/fusion/generate", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/fusion/generate"));
     app.post("/fusion/generate-base", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/fusion/generate-base"));
     app.post("/fusion/new-species", (req: Request, res: Response) => proxyToFusionWorker(req, res, "/fusion/new-species"));
@@ -692,6 +735,7 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
     app.get("/fusion/gen-check/:head/:body", (req: Request, res: Response) =>
       proxyToFusionWorker(req, res, `/fusion/gen-check/${req.params.head}/${req.params.body}`)
     );
+    fusionRemoteProxyEnabled = true;
     console.log(`[FusionGen] Remote worker mode enabled: ${FUSION_GEN_REMOTE_BASE}`);
   } else if (FUSION_GEN_SCRIPTS && FUSION_GEN_BASE) {
     fusionGenService = new FusionGenService({
@@ -717,7 +761,7 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
 // Always-available capability endpoint so the frontend knows whether
 // on-demand fusion generation is supported before attempting POSTs.
 app.get("/fusion/gen-available", (_req: Request, res: Response) => {
-  res.json({ available: !!fusionGenService || !!FUSION_GEN_REMOTE_BASE });
+  res.json({ available: !!fusionGenService || fusionRemoteProxyEnabled || !!FUSION_GEN_REMOTE_BASE });
 });
 
 // --- Custom Dex persistence & helpers ---
