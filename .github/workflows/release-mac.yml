@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish (e.g. v1.5.1). Leave empty to use ref name.'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -17,7 +22,7 @@ jobs:
         working-directory: tauri-app
     steps:
       - name: Checkout (full history)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           lfs: true
@@ -29,9 +34,9 @@ jobs:
         run: git lfs pull
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: tauri-app/package-lock.json
 
@@ -55,9 +60,14 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.inputs.tag }}
         run: |
           set -e
-          tag="${GITHUB_REF_NAME}"
+          tag="${RELEASE_TAG}"
+          tag="${tag//[[:space:]]/}"
+          if [ -z "$tag" ]; then
+            tag="${GITHUB_REF_NAME}"
+          fi
           if [ -z "$tag" ] && [ -n "$GITHUB_REF" ]; then
             tag="${GITHUB_REF#refs/tags/}"
           fi
@@ -69,7 +79,7 @@ jobs:
 
       - name: Upload artifacts (optional)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: mac-dist
           path: tauri-app/src-tauri/target/release/bundle/dmg/**
