@@ -1617,6 +1617,16 @@ export function nameToDexNum(name: string): number | undefined {
   return gNameToNum[normalizeName(name)];
 }
 
+function getCustomFusionSprite(headNum: number, bodyNum: number, slot: SpriteSlot): string | undefined {
+  const pair = `${Math.trunc(headNum)}.${Math.trunc(bodyNum)}`;
+  const keys = Array.from(new Set([`fusion:${pair}`, `fusion-${pair}`, pair]));
+  for (const key of keys) {
+    const custom = getCustomSprite(key, slot);
+    if (custom) return custom;
+  }
+  return undefined;
+}
+
 /**
  * Fusion sprite URL with onerror fallback chain:
  *   custom (localStorage) → fusion-sprites/ → ai-sprites/ → variants → placeholder
@@ -1625,8 +1635,7 @@ export function nameToDexNum(name: string): number | undefined {
  * relative paths (for GitHub-Pages deployment).
  */
 export function fusionSpriteUrl(headNum: number, bodyNum: number, options?: { base?: string }): string {
-  const customKey = `fusion:${headNum}.${bodyNum}`;
-  const custom = getCustomSprite(customKey, 'front');
+  const custom = getCustomFusionSprite(headNum, bodyNum, 'front');
   if (custom) return custom;
   // Try backend API bases first, then fall back to relative path
   const apiBases = getFusionApiBases();
@@ -1650,10 +1659,8 @@ export function fusionSpriteUrlWithFallback(
     `${headNum}.${bodyNum}.png`,
     ...alphaVariantFilenames,
   ];
-  const customKey = `fusion:${headNum}.${bodyNum}`;
-
   const candidates: string[] = [];
-  const custom = getCustomSprite(customKey, 'front');
+  const custom = getCustomFusionSprite(headNum, bodyNum, 'front');
   if (custom) candidates.push(custom);
 
   const apiBases = getFusionApiBases();
@@ -1751,11 +1758,42 @@ async function isFusionGenAvailable(): Promise<boolean> {
   return false;
 }
 
+async function waitForFusionWarmup(
+  base: string,
+  maxMs = 120000,
+  onStatus?: (status: 'warming' | 'ready' | 'unavailable') => void,
+): Promise<void> {
+  const started = Date.now();
+  while (Date.now() - started < maxMs) {
+    try {
+      const res = await fetchWithTimeout(`${base}/fusion/gen-available`, {}, 4000);
+      if (res.ok) {
+        const data = await res.json() as {
+          available?: boolean;
+          warmedUp?: boolean;
+          warming?: boolean;
+          warmup?: { ready?: boolean; inProgress?: boolean };
+        };
+        const ready = !!data?.warmedUp || !!data?.warmup?.ready;
+        const warming = !!data?.warming || !!data?.warmup?.inProgress;
+        if (ready) { onStatus?.('ready'); return; }
+        if (!warming) { onStatus?.('ready'); return; }
+        onStatus?.('warming');
+      } else {
+        onStatus?.('unavailable');
+      }
+    } catch {
+      onStatus?.('unavailable');
+    }
+    await new Promise(r => setTimeout(r, 2000));
+  }
+}
+
 async function requestFusionGenerateOnce(
   headNum: number,
   bodyNum: number,
-  options?: { guidancePrompt?: string },
-): Promise<{ base: string } | null> {
+  options?: { guidancePrompt?: string; onStatus?: (msg: string) => void },
+): Promise<{ base: string; jobId?: string } | null> {
   // Warm capability cache, but do not hard-gate generation on this endpoint.
   // Some proxies/workers can return false here while generation still works.
   void isFusionGenAvailable();
@@ -1770,6 +1808,7 @@ async function requestFusionGenerateOnce(
     basePayload.prompt = guidancePrompt;
   }
 
+  const onStatus = options?.onStatus;
   const configuredMode = normalizeName(String(safeGetLocalStorage('ttrpg.fusionGenMode') || ''));
   const modeCandidates = Array.from(new Set(
     [configuredMode, 'spliceai', 'ai', 'splice']
@@ -1781,6 +1820,12 @@ async function requestFusionGenerateOnce(
   for (const base of getFusionApiBases()) {
     const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
     const timeout = isLocal ? 12_000 : 25_000;
+    // If backend is actively warming diffusers, wait briefly before posting a job.
+    // This avoids jobs being queued while the first model load is still in progress.
+    await waitForFusionWarmup(base, isLocal ? 120_000 : 180_000, (ws) => {
+      if (ws === 'warming') onStatus?.('Warming up AI model… this may take a minute.');
+      else if (ws === 'ready') onStatus?.('Model ready, submitting generation request…');
+    });
     for (const endpoint of endpointCandidates) {
       for (const mode of modeCandidates) {
         const payload = { ...basePayload, mode };
@@ -1790,7 +1835,10 @@ async function requestFusionGenerateOnce(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           }, timeout);
-          if (res.ok) return { base };
+          if (res.ok) {
+            const data = await res.json().catch(() => ({} as { jobId?: unknown }));
+            return { base, jobId: typeof data?.jobId === 'string' ? data.jobId : undefined };
+          }
         } catch {}
       }
       // Last attempt: let backend choose its default mode.
@@ -1800,14 +1848,17 @@ async function requestFusionGenerateOnce(
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(basePayload),
         }, timeout);
-        if (res.ok) return { base };
+        if (res.ok) {
+          const data = await res.json().catch(() => ({} as { jobId?: unknown }));
+          return { base, jobId: typeof data?.jobId === 'string' ? data.jobId : undefined };
+        }
       } catch {}
     }
   }
   return null;
 }
 
-async function waitForFusionReady(headNum: number, bodyNum: number, base: string, maxMs = 180000): Promise<string | null> {
+async function waitForFusionReady(headNum: number, bodyNum: number, base: string, _jobId?: string, maxMs = 720000): Promise<string | null> {
   const started = Date.now();
   const isLocal = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/i.test(base);
   const checkTimeout = isLocal ? 4_000 : 8_000;
@@ -1836,7 +1887,7 @@ async function waitForFusionReady(headNum: number, bodyNum: number, base: string
 export function ensureFusionSpriteOnDemand(
   headNum: number,
   bodyNum: number,
-  options?: { guidancePrompt?: string },
+  options?: { guidancePrompt?: string; onStatus?: (msg: string) => void },
 ): Promise<string | null> {
   const promptKey = options?.guidancePrompt?.trim() || '';
   const key = `${headNum}.${bodyNum}:${promptKey}`;
@@ -1846,7 +1897,8 @@ export function ensureFusionSpriteOnDemand(
   const task = (async () => {
     const started = await requestFusionGenerateOnce(headNum, bodyNum, options);
     if (!started) return null;
-    return waitForFusionReady(headNum, bodyNum, started.base);
+    options?.onStatus?.('Generating sprite\u2026');
+    return waitForFusionReady(headNum, bodyNum, started.base, started.jobId);
   })().finally(() => {
     gFusionEnsurePromises.delete(key);
   });
@@ -1924,8 +1976,9 @@ export async function fetchFusionVariants(headNum: number, bodyNum: number): Pro
 
 /** Save a custom fusion sprite (data URL) to localStorage */
 export function saveCustomFusionSprite(headNum: number, bodyNum: number, dataUrl: string) {
-  const customKey = `fusion:${headNum}.${bodyNum}`;
-  saveCustomSprite(customKey, 'front', dataUrl);
+  const pair = `${Math.trunc(headNum)}.${Math.trunc(bodyNum)}`;
+  const keys = Array.from(new Set([`fusion:${pair}`, `fusion-${pair}`, pair]));
+  for (const key of keys) saveCustomSprite(key, 'front', dataUrl);
 }
 
 export const adapter = {

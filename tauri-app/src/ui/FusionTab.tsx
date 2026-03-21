@@ -453,6 +453,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
     try {
       const url = await ensureFusionSpriteOnDemand(hNum, bNum, {
         guidancePrompt: generationGuidance.trim() || undefined,
+        onStatus: (msg) => setGenerationStatus(msg),
       });
       if (url) {
         setChosenSprite(url);

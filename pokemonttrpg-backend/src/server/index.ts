@@ -801,8 +801,40 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
 
 // Always-available capability endpoint so the frontend knows whether
 // on-demand fusion generation is supported before attempting POSTs.
-app.get("/fusion/gen-available", (_req: Request, res: Response) => {
-  res.json({ available: !!fusionGenService || fusionRemoteProxyEnabled || !!FUSION_GEN_REMOTE_BASE });
+// In remote-proxy mode, forward the request to the worker so the
+// frontend receives accurate warmup state from the actual generator.
+app.get("/fusion/gen-available", async (_req: Request, res: Response) => {
+  const available = !!fusionGenService || fusionRemoteProxyEnabled || !!FUSION_GEN_REMOTE_BASE;
+
+  // Remote proxy mode: relay from worker for accurate warmup state.
+  if (fusionRemoteProxyEnabled && FUSION_GEN_REMOTE_BASE && (globalThis as any).fetch) {
+    try {
+      const workerRes = await (globalThis as any).fetch(
+        `${FUSION_GEN_REMOTE_BASE}/fusion/gen-available`,
+        { signal: AbortSignal.timeout(4000) },
+      );
+      if (workerRes.ok) {
+        const data = await workerRes.json();
+        return res.json({ ...data, available: true });
+      }
+    } catch {}
+    // Worker unreachable — report unavailable warmup, but available=true so
+    // the frontend still attempts generation (worker may come up soon).
+    return res.json({ available, warmedUp: false, warming: false });
+  }
+
+  // Local FusionGenService mode.
+  const localService = fusionGenService as any;
+  if (localService?.ensureWarmup) {
+    void localService.ensureWarmup("gen-available");
+  }
+  const warmup = localService?.getWarmupState ? localService.getWarmupState() : null;
+  res.json({
+    available,
+    warmup,
+    warmedUp: !!warmup?.ready,
+    warming: !!warmup?.inProgress,
+  });
 });
 
 // --- Custom Dex persistence & helpers ---
