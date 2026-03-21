@@ -1792,7 +1792,7 @@ async function waitForFusionWarmup(
 async function requestFusionGenerateOnce(
   headNum: number,
   bodyNum: number,
-  options?: { guidancePrompt?: string; onStatus?: (msg: string) => void },
+  options?: { guidancePrompt?: string; onStatus?: (msg: string) => void; regenerate?: boolean },
 ): Promise<{ base: string; jobId?: string } | null> {
   // Warm capability cache, but do not hard-gate generation on this endpoint.
   // Some proxies/workers can return false here while generation still works.
@@ -1806,6 +1806,9 @@ async function requestFusionGenerateOnce(
   if (guidancePrompt) {
     basePayload.guidancePrompt = guidancePrompt;
     basePayload.prompt = guidancePrompt;
+  }
+  if (options?.regenerate) {
+    basePayload.regenerate = true;
   }
 
   const onStatus = options?.onStatus;
@@ -1887,15 +1890,20 @@ async function waitForFusionReady(headNum: number, bodyNum: number, base: string
 export function ensureFusionSpriteOnDemand(
   headNum: number,
   bodyNum: number,
-  options?: { guidancePrompt?: string; onStatus?: (msg: string) => void },
+  options?: { guidancePrompt?: string; onStatus?: (msg: string) => void; regenerate?: boolean },
 ): Promise<string | null> {
   const promptKey = options?.guidancePrompt?.trim() || '';
-  const key = `${headNum}.${bodyNum}:${promptKey}`;
+  const regenFlag = options?.regenerate ? ':regen' : '';
+  const key = `${headNum}.${bodyNum}:${promptKey}${regenFlag}`;
   const existing = gFusionEnsurePromises.get(key);
   if (existing) return existing;
 
   const task = (async () => {
-    const started = await requestFusionGenerateOnce(headNum, bodyNum, options);
+    const started = await requestFusionGenerateOnce(headNum, bodyNum, {
+      guidancePrompt: options?.guidancePrompt,
+      onStatus: options?.onStatus,
+      regenerate: options?.regenerate,
+    });
     if (!started) return null;
     options?.onStatus?.('Generating sprite\u2026');
     return waitForFusionReady(headNum, bodyNum, started.base, started.jobId);
