@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2026-03-19
+
+### Boss Battles (2v1 / 3v1)
+- Added boss battle format support: 2v1 (Doubles) and 3v1 (Triples).
+- Boss player can field 2-3 active Pokémon with teams up to 12/18.
+- Challenger controls their side's active slots with standard team of 6.
+- Engine auto-selects PS format from player format rules (gen9doublescustomgame / gen5triplescustomgame).
+- Multi-slot move selection UI: progressive slot-by-slot choice with "Slot X of Y" indicator.
+- Multi-slot force switch support for doubles/triples.
+- Correct gametype protocol emission (doubles/triples) for PS battle renderer.
+- Boss format hint in lobby challenge UI.
+
+### Sprite Regeneration
+- Fixed on-demand fusion sprite regeneration: clicking Generate now creates a new sprite instead of showing the cached one.
+
 ## [1.5.1] - 2026-03-19
 
 ### Fusion Generation

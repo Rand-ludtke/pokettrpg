@@ -1046,6 +1046,11 @@ export function LobbyTab() {
                       <option key={opt.value} value={opt.value}>{opt.label} - {opt.desc}</option>
                     ))}
                   </select>
+                  {(playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1') && (
+                    <span style={{ fontSize: '0.75em', color: '#ffa' }}>
+                      Boss battles use {playerCountFormat === '2v1' ? 'Doubles' : 'Triples'} format. Boss should have {playerCountFormat === '2v1' ? '12' : '18'} Pokémon, challenger 6.
+                    </span>
+                  )}
                 </label>
 
                 {/* Team Size */}

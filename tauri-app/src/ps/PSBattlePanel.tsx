@@ -225,7 +225,8 @@ function generateTeamPreviewProtocol(
   PS_DEBUG && console.log('[DIAG-PROTOCOL] [generateTeamPreviewProtocol] CALLED - will generate local team preview lines');
   
   // Game setup - use gen 9 for better sprite support
-  lines.push('|gametype|singles');
+  const gameType = state?.gameType || 'singles';
+  lines.push(`|gametype|${gameType}`);
   
   // Players
   state.players.forEach((player: any, idx: number) => {
@@ -287,7 +288,8 @@ function generateBattleProtocol(
   const lines: string[] = [];
   
   // Game setup - use gen 9 for better sprite support
-  lines.push('|gametype|singles');
+  const gameType = state?.gameType || 'singles';
+  lines.push(`|gametype|${gameType}`);
   lines.push('|gen|9');
   lines.push('|tier|[Gen 9] Custom Game');
   
@@ -593,6 +595,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const lastSentChoiceRef = useRef<{ turn: number; choice: string; rqid: number | null } | null>(null);
   // Track when we've just sent an action - don't drop server responses immediately after
   const actionSentTimestampRef = useRef<number>(0);
+  // Multi-slot: accumulate sub-actions for each active slot (doubles/triples)
+  const pendingSlotChoicesRef = useRef<any[]>([]);
   
   // DIAGNOSTIC: Track protocol events for debugging turn 1 / team preview issues
   const protocolEventLogRef = useRef<Array<{ time: number; source: string; event: string; battleTurn?: number }>>([]);
@@ -2722,6 +2726,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const newChoices = new window.BattleChoiceBuilder(psRequest as any);
         setChoices(newChoices);
         setChoicesVersion(v => v + 1);
+        pendingSlotChoicesRef.current = []; // Clear pending multi-slot choices on new request
         PS_DEBUG && console.log('[PSBattlePanel] Built BattleChoiceBuilder choices');
       }
       
@@ -2970,6 +2975,81 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       waitingForOpponent,
     });
     
+    // Multi-slot handling (doubles/triples boss battles)
+    const activeSlotCount = currentRequest?.active?.length || 1;
+    const forceSwitchSlotCount = currentRequest?.forceSwitch?.length || 0;
+    const isMultiSlot = (activeSlotCount > 1 && !isForceSwitchScenario) || forceSwitchSlotCount > 1;
+    
+    if (isMultiSlot) {
+      const choiceIndex = choices?.index?.() ?? 0;
+      const mcParts = resolvedChoice.split(' ');
+      const mcActionType = mcParts[0];
+      
+      // Build sub-action for this slot
+      let subAction: any;
+      if (mcActionType === 'move') {
+        const isStruggle = mcParts[1] === 'struggle';
+        const moveIndex = isStruggle ? 0 : (parseInt(mcParts[1], 10) - 1);
+        const activeMoves = currentRequest?.active?.[choiceIndex]?.moves || [];
+        const selectedMove = activeMoves[moveIndex];
+        subAction = {
+          type: 'move',
+          moveIndex,
+          moveId: isStruggle ? 'struggle' : (selectedMove?.id || toID(selectedMove?.name || selectedMove?.move || '')),
+          mega: resolvedChoice.includes('mega'),
+          zmove: resolvedChoice.includes('zmove'),
+          dynamax: resolvedChoice.includes('dynamax'),
+          terastallize: resolvedChoice.includes('terastallize'),
+        };
+      } else if (mcActionType === 'switch') {
+        subAction = {
+          type: 'switch',
+          toIndex: parseInt(mcParts[1], 10) - 1,
+        };
+      }
+      
+      if (subAction) {
+        pendingSlotChoicesRef.current = [...pendingSlotChoicesRef.current, subAction];
+      }
+      
+      // Advance BattleChoiceBuilder
+      if (choices) {
+        choices.addChoice(resolvedChoice);
+        setChoicesVersion(v => v + 1);
+      }
+      
+      // Check if all slots are done
+      const allDone = choices?.isDone?.() || false;
+      if (allDone) {
+        const multiAction: any = isForceSwitchScenario
+          ? { type: 'switch', choices: [...pendingSlotChoicesRef.current].map((c, i) => ({ ...c, slotIndex: i })) }
+          : { type: 'multi-choice', choices: [...pendingSlotChoicesRef.current] };
+        pendingSlotChoicesRef.current = [];
+        
+        actionSentTimestampRef.current = Date.now();
+        lastActionTurnRef.current = latestPromptTurnRef.current;
+        lastRqidRef.current = latestPromptRqidRef.current;
+        lastSentChoiceRef.current = {
+          turn: latestPromptTurnRef.current,
+          choice: resolvedChoice,
+          rqid: latestPromptRqidRef.current ?? null,
+        };
+        
+        diagLogProtocol('handleChoice', `Sending multi-choice action with ${multiAction.choices.length} slot choices`);
+        client.sendAction(roomId, multiAction, myPlayerId);
+        
+        lastMoveRequestRef.current = currentRequest;
+        lastMoveChoicesRef.current = choices;
+        waitStartTimeRef.current = Date.now();
+        setWaitingForOpponent(true);
+      } else {
+        PS_DEBUG && console.log(`[PSBattlePanel] Multi-slot: chose for slot ${choiceIndex}, waiting for more (${pendingSlotChoicesRef.current.length}/${activeSlotCount})`);
+      }
+      
+      setMoveBoosts({ mega: false, z: false, max: false, tera: false });
+      return;
+    }
+    
     // Track when we sent this action - prevents dropping server's response as "duplicate"
     actionSentTimestampRef.current = Date.now();
     
@@ -3088,6 +3168,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     }
     lastSentChoiceRef.current = null;
     lastActionTurnRef.current = 0;
+    pendingSlotChoicesRef.current = []; // Clear multi-slot pending choices
     
     // Notify server to clear our buffered action so the turn doesn't process
     if (client && roomId && myPlayerId) {
@@ -3172,10 +3253,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   
   // Render move buttons
   const renderMoveButtons = useMemo(() => {
-    if (!request?.active?.[0]) return null;
+    // For multi-slot (doubles/triples), show moves for the current choice index
+    const choiceIndex = choices?.index?.() ?? 0;
+    if (!request?.active?.[choiceIndex]) return null;
     
-    const moves = Array.isArray(request.active[0].moves) ? request.active[0].moves : [];
-    const activeId = request.active?.[0]?.pokemonId || request.active?.[0]?.id;
+    const moves = Array.isArray(request.active[choiceIndex].moves) ? request.active[choiceIndex].moves : [];
+    const activeId = request.active?.[choiceIndex]?.pokemonId || request.active?.[choiceIndex]?.id;
     const activePokemonIndex = request.side?.pokemon?.findIndex((p: any) =>
       p.active || (activeId && (p.pokemonId === activeId || p.id === activeId))
     ) ?? 0;
@@ -3183,15 +3266,19 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
     const activeSpeciesLabel = activePokemon?.speciesForme || activePokemon?.species || activePokemon?.name || '';
     const alreadyMega = /\bmega\b/i.test(activeSpeciesLabel);
-    const megaAvailability = request.active[0].canMegaEvo ?? request.active[0].canMega ?? activePokemon?.canMegaEvo;
+    const megaAvailability = request.active[choiceIndex].canMegaEvo ?? request.active[choiceIndex].canMega ?? activePokemon?.canMegaEvo;
     const canMega = !alreadyMega && (
       (Array.isArray(megaAvailability) ? megaAvailability.length > 0 : !!megaAvailability) ||
       (!!activePokemon?.item && /(ite|redorb|blueorb)/i.test(activePokemon.item))
     );
-    const zMoveAvailability = request.active[0].canZMove;
+    const zMoveAvailability = request.active[choiceIndex].canZMove;
     const canZMove = Array.isArray(zMoveAvailability) ? zMoveAvailability.length > 0 : !!zMoveAvailability;
-    const canDynamax = !!request.active[0].canDynamax;
-    const canTera = !!(request.active[0].canTerastallize ?? request.active[0].canTera ?? activePokemon?.canTerastallize ?? activePokemon?.canTera);
+    const canDynamax = !!request.active[choiceIndex].canDynamax;
+    const canTera = !!(request.active[choiceIndex].canTerastallize ?? request.active[choiceIndex].canTera ?? activePokemon?.canTerastallize ?? activePokemon?.canTera);
+    
+    // Multi-slot indicator
+    const totalSlots = request.active?.length || 1;
+    const isMultiSlot = totalSlots > 1;
     
     // Get the active Pokemon's index for tooltips
     const fullMoveData = activePokemon?.moves || [];
@@ -3215,6 +3302,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
     return (
       <div className="movemenu">
+        {isMultiSlot && (
+          <div style={{ textAlign: 'center', padding: '2px 0', fontSize: '11px', color: '#ffa', fontWeight: 'bold' }}>
+            Slot {choiceIndex + 1} of {totalSlots}
+            {activePokemon ? ` — ${activePokemon.speciesForme || activePokemon.species || activePokemon.name || ''}` : ''}
+          </div>
+        )}
         {needsStruggle ? (
           <button
             className={`movebutton has-tooltip type-Normal${animationsBlocking ? ' disabled' : ''}`}
@@ -3349,7 +3442,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         </div>
       </div>
     );
-  }, [request, sendChoice, moveBoosts, waitingForAnimations]);
+  }, [request, sendChoice, moveBoosts, waitingForAnimations, choices, choicesVersion]);
   
   // Render switch buttons
   const renderSwitchButtons = useMemo(() => {

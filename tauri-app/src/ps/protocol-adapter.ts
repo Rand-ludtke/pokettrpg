@@ -96,8 +96,9 @@ function pokemonIdent(side: string, poke: ServerPokemon, slot = 'a'): string {
 export function stateToProtocol(state: ServerBattleState): string[] {
   const lines: string[] = [];
   
-  // Game type
-  lines.push('|gametype|singles');
+  // Game type - use state.gameType if available (doubles/triples for boss battles)
+  const gameType = (state as any).gameType || 'singles';
+  lines.push(`|gametype|${gameType}`);
   
   // Gen (assume Gen 9)
   lines.push('|gen|9');

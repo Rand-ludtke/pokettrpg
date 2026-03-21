@@ -1330,7 +1330,8 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
   // Use Pokemon Showdown engine or custom engine based on configuration
   if (USE_PS_ENGINE) {
     console.log(`[Server] Using Pokemon Showdown battle engine with rules:`, JSON.stringify(rules));
-    room.engine = new SyncPSEngine({ format: "gen9customgame", seed: battleSeed, rules });
+    // Engine selects format from rules.playerFormat (2v1=doubles, 3v1=triples, else singles)
+    room.engine = new SyncPSEngine({ seed: battleSeed, rules });
   } else {
     console.log(`[Server] Using custom battle engine`);
     room.engine = new Engine({ seed: battleSeed });
@@ -1353,6 +1354,10 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
     seed: battleSeed,
     startConditions: rules?.startConditions,
   });
+  // Attach gametype to state for client protocol rendering
+  if (room.engine instanceof SyncPSEngine) {
+    (state as any).gameType = (room.engine as any).getGameType();
+  }
   // Ensure clients treat this as turn 1 when prompting (no pre-start move UI)
   if (typeof state.turn === "number" && state.turn < 1) {
     state.turn = 1;
@@ -1409,18 +1414,25 @@ function buildInitialBattleProtocol(state: BattleState): string[] {
   lines.push("|start");
   state.players.forEach((player: any, idx: number) => {
     const side = `p${idx + 1}`;
-    const activeIndex = player.activeIndex || 0;
-    const activePoke = player.team?.[activeIndex];
-    if (!activePoke) return;
-    const nickname = activePoke.nickname || activePoke.name;
-    const species = activePoke.species || activePoke.name;
-    const level = activePoke.level || 100;
-    const gender = activePoke.gender === "M" ? ", M" : (activePoke.gender === "F" ? ", F" : "");
-    const shiny = (activePoke as any).shiny ? ", shiny" : "";
-    const hp = activePoke.currentHP ?? activePoke.maxHP ?? 100;
-    const maxHP = activePoke.maxHP ?? 100;
-    const details = `${species}, L${level}${gender}${shiny}`;
-    lines.push(`|switch|${side}a: ${nickname}|${details}|${hp}/${maxHP}`);
+    const slotLetters = ['a', 'b', 'c', 'd', 'e', 'f'];
+    // Handle multi-active (doubles/triples)
+    const activeIndices: number[] = player.activeIndices || [player.activeIndex || 0];
+    for (let slotIdx = 0; slotIdx < activeIndices.length; slotIdx++) {
+      const ai = activeIndices[slotIdx];
+      if (ai < 0) continue;
+      const activePoke = player.team?.[ai];
+      if (!activePoke) continue;
+      const nickname = activePoke.nickname || activePoke.name;
+      const species = activePoke.species || activePoke.name;
+      const level = activePoke.level || 100;
+      const gender = activePoke.gender === "M" ? ", M" : (activePoke.gender === "F" ? ", F" : "");
+      const shiny = (activePoke as any).shiny ? ", shiny" : "";
+      const hp = activePoke.currentHP ?? activePoke.maxHP ?? 100;
+      const maxHP = activePoke.maxHP ?? 100;
+      const details = `${species}, L${level}${gender}${shiny}`;
+      const slot = slotLetters[slotIdx] || 'a';
+      lines.push(`|switch|${side}${slot}: ${nickname}|${details}|${hp}/${maxHP}`);
+    }
   });
   const turn = state.turn || 1;
   lines.push(`|turn|${turn}`);
@@ -1974,8 +1986,8 @@ function processTurnWithBuffer(room: Room) {
   room.turnBuffer = {};
   clearTurnTimer(room);
   
-  // Filter to only battle actions (move/switch)
-  const battleActions = actions.filter((a): a is import("../types").BattleAction => a.type === "move" || a.type === "switch");
+  // Filter to only battle actions (move/switch/multi-choice)
+  const battleActions = actions.filter((a): a is import("../types").BattleAction => a.type === "move" || a.type === "switch" || a.type === "multi-choice");
   console.log('[Server] Processing turn with actions:', JSON.stringify(battleActions.map(a => ({ type: a.type, pokemonId: a.pokemonId, ...(a.type === 'move' ? { moveId: (a as any).moveId, targetPokemonId: (a as any).targetPokemonId } : {}) }))));
   let result: TurnResult = room.engine.processTurn(battleActions);
 
@@ -2220,7 +2232,7 @@ io.on("connection", (socket: Socket) => {
     
     const battleSeed = Number.isFinite(data.seed as number) ? (data.seed as number) : undefined;
     if (USE_PS_ENGINE) {
-      room.engine = new SyncPSEngine({ format: "gen9customgame", seed: battleSeed, rules: data.rules });
+      room.engine = new SyncPSEngine({ seed: battleSeed, rules: data.rules });
     } else {
       room.engine = new Engine({ seed: battleSeed });
     }
@@ -2357,8 +2369,9 @@ io.on("connection", (socket: Socket) => {
           return socket.emit("error", { error: "cannot switch to the same Pokemon" });
         }
       }
-      // Perform immediate forced switch via engine
-      let res = room.engine.forceSwitch(data.playerId, (data.action as any).toIndex);
+      // Perform immediate forced switch via engine (supports multi-slot choices array)
+      const switchChoices = (data.action as any).choices;
+      let res = room.engine.forceSwitch(data.playerId, (data.action as any).toIndex, Array.isArray(switchChoices) ? switchChoices : undefined);
       // Deduplicate switch lines (PS sends private + public copies)
       if (Array.isArray(res.events)) {
         res = { ...res, events: deduplicateSwitchLines(res.events) };
@@ -2448,6 +2461,27 @@ io.on("connection", (socket: Socket) => {
           toIndex: targetIndex,
         } as SwitchAction;
         console.log(`[Server] Processed switch action to index ${targetIndex}`);
+      }
+    }
+    
+    // Handle multi-choice actions (doubles/triples - one choice per active slot)
+    if (data.action.type === "multi-choice") {
+      const mcChoices = (data.action as any).choices;
+      if (Array.isArray(mcChoices)) {
+        processedAction = {
+          type: "multi-choice",
+          actorPlayerId: data.playerId,
+          choices: mcChoices.map((c: any) => {
+            if (c.type === "move") {
+              return { type: "move", moveId: c.moveId, moveIndex: c.moveIndex, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
+            }
+            if (c.type === "switch") {
+              return { type: "switch", toIndex: c.toIndex ?? c.switchTo };
+            }
+            return { type: "move", moveId: "default" };
+          }),
+        } as any;
+        console.log(`[Server] Processed multi-choice action with ${mcChoices.length} choices`);
       }
     }
     
