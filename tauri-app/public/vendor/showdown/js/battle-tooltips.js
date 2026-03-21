@@ -823,6 +823,7 @@ showPokemonTooltip=function showPokemonTooltip(
 clientPokemon,serverPokemon,isActive,illusionIndex)
 {var _this3=this;
 var pokemon=clientPokemon||serverPokemon;
+if(!pokemon)return'<p class="message-error">Pokemon data not available yet.</p>';
 var text='';
 var genderBuf='';
 var gender=pokemon.gender;

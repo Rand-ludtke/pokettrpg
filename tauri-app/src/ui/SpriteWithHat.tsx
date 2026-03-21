@@ -4,7 +4,7 @@
  * The hat is positioned relative to the sprite and can be offset for fine-tuning.
  */
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
-import { spriteUrl, spriteUrlWithFallback, placeholderSpriteDataURL, getFusionApiBases } from '../data/adapter';
+import { spriteUrl, spriteUrlWithFallback, placeholderSpriteDataURL, getFusionApiBases, getCustomSprites, type SpriteSlot } from '../data/adapter';
 import '../styles/sprite-with-hat.css';
 
 // Available hat options with their overlay images
@@ -41,6 +41,33 @@ export type HatId = typeof AVAILABLE_HATS[number]['id'];
  * - 'auto': Automatically select best available option
  */
 export type SpriteMode = 'ai-generated' | 'two-step' | 'auto';
+
+function getCustomFusionSprite(headId: number, bodyId: number, shiny: boolean, back: boolean): string | undefined {
+  const pair = `${Math.trunc(headId)}.${Math.trunc(bodyId)}`;
+  const keys = Array.from(new Set([`fusion:${pair}`, `fusion-${pair}`, pair]));
+  const all = getCustomSprites();
+  const frontSlots: SpriteSlot[] = shiny
+    ? ['shiny', 'gen5-shiny', 'home-shiny', 'ani-shiny', 'front', 'gen5', 'home', 'ani']
+    : ['front', 'gen5', 'home', 'ani'];
+  const backSlots: SpriteSlot[] = shiny
+    ? [
+        'back-shiny', 'gen5-back-shiny', 'home-back-shiny', 'ani-back-shiny',
+        'shiny', 'gen5-shiny', 'home-shiny', 'ani-shiny',
+        'back', 'gen5-back', 'home-back', 'ani-back',
+        'front', 'gen5', 'home', 'ani',
+      ]
+    : ['back', 'gen5-back', 'home-back', 'ani-back', 'front', 'gen5', 'home', 'ani'];
+  const slots = back ? backSlots : frontSlots;
+  for (const key of keys) {
+    const entry = all[key];
+    if (!entry) continue;
+    for (const slot of slots) {
+      const url = entry[slot];
+      if (url) return url;
+    }
+  }
+  return undefined;
+}
 
 interface SpriteWithHatProps {
   species: string;
@@ -734,11 +761,16 @@ export function SpriteWithHat({
   const [isZoomed, setIsZoomed] = useState(false);
   const [currentMode, setCurrentMode] = useState<SpriteMode>(spriteMode);
   const [fusionCandidateIndex, setFusionCandidateIndex] = useState(0);
+  const customFusionSprite = useMemo(() => {
+    if (!fusion) return undefined;
+    return getCustomFusionSprite(fusion.headId, fusion.bodyId, shiny, back);
+  }, [fusion, shiny, back]);
   
   // Determine sprite URL based on mode - fusion sprites take priority
   const getFusionUrl = useCallback((mode: SpriteMode = currentMode) => {
     if (!fusion) return null;
     const { headId, bodyId, spriteFile } = fusion;
+    if (customFusionSprite) return customFusionSprite;
 
     // Normalize spriteFile: if it's a bare variant key (e.g. 'a', 'b', 'default'),
     // expand it to a proper filename using headId.bodyId
@@ -799,7 +831,7 @@ export function SpriteWithHat({
     }
 
     return `${fusionSpriteBase}/${files[0] || `${headId}.${bodyId}.png`}`;
-  }, [fusion, fusionSpriteBase, aiSpritesBase, splicedSpritesBase, currentMode]);
+  }, [fusion, fusionSpriteBase, aiSpritesBase, splicedSpritesBase, currentMode, customFusionSprite]);
 
   const getFusionCandidates = useCallback(() => {
     if (!fusion) return [] as string[];
@@ -837,6 +869,8 @@ export function SpriteWithHat({
       if (value && !out.includes(value)) out.push(value);
     };
 
+    if (customFusionSprite) push(customFusionSprite);
+
     // Direct absolute/data file first if present
     if (fusion.spriteFile && (/^https?:\/\//i.test(fusion.spriteFile) || /^data:image\//i.test(fusion.spriteFile) || fusion.spriteFile.startsWith('/'))) {
       push(fusion.spriteFile);
@@ -858,7 +892,7 @@ export function SpriteWithHat({
     }
 
     return out;
-  }, [fusion, fusionSpriteBase, aiSpritesBase, splicedSpritesBase]);
+  }, [fusion, fusionSpriteBase, aiSpritesBase, splicedSpritesBase, customFusionSprite]);
 
   const getRegularUrl = useCallback((preferBack: boolean) => {
     if (preferBack && backSpriteOverride) return backSpriteOverride;

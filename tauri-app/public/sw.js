@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pokettrpg-pwa-v5';
+const CACHE_NAME = 'pokettrpg-pwa-v6';
 const scope = self?.registration?.scope || '/';
 const base = scope.endsWith('/') ? scope : `${scope}/`;
 const CORE_ASSETS = [
@@ -41,8 +41,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Never cache fusion/API endpoints — gen-check, generate, sprites must always hit the server
+  const url = new URL(event.request.url);
+  if (url.pathname.includes('/fusion/') || url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(event.request).catch(() => new Response('Offline', { status: 503 })));
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request)
         .then(response => {

@@ -115,7 +115,8 @@ export function stateToProtocol(state: ServerBattleState): string[] {
   // Players
   state.players.forEach((player, idx) => {
     const side = `p${idx + 1}`;
-    lines.push(`|player|${side}|${player.name || player.id}|1|`);
+    const avatar = (player as any).trainerSprite || (player as any).avatar || 'acetrainer';
+    lines.push(`|player|${side}|${player.name || player.id}|${avatar}|`);
   });
   
   // Team sizes

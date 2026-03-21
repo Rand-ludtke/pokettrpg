@@ -1271,26 +1271,17 @@ function beginBattle(room, players, seed, rules) {
         io.to(room.id).emit("battleStarted", { roomId: room.id, state });
         // Emit initial protocol events (|start|, |switch|, |turn|1) before prompting for moves
         // This prevents a pre-start move prompt from showing before the battle is visually started.
-        // ONLY do this if the engine hasn't already generated start events (SyncPSEngine now does)
+        // Always emit initial protocol so the client's PS Battle receives all setup lines
+        room.startProtocolSent = true;
         const hasStart = Array.isArray(state.log) && state.log.some((l) => l.startsWith("|start"));
-        if (hasStart)
-            room.startProtocolSent = true;
-        if (!hasStart) {
-            const initialEvents = buildInitialBattleProtocol(state);
-            if (initialEvents.length > 0) {
-                // Append to state.log so SyncPSEngine won't re-send these lines later
-                if (Array.isArray(state.log)) {
-                    for (const line of initialEvents) {
-                        if (!state.log.includes(line))
-                            state.log.push(line);
-                    }
-                }
-                room.startProtocolSent = true;
-                io.to(room.id).emit("battleUpdate", {
-                    result: { state, events: initialEvents, anim: [] },
-                    needsSwitch: Array.from(room.forceSwitchNeeded ?? []),
-                });
-            }
+        const initialEvents = hasStart
+            ? (state.log || []).filter((l) => typeof l === 'string' && l.startsWith('|'))
+            : buildInitialBattleProtocol(state);
+        if (initialEvents.length > 0) {
+            io.to(room.id).emit("battleUpdate", {
+                result: { state, events: initialEvents, anim: [] },
+                needsSwitch: Array.from(room.forceSwitchNeeded ?? []),
+            });
         }
         // Emit move prompts to each player so they can choose their first action
         emitMovePrompts(room, state);
@@ -1313,6 +1304,23 @@ function buildInitialBattleProtocol(state) {
     if (!state?.players?.length)
         return [];
     const lines = [];
+    // Game type
+    const gameType = state.gameType || 'singles';
+    lines.push(`|gametype|${gameType}`);
+    lines.push('|gen|9');
+    lines.push('|tier|[Gen 9] Custom Game');
+    // Player info (name + avatar)
+    state.players.forEach((player, idx) => {
+        const side = `p${idx + 1}`;
+        const name = player.name || player.id;
+        const avatar = player.trainerSprite || player.avatar || 'acetrainer';
+        lines.push(`|player|${side}|${name}|${avatar}|`);
+    });
+    // Team sizes
+    state.players.forEach((player, idx) => {
+        const side = `p${idx + 1}`;
+        lines.push(`|teamsize|${side}|${player.team?.length || 6}`);
+    });
     lines.push("|start");
     state.players.forEach((player, idx) => {
         const side = `p${idx + 1}`;
@@ -1840,6 +1848,7 @@ function clearTurnTimer(room) {
 function processTurnWithBuffer(room) {
     if (!room.engine)
         return;
+    try {
     const state = room.engine.getState();
     const actions = Object.values(room.turnBuffer);
     room.turnBuffer = {};
@@ -1923,6 +1932,15 @@ function processTurnWithBuffer(room) {
     else if (needsSwitch.length === 0) {
         // Emit new move prompts for the next turn
         emitMovePrompts(room, result.state);
+    }
+    } catch (err) {
+        console.error(`[Server] processTurnWithBuffer error for room ${room.id}:`, err?.stack || err);
+        if (room.engine) {
+            try {
+                const freshState = room.engine.getState();
+                emitMovePrompts(room, freshState);
+            } catch {}
+        }
     }
 }
 io.on("connection", (socket) => {
@@ -2120,25 +2138,17 @@ io.on("connection", (socket) => {
         room.forceSwitchNeeded = new Set();
         console.log(`[Server] Emitting battleStarted for room ${room.id} (startBattle socket)`);
         io.to(room.id).emit("battleStarted", { roomId: room.id, state });
-        // Only verify/inject start events if the engine hasn't already done so
+        // Always emit initial protocol so the client's PS Battle receives all setup lines
+        room.startProtocolSent = true;
         const hasStart = Array.isArray(state.log) && state.log.some((l) => l.startsWith("|start"));
-        if (hasStart)
-            room.startProtocolSent = true;
-        if (!hasStart) {
-            const initialEvents = buildInitialBattleProtocol(state);
-            if (initialEvents.length > 0) {
-                if (Array.isArray(state.log)) {
-                    for (const line of initialEvents) {
-                        if (!state.log.includes(line))
-                            state.log.push(line);
-                    }
-                }
-                room.startProtocolSent = true;
-                io.to(room.id).emit("battleUpdate", {
-                    result: { state, events: initialEvents, anim: [] },
-                    needsSwitch: Array.from(room.forceSwitchNeeded ?? []),
-                });
-            }
+        const initialEvents = hasStart
+            ? (state.log || []).filter((l) => typeof l === 'string' && l.startsWith('|'))
+            : buildInitialBattleProtocol(state);
+        if (initialEvents.length > 0) {
+            io.to(room.id).emit("battleUpdate", {
+                result: { state, events: initialEvents, anim: [] },
+                needsSwitch: Array.from(room.forceSwitchNeeded ?? []),
+            });
         }
         emitMovePrompts(room, state);
     });

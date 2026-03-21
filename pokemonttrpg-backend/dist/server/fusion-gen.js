@@ -84,9 +84,18 @@ class FusionGenService extends events_1.EventEmitter {
         void this.ensureWarmup("on-demand");
         const outputPath = this.spriteOutputPath(headNum, bodyNum);
         // If regenerate requested, remove existing sprite so a fresh one is generated
-        if (options?.regenerate && fs_1.default.existsSync(outputPath)) {
-            try { fs_1.default.unlinkSync(outputPath); } catch {}
-            console.log(`[FusionGen] Regenerate: removed existing ${outputPath}`);
+        if (options?.regenerate) {
+            if (fs_1.default.existsSync(outputPath)) {
+                try { fs_1.default.unlinkSync(outputPath); } catch {}
+                console.log(`[FusionGen] Regenerate: removed existing ${outputPath}`);
+            }
+            // Also remove variant files
+            for (const v of ["a", "b", "c"]) {
+                const vPath = path_1.default.join(this.config.spritesDir, `${headNum}.${bodyNum}${v}.png`);
+                if (fs_1.default.existsSync(vPath)) {
+                    try { fs_1.default.unlinkSync(vPath); } catch {}
+                }
+            }
         }
         // If it already exists, return immediately
         if (fs_1.default.existsSync(outputPath)) {
