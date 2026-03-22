@@ -113,6 +113,8 @@ export default defineConfig(({ mode }) => {
             }
             writeSpriteIndex(path.resolve(__dirname, 'dist', 'vendor', 'showdown', 'sprites'));
           }
+          // Generate index.json for custom/regional sprites (Wylin, Sage, etc.)
+          writeSpriteIndex(path.resolve(__dirname, 'dist', 'sprites'));
           // Generate trainer sprite manifest for static builds (can't list directories)
           try {
             const publicTrainersDir = path.resolve(__dirname, 'public', 'vendor', 'showdown', 'sprites', 'trainers');

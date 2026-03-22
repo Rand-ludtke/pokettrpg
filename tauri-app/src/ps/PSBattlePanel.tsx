@@ -584,6 +584,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const autoFirstTurnRef = useRef(false); // Auto-select first turn move
   const pendingMovePromptRef = useRef<PSBattleRequest | null>(null); // Hold move prompt until |start|
   const pendingTeamPreviewLinesRef = useRef<string[]>([]); // Hold team preview protocol until battle is ready
+  const deferredPostStartLinesRef = useRef<string[]>([]); // Hold post-|start| lines until team order is submitted
   const latestPromptTurnRef = useRef<number>(0);
   const latestPromptRqidRef = useRef<number | null>(null);
   const teamSubmittedRef = useRef(false);
@@ -1136,6 +1137,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 result.w = 96;
                 result.h = 96;
                 result.pixelated = true;
+                // If we used a front sprite as the back sprite fallback,
+                // PS will need to know it's not a real back sprite
+                if (!isFront) result.isCustomFront = true;
               }
             } catch { /* ignore lookup errors */ }
             return result;
@@ -1473,6 +1477,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       teamPreviewFedRef.current = false;
       battleStartedRef.current = false;
       startEventReceivedRef.current = false;
+      deferredPostStartLinesRef.current = [];
       if (teamSubmittedRef.current) {
         teamSubmittedRef.current = false;
       }
@@ -1890,11 +1895,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         startEventReceivedBefore: startEventReceivedRef.current,
       });
       if (hasStartEvent) {
-        diagLogProtocol('battleUpdate', `|start| DETECTED - was startEventReceived=${startEventReceivedRef.current}, setting to true`);
-        startEventReceivedRef.current = true;
-        // Do not generate fallback start protocol; rely on battleUpdate events/log to avoid duplicate Turn 1.
-        PS_DEBUG && console.log('[PSBattlePanel] Received |start| event - battle has begun, setting startEventReceivedRef=true');
-        if (pendingMovePromptRef.current) {
+        // Check if we'll be deferring the |start| line (team preview active, team not submitted)
+        const willDeferStart = ((hasTeamPreviewEvent || teamPreviewFedRef.current) && !teamSubmittedRef.current);
+        if (willDeferStart) {
+          PS_DEBUG && console.log('[PSBattlePanel] |start| detected but deferring (team preview active)');
+          diagLogProtocol('battleUpdate', `|start| DETECTED but DEFERRED (team preview active)`);
+        } else {
+          diagLogProtocol('battleUpdate', `|start| DETECTED - was startEventReceived=${startEventReceivedRef.current}, setting to true`);
+          startEventReceivedRef.current = true;
+          PS_DEBUG && console.log('[PSBattlePanel] Received |start| event - battle has begun, setting startEventReceivedRef=true');
+        }
+        if (pendingMovePromptRef.current && !willDeferStart) {
           PS_DEBUG && console.log('[PSBattlePanel] Applying deferred move prompt after |start| event');
           diagLogProtocol('battleUpdate', 'Applying deferred move prompt after |start|');
           const pending = pendingMovePromptRef.current;
@@ -2000,16 +2011,35 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             PS_DEBUG && console.log('[PSBattlePanel] Skipping team preview request (|start| already received or team submitted)');
           }
 
+          // When team preview is active and team not yet submitted, defer lines from |start| onward
+          // so the PS engine stays in team-preview phase until the player chooses their lead.
+          // This handles both: (a) |teampreview| + |start| in same batch, and
+          // (b) |start| arriving in a later batch while team preview UI is still shown.
+          // (c) subsequent batches arriving after we already started deferring.
+          const teamPreviewActive = (hasTeamPreviewEvent || teamPreviewFedRef.current) && !teamSubmittedRef.current;
+          const deferAfterTeamPreview = teamPreviewActive && (hasStartEvent || deferredPostStartLinesRef.current.length > 0);
+          let deferring = deferredPostStartLinesRef.current.length > 0; // Continue deferring if already started
+
           for (const line of protocolLines) {
             if (line && typeof line === 'string') {
               // DIAGNOSTIC: Log key protocol lines as they're added
               if (line.startsWith('|start') || line.startsWith('|turn') || line.startsWith('|teampreview')) {
                 diagLogProtocol('battleUpdate-feed', `Adding KEY LINE: ${line}`);
               }
-              battle.add(line);
+              // Once we hit |start|, defer remaining lines for after team order submission
+              if (deferAfterTeamPreview && line.startsWith('|start')) {
+                deferring = true;
+                PS_DEBUG && console.log('[PSBattlePanel] Deferring post-|start| lines for team preview');
+                diagLogProtocol('battleUpdate-feed', 'DEFERRING lines from |start| onward');
+              }
+              if (deferring) {
+                deferredPostStartLinesRef.current.push(line);
+              } else {
+                battle.add(line);
+              }
             }
           }
-          diagLogProtocol('battleUpdate-feed', `After feeding: battle.turn=${battle.turn}`);
+          diagLogProtocol('battleUpdate-feed', `After feeding: battle.turn=${battle.turn} (deferred=${deferredPostStartLinesRef.current.length} lines)`);
           // NOTE: Do NOT call fastForwardToEnd here - it races with pending animations
           // and causes interruptionCount mismatch which freezes the queue.
           // The queue will process naturally via battle.add() -> nextStep() chain.
@@ -2923,7 +2953,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           });
         };
 
-        const localTooltipSideIndex = mySideId === 'p2' ? 0 : 1;
+        const localTooltipSideIndex = mySideId === 'p2' ? 1 : 0;
         const opponentTooltipSideIndex = localTooltipSideIndex === 0 ? 1 : 0;
         applyToTrainer('.trainer-near', sidePokemon, localTooltipSideIndex);
         applyToTrainer('.trainer-far', opponentTeam, opponentTooltipSideIndex);
@@ -3156,6 +3186,25 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     }
 
     if (actionTypeResolved === 'team') {
+      // Flush deferred post-|start| lines that were held back during team preview
+      if (deferredPostStartLinesRef.current.length > 0) {
+        const battle = battleRef.current;
+        if (battle) {
+          PS_DEBUG && console.log('[PSBattlePanel] Flushing', deferredPostStartLinesRef.current.length, 'deferred post-start lines');
+          diagLogProtocol('handleChoice-team', `Flushing ${deferredPostStartLinesRef.current.length} deferred post-start lines`);
+          for (const line of deferredPostStartLinesRef.current) {
+            if (line && typeof line === 'string') {
+              if (line.startsWith('|start')) {
+                startEventReceivedRef.current = true;
+              }
+              battle.add(line);
+            }
+          }
+          deferredPostStartLinesRef.current = [];
+          startAnimationWait(battle);
+        }
+      }
+
       const pending = pendingMovePromptRef.current;
       if (pending) {
         pendingMovePromptRef.current = null;

@@ -1755,8 +1755,9 @@ this.scene=scene;
 var sp=null;
 if(spriteData){
 sp=spriteData;
+var flipStyle=sp.isCustomFront?'transform:scaleX(-1);':'';
 var rawHTML=sp.rawHTML||"<img src=\""+
-sp.url+"\" style=\"display:none;position:absolute\""+(sp.pixelated?' class="pixelated"':'')+" />";
+sp.url+"\" style=\"display:none;position:absolute;"+flipStyle+"\""+(sp.pixelated?' class="pixelated"':'')+" />";
 this.$el=$(rawHTML);
 }else{
 sp={
@@ -2005,6 +2006,7 @@ this.oldsp=null;
 
 var $el=this.isSubActive?this.$sub:this.$el;
 $el.attr('src',sp.url);
+if(sp.isCustomFront){$el.css('transform','scaleX(-1)');}else{$el.css('transform','');}
 $el.css(this.scene.pos({
 x:this.x,
 y:this.y,
@@ -2589,7 +2591,8 @@ doCry=true;
 }
 }
 
-var $newEl=$('<img src="'+sp.url+'" style="display:block;opacity:0;position:absolute"'+(sp.pixelated?' class="pixelated"':'')+' />');
+var flipStyle2=sp.isCustomFront?'transform:scaleX(-1);':'';
+var $newEl=$('<img src="'+sp.url+'" style="display:block;opacity:0;position:absolute;'+flipStyle2+'"'+(sp.pixelated?' class="pixelated"':'')+' />');
 $newEl.css(this.scene.pos({
 x:this.x,
 y:this.y,

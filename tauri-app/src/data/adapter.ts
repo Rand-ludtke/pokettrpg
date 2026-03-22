@@ -1241,8 +1241,8 @@ export function getCustomSprite(id: string, slot: SpriteSlot, forceBundled?: boo
   if (bySlot) return bySlot;
   if (slot === 'front') return bundled.front || bundled.gen5 || bundled.home || bundled.ani;
   if (slot === 'shiny') return bundled.shiny || bundled['gen5-shiny'] || bundled['home-shiny'] || bundled['ani-shiny'];
-  if (slot === 'back') return bundled.back || bundled['gen5-back'] || bundled['home-back'] || bundled['ani-back'];
-  if (slot === 'back-shiny') return bundled['back-shiny'] || bundled['gen5-back-shiny'] || bundled['home-back-shiny'] || bundled['ani-back-shiny'];
+  if (slot === 'back') return bundled.back || bundled['gen5-back'] || bundled['home-back'] || bundled['ani-back'] || bundled.front || bundled.gen5 || bundled.home || bundled.ani;
+  if (slot === 'back-shiny') return bundled['back-shiny'] || bundled['gen5-back-shiny'] || bundled['home-back-shiny'] || bundled['ani-back-shiny'] || bundled.shiny || bundled['gen5-shiny'] || bundled['home-shiny'] || bundled['ani-shiny'];
   return undefined;
 }
 export function saveCustomSprite(id: string, slot: SpriteSlot, dataUrl: string) {
