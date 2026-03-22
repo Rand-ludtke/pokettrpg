@@ -11,7 +11,7 @@ import { withPublicBase } from '../utils/publicBase';
 import { loadPokemonShowdown, createPSBattle, getDex, toID } from './ps-loader';
 import { ProtocolConverter, requestToPS } from './protocol-adapter';
 import type { PoketTRPGClient } from '../net/pokettrpgClient';
-import { getCustomSprite, normalizeName } from '../data/adapter';
+import { getCustomSprite, hasRealBackSprite, normalizeName } from '../data/adapter';
 import './ps-battle.css';
 
 /** Set to true to enable verbose console logging during battles. */
@@ -1120,6 +1120,18 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                         result.pixelated = true;
                         return result;
                       }
+                      // For back sprites: fall back to front sprite URL with flip flag
+                      if (!isFront) {
+                        const frontUrl = mon.sprite || mon.spriteUrl || mon.image;
+                        if (frontUrl) {
+                          result.url = frontUrl;
+                          result.w = 96;
+                          result.h = 96;
+                          result.pixelated = true;
+                          result.isCustomFront = true;
+                          return result;
+                        }
+                      }
                       break;
                     }
                   }
@@ -1137,9 +1149,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 result.w = 96;
                 result.h = 96;
                 result.pixelated = true;
-                // If we used a front sprite as the back sprite fallback,
-                // PS will need to know it's not a real back sprite
-                if (!isFront) result.isCustomFront = true;
+                // If we used a front sprite as the back sprite fallback (no real back exists),
+                // flag it so PS flips it horizontally
+                if (!isFront && !hasRealBackSprite(speciesId)) result.isCustomFront = true;
               }
             } catch { /* ignore lookup errors */ }
             return result;

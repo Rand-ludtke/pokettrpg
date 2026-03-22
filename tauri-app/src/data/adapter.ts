@@ -1245,6 +1245,14 @@ export function getCustomSprite(id: string, slot: SpriteSlot, forceBundled?: boo
   if (slot === 'back-shiny') return bundled['back-shiny'] || bundled['gen5-back-shiny'] || bundled['home-back-shiny'] || bundled['ani-back-shiny'] || bundled.shiny || bundled['gen5-shiny'] || bundled['home-shiny'] || bundled['ani-shiny'];
   return undefined;
 }
+/** Check if a species has a dedicated back sprite (not a front-as-back fallback). */
+export function hasRealBackSprite(id: string): boolean {
+  const normalizedId = normalizeName(id);
+  const all = getCustomSprites();
+  if (all[id]?.back || all[normalizedId]?.back) return true;
+  const bundled = gBundledSprites[normalizedId] || gBundledSprites[id];
+  return !!(bundled?.back || bundled?.['gen5-back'] || bundled?.['home-back'] || bundled?.['ani-back']);
+}
 export function saveCustomSprite(id: string, slot: SpriteSlot, dataUrl: string) {
   const all = getCustomSprites();
   all[id] = { ...(all[id] || {}), [slot]: dataUrl };
