@@ -111,10 +111,10 @@ class SyncPSEngine {
             const p1TeamSize = this.state.players?.[0]?.team?.length || 6;
             const p2TeamSize = this.state.players?.[1]?.team?.length || 6;
             const buildTeamOrder = (size) => `team ${Array.from({ length: size }, (_v, i) => i + 1).join("")}`;
-            if (p1?.request?.teamPreview) {
+            if ((p1?.request || p1?.activeRequest)?.teamPreview) {
                 this.battle.choose("p1", buildTeamOrder(p1TeamSize));
             }
-            if (p2?.request?.teamPreview) {
+            if ((p2?.request || p2?.activeRequest)?.teamPreview) {
                 this.battle.choose("p2", buildTeamOrder(p2TeamSize));
             }
             // Re-sync state in case turn advanced
@@ -127,12 +127,46 @@ class SyncPSEngine {
         return this.state;
     }
     /**
+     * Register a custom/unknown species with PS's Dex so it doesn't throw
+     * "Unidentified species" when creating the battle. Uses the mon's own
+     * stats, types, and ability so the battle simulation is accurate.
+     */
+    ensureSpeciesRegistered(mon) {
+        const speciesName = mon.species || mon.name;
+        if (!speciesName) return;
+        const id = speciesName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const existing = Dex.species.get(speciesName);
+        if (existing && existing.exists) return; // already known
+        // Build base stats from the mon's stat block
+        const s = mon.stats || {};
+        const baseStats = {
+            hp: s.hp || 80, atk: s.atk || 80, def: s.def || 80,
+            spa: s.spa || 80, spd: s.spd || 80, spe: s.spe || 80,
+        };
+        const types = Array.isArray(mon.types) && mon.types.length > 0
+            ? mon.types.map(t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase())
+            : ['Normal'];
+        const ability = mon.ability || 'No Ability';
+        Dex.data.Pokedex[id] = {
+            num: -1,
+            name: speciesName,
+            types,
+            baseStats,
+            abilities: { '0': ability },
+        };
+        console.log(`[SyncPSEngine] Registered custom species "${speciesName}" with PS Dex`);
+    }
+    /**
      * Convert our Pokemon team to PS packed format
      */
     convertTeamToPacked(team) {
+        // Register any custom/unknown species before packing
+        for (const mon of team) {
+            this.ensureSpeciesRegistered(mon);
+        }
         const sets = team.map((mon) => ({
             name: mon.nickname || mon.name,
-            species: mon.name,
+            species: mon.species || mon.name,
             item: mon.item || "",
             ability: mon.ability || "",
             moves: mon.moves.map((m) => m.name || m.id),
@@ -785,6 +819,7 @@ class SyncPSEngine {
                 continue;
             // Handle multiple active pokemon (doubles/triples)
             const activeCount = psSide.active?.length || 1;
+            let activePokemon = psSide.active?.[0] || null;
             if (activeCount > 1) {
                 // Multi-active: track all active indices
                 const activeIndices = [];
@@ -809,7 +844,7 @@ class SyncPSEngine {
                 console.log(`[SyncPSEngine] Side ${sideIdx} multi-active: ${JSON.stringify(activeIndices)}`);
             } else {
             // Find active index - PS's active[0] is a reference to an object in psSide.pokemon
-            const activePokemon = psSide.active[0];
+            activePokemon = psSide.active[0];
             if (activePokemon) {
                 // Direct object reference check
                 let activeIdx = psSide.pokemon.indexOf(activePokemon);
