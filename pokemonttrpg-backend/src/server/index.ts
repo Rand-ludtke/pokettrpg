@@ -1382,11 +1382,16 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
     // For "true boss" mode, force singles format so boss only has 1 active Pokemon
     let engineRules = rules;
     if (rules?.trueBoss && rules?.playerFormat?.match(/^\d+v1$/)) {
-      engineRules = { ...rules, playerFormat: '1v1' };
+      engineRules = { ...rules, playerFormat: '1v1', format: 'singles' };
       console.log(`[Server] True Boss mode: overriding format to singles (1v1)`);
     }
-    // Engine selects format from rules.playerFormat (2v1=doubles, 3v1=triples, else singles)
-    room.engine = new SyncPSEngine({ seed: battleSeed, rules: engineRules });
+    // Determine PS format from rules.format (singles/doubles/triples) or boss playerFormat
+    let psFormat: string | undefined;
+    const fmt = engineRules?.format;
+    if (fmt === 'doubles') psFormat = 'gen9doublescustomgame';
+    else if (fmt === 'triples') psFormat = 'gen5triplescustomgame';
+    // Boss playerFormat (2v1/3v1) will override inside the engine constructor
+    room.engine = new SyncPSEngine({ seed: battleSeed, rules: engineRules, format: psFormat });
   } else {
     console.log(`[Server] Using custom battle engine`);
     room.engine = new Engine({ seed: battleSeed });
@@ -1411,7 +1416,12 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
   });
   // Attach gametype to state for client protocol rendering
   if (room.engine instanceof SyncPSEngine) {
-    (state as any).gameType = (room.engine as any).getGameType();
+    // Derive gameType from the actual format the engine is using
+    const engineFormat = (room.engine as any).format as string;
+    let gameType = 'singles';
+    if (engineFormat?.includes('doubles')) gameType = 'doubles';
+    else if (engineFormat?.includes('triples')) gameType = 'triples';
+    (state as any).gameType = gameType;
   }
   // Ensure clients treat this as turn 1 when prompting (no pre-start move UI)
   if (typeof state.turn === "number" && state.turn < 1) {

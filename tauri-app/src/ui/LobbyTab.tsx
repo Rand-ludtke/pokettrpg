@@ -694,6 +694,7 @@ export function LobbyTab() {
       .map(clause => clause.label);
     const rulesComponents: string[] = [];
     if (teamPreviewEnabled) rulesComponents.push('Team Preview');
+    if (challengeFormat !== 'singles') rulesComponents.push(formatLabel);
     if (activeCount !== 1) rulesComponents.push(`Active: ${activeCount}`);
     if (clauseLabels.length) rulesComponents.push(`Clauses: ${clauseLabels.join(', ')}`);
     if (playerCountFormat !== '1v1') rulesComponents.push(`Format: ${playerFormatLabel}`);
@@ -733,6 +734,7 @@ export function LobbyTab() {
       activeCount: activeCount,
       teamSize: teamSize,
       playerFormat: playerCountFormat,
+      format: challengeFormat,
       trueBoss: isBossFormat && trueBoss ? true : undefined,
       clauses: Array.from(selectedClauses),
       customRules: challengeRules.trim() || undefined,
