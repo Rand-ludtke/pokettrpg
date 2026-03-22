@@ -241,6 +241,7 @@ export function LobbyTab() {
   // Enhanced custom game options - all clauses OFF by default
   const [selectedClauses, setSelectedClauses] = useState<Set<string>>(new Set());
   const [playerCountFormat, setPlayerCountFormat] = useState<string>('1v1');
+  const [trueBoss, setTrueBoss] = useState<boolean>(false);
   const [teamSize, setTeamSize] = useState<number>(6);
   const [teamPreviewEnabled, setTeamPreviewEnabled] = useState<boolean>(true);
   const [activeCount, setActiveCount] = useState<number>(1);
@@ -429,7 +430,7 @@ export function LobbyTab() {
   const roomChallenges = challengesByRoom[activeRoomId] ?? [];
   const actionableChallenges = useMemo(() => roomChallenges.filter(ch => isChallengeActionable(ch.status)), [roomChallenges]);
   const myActionableChallenges = useMemo(
-    () => actionableChallenges.filter(ch => ch.owner?.id === myId || ch.target?.id === myId),
+    () => actionableChallenges.filter(ch => ch.owner?.id === myId || ch.target?.id === myId || (ch.allies || []).some(a => a?.id === myId)),
     [actionableChallenges, myId],
   );
   const myPendingChallenges = useMemo(
@@ -479,9 +480,14 @@ export function LobbyTab() {
       const isOwner = challenge.owner?.id === myId;
       if (isOwner && !challenge.owner?.accepted) return challenge;
       const targetId = challenge.target?.id;
-      if (targetId && targetId !== myId) continue;
+      if (targetId && targetId === myId && !challenge.target?.accepted) return challenge;
+      // Check if I'm an ally who hasn't accepted
+      const myAlly = (challenge.allies || []).find(a => a?.id === myId);
+      if (myAlly && !myAlly.accepted) return challenge;
+      // For open challenges that need me as target
+      if (!targetId && targetId !== myId) continue;
       const targetAccepted = challenge.target?.accepted ?? false;
-      if (!targetAccepted) return challenge;
+      if (!targetAccepted && targetId === myId) return challenge;
     }
     return null;
   }, [myActionableChallenges, myId]);
@@ -691,6 +697,7 @@ export function LobbyTab() {
     if (activeCount !== 1) rulesComponents.push(`Active: ${activeCount}`);
     if (clauseLabels.length) rulesComponents.push(`Clauses: ${clauseLabels.join(', ')}`);
     if (playerCountFormat !== '1v1') rulesComponents.push(`Format: ${playerFormatLabel}`);
+    if (trueBoss && (playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1')) rulesComponents.push('True Boss Fight');
     if (teamSize !== 6) rulesComponents.push(`Team Size: ${teamSize}`);
     if (startWeather !== 'none') rulesComponents.push(`Start Weather: ${startWeather} (${clampInt(startWeatherTurns, 1, 99)}t)`);
     if (startTerrain !== 'none') rulesComponents.push(`Start Terrain: ${startTerrain} (${clampInt(startTerrainTurns, 1, 99)}t)`);
@@ -720,11 +727,13 @@ export function LobbyTab() {
         : undefined;
 
     // Build rules object for the backend
+    const isBossFormat = playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1';
     const rulesObject: Record<string, any> = {
       teamPreview: teamPreviewEnabled,
       activeCount: activeCount,
       teamSize: teamSize,
       playerFormat: playerCountFormat,
+      trueBoss: isBossFormat && trueBoss ? true : undefined,
       clauses: Array.from(selectedClauses),
       customRules: challengeRules.trim() || undefined,
       displayString: fullRulesDisplay || undefined,
@@ -1051,6 +1060,13 @@ export function LobbyTab() {
                       Boss battles use {playerCountFormat === '2v1' ? 'Doubles' : 'Triples'} format. Boss should have {playerCountFormat === '2v1' ? '12' : '18'} Pokémon, challenger 6.
                     </span>
                   )}
+                  {(playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1') && (
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85em', marginTop: 4 }}>
+                      <input type="checkbox" checked={trueBoss} onChange={e => setTrueBoss(e.target.checked)} />
+                      True Boss Fight
+                      <span className="dim" style={{ fontSize: '0.8em' }}>(Boss only sends out 1 Pokémon — each challenger sends 1)</span>
+                    </label>
+                  )}
                 </label>
 
                 {/* Team Size */}
@@ -1293,21 +1309,35 @@ export function LobbyTab() {
                 const isOwner = challenge.owner?.id === myId;
                 const targetId = challenge.target?.id;
                 const isTarget = targetId === myId;
-                const isMine = isOwner || isTarget;
+                const isAlly = (challenge.allies || []).some(a => a?.id === myId);
+                const isMine = isOwner || isTarget || isAlly;
                 const actionable = isChallengeActionable(challenge.status);
                 const awaitingMyResponse = challengeAwaitingMyDecision?.id === challenge.id;
                 const ownerReady = !!challenge.owner?.accepted;
                 const targetReady = !!challenge.target?.accepted;
-                const canAccept = actionable && !isOwner && (!targetId || targetId === myId) && iAmPlayer && hasValidTeam;
-                const canDecline = actionable && isTarget && targetId === myId && iAmPlayer;
+                const requiredAllies = challenge.requiredAllies || 0;
+                const currentAllies = challenge.allies?.length || 0;
+                const needsMoreAllies = currentAllies < requiredAllies;
+                // Can accept if: not already in the challenge, and either target slot is open OR ally slots are available
+                const canAccept = actionable && !isOwner && !isAlly && ((!targetId || targetId === myId) || needsMoreAllies) && iAmPlayer && hasValidTeam;
+                const canDecline = actionable && (isTarget || isAlly) && iAmPlayer;
                 const canCancel = actionable && isOwner;
                 const canUpdate = actionable && isMine && iAmPlayer && hasValidTeam;
-                const label = `${formatName(challenge.owner)} vs ${formatName(challenge.target, 'Anyone')}`;
+                const challengerNames = [formatName(challenge.owner), ...(challenge.allies || []).map(a => formatName(a))].join(' & ');
+                const label = requiredAllies > 0
+                  ? `${challengerNames} vs ${formatName(challenge.target, 'Anyone')}`
+                  : `${formatName(challenge.owner)} vs ${formatName(challenge.target, 'Anyone')}`;
                 const statusLabel = describeChallengeStatus(challenge.status);
                 const ownerLabel = `${formatName(challenge.owner)} ${ownerReady ? '(ready)' : '(waiting)'}`;
                 const targetLabel = challenge.target
                   ? `${formatName(challenge.target)} ${targetReady ? '(ready)' : '(waiting)'}`
                   : 'Awaiting opponent';
+                const allyLabels = (challenge.allies || []).map(a =>
+                  `${formatName(a)} ${a.accepted ? '(ready)' : '(waiting)'}`
+                );
+                const slotsLabel = requiredAllies > 0
+                  ? ` • Allies: ${currentAllies}/${requiredAllies}`
+                  : '';
                 return (
                   <div
                     key={challenge.id}
@@ -1320,11 +1350,12 @@ export function LobbyTab() {
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                       <strong>{label}</strong>
-                      <span className="dim" style={{ fontSize: '0.8em' }}>• {statusLabel}</span>
+                      <span className="dim" style={{ fontSize: '0.8em' }}>• {statusLabel}{slotsLabel}</span>
                       {awaitingMyResponse && <span style={{ marginLeft: 'auto', fontSize: '0.75em', textTransform: 'uppercase' }}>Your response needed</span>}
                     </div>
                     <div className="dim" style={{ fontSize: '0.85em', marginBottom: 6 }}>
                       {ownerLabel} • {targetLabel}
+                      {allyLabels.length > 0 && allyLabels.map((al, i) => <span key={i}> • {al}</span>)}
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {canAccept && (
@@ -1360,7 +1391,7 @@ export function LobbyTab() {
           <div style={{ borderTop: '1px solid #333', paddingTop: 12 }}>
             <h4 style={{ margin: '0 0 8px 0' }}>Battle Setup</h4>
             <div className="dim" style={{ fontSize: '0.85em', marginBottom: 8 }}>
-              Select a team and submit it to your active challenge. Both players must send their payload before the battle begins.
+              Select a team and submit it to your active challenge. All players must send their payload before the battle begins.
             </div>
             {!primaryChallenge && (
               <div className="dim" style={{ fontSize: '0.8em', marginBottom: 8 }}>

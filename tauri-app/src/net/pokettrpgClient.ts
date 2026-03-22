@@ -89,6 +89,8 @@ export type ChallengeSummary = {
   rules?: any;
   owner: ChallengeParticipant;
   target?: ChallengeParticipant | null;
+  allies?: ChallengeParticipant[];
+  requiredAllies?: number;
   battleRoomId?: string;
   battleRoomName?: string;
   battleSeed?: number;

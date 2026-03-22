@@ -89,6 +89,13 @@ export interface Room {
   teamPreviewRules?: any;
   // Reconnection grace: players removed on disconnect but held for reconnection
   disconnectedPlayers?: Map<string, { data: { id: string; username: string; socketId: string; trainerSprite?: string }; timestamp: number }>;
+  // Boss-mode metadata: tracks which real players map to which engine side/slots
+  bossMode?: {
+    mergedSide: "p1" | "p2";  // which engine side is the merged multi-player side
+    mergedPlayerId: string;    // the engine player ID for the merged side (owner's ID)
+    playerSlots: { playerId: string; slot: number }[];  // real player → active slot index
+    pokemonOwnership: Map<string, string>;  // pokemonId → real player ID
+  };
 }
 
 type ChallengeStatus = "pending" | "launching" | "cancelled" | "declined";
@@ -111,7 +118,38 @@ interface Challenge {
   status: ChallengeStatus;
   owner: ChallengeParticipant;
   target?: ChallengeParticipant;
+  allies: ChallengeParticipant[];
   open: boolean;
+}
+
+/** Parse a playerFormat string (e.g. "2v1") and return how many allies the owner needs. */
+function getRequiredAllyCount(playerFormat?: string): number {
+  if (!playerFormat) return 0;
+  const m = playerFormat.match(/^(\d+)v(\d+)$/);
+  if (!m) return 0;
+  const challengers = parseInt(m[1], 10);
+  // Boss formats: Xv1 where X > 1 means owner + (X-1) allies
+  if (parseInt(m[2], 10) === 1 && challengers > 1) return challengers - 1;
+  return 0;
+}
+
+/** Check whether all required slots are filled and accepted for a challenge. */
+function isChallengeReady(challenge: Challenge): boolean {
+  if (!challenge.owner.accepted || !challenge.owner.playerPayload) return false;
+  if (!challenge.target || !challenge.target.accepted || !challenge.target.playerPayload) return false;
+  const requiredAllies = getRequiredAllyCount(challenge.rules?.playerFormat);
+  if (challenge.allies.length < requiredAllies) return false;
+  for (const ally of challenge.allies) {
+    if (!ally.accepted || !ally.playerPayload) return false;
+  }
+  return true;
+}
+
+/** Check whether a challenge still needs more players. */
+function challengeNeedsMorePlayers(challenge: Challenge): boolean {
+  if (!challenge.target) return true;
+  const requiredAllies = getRequiredAllyCount(challenge.rules?.playerFormat);
+  return challenge.allies.length < requiredAllies;
 }
 
 interface ChallengeSummary {
@@ -124,6 +162,8 @@ interface ChallengeSummary {
   rules?: any;
   owner: { id: string; username: string; accepted: boolean; ready: boolean };
   target?: { id: string; username: string; accepted: boolean; ready: boolean } | null;
+  allies: { id: string; username: string; accepted: boolean; ready: boolean }[];
+  requiredAllies: number;
 }
 
 const DEFAULT_LOBBY_ID = "global-lobby";
@@ -196,7 +236,7 @@ function challengeSummary(ch: Challenge): ChallengeSummary {
     roomId: ch.roomId,
     status: ch.status,
     createdAt: ch.createdAt,
-    open: ch.open && !ch.target,
+    open: challengeNeedsMorePlayers(ch),
     format: ch.format,
     rules: ch.rules,
     owner: {
@@ -213,6 +253,13 @@ function challengeSummary(ch: Challenge): ChallengeSummary {
           ready: Boolean(ch.target.playerPayload),
         }
       : null,
+    allies: ch.allies.map(a => ({
+      id: a.playerId,
+      username: a.username,
+      accepted: a.accepted,
+      ready: Boolean(a.playerPayload),
+    })),
+    requiredAllies: getRequiredAllyCount(ch.rules?.playerFormat),
   };
 }
 
@@ -1332,8 +1379,14 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
   // Use Pokemon Showdown engine or custom engine based on configuration
   if (USE_PS_ENGINE) {
     console.log(`[Server] Using Pokemon Showdown battle engine with rules:`, JSON.stringify(rules));
+    // For "true boss" mode, force singles format so boss only has 1 active Pokemon
+    let engineRules = rules;
+    if (rules?.trueBoss && rules?.playerFormat?.match(/^\d+v1$/)) {
+      engineRules = { ...rules, playerFormat: '1v1' };
+      console.log(`[Server] True Boss mode: overriding format to singles (1v1)`);
+    }
     // Engine selects format from rules.playerFormat (2v1=doubles, 3v1=triples, else singles)
-    room.engine = new SyncPSEngine({ seed: battleSeed, rules });
+    room.engine = new SyncPSEngine({ seed: battleSeed, rules: engineRules });
   } else {
     console.log(`[Server] Using custom battle engine`);
     room.engine = new Engine({ seed: battleSeed });
@@ -1516,6 +1569,73 @@ function emitMovePrompts(room: Room, state: BattleState) {
   const skippedPlayers: { id: string; reason: string }[] = [];
   
   for (const player of state.players) {
+    // Boss mode: split the merged side's prompt to individual real players
+    if (room.bossMode && player.id === room.bossMode.mergedPlayerId) {
+      let psRequest: any = null;
+      if (room.engine instanceof SyncPSEngine) {
+        psRequest = room.engine.getRequest(player.id);
+      }
+      if (!psRequest) {
+        skippedPlayers.push({ id: player.id, reason: "no PS request for merged side" });
+        continue;
+      }
+
+      const activeSlots = psRequest.active || [];
+      for (const slotInfo of room.bossMode.playerSlots) {
+        const realPlayerId = slotInfo.playerId;
+        const slotIdx = slotInfo.slot;
+        const alreadyActed = !!room.turnBuffer[realPlayerId];
+
+        const rpSock = room.players.filter(p => p.id === realPlayerId).map(p => p.socketId).find(sid => io.sockets.sockets.has(sid));
+        if (!rpSock) {
+          skippedPlayers.push({ id: realPlayerId, reason: "no valid socket (boss ally)" });
+          continue;
+        }
+        const realSock = io.sockets.sockets.get(rpSock);
+        if (!realSock) continue;
+
+        // Filter side pokemon to only those owned by this player
+        const ownedPokemonIds = new Set<string>();
+        for (const [pokId, ownerId] of room.bossMode.pokemonOwnership) {
+          if (ownerId === realPlayerId) ownedPokemonIds.add(pokId);
+        }
+
+        const sideIndex = state.players.indexOf(player);
+        const sideId = `p${sideIndex + 1}`;
+        const filteredSide = psRequest.side ? {
+          ...psRequest.side,
+          playerId: realPlayerId,
+          pokemon: (psRequest.side.pokemon || []).filter((p: any) => {
+            // Only include pokemon owned by this player
+            return ownedPokemonIds.has(p.pokemonId || p.id);
+          }),
+        } : undefined;
+
+        const promptType: "move" | "wait" = alreadyActed ? "wait" : "move";
+        const lastPrompt = room.lastPromptByPlayer![realPlayerId];
+        if (lastPrompt && lastPrompt.turn === turn && lastPrompt.type === promptType) continue;
+
+        const slotMoves = activeSlots[slotIdx];
+        const prompt = alreadyActed
+          ? { wait: true, side: filteredSide, rqid: psRequest.rqid || Date.now() }
+          : {
+              ...psRequest,
+              requestType: "move" as const,
+              playerId: realPlayerId,
+              rqid: psRequest.rqid || Date.now(),
+              side: filteredSide,
+              active: slotMoves ? [slotMoves] : [],
+              bossSlot: slotIdx,
+            };
+
+        realSock.emit("promptAction", { roomId: room.id, playerId: realPlayerId, prompt, state });
+
+        room.lastPromptByPlayer![realPlayerId] = { turn, type: promptType, rqid: (prompt as any).rqid };
+        promptedPlayers.push(realPlayerId);
+      }
+      continue; // Skip normal processing for merged player
+    }
+
     const candidateSockets = room.players.filter((p) => p.id === player.id).map((p) => p.socketId);
     const playerSocket = candidateSockets.find((id) => io.sockets.sockets.has(id));
     if (!playerSocket) {
@@ -1783,6 +1903,15 @@ function launchChallenge(sourceRoom: Room, challenge: Challenge) {
     return;
   }
 
+  // Validate all ally payloads for boss battles
+  for (const ally of challenge.allies) {
+    if (!ally.playerPayload) {
+      emitChallengeRemoved(sourceRoom, challenge.id, "missing-team");
+      sourceRoom.challenges.delete(challenge.id);
+      return;
+    }
+  }
+
   const ownerSocket = io.sockets.sockets.get(challenge.owner.socketId);
   const targetSocket = io.sockets.sockets.get(challenge.target.socketId);
   if (!ownerSocket || !targetSocket) {
@@ -1791,10 +1920,23 @@ function launchChallenge(sourceRoom: Room, challenge: Challenge) {
     return;
   }
 
+  // Check ally sockets
+  const allySockets: import("socket.io").Socket[] = [];
+  for (const ally of challenge.allies) {
+    const allySock = io.sockets.sockets.get(ally.socketId);
+    if (!allySock) {
+      emitChallengeRemoved(sourceRoom, challenge.id, "socket-disconnected");
+      sourceRoom.challenges.delete(challenge.id);
+      return;
+    }
+    allySockets.push(allySock);
+  }
+
   const battleRoomId = uuidv4().slice(0, 8);
   const nameTokens: string[] = [];
   if (challenge.format) nameTokens.push(challenge.format);
-  nameTokens.push(`${challenge.owner.username} vs ${challenge.target.username}`);
+  const challengerNames = [challenge.owner.username, ...challenge.allies.map(a => a.username)].join(" & ");
+  nameTokens.push(`${challengerNames} vs ${challenge.target.username}`);
   const battleRoomName = `Battle: ${nameTokens.join(" • ")}`;
   const battleRoom = createRoomRecord(battleRoomId, battleRoomName);
   rooms.set(battleRoomId, battleRoom);
@@ -1808,13 +1950,75 @@ function launchChallenge(sourceRoom: Room, challenge: Challenge) {
   const targetTrainerSprite = coerceTrainerSprite(
     (challenge.target.playerPayload as any)?.trainerSprite ?? (challenge.target.playerPayload as any)?.avatar ?? challenge.target.trainerSprite
   );
+
   battleRoom.players.push({ id: challenge.owner.playerId, username: challenge.owner.username, socketId: challenge.owner.socketId, trainerSprite: ownerTrainerSprite });
   battleRoom.players.push({ id: challenge.target.playerId, username: challenge.target.username, socketId: challenge.target.socketId, trainerSprite: targetTrainerSprite });
 
-  const playersPayload = [
-    sanitizePlayerPayload(challenge.owner.playerPayload, challenge.owner),
-    sanitizePlayerPayload(challenge.target.playerPayload, challenge.target),
-  ];
+  // Join allies to the battle room as players
+  for (let i = 0; i < challenge.allies.length; i++) {
+    const ally = challenge.allies[i];
+    allySockets[i].join(battleRoomId);
+    const allyTrainerSprite = coerceTrainerSprite(
+      (ally.playerPayload as any)?.trainerSprite ?? (ally.playerPayload as any)?.avatar ?? ally.trainerSprite
+    );
+    battleRoom.players.push({ id: ally.playerId, username: ally.username, socketId: ally.socketId, trainerSprite: allyTrainerSprite });
+  }
+
+  const isBossMode = challenge.allies.length > 0;
+  let playersPayload: Player[];
+
+  if (isBossMode) {
+    // Boss battle: merge owner + allies into one side (p2), boss is p1
+    // Target (boss) = p1; Owner + Allies (challengers) = p2
+    const bossPayload = sanitizePlayerPayload(challenge.target.playerPayload, challenge.target);
+    const ownerPayload = sanitizePlayerPayload(challenge.owner.playerPayload, challenge.owner);
+    const allyPayloads = challenge.allies.map(ally => sanitizePlayerPayload(ally.playerPayload!, ally));
+
+    // Interleave challenger teams so each player's first Pokemon alternates in the active slots
+    // For 2v1 doubles: [owner[0], ally[0], owner[1], ally[1], ...]
+    // For 3v1 triples: [owner[0], ally1[0], ally2[0], owner[1], ally1[1], ally2[1], ...]
+    const allChallengerPayloads = [ownerPayload, ...allyPayloads];
+    const maxTeamLen = Math.max(...allChallengerPayloads.map(p => p.team.length));
+    const mergedTeam: any[] = [];
+    const pokemonOwnership = new Map<string, string>();
+    for (let slot = 0; slot < maxTeamLen; slot++) {
+      for (const cp of allChallengerPayloads) {
+        if (slot < cp.team.length) {
+          mergedTeam.push(cp.team[slot]);
+          pokemonOwnership.set(cp.team[slot].id, cp.id);
+        }
+      }
+    }
+
+    // Build the merged challenger player payload using the owner's identity
+    const mergedChallengerPayload: Player = {
+      ...ownerPayload,
+      name: challengerNames,
+      team: mergedTeam,
+    };
+
+    // Build player slot mapping: owner = slot 0, ally1 = slot 1, ally2 = slot 2, etc.
+    const playerSlots = [
+      { playerId: challenge.owner.playerId, slot: 0 },
+      ...challenge.allies.map((ally, idx) => ({ playerId: ally.playerId, slot: idx + 1 })),
+    ];
+
+    battleRoom.bossMode = {
+      mergedSide: "p2",
+      mergedPlayerId: ownerPayload.id,
+      playerSlots,
+      pokemonOwnership,
+    };
+
+    playersPayload = [bossPayload, mergedChallengerPayload];
+    console.log(`[Server] Boss battle launched: ${challengerNames} (${mergedTeam.length} mons merged) vs ${challenge.target.username}`);
+  } else {
+    // Standard 1v1 battle
+    playersPayload = [
+      sanitizePlayerPayload(challenge.owner.playerPayload, challenge.owner),
+      sanitizePlayerPayload(challenge.target.playerPayload, challenge.target),
+    ];
+  }
 
   beginBattle(battleRoom, playersPayload, challenge.rules?.seed, challenge.rules);
 
@@ -1965,18 +2169,19 @@ function startTurnTimer(room: Room) {
   room.turnTimer = setTimeout(() => {
     if (!room.engine || room.phase === "force-switch" || room.phase === "team-preview") return;
     const state = room.engine.getState();
-    const expected = state.players.length;
+    const expected = room.bossMode ? 1 + room.bossMode.playerSlots.length : state.players.length;
     const submitted = Object.keys(room.turnBuffer);
     if (submitted.length >= expected) return; // Already complete
     
     // Log detailed info about who hasn't submitted - but DO NOT auto-fill
-    const missing = state.players.filter(p => !room.turnBuffer[p.id]).map(p => p.id);
+    const allExpectedIds = room.bossMode
+      ? [state.players.find(p => p.id !== room.bossMode!.mergedPlayerId)?.id, ...room.bossMode.playerSlots.map(s => s.playerId)].filter(Boolean)
+      : state.players.map(p => p.id);
+    const missing = allExpectedIds.filter(id => !room.turnBuffer[id!]);
     console.warn(`[Server] Turn ${state.turn} timeout - still waiting for ${missing.length} players: ${missing.join(', ')}`);
     console.warn(`[Server] Submitted: ${submitted.join(', ') || 'none'} | Missing: ${missing.join(', ')}`);
     
     // DO NOT auto-fill moves - just continue waiting
-    // The battle will only progress when all players submit their actions
-    // Restart the timer to keep checking
     startTurnTimer(room);
   }, TURN_TIMEOUT_MS);
 }
@@ -2320,11 +2525,13 @@ io.on("connection", (socket: Socket) => {
     if (!sender || sender.id !== data.playerId) {
       const inRoom = socket.rooms.has(room.id);
       const statePlayer = room.engine?.getState().players.find((p) => p.id === data.playerId);
-      if (inRoom && statePlayer) {
+      // In boss mode, allies are real players not in state.players but in room.players
+      const isBossAlly = room.bossMode?.playerSlots.some(s => s.playerId === data.playerId);
+      if (inRoom && (statePlayer || isBossAlly)) {
         console.warn(`[Server] Recovering missing room player for ${data.playerId} (socket ${socket.id})`);
-        // Upsert player record so future prompts/actions have a live socket
         room.players = room.players.filter((p) => p.id !== data.playerId && p.socketId !== socket.id);
-        room.players.push({ id: data.playerId, username: statePlayer.name || data.playerId, socketId: socket.id, trainerSprite: (statePlayer as any).trainerSprite });
+        const existingName = statePlayer?.name || data.playerId;
+        room.players.push({ id: data.playerId, username: existingName, socketId: socket.id, trainerSprite: (statePlayer as any)?.trainerSprite });
         sender = room.players.find((p) => p.socketId === socket.id);
       } else {
         return socket.emit("error", { error: "not authorized for this action" });
@@ -2503,7 +2710,15 @@ io.on("connection", (socket: Socket) => {
     room.turnBuffer[data.playerId] = processedAction;
     console.log(`[Server] Action received from ${data.playerId}:`, JSON.stringify(processedAction));
     const currentState = room.engine.getState();
-    const expected = currentState.players.length;
+
+    // In boss mode, count real players (boss + each challenger) instead of engine players (always 2)
+    let expected: number;
+    if (room.bossMode) {
+      // Boss (1) + all challengers on the merged side
+      expected = 1 + room.bossMode.playerSlots.length;
+    } else {
+      expected = currentState.players.length;
+    }
 
     // Log disconnected players but DO NOT auto-fill their actions
     const livePlayerIds = new Set(
@@ -2516,10 +2731,33 @@ io.on("connection", (socket: Socket) => {
 
     console.log(`[Server] Turn buffer size: ${Object.keys(room.turnBuffer).length}/${expected}`);
     if (Object.keys(room.turnBuffer).length >= expected) {
+      // In boss mode, combine individual challenger actions into a multi-choice for the engine
+      if (room.bossMode) {
+        const mergedChoices: any[] = [];
+        for (const slotInfo of room.bossMode.playerSlots) {
+          const action = room.turnBuffer[slotInfo.playerId];
+          if (action) {
+            if (action.type === "move") {
+              mergedChoices.push({ type: "move", moveId: (action as any).moveId, moveIndex: (action as any).moveIndex, mega: !!(action as any).mega, zmove: !!(action as any).zmove, dynamax: !!(action as any).dynamax, terastallize: !!(action as any).terastallize });
+            } else if (action.type === "switch") {
+              mergedChoices.push({ type: "switch", toIndex: (action as any).toIndex });
+            } else {
+              mergedChoices.push(action);
+            }
+            delete room.turnBuffer[slotInfo.playerId];
+          }
+        }
+        // Replace individual ally actions with a single multi-choice for the merged player
+        room.turnBuffer[room.bossMode.mergedPlayerId] = {
+          type: "multi-choice",
+          actorPlayerId: room.bossMode.mergedPlayerId,
+          choices: mergedChoices,
+        } as any;
+        console.log(`[Server] Combined ${mergedChoices.length} boss-mode actions into multi-choice for ${room.bossMode.mergedPlayerId}`);
+      }
       processTurnWithBuffer(room);
     } else {
       // Send "waiting" notification ONLY to the player who just submitted
-      // Not to all players - that would incorrectly put both in waiting state
       socket.emit("promptAction", { 
         roomId: data.roomId,
         playerId: data.playerId,
@@ -2575,6 +2813,7 @@ io.on("connection", (socket: Socket) => {
             accepted: false,
           }
         : undefined,
+      allies: [],
       open: !targetPlayer,
     };
 
@@ -2603,25 +2842,50 @@ io.on("connection", (socket: Socket) => {
     let participant: ChallengeParticipant | undefined;
     if (challenge.owner.socketId === socket.id) participant = challenge.owner;
     if (!participant && challenge.target && challenge.target.socketId === socket.id) participant = challenge.target;
+    if (!participant) {
+      // Check if already an ally
+      participant = challenge.allies.find(a => a.socketId === socket.id);
+    }
 
-    if (!participant && challenge.open && data?.accepted) {
-      // Claim the open challenge
-      challenge.target = {
-        playerId: user.id,
-        username: user.username,
-        socketId: socket.id,
-        accepted: false,
-      };
-      challenge.open = false;
-      participant = challenge.target;
+    if (!participant && data?.accepted) {
+      // New player joining - determine which slot to fill
+      const requiredAllies = getRequiredAllyCount(challenge.rules?.playerFormat);
+      if (!challenge.target) {
+        // Fill the target (boss/opponent) slot first
+        challenge.target = {
+          playerId: user.id,
+          username: user.username,
+          socketId: socket.id,
+          accepted: false,
+        };
+        participant = challenge.target;
+      } else if (challenge.allies.length < requiredAllies) {
+        // Fill an ally slot on the owner's side
+        const newAlly: ChallengeParticipant = {
+          playerId: user.id,
+          username: user.username,
+          socketId: socket.id,
+          accepted: false,
+        };
+        challenge.allies.push(newAlly);
+        participant = newAlly;
+      }
     }
 
     if (!participant) return socket.emit("error", { error: "not part of challenge" });
 
     if (!data?.accepted) {
-      room.challenges.delete(challenge.id);
-      emitChallengeRemoved(room, challenge.id, "declined");
-      broadcastRoomSummary(room);
+      // If an ally declines, remove just that ally; if owner/target declines, cancel the whole challenge
+      const allyIdx = challenge.allies.indexOf(participant);
+      if (allyIdx >= 0) {
+        challenge.allies.splice(allyIdx, 1);
+        emitChallengeUpdated(room, challenge);
+        broadcastRoomSummary(room);
+      } else {
+        room.challenges.delete(challenge.id);
+        emitChallengeRemoved(room, challenge.id, "declined");
+        broadcastRoomSummary(room);
+      }
       return;
     }
 
@@ -2638,7 +2902,7 @@ io.on("connection", (socket: Socket) => {
     participant.trainerSprite = participantTrainerSprite;
     participant.playerPayload = participantPayload;
 
-    if (challenge.owner.accepted && challenge.owner.playerPayload && challenge.target && challenge.target.accepted && challenge.target.playerPayload) {
+    if (isChallengeReady(challenge)) {
       challenge.status = "launching";
       emitChallengeUpdated(room, challenge);
       launchChallenge(room, challenge);
@@ -2697,9 +2961,15 @@ io.on("connection", (socket: Socket) => {
             emitChallengeRemoved(room, challenge.id, "creator-left");
           } else if (challenge.target && challenge.target.socketId === socket.id) {
             challenge.target = undefined;
-            challenge.open = true;
             challenge.status = "pending";
             emitChallengeUpdated(room, challenge);
+          } else {
+            // Check if disconnecting player was an ally
+            const allyIdx = challenge.allies.findIndex(a => a.socketId === socket.id);
+            if (allyIdx >= 0) {
+              challenge.allies.splice(allyIdx, 1);
+              emitChallengeUpdated(room, challenge);
+            }
           }
         }
         broadcastRoomSummary(room);
