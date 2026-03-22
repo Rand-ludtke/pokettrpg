@@ -539,8 +539,9 @@ function tryCacheSpriteToUnified(folder, filename) {
             }
         }
     }
-    // If a dedicated back sprite doesn't exist for numeric/base variants, use front as fallback.
-    if ((folder === "gen5-back" || folder === "gen5-back-shiny") && /^-?\d+[a-z]*\.png$/i.test(filename)) {
+    // If a dedicated back sprite doesn't exist, use front sprite as fallback.
+    // This covers both numeric IDs (e.g. "20059.png") and named sprites (e.g. "goldica.png").
+    if (folder === "gen5-back" || folder === "gen5-back-shiny") {
         const siblingFolder = folder === "gen5-back-shiny" ? "gen5-shiny" : "gen5";
         sourceCandidates.push(path_1.default.join(UNIFIED_SPRITES_ROOT, siblingFolder, filename));
         if (VENDOR_SPRITES_DIR) {

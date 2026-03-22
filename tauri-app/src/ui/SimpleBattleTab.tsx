@@ -719,21 +719,36 @@ function buildSpriteChain(pkm: any, side: SideId, showBack: boolean) {
     pkm?.backSpriteUrl,
   ].find((value: unknown) => typeof value === 'string' && String(value).trim()) as string | undefined;
 
+  // Debug: log sprite chain resolution for custom sprites
+  if (pkm?.sprite || pkm?.backSprite || directFront || directBack) {
+    console.warn('[buildSpriteChain]', species, side, showBack ? 'BACK' : 'FRONT', {
+      'pkm.sprite': pkm?.sprite, 'pkm.backSprite': pkm?.backSprite,
+      directFront, directBack,
+    });
+  }
+
   const frontChain = spriteUrlWithFallback(species, () => {}, { back: false, shiny });
 
   if (showBack) {
     const backChain = spriteUrlWithFallback(species, () => {}, { back: true, shiny });
     const preferredBack = directBack ? [directBack, ...fusionCandidates.back] : [...fusionCandidates.back];
     const preferredFront = directFront ? [directFront, ...fusionCandidates.front] : [...fusionCandidates.front];
+    // When a custom front sprite is chosen but no back sprite exists,
+    // use the front sprite as the first back candidate — it will be mirrored via scaleX(-1).
+    if (directFront && !directBack && !fusionCandidates.back.length) {
+      preferredBack.unshift(directFront);
+    }
     const backCandidates = [...preferredBack, backChain.src, ...(backChain.candidates || [])].filter(Boolean) as string[];
     const frontCandidates = [...preferredFront, frontChain.src, ...(frontChain.candidates || [])].filter(Boolean) as string[];
     const candidates = Array.from(new Set([...backCandidates, ...frontCandidates]));
     const placeholder = backChain.placeholder || frontChain.placeholder;
+    // If the first candidate is really a front sprite used as back fallback, mark it for mirroring
+    const needsImmediateMirror = directFront && !directBack && !fusionCandidates.back.length && candidates[0] === directFront;
     return {
       initial: candidates[0] || placeholder,
       candidates,
       placeholder,
-      backFallbackStart: backCandidates.length,
+      backFallbackStart: needsImmediateMirror ? 0 : backCandidates.length,
       mirrorBackFallback: true,
     };
   }
@@ -2061,19 +2076,20 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
       p1: buildRosterEntries(battleState, requestBySide.p1 ?? promptRequests.p1 ?? derivedRequests.p1, 'p1', playerIds.p1),
       p2: buildRosterEntries(battleState, requestBySide.p2 ?? promptRequests.p2 ?? derivedRequests.p2, 'p2', playerIds.p2),
     };
-    // Diagnostic: warn if both sides got the same roster (tooltip bug investigation)
-    if (entries.p1.length && entries.p2.length) {
+    // Diagnostic: log side mapping for tooltip swap investigation
+    if (entries.p1.length || entries.p2.length) {
       const p1Names = entries.p1.map(e => speciesFromPokemon(e.pokemon)).join(',');
       const p2Names = entries.p2.map(e => speciesFromPokemon(e.pokemon)).join(',');
-      if (p1Names === p2Names && p1Names) {
-        console.warn('[rosterEntries] Both sides have identical rosters — possible data bug!', {
-          p1Names, p2Names,
-          playerIds,
-          p1PlayerId: playerIds.p1,
-          p2PlayerId: playerIds.p2,
-          playersInState: battleState?.players?.map((p: any) => ({ id: p.id, teamCount: p.team?.length })),
-        });
-      }
+      console.warn('[LAYOUT DEBUG]', {
+        mySide,
+        bottomSideWillBe: mySide ?? 'p1',
+        topSideWillBe: (mySide ?? 'p1') === 'p1' ? 'p2' : 'p1',
+        p1Roster: p1Names,
+        p2Roster: p2Names,
+        playerIds,
+        userId: client.user?.id,
+        statePlayerIds: battleState?.players?.map((p: any) => p?.id),
+      });
     }
     return entries;
   }, [battleState, requestBySide, promptRequests, derivedRequests, playerIds]);

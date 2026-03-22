@@ -1079,6 +1079,10 @@ export function spriteUrlWithFallback(
   addFolder(chosen);
   if (chosen !== 'gen5') addFolder('gen5');
   if (chosen !== 'home') addFolder('home');
+  // When animated gen5 is chosen, 'gen5' folder becomes 'ani' above.
+  // Always add static gen5 as a fallback so backend BaseSprites (served under gen5/) are reachable.
+  const staticGen5 = spriteFolderForSet('gen5', shiny, back, false);
+  if (staticGen5 && !folders.includes(staticGen5)) folders.push(staticGen5);
 
   // Insert custom sprite data URL at the front if available (try every candidate id)
   const candidates: string[] = [];
