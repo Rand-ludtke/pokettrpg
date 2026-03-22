@@ -1949,6 +1949,11 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
         setPendingAction(null);
       }
     });
+    const offBattleStartError = client.on('battleStartError', ({ roomId: errorRoomId, message }) => {
+      if (errorRoomId !== roomId) return;
+      console.error('[SimpleBattleTab] Battle failed to start:', message);
+      setLog(prev => [...prev, `|error|Battle failed to start: ${message || 'Unknown error'}`]);
+    });
     return () => {
       offRoomsSnapshot();
       offRoomUpdate();
@@ -1962,6 +1967,7 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
       offBattleEnd();
       offChat();
       offActionCancelled();
+      offBattleStartError();
     };
   }, [client, roomId, mySide]);
 

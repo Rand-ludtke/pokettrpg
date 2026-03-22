@@ -156,6 +156,7 @@ export type ClientEvents = {
   roomRemove: string;
   chatMessage: ChatMessage;
   battleStarted: { roomId: string; state: any };
+  battleStartError: { roomId: string; message: string };
   teamPreviewStarted: { roomId: string };
   battleUpdate: { roomId: string; update: BattleStatePayload };
   phase: { roomId: string; payload: PhasePayload };
@@ -705,6 +706,14 @@ export class PoketTRPGClient {
         return;
       }
       this.finalizeBattleStart(roomId, state, data);
+    });
+
+    socket.on('battleStartError', (data: any) => {
+      const roomId = data?.roomId;
+      console.error('[Client] battleStartError from server:', data?.message, roomId);
+      if (roomId) {
+        this.emitter.emit('battleStartError', { roomId, message: data?.message || 'Battle failed to start on server' });
+      }
     });
 
     socket.on('teamPreviewStarted', ({ roomId }: { roomId: string }) => {

@@ -307,6 +307,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
   res.status(200).json({
     ok: true,
     service: "pokemonttrpg-backend",
+    version: "1.5.3-fix1",
     uptimeSec: Math.floor(process.uptime()),
     ts: Date.now(),
   });

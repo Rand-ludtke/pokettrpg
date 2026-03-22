@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pokettrpg-pwa-v6';
+const CACHE_NAME = 'pokettrpg-pwa-v7';
 const scope = self?.registration?.scope || '/';
 const base = scope.endsWith('/') ? scope : `${scope}/`;
 const CORE_ASSETS = [
@@ -49,6 +49,7 @@ self.addEventListener('fetch', event => {
   }
 
   event.respondWith(
+    caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request)
         .then(response => {

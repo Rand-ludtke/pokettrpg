@@ -239,6 +239,7 @@ app.get("/api/health", (_req, res) => {
     res.status(200).json({
         ok: true,
         service: "pokemonttrpg-backend",
+        version: "1.5.3-fix1",
         uptimeSec: Math.floor(process.uptime()),
         ts: Date.now(),
     });
@@ -1269,13 +1270,13 @@ function beginBattle(room, players, seed, rules) {
         room.forceSwitchNeeded = new Set();
         console.log(`[Server] Emitting battleStarted for room ${room.id}`);
         io.to(room.id).emit("battleStarted", { roomId: room.id, state });
-        // Emit initial protocol events (|start|, |switch|, |turn|1) before prompting for moves
-        // This prevents a pre-start move prompt from showing before the battle is visually started.
-        // Always emit initial protocol so the client's PS Battle receives all setup lines
+        // Emit initial protocol events before prompting for moves.
+        // Always emit a battleUpdate with the initial protocol so the client's PS Battle
+        // instance receives |player|, |gametype|, |switch|, |start|, |turn| lines.
         room.startProtocolSent = true;
         const hasStart = Array.isArray(state.log) && state.log.some((l) => l.startsWith("|start"));
         const initialEvents = hasStart
-            ? (state.log || []).filter((l) => typeof l === 'string' && l.startsWith('|'))
+            ? state.log.filter((l) => typeof l === 'string' && l.startsWith('|'))
             : buildInitialBattleProtocol(state);
         if (initialEvents.length > 0) {
             io.to(room.id).emit("battleUpdate", {
@@ -1329,9 +1330,11 @@ function buildInitialBattleProtocol(state) {
         const activeIndices = player.activeIndices || [player.activeIndex || 0];
         for (let slotIdx = 0; slotIdx < activeIndices.length; slotIdx++) {
             const ai = activeIndices[slotIdx];
-            if (ai < 0) continue;
+            if (ai < 0)
+                continue;
             const activePoke = player.team?.[ai];
-            if (!activePoke) continue;
+            if (!activePoke)
+                continue;
             const nickname = activePoke.nickname || activePoke.name;
             const species = activePoke.species || activePoke.name;
             const level = activePoke.level || 100;
@@ -1849,97 +1852,100 @@ function processTurnWithBuffer(room) {
     if (!room.engine)
         return;
     try {
-    const state = room.engine.getState();
-    const actions = Object.values(room.turnBuffer);
-    room.turnBuffer = {};
-    clearTurnTimer(room);
-    // Filter to only battle actions (move/switch/multi-choice)
-    const battleActions = actions.filter((a) => a.type === "move" || a.type === "switch" || a.type === "multi-choice");
-    console.log('[Server] Processing turn with actions:', JSON.stringify(battleActions.map(a => ({ type: a.type, pokemonId: a.pokemonId, ...(a.type === 'move' ? { moveId: a.moveId, targetPokemonId: a.targetPokemonId } : {}) }))));
-    let result = room.engine.processTurn(battleActions);
-    // Deduplicate switch lines (PS sends private + public copies after |split| markers)
-    if (Array.isArray(result.events)) {
-        result = { ...result, events: deduplicateSwitchLines(result.events) };
-    }
-    // Filter duplicate start/switch batches after start protocol has already been sent
-    if (room.startProtocolSent && Array.isArray(result.events) && result.events.some((l) => l.startsWith("|start"))) {
-        const hasActionLine = result.events.some((l) => l.startsWith("|move|") ||
-            l.startsWith("|cant|") ||
-            l.startsWith("|-damage|") ||
-            l.startsWith("|damage|") ||
-            l.startsWith("|-heal|") ||
-            l.startsWith("|heal|") ||
-            l.startsWith("|faint|") ||
-            l.startsWith("|-"));
-        if (!hasActionLine) {
-            result = { ...result, events: [], anim: [] };
+        const state = room.engine.getState();
+        const actions = Object.values(room.turnBuffer);
+        room.turnBuffer = {};
+        clearTurnTimer(room);
+        // Filter to only battle actions (move/switch/multi-choice)
+        const battleActions = actions.filter((a) => a.type === "move" || a.type === "switch" || a.type === "multi-choice");
+        console.log('[Server] Processing turn with actions:', JSON.stringify(battleActions.map(a => ({ type: a.type, pokemonId: a.pokemonId, ...(a.type === 'move' ? { moveId: a.moveId, targetPokemonId: a.targetPokemonId } : {}) }))));
+        let result = room.engine.processTurn(battleActions);
+        // Deduplicate switch lines (PS sends private + public copies after |split| markers)
+        if (Array.isArray(result.events)) {
+            result = { ...result, events: deduplicateSwitchLines(result.events) };
+        }
+        // Filter duplicate start/switch batches after start protocol has already been sent
+        if (room.startProtocolSent && Array.isArray(result.events) && result.events.some((l) => l.startsWith("|start"))) {
+            const hasActionLine = result.events.some((l) => l.startsWith("|move|") ||
+                l.startsWith("|cant|") ||
+                l.startsWith("|-damage|") ||
+                l.startsWith("|damage|") ||
+                l.startsWith("|-heal|") ||
+                l.startsWith("|heal|") ||
+                l.startsWith("|faint|") ||
+                l.startsWith("|-"));
+            if (!hasActionLine) {
+                result = { ...result, events: [], anim: [] };
+            }
+            else {
+                const initPrefixes = [
+                    "|start",
+                    "|teampreview",
+                    "|clearpoke",
+                    "|poke|",
+                    "|player|",
+                    "|teamsize|",
+                    "|gen|",
+                    "|tier|",
+                    "|gametype|",
+                    "|t:|",
+                    "|split|",
+                ];
+                const filteredEvents = result.events.filter((line) => {
+                    if (line === "|")
+                        return false;
+                    return !initPrefixes.some((prefix) => line.startsWith(prefix));
+                });
+                result = { ...result, events: filteredEvents };
+            }
+        }
+        if (!room.startProtocolSent && Array.isArray(result.events) && result.events.some((l) => l.startsWith("|start"))) {
+            room.startProtocolSent = true;
+        }
+        room.replay.push({ turn: result.state.turn, events: result.events, anim: result.anim });
+        const needsSwitch = computeNeedsSwitch(result.state, room.engine instanceof sync_ps_engine_1.default ? room.engine : undefined);
+        console.log(`[Server] Turn ${result.state.turn} results: events=${result.events.length} needsSwitch=${needsSwitch.length} (${needsSwitch.join(', ')})`);
+        if (needsSwitch.length > 0) {
+            room.phase = "force-switch";
+            room.forceSwitchNeeded = new Set(needsSwitch);
+            io.to(room.id).emit("phase", { phase: room.phase, deadline: (room.forceSwitchDeadline = Date.now() + FORCE_SWITCH_TIMEOUT_MS) });
+            startForceSwitchTimer(room);
+            // Emit force-switch prompts to players who need to switch
+            emitForceSwitchPrompts(room, result.state, needsSwitch);
+        }
+        if (Array.isArray(result?.events)) {
+            const hasStart = result.events.some((l) => l === "|start" || l.startsWith("|start|"));
+            const hasTurn = result.events.some((l) => l.startsWith("|turn|"));
+            const sample = result.events.slice(0, 8);
+            console.log(`[DIAG-PROTOCOL] [server] battleUpdate events=${result.events.length} start=${hasStart} turn=${hasTurn} sample=${JSON.stringify(sample)}`);
         }
         else {
-            const initPrefixes = [
-                "|start",
-                "|teampreview",
-                "|clearpoke",
-                "|poke|",
-                "|player|",
-                "|teamsize|",
-                "|gen|",
-                "|tier|",
-                "|gametype|",
-                "|t:|",
-                "|split|",
-            ];
-            const filteredEvents = result.events.filter((line) => {
-                if (line === "|")
-                    return false;
-                return !initPrefixes.some((prefix) => line.startsWith(prefix));
-            });
-            result = { ...result, events: filteredEvents };
+            console.log(`[DIAG-PROTOCOL] [server] battleUpdate events=none`);
+        }
+        io.to(room.id).emit("battleUpdate", { result, needsSwitch, rooms: { trick: result.state.field.room, magic: result.state.field.magicRoom, wonder: result.state.field.wonderRoom } });
+        // Simple end detection: if any player's active mon is fainted and no healthy mons remain
+        const sideDefeated = result.state.players.find((pl) => pl.team.every(m => m.currentHP <= 0));
+        if (sideDefeated) {
+            const winner = result.state.players.find(pl => pl.id !== sideDefeated.id)?.id;
+            const replayId = saveReplay(room);
+            io.to(room.id).emit("battleEnd", { winner, replayId });
+            clearForceSwitchTimer(room);
+            clearTurnTimer(room);
+        }
+        else if (needsSwitch.length === 0) {
+            // Emit new move prompts for the next turn
+            emitMovePrompts(room, result.state);
         }
     }
-    if (!room.startProtocolSent && Array.isArray(result.events) && result.events.some((l) => l.startsWith("|start"))) {
-        room.startProtocolSent = true;
-    }
-    room.replay.push({ turn: result.state.turn, events: result.events, anim: result.anim });
-    const needsSwitch = computeNeedsSwitch(result.state, room.engine instanceof sync_ps_engine_1.default ? room.engine : undefined);
-    console.log(`[Server] Turn ${result.state.turn} results: events=${result.events.length} needsSwitch=${needsSwitch.length} (${needsSwitch.join(', ')})`);
-    if (needsSwitch.length > 0) {
-        room.phase = "force-switch";
-        room.forceSwitchNeeded = new Set(needsSwitch);
-        io.to(room.id).emit("phase", { phase: room.phase, deadline: (room.forceSwitchDeadline = Date.now() + FORCE_SWITCH_TIMEOUT_MS) });
-        startForceSwitchTimer(room);
-        // Emit force-switch prompts to players who need to switch
-        emitForceSwitchPrompts(room, result.state, needsSwitch);
-    }
-    if (Array.isArray(result?.events)) {
-        const hasStart = result.events.some((l) => l === "|start" || l.startsWith("|start|"));
-        const hasTurn = result.events.some((l) => l.startsWith("|turn|"));
-        const sample = result.events.slice(0, 8);
-        console.log(`[DIAG-PROTOCOL] [server] battleUpdate events=${result.events.length} start=${hasStart} turn=${hasTurn} sample=${JSON.stringify(sample)}`);
-    }
-    else {
-        console.log(`[DIAG-PROTOCOL] [server] battleUpdate events=none`);
-    }
-    io.to(room.id).emit("battleUpdate", { result, needsSwitch, rooms: { trick: result.state.field.room, magic: result.state.field.magicRoom, wonder: result.state.field.wonderRoom } });
-    // Simple end detection: if any player's active mon is fainted and no healthy mons remain
-    const sideDefeated = result.state.players.find((pl) => pl.team.every(m => m.currentHP <= 0));
-    if (sideDefeated) {
-        const winner = result.state.players.find(pl => pl.id !== sideDefeated.id)?.id;
-        const replayId = saveReplay(room);
-        io.to(room.id).emit("battleEnd", { winner, replayId });
-        clearForceSwitchTimer(room);
-        clearTurnTimer(room);
-    }
-    else if (needsSwitch.length === 0) {
-        // Emit new move prompts for the next turn
-        emitMovePrompts(room, result.state);
-    }
-    } catch (err) {
+    catch (err) {
         console.error(`[Server] processTurnWithBuffer error for room ${room.id}:`, err?.stack || err);
+        // Re-prompt players so they aren't stuck
         if (room.engine) {
             try {
                 const freshState = room.engine.getState();
                 emitMovePrompts(room, freshState);
-            } catch {}
+            }
+            catch { }
         }
     }
 }
@@ -2142,7 +2148,7 @@ io.on("connection", (socket) => {
         room.startProtocolSent = true;
         const hasStart = Array.isArray(state.log) && state.log.some((l) => l.startsWith("|start"));
         const initialEvents = hasStart
-            ? (state.log || []).filter((l) => typeof l === 'string' && l.startsWith('|'))
+            ? state.log.filter((l) => typeof l === 'string' && l.startsWith('|'))
             : buildInitialBattleProtocol(state);
         if (initialEvents.length > 0) {
             io.to(room.id).emit("battleUpdate", {

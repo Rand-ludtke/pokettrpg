@@ -924,7 +924,7 @@ return"background:transparent url("+Dex.resourcePrefix+"sprites/itemicons-sheet.
 
 getTypeIcon=function getTypeIcon(type,b){
 type=this.types.get(type).name;
-if(!type)type='???';
+if(!type||type==='???')return'';
 var sanitizedType=type.replace(/\?/g,'%3f');
 return"<img src=\""+Dex.resourcePrefix+"sprites/types/"+sanitizedType+".png\" alt=\""+type+"\" height=\"14\" width=\"32\" class=\"pixelated"+(b?' b':'')+"\" />";
 };_proto2.
