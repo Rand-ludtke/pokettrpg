@@ -55,6 +55,8 @@ export function normalizeName(id: string) {
 
 const DEFAULT_DATA_BASE = withPublicBase('vendor/showdown/data').replace(/\/+$/, '');
 const DEFAULT_SPRITE_BASE = withPublicBase('vendor/showdown/sprites').replace(/\/+$/, '');
+/** Custom/regional sprites shipped at public/sprites/ (Wylin, Sage, etc.) */
+const CUSTOM_SPRITE_BASE = withPublicBase('sprites').replace(/\/+$/, '');
 
 function normalizeBaseUrl(base: string | null | undefined): string {
   const value = String(base || '').trim();
@@ -98,9 +100,12 @@ function getSpriteBaseCandidates(preferredBase?: string): string[] {
     ? ''
     : DEFAULT_BACKEND_SPRITE_BASE;
 
-  // Static vendor first (GitHub Pages / Tauri bundle), then API backend for
+  // Custom/regional sprites folder (Wylin, Sage, etc.) lives next to vendor sprites
+  const customBase = normalizeBaseUrl(CUSTOM_SPRITE_BASE);
+
+  // Static vendor first, then custom regional sprites, then API backend for
   // numeric BaseSprites that only exist on the Pi server.
-  const all = [explicit, staticBase, ...fromApiBase, defaultBackend]
+  const all = [explicit, staticBase, customBase, ...fromApiBase, defaultBackend]
     .map(normalizeBaseUrl)
     .filter((v): v is string => !!v);
   return Array.from(new Set(all));
@@ -763,11 +768,20 @@ type SpriteFolderIndex = Record<string, Set<string>>;
 
 let gSpriteIndexPromise: Promise<SpriteFolderIndex | null> | null = null;
 
+/** Maps "folder:spriteId" → first base URL that contributed it. Used to generate correct URLs. */
+let gSpriteIdBaseMap: Map<string, string> = new Map();
+
+/** Look up the best sprite base for a specific folder+id combination (prefers the base that indexed it). */
+function spriteBaseForFolderId(folder: string, spriteId: string, fallback: string): string {
+  return gSpriteIdBaseMap.get(`${folder}:${spriteId}`) || fallback;
+}
+
 async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex | null> {
   if (gSpriteIndexPromise) return gSpriteIndexPromise;
   gSpriteIndexPromise = (async () => {
     const bases = getSpriteBaseCandidates(base ?? DEFAULT_SPRITE_BASE);
     const out: SpriteFolderIndex = {};
+    const baseMap = new Map<string, string>();
     let foundAny = false;
     // Give mobile browsers extra time — HTTPS negotiation + 4G latency can be slow.
     const timeoutMs = /Mobi|Android|iPhone/i.test(navigator?.userAgent ?? '') ? 10_000 : 5_000;
@@ -786,6 +800,9 @@ async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex |
             const v = String(id || '').trim();
             if (!v) continue;
             out[folder].add(v);
+            // Track first base that contributed this sprite ID so we can build correct URLs
+            const key = `${folder}:${v}`;
+            if (!baseMap.has(key)) baseMap.set(key, spriteBase);
           }
         }
         foundAny = true;
@@ -795,6 +812,7 @@ async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex |
         clearTimeout(timeoutId);
       }
     }
+    gSpriteIdBaseMap = baseMap;
     return foundAny ? out : null;
   })();
   // If no index was found, allow retry on next call (e.g. after deploy or service restart)
@@ -966,8 +984,10 @@ export async function listPokemonSpriteOptions(
     if (strictExisting && !frontEntries) continue;
     for (const spriteId of sortedVariantIds) {
       if (frontEntries && !frontEntries.has(spriteId)) continue;
-      // Use API base for numeric sprites (from BaseSprites), static base for named/delta sprites
-      const optBase = bestSpriteBaseForId(spriteId, base);
+      // Use the base that actually indexed this sprite ID; fall back to API for numerics, static otherwise
+      const optBase = def.front
+        ? spriteBaseForFolderId(def.front, spriteId, bestSpriteBaseForId(spriteId, base))
+        : bestSpriteBaseForId(spriteId, base);
       const front = `${optBase}/${def.front}/${spriteId}.${def.ext}`;
       const back = def.back && (!backEntries || backEntries.has(spriteId))
         ? `${optBase}/${def.back}/${spriteId}.${def.ext}`
@@ -1207,13 +1227,14 @@ export type SpriteSlot =
 export function getCustomSprites(): Record<string, Partial<Record<SpriteSlot, string>>> {
   try { return JSON.parse(localStorage.getItem(LS_CUSTOM_SPRITES) || '{}'); } catch { return {}; }
 }
-export function getCustomSprite(id: string, slot: SpriteSlot): string | undefined {
+export function getCustomSprite(id: string, slot: SpriteSlot, forceBundled?: boolean): string | undefined {
   const all = getCustomSprites();
   const normalizedId = normalizeName(id);
   const local = all[id]?.[slot] || all[normalizedId]?.[slot];
   if (local) return local;
   // Wylin/custom region sprites should prefer backend-hosted updates over bundled snapshots.
-  if (gPreferBackendSpriteIds.has(normalizedId) && getApiSpriteBase()) return undefined;
+  // When forceBundled is true (e.g. PS engine needs a sprite immediately), skip this guard.
+  if (!forceBundled && gPreferBackendSpriteIds.has(normalizedId) && getApiSpriteBase()) return undefined;
   const bundled = gBundledSprites[normalizedId] || gBundledSprites[id];
   if (!bundled) return undefined;
   const bySlot = bundled[slot];

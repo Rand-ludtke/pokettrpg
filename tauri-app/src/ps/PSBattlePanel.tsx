@@ -1100,9 +1100,36 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 return result;
               }
               const speciesId = normalizeName(speciesName);
-              // Check for a locally-cached custom sprite matching this species
+
+              // 1) Check battle state for per-Pokemon custom sprite URLs (e.g. 5a, 5b choices from PC)
+              const battleState = lastBattleStateRef.current;
+              if (battleState?.players) {
+                for (const player of battleState.players) {
+                  const team = player.team || player.pokemon || [];
+                  for (const mon of team) {
+                    const monId = normalizeName(mon.species || mon.name || '');
+                    if (monId === speciesId) {
+                      const directUrl = isFront
+                        ? (mon.sprite || mon.spriteUrl || mon.image)
+                        : (mon.backSprite || mon.backSpriteUrl);
+                      if (directUrl) {
+                        result.url = directUrl;
+                        result.w = 96;
+                        result.h = 96;
+                        result.pixelated = true;
+                        return result;
+                      }
+                      break;
+                    }
+                  }
+                }
+              }
+
+              // 2) Check for a locally-cached or bundled custom sprite matching this species
+              //    forceBundled=true ensures bundled data URLs are returned even when
+              //    backend is preferred (PS engine can't async-load backend URLs).
               const slot = isFront ? 'front' as const : 'back' as const;
-              const custom = getCustomSprite(speciesId, slot);
+              const custom = getCustomSprite(speciesId, slot, true);
               if (custom) {
                 result.url = custom;
                 // Custom sprites are 96×96 pixel art
