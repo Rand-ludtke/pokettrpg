@@ -990,6 +990,14 @@ function getSideRoster(state: any, request: any, side: SideId, sidePlayerId?: st
     ? (players.find((p: any) => p?.id === sidePlayerId) || players[idx])
     : players[idx];
 
+  // Diagnostic: warn if player lookup resolved to the wrong index
+  if (sidePlayerId && players.length >= 2 && player === players[1 - idx]) {
+    console.warn(`[getSideRoster] Side ${side} resolved to wrong player index!`, {
+      sidePlayerId, expectedIdx: idx, actualPlayer: player?.id,
+      players: players.map((p: any) => p?.id),
+    });
+  }
+
   // PRIORITY: When battle state has player.team AND activeIndex, use that as authoritative source
   // This ensures roster indices match activeIndex from battle state
   if (player?.team?.length && typeof player.activeIndex === 'number') {
@@ -2048,10 +2056,27 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
       p2: raw.p2 === undefined ? undefined : coerceRequestObject(raw.p2),
     } as RequestMap;
   }, [battleState]);
-  const rosterEntries = useMemo<Record<SideId, RosterEntry[]>>(() => ({
-    p1: buildRosterEntries(battleState, requestBySide.p1 ?? promptRequests.p1 ?? derivedRequests.p1, 'p1', playerIds.p1),
-    p2: buildRosterEntries(battleState, requestBySide.p2 ?? promptRequests.p2 ?? derivedRequests.p2, 'p2', playerIds.p2),
-  }), [battleState, requestBySide, promptRequests, derivedRequests, playerIds]);
+  const rosterEntries = useMemo<Record<SideId, RosterEntry[]>>(() => {
+    const entries = {
+      p1: buildRosterEntries(battleState, requestBySide.p1 ?? promptRequests.p1 ?? derivedRequests.p1, 'p1', playerIds.p1),
+      p2: buildRosterEntries(battleState, requestBySide.p2 ?? promptRequests.p2 ?? derivedRequests.p2, 'p2', playerIds.p2),
+    };
+    // Diagnostic: warn if both sides got the same roster (tooltip bug investigation)
+    if (entries.p1.length && entries.p2.length) {
+      const p1Names = entries.p1.map(e => speciesFromPokemon(e.pokemon)).join(',');
+      const p2Names = entries.p2.map(e => speciesFromPokemon(e.pokemon)).join(',');
+      if (p1Names === p2Names && p1Names) {
+        console.warn('[rosterEntries] Both sides have identical rosters — possible data bug!', {
+          p1Names, p2Names,
+          playerIds,
+          p1PlayerId: playerIds.p1,
+          p2PlayerId: playerIds.p2,
+          playersInState: battleState?.players?.map((p: any) => ({ id: p.id, teamCount: p.team?.length })),
+        });
+      }
+    }
+    return entries;
+  }, [battleState, requestBySide, promptRequests, derivedRequests, playerIds]);
   // Only show one active Pokemon per side (in singles format)
   const p1FirstActive = rosterEntries.p1.find(entry => entry.isActive)?.pokemon;
   const p2FirstActive = rosterEntries.p2.find(entry => entry.isActive)?.pokemon;

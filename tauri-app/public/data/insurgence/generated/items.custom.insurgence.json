@@ -1,1 +1,692 @@
-{}
+{
+  "poliwrathite": {
+    "name": "Poliwrathite",
+    "shortDesc": "Enables Poliwrath to Mega Evolve.",
+    "desc": "If held by Poliwrath, allows it to Mega Evolve.",
+    "megaStone": "Poliwrath",
+    "megaEvolves": "Poliwrath",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "marowite": {
+    "name": "Marowite",
+    "shortDesc": "Enables Marowak to Mega Evolve.",
+    "desc": "If held by Marowak, allows it to Mega Evolve.",
+    "megaStone": "Marowak",
+    "megaEvolves": "Marowak",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "eevite": {
+    "name": "Eevite",
+    "shortDesc": "Enables Eevee to Mega Evolve.",
+    "desc": "If held by Eevee, allows it to Mega Evolve.",
+    "megaStone": "Eevee",
+    "megaEvolves": "Eevee",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "meganiumite": {
+    "name": "Meganiumite",
+    "shortDesc": "Enables Meganium to Mega Evolve.",
+    "desc": "If held by Meganium, allows it to Mega Evolve.",
+    "megaStone": "Meganium",
+    "megaEvolves": "Meganium",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "typhlosionite": {
+    "name": "Typhlosionite",
+    "shortDesc": "Enables Typhlosion to Mega Evolve.",
+    "desc": "If held by Typhlosion, allows it to Mega Evolve.",
+    "megaStone": "Typhlosion",
+    "megaEvolves": "Typhlosion",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "feraligatite": {
+    "name": "Feraligatite",
+    "shortDesc": "Enables Feraligatr to Mega Evolve.",
+    "desc": "If held by Feraligatr, allows it to Mega Evolve.",
+    "megaStone": "Feraligatr",
+    "megaEvolves": "Feraligatr",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "sudowoodite": {
+    "name": "Sudowoodite",
+    "shortDesc": "Enables Sudowoodo to Mega Evolve.",
+    "desc": "If held by Sudowoodo, allows it to Mega Evolve.",
+    "megaStone": "Sudowoodo",
+    "megaEvolves": "Sudowoodo",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "politoedite": {
+    "name": "Politoedite",
+    "shortDesc": "Enables Politoed to Mega Evolve.",
+    "desc": "If held by Politoed, allows it to Mega Evolve.",
+    "megaStone": "Politoed",
+    "megaEvolves": "Politoed",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "sunflorite": {
+    "name": "Sunflorite",
+    "shortDesc": "Enables Sunflora to Mega Evolve.",
+    "desc": "If held by Sunflora, allows it to Mega Evolve.",
+    "megaStone": "Sunflora",
+    "megaEvolves": "Sunflora",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "etigirafarigite": {
+    "name": "Etigirafarigite",
+    "shortDesc": "Enables Girafarig to Mega Evolve.",
+    "desc": "If held by Girafarig, allows it to Mega Evolve.",
+    "megaStone": "Girafarig",
+    "megaEvolves": "Girafarig",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "steelixitefire": {
+    "name": "Steelixite (Fire)",
+    "shortDesc": "Enables Steelix to Mega Evolve.",
+    "desc": "If held by Steelix, allows it to Mega Evolve.",
+    "megaStone": "Steelix",
+    "megaEvolves": "Steelix",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "magcargonite": {
+    "name": "Magcargonite",
+    "shortDesc": "Enables Magcargo to Mega Evolve.",
+    "desc": "If held by Magcargo, allows it to Mega Evolve.",
+    "megaStone": "Magcargo",
+    "megaEvolves": "Magcargo",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "donphanite": {
+    "name": "Donphanite",
+    "shortDesc": "Enables Donphan to Mega Evolve.",
+    "desc": "If held by Donphan, allows it to Mega Evolve.",
+    "megaStone": "Donphan",
+    "megaEvolves": "Donphan",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "miltankite": {
+    "name": "Miltankite",
+    "shortDesc": "Enables Miltank to Mega Evolve.",
+    "desc": "If held by Miltank, allows it to Mega Evolve.",
+    "megaStone": "Miltank",
+    "megaEvolves": "Miltank",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "shiftrite": {
+    "name": "Shiftrite",
+    "shortDesc": "Enables Shiftry to Mega Evolve.",
+    "desc": "If held by Shiftry, allows it to Mega Evolve.",
+    "megaStone": "Shiftry",
+    "megaEvolves": "Shiftry",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "flygonite": {
+    "name": "Flygonite",
+    "shortDesc": "Enables Flygon to Mega Evolve.",
+    "desc": "If held by Flygon, allows it to Mega Evolve.",
+    "megaStone": "Flygon",
+    "megaEvolves": "Flygon",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "cacturnite": {
+    "name": "Cacturnite",
+    "shortDesc": "Enables Cacturne to Mega Evolve.",
+    "desc": "If held by Cacturne, allows it to Mega Evolve.",
+    "megaStone": "Cacturne",
+    "megaEvolves": "Cacturne",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "crawdite": {
+    "name": "Crawdite",
+    "shortDesc": "Enables Crawdaunt to Mega Evolve.",
+    "desc": "If held by Crawdaunt, allows it to Mega Evolve.",
+    "megaStone": "Crawdaunt",
+    "megaEvolves": "Crawdaunt",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "milotite": {
+    "name": "Milotite",
+    "shortDesc": "Enables Milotic to Mega Evolve.",
+    "desc": "If held by Milotic, allows it to Mega Evolve.",
+    "megaStone": "Milotic",
+    "megaEvolves": "Milotic",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "jirachite": {
+    "name": "Jirachite",
+    "shortDesc": "Enables Jirachi to Mega Evolve.",
+    "desc": "If held by Jirachi, allows it to Mega Evolve.",
+    "megaStone": "Jirachi",
+    "megaEvolves": "Jirachi",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "chatotite": {
+    "name": "Chatotite",
+    "shortDesc": "Enables Chatot to Mega Evolve.",
+    "desc": "If held by Chatot, allows it to Mega Evolve.",
+    "megaStone": "Chatot",
+    "megaEvolves": "Chatot",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "spiritombite": {
+    "name": "Spiritombite",
+    "shortDesc": "Enables Spiritomb to Mega Evolve.",
+    "desc": "If held by Spiritomb, allows it to Mega Evolve.",
+    "megaStone": "Spiritomb",
+    "megaEvolves": "Spiritomb",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "froslassite": {
+    "name": "Froslassite",
+    "shortDesc": "Enables Froslass to Mega Evolve.",
+    "desc": "If held by Froslass, allows it to Mega Evolve.",
+    "megaStone": "Froslass",
+    "megaEvolves": "Froslass",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "zebstrikite": {
+    "name": "Zebstrikite",
+    "shortDesc": "Enables Zebstrika to Mega Evolve.",
+    "desc": "If held by Zebstrika, allows it to Mega Evolve.",
+    "megaStone": "Zebstrika",
+    "megaEvolves": "Zebstrika",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "zoronite": {
+    "name": "Zoronite",
+    "shortDesc": "Enables Zoroark to Mega Evolve.",
+    "desc": "If held by Zoroark, allows it to Mega Evolve.",
+    "megaStone": "Zoroark",
+    "megaEvolves": "Zoroark",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "gothitite": {
+    "name": "Gothitite",
+    "shortDesc": "Enables Gothitelle to Mega Evolve.",
+    "desc": "If held by Gothitelle, allows it to Mega Evolve.",
+    "megaStone": "Gothitelle",
+    "megaEvolves": "Gothitelle",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "reuniclite": {
+    "name": "Reuniclite",
+    "shortDesc": "Enables Reuniclus to Mega Evolve.",
+    "desc": "If held by Reuniclus, allows it to Mega Evolve.",
+    "megaStone": "Reuniclus",
+    "megaEvolves": "Reuniclus",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "cryogonite": {
+    "name": "Cryogonite",
+    "shortDesc": "Enables Cryogonal to Mega Evolve.",
+    "desc": "If held by Cryogonal, allows it to Mega Evolve.",
+    "megaStone": "Cryogonal",
+    "megaEvolves": "Cryogonal",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "haxorite": {
+    "name": "Haxorite",
+    "shortDesc": "Enables Haxorus to Mega Evolve.",
+    "desc": "If held by Haxorus, allows it to Mega Evolve.",
+    "megaStone": "Haxorus",
+    "megaEvolves": "Haxorus",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "stunfiskite": {
+    "name": "Stunfiskite",
+    "shortDesc": "Enables Stunfisk to Mega Evolve.",
+    "desc": "If held by Stunfisk, allows it to Mega Evolve.",
+    "megaStone": "Stunfisk",
+    "megaEvolves": "Stunfisk",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "bisharpite": {
+    "name": "Bisharpite",
+    "shortDesc": "Enables Bisharp to Mega Evolve.",
+    "desc": "If held by Bisharp, allows it to Mega Evolve.",
+    "megaStone": "Bisharp",
+    "megaEvolves": "Bisharp",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "hydreigonite": {
+    "name": "Hydreigonite",
+    "shortDesc": "Enables Hydreigon to Mega Evolve.",
+    "desc": "If held by Hydreigon, allows it to Mega Evolve.",
+    "megaStone": "Hydreigon",
+    "megaEvolves": "Hydreigon",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "mewtwonitex": {
+    "name": "Mewtwonite X",
+    "shortDesc": "Enables Shadow Mewtwo to Mega Evolve.",
+    "desc": "If held by Shadow Mewtwo, allows it to Mega Evolve.",
+    "megaStone": "Shadow Mewtwo",
+    "megaEvolves": "Shadow Mewtwo",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltavenusaurite": {
+    "name": "Delta Venusaurite",
+    "shortDesc": "Enables Delta Venusaur to Mega Evolve.",
+    "desc": "If held by Delta Venusaur, allows it to Mega Evolve.",
+    "megaStone": "Delta Venusaur",
+    "megaEvolves": "Delta Venusaur",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltacharizardite": {
+    "name": "Delta Charizardite",
+    "shortDesc": "Enables Delta Charizard to Mega Evolve.",
+    "desc": "If held by Delta Charizard, allows it to Mega Evolve.",
+    "megaStone": "Delta Charizard",
+    "megaEvolves": "Delta Charizard",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltablastoisinite": {
+    "name": "Delta Blastoisinite",
+    "shortDesc": "Enables Delta Blastoise to Mega Evolve.",
+    "desc": "If held by Delta Blastoise, allows it to Mega Evolve.",
+    "megaStone": "Delta Blastoise",
+    "megaEvolves": "Delta Blastoise",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltabisharpite": {
+    "name": "Delta Bisharpite",
+    "shortDesc": "Enables Delta Bisharp to Mega Evolve.",
+    "desc": "If held by Delta Bisharp, allows it to Mega Evolve.",
+    "megaStone": "Delta Bisharp",
+    "megaEvolves": "Delta Bisharp",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltagardevoirite": {
+    "name": "Delta Gardevoirite",
+    "shortDesc": "Enables Delta Gardevoir to Mega Evolve.",
+    "desc": "If held by Delta Gardevoir, allows it to Mega Evolve.",
+    "megaStone": "Delta Gardevoir",
+    "megaEvolves": "Delta Gardevoir",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltagalladite": {
+    "name": "Delta Galladite",
+    "shortDesc": "Enables Delta Gallade to Mega Evolve.",
+    "desc": "If held by Delta Gallade, allows it to Mega Evolve.",
+    "megaStone": "Delta Gallade",
+    "megaEvolves": "Delta Gallade",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltasunflorite": {
+    "name": "Delta Sunflorite",
+    "shortDesc": "Enables Delta Sunflora to Mega Evolve.",
+    "desc": "If held by Delta Sunflora, allows it to Mega Evolve.",
+    "megaStone": "Delta Sunflora",
+    "megaEvolves": "Delta Sunflora",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltascizorite": {
+    "name": "Delta Scizorite",
+    "shortDesc": "Enables Delta Scizor to Mega Evolve.",
+    "desc": "If held by Delta Scizor, allows it to Mega Evolve.",
+    "megaStone": "Delta Scizor",
+    "megaEvolves": "Delta Scizor",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltaglalitite": {
+    "name": "Delta Glalitite",
+    "shortDesc": "Enables Delta Glalie to Mega Evolve.",
+    "desc": "If held by Delta Glalie, allows it to Mega Evolve.",
+    "megaStone": "Delta Glalie",
+    "megaEvolves": "Delta Glalie",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltafroslassite": {
+    "name": "Delta Froslassite",
+    "shortDesc": "Enables Delta Froslass to Mega Evolve.",
+    "desc": "If held by Delta Froslass, allows it to Mega Evolve.",
+    "megaStone": "Delta Froslass",
+    "megaEvolves": "Delta Froslass",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltatyphlosionite": {
+    "name": "Delta Typhlosionite",
+    "shortDesc": "Enables Delta Typhlosion to Mega Evolve.",
+    "desc": "If held by Delta Typhlosion, allows it to Mega Evolve.",
+    "megaStone": "Delta Typhlosion",
+    "megaEvolves": "Delta Typhlosion",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltapidgeotite": {
+    "name": "Delta Pidgeotite",
+    "shortDesc": "Enables Delta Pidgeot to Mega Evolve.",
+    "desc": "If held by Delta Pidgeot, allows it to Mega Evolve.",
+    "megaStone": "Delta Pidgeot",
+    "megaEvolves": "Delta Pidgeot",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltaetigirafarigite": {
+    "name": "Delta Etigirafarigite",
+    "shortDesc": "Enables Delta Girafarig to Mega Evolve.",
+    "desc": "If held by Delta Girafarig, allows it to Mega Evolve.",
+    "megaStone": "Delta Girafarig",
+    "megaEvolves": "Delta Girafarig",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltasablenite": {
+    "name": "Delta Sablenite",
+    "shortDesc": "Enables Delta Sableye to Mega Evolve.",
+    "desc": "If held by Delta Sableye, allows it to Mega Evolve.",
+    "megaStone": "Delta Sableye",
+    "megaEvolves": "Delta Sableye",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltamawilite": {
+    "name": "Delta Mawilite",
+    "shortDesc": "Enables Delta Mawile to Mega Evolve.",
+    "desc": "If held by Delta Mawile, allows it to Mega Evolve.",
+    "megaStone": "Delta Mawile",
+    "megaEvolves": "Delta Mawile",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltamedichamite": {
+    "name": "Delta Medichamite",
+    "shortDesc": "Enables Delta Medicham to Mega Evolve.",
+    "desc": "If held by Delta Medicham, allows it to Mega Evolve.",
+    "megaStone": "Delta Medicham",
+    "megaEvolves": "Delta Medicham",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltacameruptite": {
+    "name": "Delta Cameruptite",
+    "shortDesc": "Enables Delta Camerupt to Mega Evolve.",
+    "desc": "If held by Delta Camerupt, allows it to Mega Evolve.",
+    "megaStone": "Delta Camerupt",
+    "megaEvolves": "Delta Camerupt",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltamilotite": {
+    "name": "Delta Milotite",
+    "shortDesc": "Enables Delta Milotic to Mega Evolve.",
+    "desc": "If held by Delta Milotic, allows it to Mega Evolve.",
+    "megaStone": "Delta Milotic",
+    "megaEvolves": "Delta Milotic",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltametagrossitespider": {
+    "name": "Delta Metagrossite (Spider)",
+    "shortDesc": "Enables Delta Metagross (Spider) to Mega Evolve.",
+    "desc": "If held by Delta Metagross (Spider), allows it to Mega Evolve.",
+    "megaStone": "Delta Metagross (Spider)",
+    "megaEvolves": "Delta Metagross (Spider)",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltametagrossiteruin": {
+    "name": "Delta Metagrossite (Ruin)",
+    "shortDesc": "Enables Delta Metagross (Ruin) to Mega Evolve.",
+    "desc": "If held by Delta Metagross (Ruin), allows it to Mega Evolve.",
+    "megaStone": "Delta Metagross (Ruin)",
+    "megaEvolves": "Delta Metagross (Ruin)",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "crystalfragment": {
+    "name": "Crystal Fragment",
+    "shortDesc": "Enables Delta Metagross (Ruin) to Crystallize.",
+    "desc": "If held by Delta Metagross (Ruin), allows it to change into its Crystallized form.",
+    "megaStone": "Delta Metagross (Ruin)-Crystal",
+    "megaEvolves": "Delta Metagross (Ruin)",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltalopunnite": {
+    "name": "Delta Lopunnite",
+    "shortDesc": "Enables Delta Lopunny to Mega Evolve.",
+    "desc": "If held by Delta Lopunny, allows it to Mega Evolve.",
+    "megaStone": "Delta Lopunny",
+    "megaEvolves": "Delta Lopunny",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "deltalucarionite": {
+    "name": "Delta Lucarionite",
+    "shortDesc": "Enables Delta Lucario to Mega Evolve.",
+    "desc": "If held by Delta Lucario, allows it to Mega Evolve.",
+    "megaStone": "Delta Lucario",
+    "megaEvolves": "Delta Lucario",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "meganiumiteza": {
+    "name": "Meganiumite ZA",
+    "shortDesc": "Enables Meganium to Mega Evolve.",
+    "desc": "If held by Meganium, allows it to Mega Evolve.",
+    "megaStone": "Meganium",
+    "megaEvolves": "Meganium",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "feraligatiteza": {
+    "name": "Feraligatite ZA",
+    "shortDesc": "Enables Feraligatr to Mega Evolve.",
+    "desc": "If held by Feraligatr, allows it to Mega Evolve.",
+    "megaStone": "Feraligatr",
+    "megaEvolves": "Feraligatr",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "froslassiteza": {
+    "name": "Froslassite ZA",
+    "shortDesc": "Enables Froslass to Mega Evolve.",
+    "desc": "If held by Froslass, allows it to Mega Evolve.",
+    "megaStone": "Froslass",
+    "megaEvolves": "Froslass",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "flygoniteza": {
+    "name": "Flygonite ZA",
+    "shortDesc": "Enables Flygon to Mega Evolve.",
+    "desc": "If held by Flygon, allows it to Mega Evolve.",
+    "megaStone": "Flygon",
+    "megaEvolves": "Flygon",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "kingambitite": {
+    "name": "Kingambitite",
+    "shortDesc": "Enables Kingambit to Mega Evolve.",
+    "desc": "If held by Kingambit, allows it to Mega Evolve.",
+    "megaStone": "Kingambit",
+    "megaEvolves": "Kingambit",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "toucannonite": {
+    "name": "Toucannonite",
+    "shortDesc": "Enables Toucannon to Mega Evolve.",
+    "desc": "If held by Toucannon, allows it to Mega Evolve.",
+    "megaStone": "Toucannon",
+    "megaEvolves": "Toucannon",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "luxraynite": {
+    "name": "Luxraynite",
+    "shortDesc": "Enables Luxray to Mega Evolve.",
+    "desc": "If held by Luxray, allows it to Mega Evolve.",
+    "megaStone": "Luxray",
+    "megaEvolves": "Luxray",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "talonflamite": {
+    "name": "Talonflamite",
+    "shortDesc": "Enables Talonflame to Mega Evolve.",
+    "desc": "If held by Talonflame, allows it to Mega Evolve.",
+    "megaStone": "Talonflame",
+    "megaEvolves": "Talonflame",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "chandelurite": {
+    "name": "Chandelurite",
+    "shortDesc": "Enables Chandelure to Mega Evolve.",
+    "desc": "If held by Chandelure, allows it to Mega Evolve.",
+    "megaStone": "Chandelure",
+    "megaEvolves": "Chandelure",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "arcaninite": {
+    "name": "Arcaninite",
+    "shortDesc": "Enables Arcanine to Mega Evolve.",
+    "desc": "If held by Arcanine, allows it to Mega Evolve.",
+    "megaStone": "Arcanine",
+    "megaEvolves": "Arcanine",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "dragonitite": {
+    "name": "Dragonitite",
+    "shortDesc": "Enables Dragonite to Mega Evolve.",
+    "desc": "If held by Dragonite, allows it to Mega Evolve.",
+    "megaStone": "Dragonite",
+    "megaEvolves": "Dragonite",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "laprsite": {
+    "name": "Laprsite",
+    "shortDesc": "Enables Lapras to Mega Evolve.",
+    "desc": "If held by Lapras, allows it to Mega Evolve.",
+    "megaStone": "Lapras",
+    "megaEvolves": "Lapras",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  },
+  "floettite": {
+    "name": "Floettite",
+    "shortDesc": "Enables Floette-Eternal to Mega Evolve.",
+    "desc": "If held by Floette-Eternal, allows it to Mega Evolve.",
+    "megaStone": "Floette-Eternal",
+    "megaEvolves": "Floette",
+    "gen": 6,
+    "isNonstandard": "Custom",
+    "num": -1
+  }
+}

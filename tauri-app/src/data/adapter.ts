@@ -737,6 +737,19 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
       pushId(String(Math.trunc(deltaDexNum)));
     }
   }
+  // Wylin regional formes: "Wylin Gardevoir" → sprite file is "gardevoir-wylin.png"
+  if (/\bwylin\b/i.test(speciesName)) {
+    const cleaned = String(speciesName || '')
+      .replace(/\bwylin\b/gi, '')
+      .replace(/[-_]+/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    const baseNorm = normalizeName(toAscii(cleaned));
+    if (baseNorm) {
+      pushId(`${baseNorm}-wylin`);
+      pushId(`wylin-${baseNorm}`);
+    }
+  }
   // For Calyrex rider forms, ensure short variant is present explicitly
   if (/calyrex/i.test(speciesName)) {
     if (/ice/i.test(speciesName)) pushId('calyrex-ice');

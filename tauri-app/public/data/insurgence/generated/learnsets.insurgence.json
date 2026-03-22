@@ -1,1 +1,11645 @@
-{}
+{
+  "deltabulbasaur": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaivysaur": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltavenusaur": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacharmander": {
+    "learnset": {
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacharmeleon": {
+    "learnset": {
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacharizard": {
+    "learnset": {
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasquirtle": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltawartortle": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltablastoise": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapawniard": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "aurasphere": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltabisharp": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "aurasphere": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaralts": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltakirlia": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagardevoir": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagallade": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasunkern": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasunflora": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltabergmite": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaavalugg": {
+    "learnset": {
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltascyther": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "blizzard": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltascizor": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "blizzard": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltascraggy": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltascrafty": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacombee": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltavespiquen": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltakoffing": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaweezing": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapurrloin": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaliepard": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaphantump": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatrevenant": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasnorunt": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaglalie": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltafroslass": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltashinx": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaluxio": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaluxray": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltanoibat": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "energyball": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltanoivern": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "energyball": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltabudew": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaroselia": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaroserade": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadrifloon": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadrifblim": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagrimer": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamuk": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltawooper": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaquagsire": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamunchlax": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasnorlax": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamisdreavus": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamismagius": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacyndaquil": {
+    "learnset": {
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaquilava": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatyphlosion": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatreecko": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "bodyslam": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagrovyle": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "bodyslam": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasceptile": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatorchic": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacombusken": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltablaziken": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaturtwig": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagrotle": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatorterra": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasnivy": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaservine": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaserperior": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltafroakie": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltafrogadier": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagreninja": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapidgey": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapidgeotto": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapidgeot": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadiglett": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "bodyslam": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadugtrio": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "bodyslam": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagrowlithe": {
+    "learnset": {
+      "bodyslam": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaarcanine": {
+    "learnset": {
+      "bodyslam": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltageodude": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagraveler": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagolem": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatentacool": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatentacruel": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadoduo": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadodrio": {
+    "learnset": {
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatangela": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatangrowth": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaditto": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltakabuto": {
+    "learnset": {
+      "bugbuzz": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "leechlife": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "signalbeam": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stickyweb": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "uturn": [
+        "6L1"
+      ],
+      "xscissor": [
+        "6L1"
+      ]
+    }
+  },
+  "deltakabutops": {
+    "learnset": {
+      "bugbuzz": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "leechlife": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "signalbeam": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stickyweb": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "uturn": [
+        "6L1"
+      ],
+      "xscissor": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadratini": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadragonair": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadragonite": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltahoothoot": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "blizzard": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltanoctowl": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "blizzard": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltachinchou": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalanturn": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapichu": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapikachu": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaraichu": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaaipom": {
+    "learnset": {
+      "bodyslam": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaambipom": {
+    "learnset": {
+      "bodyslam": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltayanma": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltayanmega": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagirafarig": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadunsparce": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bugbuzz": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "leechlife": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "signalbeam": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stickyweb": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "uturn": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "xscissor": [
+        "6L1"
+      ]
+    }
+  },
+  "deltashuckle": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "bulletpunch": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaremoraid": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaoctillery": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaelekid": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaelectabuzz": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaelectivire": {
+    "learnset": {
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamagby": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamagmar": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamagmortar": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalotad": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalombre": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaludicolo": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "calmmind": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "lightscreen": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "psychic": [
+        "6L1"
+      ],
+      "psyshock": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "reflect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "trickroom": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "zenheadbutt": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaseedot": {
+    "learnset": {
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltanuzleaf": {
+    "learnset": {
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltashiftry": {
+    "learnset": {
+      "discharge": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "thunder": [
+        "6L1"
+      ],
+      "thunderbolt": [
+        "6L1"
+      ],
+      "thunderwave": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "voltswitch": [
+        "6L1"
+      ],
+      "wildcharge": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasableye": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamawile": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaaron": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalairon": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaaggron": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltameditite": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamedicham": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltanumel": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacamerupt": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaplusle": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaminun": {
+    "learnset": {
+      "blizzard": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltawailmer": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "blizzard": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltawailord": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "blizzard": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "freezedry": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hail": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "icebeam": [
+        "6L1"
+      ],
+      "icepunch": [
+        "6L1"
+      ],
+      "iceshard": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltafeebas": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamilotic": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaclamperl": {
+    "learnset": {
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltahuntail": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagorebyss": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "dracometeor": [
+        "6L1"
+      ],
+      "dragonclaw": [
+        "6L1"
+      ],
+      "dragondance": [
+        "6L1"
+      ],
+      "dragonpulse": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "outrage": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltabeldumspider": {
+    "learnset": {
+      "bugbuzz": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leechlife": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "signalbeam": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stickyweb": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "uturn": [
+        "6L1"
+      ],
+      "xscissor": [
+        "6L1"
+      ]
+    }
+  },
+  "deltametangspider": {
+    "learnset": {
+      "bugbuzz": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leechlife": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "signalbeam": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stickyweb": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "uturn": [
+        "6L1"
+      ],
+      "xscissor": [
+        "6L1"
+      ]
+    }
+  },
+  "deltametagrossspider": {
+    "learnset": {
+      "bugbuzz": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leechlife": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "signalbeam": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stickyweb": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "uturn": [
+        "6L1"
+      ],
+      "xscissor": [
+        "6L1"
+      ]
+    }
+  },
+  "deltabeldumruin": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltametangruin": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltametagrossruin": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltabuneary": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalopunny": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltariolu": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalucario": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacroagunk": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltatoxicroak": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltavenipede": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltawhirlipede": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltascolipede": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapetililwater": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalilligantwater": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltapetililfairy": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalilligantfairy": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasolosis": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaduosion": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltareuniclus": {
+    "learnset": {
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "powergem": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "rockblast": [
+        "6L1"
+      ],
+      "rockslide": [
+        "6L1"
+      ],
+      "rocktomb": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "stoneedge": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadarumaka": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadarmanitan": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltamaractus": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadwebbleberry": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacrustleberry": {
+    "learnset": {
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadwebblecake": {
+    "learnset": {
+      "bodyslam": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacrustlecake": {
+    "learnset": {
+      "bodyslam": [
+        "6L1"
+      ],
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "extremespeed": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hypervoice": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "swordsdance": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltayamask": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltacofagrigus": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaemolga": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltakarrablast": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaescavalier": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltafoongus": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaamoonguss": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hex": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "phantomforce": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "shadowball": [
+        "6L1"
+      ],
+      "shadowclaw": [
+        "6L1"
+      ],
+      "shadowsneak": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalitwick": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalampent": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltachandelure": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaaxew": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltafraxure": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltahaxorus": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagolett": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "bulletpunch": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagolurk": {
+    "learnset": {
+      "aurasphere": [
+        "6L1"
+      ],
+      "brickbreak": [
+        "6L1"
+      ],
+      "bulkup": [
+        "6L1"
+      ],
+      "bulletpunch": [
+        "6L1"
+      ],
+      "closecombat": [
+        "6L1"
+      ],
+      "drainpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "machpunch": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaheatmor": {
+    "learnset": {
+      "bulletpunch": [
+        "6L1"
+      ],
+      "flashcannon": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heavyslam": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "irondefense": [
+        "6L1"
+      ],
+      "ironhead": [
+        "6L1"
+      ],
+      "metalsound": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltadeino": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltazweilous": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltahydreigon": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltalarvesta": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltavolcarona": {
+    "learnset": {
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "poisonjab": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "sludgebomb": [
+        "6L1"
+      ],
+      "sludgewave": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "toxicspikes": [
+        "6L1"
+      ],
+      "venoshock": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaamaura": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaaurorus": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "energyball": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "gigadrain": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "leafblade": [
+        "6L1"
+      ],
+      "leechseed": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "seedbomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "synthesis": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagoomy": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltasliggoo": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltagoodra": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaregirock": {
+    "learnset": {
+      "bulldoze": [
+        "6L1"
+      ],
+      "dig": [
+        "6L1"
+      ],
+      "earthpower": [
+        "6L1"
+      ],
+      "earthquake": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sandtomb": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "stealthrock": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaregice": {
+    "learnset": {
+      "aquajet": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hydropump": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "raindance": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "scald": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "surf": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "waterfall": [
+        "6L1"
+      ]
+    }
+  },
+  "deltaregisteel": {
+    "learnset": {
+      "fireblast": [
+        "6L1"
+      ],
+      "firepunch": [
+        "6L1"
+      ],
+      "flamecharge": [
+        "6L1"
+      ],
+      "flamethrower": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "heatwave": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ],
+      "willowisp": [
+        "6L1"
+      ]
+    }
+  },
+  "deltameloetta": {
+    "learnset": {
+      "charm": [
+        "6L1"
+      ],
+      "crunch": [
+        "6L1"
+      ],
+      "darkpulse": [
+        "6L1"
+      ],
+      "dazzlinggleam": [
+        "6L1"
+      ],
+      "drainingkiss": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "knockoff": [
+        "6L1"
+      ],
+      "mistyterrain": [
+        "6L1"
+      ],
+      "moonblast": [
+        "6L1"
+      ],
+      "nastyplot": [
+        "6L1"
+      ],
+      "playrough": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "pursuit": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "suckerpunch": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  },
+  "deltahoopa": {
+    "learnset": {
+      "aerialace": [
+        "6L1"
+      ],
+      "airslash": [
+        "6L1"
+      ],
+      "bravebird": [
+        "6L1"
+      ],
+      "frustration": [
+        "6L1"
+      ],
+      "hiddenpower": [
+        "6L1"
+      ],
+      "hurricane": [
+        "6L1"
+      ],
+      "protect": [
+        "6L1"
+      ],
+      "rest": [
+        "6L1"
+      ],
+      "return": [
+        "6L1"
+      ],
+      "roost": [
+        "6L1"
+      ],
+      "sleeptalk": [
+        "6L1"
+      ],
+      "substitute": [
+        "6L1"
+      ],
+      "tailwind": [
+        "6L1"
+      ],
+      "toxic": [
+        "6L1"
+      ]
+    }
+  }
+}
