@@ -3059,12 +3059,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       if (mcActionType === 'move') {
         const isStruggle = mcParts[1] === 'struggle';
         const moveIndex = isStruggle ? 0 : (parseInt(mcParts[1], 10) - 1);
+        const parsedTargetLoc = parseInt(mcParts[2], 10);
+        const targetLoc = Number.isFinite(parsedTargetLoc) ? parsedTargetLoc : undefined;
         const activeMoves = currentRequest?.active?.[choiceIndex]?.moves || [];
         const selectedMove = activeMoves[moveIndex];
         subAction = {
           type: 'move',
           moveIndex,
           moveId: isStruggle ? 'struggle' : (selectedMove?.id || toID(selectedMove?.name || selectedMove?.move || '')),
+          targetLoc,
           mega: resolvedChoice.includes('mega'),
           zmove: resolvedChoice.includes('zmove'),
           dynamax: resolvedChoice.includes('dynamax'),
@@ -3138,6 +3141,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       case 'move': {
         const isStruggle = parts[1] === 'struggle';
         const parsedMoveIndex = parseInt(parts[1], 10);
+        const parsedTargetLoc = parseInt(parts[2], 10);
+        const targetLoc = Number.isFinite(parsedTargetLoc) ? parsedTargetLoc : undefined;
         const moveIndex = isStruggle ? 0 : (parsedMoveIndex - 1);
         if (!isStruggle && (!Number.isFinite(parsedMoveIndex) || moveIndex < 0)) {
           console.warn('[PSBattlePanel] Invalid move choice:', choiceString);
@@ -3151,6 +3156,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           type: 'move',
           moveIndex,
           moveId: moveId || undefined,
+          targetLoc,
           mega: resolvedChoice.includes('mega'),
           zmove: resolvedChoice.includes('zmove'),
           dynamax: resolvedChoice.includes('dynamax'),

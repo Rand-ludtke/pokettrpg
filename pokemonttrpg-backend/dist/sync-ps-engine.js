@@ -104,8 +104,9 @@ class SyncPSEngine {
         }
         // Sync initial state
         this.syncStateFromPS();
-        // Auto-complete Team Preview if needed (server handles ordering before this)
-        if (this.battle) {
+        // Auto-complete Team Preview only when explicitly requested.
+        // The server already manages team preview ordering and prompts.
+        if (this.battle && options?.autoTeamPreview) {
             const p1 = this.battle.p1;
             const p2 = this.battle.p2;
             const p1TeamSize = this.state.players?.[0]?.team?.length || 6;
@@ -638,6 +639,9 @@ class SyncPSEngine {
             }
             const moveIndex = this.findMoveIndex(moveAction.moveId, side, slotIndex);
             let choice = `move ${moveIndex}`;
+            if (typeof moveAction.targetLoc === "number" && Number.isFinite(moveAction.targetLoc) && moveAction.targetLoc !== 0) {
+                choice += ` ${moveAction.targetLoc}`;
+            }
             if (moveAction.mega)
                 choice += " mega";
             if (moveAction.zmove)
