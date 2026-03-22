@@ -270,7 +270,16 @@ export async function loadShowdownDex(options?: { base?: string }) {
     const entryName = normalizeName(String(entry?.name || ''));
     if (entryName) gPreferBackendSpriteIds.add(entryName);
     const num = Number(entry?.num);
-    if (Number.isFinite(num) && num > 0) gPreferBackendSpriteIds.add(String(Math.trunc(num)));
+    if (Number.isFinite(num) && num > 0) {
+      const numericId = String(Math.trunc(num));
+      gPreferBackendSpriteIds.add(numericId);
+      // Mirror bundled sprite records under numeric keys so PS lookups like "20059"
+      // resolve to the same embedded data URLs as named keys.
+      const source = gBundledSprites[normalizedKey] || gBundledSprites[entryName];
+      if (source && !gBundledSprites[numericId]) {
+        gBundledSprites[numericId] = source;
+      }
+    }
   }
 
   const mergedBaseDex = {
@@ -761,6 +770,10 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
     if (/shadow/i.test(speciesName)) pushId('calyrex-shadow');
   }
   return ids;
+}
+
+export function getSpriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
+  return spriteIdCandidates(speciesName, cosmetic);
 }
 
 type SpriteIndexPayload = { folders?: Record<string, string[]> };

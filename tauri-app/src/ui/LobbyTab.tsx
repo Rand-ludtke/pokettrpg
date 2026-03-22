@@ -146,17 +146,12 @@ const FORMAT_OPTIONS = [
 
 // Player count formats for multi-player battles
 const PLAYER_COUNT_OPTIONS = [
-  { value: '1v1', label: '1v1', desc: '2 players, standard duel' },
-  { value: '2v2', label: '2v2', desc: '2 teams of 2 players' },
-  { value: '1v1v1', label: '1v1v1', desc: '3-way free-for-all' },
-  { value: '1v1v1v1', label: '1v1v1v1', desc: '4-way free-for-all' },
-  { value: '2v2v2', label: '2v2v2', desc: '3 teams of 2 players' },
-  { value: '2v2v2v2', label: '2v2v2v2', desc: '4 teams of 2 players' },
-  { value: '3v3', label: '3v3', desc: '2 teams of 3 players' },
-  { value: '5v5', label: '5v5', desc: '2 teams of 5 players' },
-  { value: '2v1', label: '2v1 (Boss)', desc: 'Boss raid style' },
-  { value: '3v1', label: '3v1 (Boss)', desc: 'Boss raid style' },
-  { value: '5v1', label: '5v1 (Boss)', desc: 'Boss raid style' },
+  { value: '1v1', label: '1v1', desc: '1 player vs 1 player (usually singles)' },
+  { value: '2v2', label: '2v2', desc: '1 player vs 1 player, 2 active Pokemon each (doubles)' },
+  { value: '3v3', label: '3v3', desc: '1 player vs 1 player, 3 active Pokemon each (triples)' },
+  { value: '2v1', label: '2v1 (Boss)', desc: '2 human challengers vs 1 boss player' },
+  { value: '3v1', label: '3v1 (Boss)', desc: '3 human challengers vs 1 boss player' },
+  { value: '5v1', label: '5v1 (Boss)', desc: '5 human challengers vs 1 boss player' },
 ];
 
 // Clauses/rules that can be enabled

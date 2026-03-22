@@ -408,6 +408,11 @@ class SyncPSEngine {
             let inDuplicateStartBlock = false;
             let seenTurnInBlock = false;
             for (const entry of slice) {
+                // After start protocol has already been sent, stray setup lines from
+                // duplicate pre-start protocol blocks should be ignored.
+                if (this.startSent && (entry.startsWith("|tier|") || entry.startsWith("|gen|") || entry.startsWith("|gametype|") || entry.startsWith("|player|") || entry.startsWith("|teamsize|") || entry.startsWith("|clearpoke") || entry.startsWith("|poke|") || entry.startsWith("|teampreview"))) {
+                    continue;
+                }
                 // Mark initial protocol complete when we see real action lines or later turns
                 if (!this.initialProtocolComplete) {
                     const actionLine = this.isActionProtocolLine(entry);

@@ -11,7 +11,7 @@ import { withPublicBase } from '../utils/publicBase';
 import { loadPokemonShowdown, createPSBattle, getDex, toID } from './ps-loader';
 import { ProtocolConverter, requestToPS } from './protocol-adapter';
 import type { PoketTRPGClient } from '../net/pokettrpgClient';
-import { getCustomSprite, hasRealBackSprite, normalizeName } from '../data/adapter';
+import { getCustomSprite, getSpriteIdCandidates, hasRealBackSprite, normalizeName } from '../data/adapter';
 import './ps-battle.css';
 
 /** Set to true to enable verbose console logging during battles. */
@@ -1101,6 +1101,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 return result;
               }
               const speciesId = normalizeName(speciesName);
+              const spriteIds = getSpriteIdCandidates(speciesName);
+              const spriteLookupIds = Array.from(new Set([speciesId, ...spriteIds]));
 
               // 1) Check battle state for per-Pokemon custom sprite URLs (e.g. 5a, 5b choices from PC)
               const battleState = lastBattleStateRef.current;
@@ -1142,7 +1144,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               //    forceBundled=true ensures bundled data URLs are returned even when
               //    backend is preferred (PS engine can't async-load backend URLs).
               const slot = isFront ? 'front' as const : 'back' as const;
-              const custom = getCustomSprite(speciesId, slot, true);
+              const custom = spriteLookupIds.map((id) => getCustomSprite(id, slot, true)).find(Boolean);
               if (custom) {
                 result.url = custom;
                 // Custom sprites are 96×96 pixel art
@@ -1151,7 +1153,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 result.pixelated = true;
                 // If we used a front sprite as the back sprite fallback (no real back exists),
                 // flag it so PS flips it horizontally
-                if (!isFront && !hasRealBackSprite(speciesId)) result.isCustomFront = true;
+                if (!isFront && !spriteLookupIds.some((id) => hasRealBackSprite(id))) result.isCustomFront = true;
               }
             } catch { /* ignore lookup errors */ }
             return result;

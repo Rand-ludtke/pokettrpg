@@ -1472,7 +1472,12 @@ function buildInitialBattleProtocol(state: BattleState): string[] {
   const gameType = (state as any).gameType || 'singles';
   lines.push(`|gametype|${gameType}`);
   lines.push('|gen|9');
-  lines.push('|tier|[Gen 9] Custom Game');
+  const tierByGameType: Record<string, string> = {
+    singles: '[Gen 9] Custom Game',
+    doubles: '[Gen 9] Doubles Custom Game',
+    triples: '[Gen 9] Triples Custom Game',
+  };
+  lines.push(`|tier|${tierByGameType[gameType] || '[Gen 9] Custom Game'}`);
   // Player info (name + avatar)
   state.players.forEach((player: any, idx: number) => {
     const side = `p${idx + 1}`;
@@ -2661,6 +2666,7 @@ io.on("connection", (socket: Socket) => {
             actorPlayerId: data.playerId,
             pokemonId: activePokemon.id,
             moveId: resolvedMoveId,
+            targetLoc: (data.action as any).targetLoc,
             targetPlayerId: opponent?.id || "",
             targetPokemonId: opponentActive?.id || "",
             mega: !!(data.action as any).mega,
@@ -2705,7 +2711,7 @@ io.on("connection", (socket: Socket) => {
           actorPlayerId: data.playerId,
           choices: mcChoices.map((c: any) => {
             if (c.type === "move") {
-              return { type: "move", moveId: c.moveId, moveIndex: c.moveIndex, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
+              return { type: "move", moveId: c.moveId, moveIndex: c.moveIndex, targetLoc: c.targetLoc, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
             }
             if (c.type === "switch") {
               return { type: "switch", toIndex: c.toIndex ?? c.switchTo };
@@ -2748,7 +2754,7 @@ io.on("connection", (socket: Socket) => {
           const action = room.turnBuffer[slotInfo.playerId];
           if (action) {
             if (action.type === "move") {
-              mergedChoices.push({ type: "move", moveId: (action as any).moveId, moveIndex: (action as any).moveIndex, mega: !!(action as any).mega, zmove: !!(action as any).zmove, dynamax: !!(action as any).dynamax, terastallize: !!(action as any).terastallize });
+              mergedChoices.push({ type: "move", moveId: (action as any).moveId, moveIndex: (action as any).moveIndex, targetLoc: (action as any).targetLoc, mega: !!(action as any).mega, zmove: !!(action as any).zmove, dynamax: !!(action as any).dynamax, terastallize: !!(action as any).terastallize });
             } else if (action.type === "switch") {
               mergedChoices.push({ type: "switch", toIndex: (action as any).toIndex });
             } else {
