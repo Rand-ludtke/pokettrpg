@@ -136,22 +136,17 @@ async function uploadTrainerSpriteIfNeeded(apiBase: string, trainerSprite?: stri
 
 const DEFAULT_ROOM = 'global-lobby';
 
-// Format options for challenge creation
-const FORMAT_OPTIONS = [
-  { value: 'singles', label: 'Singles', desc: '1 active Pokémon per side' },
-  { value: 'doubles', label: 'Doubles', desc: '2 active Pokémon per side' },
-  { value: 'triples', label: 'Triples', desc: '3 active Pokémon per side' },
-  { value: 'custom', label: 'Custom', desc: 'Configure your own rules' },
-];
-
-// Player count formats for multi-player battles
-const PLAYER_COUNT_OPTIONS = [
-  { value: '1v1', label: '1v1', desc: '1 player vs 1 player (usually singles)' },
-  { value: '2v2', label: '2v2', desc: '1 player vs 1 player, 2 active Pokemon each (doubles)' },
-  { value: '3v3', label: '3v3', desc: '1 player vs 1 player, 3 active Pokemon each (triples)' },
-  { value: '2v1', label: '2v1 (Boss)', desc: '2 human challengers vs 1 boss player' },
-  { value: '3v1', label: '3v1 (Boss)', desc: '3 human challengers vs 1 boss player' },
-  { value: '5v1', label: '5v1 (Boss)', desc: '5 human challengers vs 1 boss player' },
+// Unified battle mode options (replaces old separate format + player count selectors)
+const BATTLE_MODE_OPTIONS = [
+  { value: 'singles',   label: 'Singles',              desc: '1v1 — each player has 1 active Pokémon',                   format: 'singles', playerFormat: '1v1', players: 2 },
+  { value: 'doubles',   label: 'Doubles',              desc: '1v1 — each player has 2 active Pokémon',                   format: 'doubles', playerFormat: '1v1', players: 2 },
+  { value: 'triples',   label: 'Triples',              desc: '1v1 — each player has 3 active Pokémon',                   format: 'triples', playerFormat: '1v1', players: 2 },
+  { value: 'multi',     label: 'Multi Battle (2v2)',    desc: '2 players per side — each controls 1 Pokémon (doubles)',    format: 'doubles', playerFormat: '2v2-teams', players: 4 },
+  { value: 'multi3',    label: 'Multi Battle (3v3)',    desc: '3 players per side — each controls 1 Pokémon (triples)',    format: 'triples', playerFormat: '3v3-teams', players: 6 },
+  { value: 'ffa4',      label: 'Free-for-All (4P)',     desc: '4 players — everyone for themselves, 1 active each',        format: 'ffa',     playerFormat: '4ffa', players: 4 },
+  { value: 'boss2v1',   label: 'Boss 2v1',             desc: '2 challengers vs 1 boss — doubles format',                  format: 'doubles', playerFormat: '2v1', players: 3 },
+  { value: 'boss3v1',   label: 'Boss 3v1',             desc: '3 challengers vs 1 boss — triples format',                  format: 'triples', playerFormat: '3v1', players: 3 },
+  { value: 'boss5v1',   label: 'Boss 5v1',             desc: '5 challengers vs 1 boss — triples format',                  format: 'triples', playerFormat: '5v1', players: 6 },
 ];
 
 // Clauses/rules that can be enabled
@@ -230,12 +225,11 @@ export function LobbyTab() {
   const [challengeBusy, setChallengeBusy] = useState<boolean>(false);
   const [challengesByRoom, setChallengesByRoom] = useState<Record<string, ChallengeSummary[]>>({});
   const [challengeNotice, setChallengeNotice] = useState<string>('');
-  const [challengeFormat, setChallengeFormat] = useState<string>('singles');
+  const [battleMode, setBattleMode] = useState<string>('singles');
   const [challengeRules, setChallengeRules] = useState<string>('');
   const [challengeTargetId, setChallengeTargetId] = useState<string>('');
   // Enhanced custom game options - all clauses OFF by default
   const [selectedClauses, setSelectedClauses] = useState<Set<string>>(new Set());
-  const [playerCountFormat, setPlayerCountFormat] = useState<string>('1v1');
   const [trueBoss, setTrueBoss] = useState<boolean>(false);
   const [teamSize, setTeamSize] = useState<number>(6);
   const [teamPreviewEnabled, setTeamPreviewEnabled] = useState<boolean>(true);
@@ -261,6 +255,16 @@ export function LobbyTab() {
     setServerUrl(current);
     setServerUrlDraft(current);
   }, [client]);
+
+  // Auto-sync activeCount when battleMode changes
+  useEffect(() => {
+    const mode = BATTLE_MODE_OPTIONS.find(m => m.value === battleMode);
+    if (!mode) return;
+    if (mode.format === 'doubles') setActiveCount(2);
+    else if (mode.format === 'triples') setActiveCount(3);
+    else if (mode.format === 'ffa') setActiveCount(1);
+    else setActiveCount(1);
+  }, [battleMode]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -679,9 +683,11 @@ export function LobbyTab() {
     if (!payload) return;
     setChallengeBusy(true);
 
-    // Build comprehensive format string for display
-    const formatLabel = FORMAT_OPTIONS.find(opt => opt.value === challengeFormat)?.label || challengeFormat;
-    const playerFormatLabel = PLAYER_COUNT_OPTIONS.find(opt => opt.value === playerCountFormat)?.label || playerCountFormat;
+    // Resolve the selected battle mode
+    const modeConfig = BATTLE_MODE_OPTIONS.find(m => m.value === battleMode) || BATTLE_MODE_OPTIONS[0];
+    const formatLabel = modeConfig.label;
+    const challengeFormat = modeConfig.format;
+    const playerCountFormat = modeConfig.playerFormat;
     
     // Build rules string from selected clauses + custom rules (for display)
     const clauseLabels = CLAUSE_OPTIONS
@@ -689,11 +695,11 @@ export function LobbyTab() {
       .map(clause => clause.label);
     const rulesComponents: string[] = [];
     if (teamPreviewEnabled) rulesComponents.push('Team Preview');
-    if (challengeFormat !== 'singles') rulesComponents.push(formatLabel);
+    rulesComponents.push(formatLabel);
     if (activeCount !== 1) rulesComponents.push(`Active: ${activeCount}`);
     if (clauseLabels.length) rulesComponents.push(`Clauses: ${clauseLabels.join(', ')}`);
-    if (playerCountFormat !== '1v1') rulesComponents.push(`Format: ${playerFormatLabel}`);
-    if (trueBoss && (playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1')) rulesComponents.push('True Boss Fight');
+    const isBossFormat = playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1';
+    if (isBossFormat && trueBoss) rulesComponents.push('True Boss Fight');
     if (teamSize !== 6) rulesComponents.push(`Team Size: ${teamSize}`);
     if (startWeather !== 'none') rulesComponents.push(`Start Weather: ${startWeather} (${clampInt(startWeatherTurns, 1, 99)}t)`);
     if (startTerrain !== 'none') rulesComponents.push(`Start Terrain: ${startTerrain} (${clampInt(startTerrainTurns, 1, 99)}t)`);
@@ -723,18 +729,19 @@ export function LobbyTab() {
         : undefined;
 
     // Build rules object for the backend
-    const isBossFormat = playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1';
     const rulesObject: Record<string, any> = {
       teamPreview: teamPreviewEnabled,
       activeCount: activeCount,
       teamSize: teamSize,
       playerFormat: playerCountFormat,
       format: challengeFormat,
+      battleMode: battleMode,
       trueBoss: isBossFormat && trueBoss ? true : undefined,
       clauses: Array.from(selectedClauses),
       customRules: challengeRules.trim() || undefined,
       displayString: fullRulesDisplay || undefined,
       startConditions: startConditionsPayload,
+      expectedPlayers: modeConfig.players,
     };
 
     try {
@@ -994,20 +1001,30 @@ export function LobbyTab() {
 
             {/* Format Selection */}
             <label className="dim" style={{ display: 'grid', gap: 6 }}>
-              Battle Format
+              Battle Mode
               <select
-                value={challengeFormat}
-                onChange={e => setChallengeFormat(e.target.value)}
+                value={battleMode}
+                onChange={e => setBattleMode(e.target.value)}
                 style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }}
               >
-                {FORMAT_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                {BATTLE_MODE_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label} — {opt.desc}</option>
                 ))}
               </select>
               <span style={{ fontSize: '0.75em', color: '#888' }}>
-                {FORMAT_OPTIONS.find(opt => opt.value === challengeFormat)?.desc}
+                {BATTLE_MODE_OPTIONS.find(opt => opt.value === battleMode)?.desc}
+                {' '}({(BATTLE_MODE_OPTIONS.find(opt => opt.value === battleMode)?.players || 2)} players needed)
               </span>
             </label>
+
+            {/* Boss True Boss toggle */}
+            {(() => { const m = BATTLE_MODE_OPTIONS.find(opt => opt.value === battleMode); return m && (m.playerFormat === '2v1' || m.playerFormat === '3v1' || m.playerFormat === '5v1'); })() && (
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85em' }}>
+                <input type="checkbox" checked={trueBoss} onChange={e => setTrueBoss(e.target.checked)} />
+                True Boss Fight
+                <span className="dim" style={{ fontSize: '0.8em' }}>(Boss only sends out 1 Pokémon — each challenger sends 1)</span>
+              </label>
+            )}
 
             {/* Advanced Options Toggle */}
             <button
@@ -1040,32 +1057,6 @@ export function LobbyTab() {
                   <span style={{ fontSize: '0.75em', color: '#888' }}>Choose lead order before battle</span>
                 </label>
 
-                {/* Player Count Format */}
-                <label className="dim" style={{ display: 'grid', gap: 6 }}>
-                  Player Format
-                  <select
-                    value={playerCountFormat}
-                    onChange={e => setPlayerCountFormat(e.target.value)}
-                    style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }}
-                  >
-                    {PLAYER_COUNT_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label} - {opt.desc}</option>
-                    ))}
-                  </select>
-                  {(playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1') && (
-                    <span style={{ fontSize: '0.75em', color: '#ffa' }}>
-                      Boss battles use {playerCountFormat === '2v1' ? 'Doubles' : 'Triples'} format. Boss should have {playerCountFormat === '2v1' ? '12' : '18'} Pokémon, challenger 6.
-                    </span>
-                  )}
-                  {(playerCountFormat === '2v1' || playerCountFormat === '3v1' || playerCountFormat === '5v1') && (
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85em', marginTop: 4 }}>
-                      <input type="checkbox" checked={trueBoss} onChange={e => setTrueBoss(e.target.checked)} />
-                      True Boss Fight
-                      <span className="dim" style={{ fontSize: '0.8em' }}>(Boss only sends out 1 Pokémon — each challenger sends 1)</span>
-                    </label>
-                  )}
-                </label>
-
                 {/* Team Size */}
                 <label className="dim" style={{ display: 'grid', gap: 6 }}>
                   Team Size (Pokémon per team)
@@ -1089,18 +1080,10 @@ export function LobbyTab() {
                   </div>
                 </label>
 
-                {/* Active Pokemon Count */}
+                {/* Active Pokemon Count - auto-set by battle mode, shown as read-only info */}
                 <label className="dim" style={{ display: 'grid', gap: 6 }}>
-                  Active Pokémon (per side)
-                  <select
-                    value={activeCount}
-                    onChange={e => setActiveCount(Number(e.target.value))}
-                    style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }}
-                  >
-                    <option value={1}>1 (Singles)</option>
-                    <option value={2}>2 (Doubles)</option>
-                    <option value={3}>3 (Triples)</option>
-                  </select>
+                  Active Pokémon (per side): <strong>{activeCount}</strong>
+                  <small style={{ color: '#888' }}>Automatically set by Battle Mode above</small>
                 </label>
 
                 <div className="dim" style={{ display: 'grid', gap: 8, borderTop: '1px solid #444', paddingTop: 8 }}>

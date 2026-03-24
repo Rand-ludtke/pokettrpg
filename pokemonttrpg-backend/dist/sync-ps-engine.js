@@ -28,12 +28,14 @@ class SyncPSEngine {
         this.seenInitialTurns = new Set();
         this.format = options?.format || "gen9customgame";
         this.rules = options?.rules;
-        // Boss battle: select PS format based on playerFormat rule
+        // Boss battle / team battle / FFA: select PS format based on playerFormat rule
         const playerFormat = options?.rules?.playerFormat;
-        if (playerFormat === '2v1') {
+        if (playerFormat === '2v1' || playerFormat === '2v2-teams') {
             this.format = 'gen9doublescustomgame';
-        } else if (playerFormat === '3v1') {
+        } else if (playerFormat === '3v1' || playerFormat === '3v3-teams') {
             this.format = 'gen5triplescustomgame';
+        } else if (playerFormat === '4ffa') {
+            this.format = 'gen9freeforallcustomgame';
         }
     }
     /**
@@ -109,15 +111,42 @@ class SyncPSEngine {
         if (this.battle && options?.autoTeamPreview) {
             const p1 = this.battle.p1;
             const p2 = this.battle.p2;
-            const p1TeamSize = this.state.players?.[0]?.team?.length || 6;
-            const p2TeamSize = this.state.players?.[1]?.team?.length || 6;
-            const buildTeamOrder = (size) => `team ${Array.from({ length: size }, (_v, i) => i + 1).join("")}`;
-            if ((p1?.request || p1?.activeRequest)?.teamPreview) {
-                this.battle.choose("p1", buildTeamOrder(p1TeamSize));
+            // Use the actual PS side's pokemon count (max 6 per side in standard formats)
+            const p1TeamSize = p1?.pokemon?.length || this.state.players?.[0]?.team?.length || 6;
+            const p2TeamSize = p2?.pokemon?.length || this.state.players?.[1]?.team?.length || 6;
+            const buildTeamOrder = (size) => {
+                const capped = Math.min(size, 6); // PS max 6 per side
+                return `team ${Array.from({ length: capped }, (_v, i) => i + 1).join("")}`;
+            };
+            console.log(`[SyncPS autoTeamPreview] p1 request:`, JSON.stringify({ teamPreview: (p1?.request || p1?.activeRequest)?.teamPreview, rqid: (p1?.request || p1?.activeRequest)?.rqid }));
+            console.log(`[SyncPS autoTeamPreview] p2 request:`, JSON.stringify({ teamPreview: (p2?.request || p2?.activeRequest)?.teamPreview, rqid: (p2?.request || p2?.activeRequest)?.rqid }));
+            const p1Req = p1?.request || p1?.activeRequest;
+            const p2Req = p2?.request || p2?.activeRequest;
+            if (p1Req?.teamPreview) {
+                const order = buildTeamOrder(p1TeamSize);
+                console.log(`[SyncPS autoTeamPreview] p1 choosing: "${order}"`);
+                try {
+                    this.battle.choose("p1", order);
+                    console.log(`[SyncPS autoTeamPreview] p1 choose succeeded`);
+                } catch(e) {
+                    console.log(`[SyncPS autoTeamPreview] p1 choose failed:`, e.message);
+                }
             }
-            if ((p2?.request || p2?.activeRequest)?.teamPreview) {
-                this.battle.choose("p2", buildTeamOrder(p2TeamSize));
+            if (p2Req?.teamPreview) {
+                const order = buildTeamOrder(p2TeamSize);
+                console.log(`[SyncPS autoTeamPreview] p2 choosing: "${order}"`);
+                try {
+                    this.battle.choose("p2", order);
+                    console.log(`[SyncPS autoTeamPreview] p2 choose succeeded`);
+                } catch(e) {
+                    console.log(`[SyncPS autoTeamPreview] p2 choose failed:`, e.message);
+                }
             }
+            // Check state after choose
+            const p1After = p1?.request || p1?.activeRequest;
+            const p2After = p2?.request || p2?.activeRequest;
+            console.log(`[SyncPS autoTeamPreview] After choose - p1 still teamPreview?`, !!p1After?.teamPreview, `p2 still teamPreview?`, !!p2After?.teamPreview);
+            console.log(`[SyncPS autoTeamPreview] After choose - p1 active?`, !!p1After?.active, `p2 active?`, !!p2After?.active);
             // Re-sync state in case turn advanced
             this.syncStateFromPS();
         }
@@ -1007,8 +1036,13 @@ class SyncPSEngine {
      */
     getGameType() {
         const playerFormat = this.rules?.playerFormat;
-        if (playerFormat === '2v1') return 'doubles';
-        if (playerFormat === '3v1') return 'triples';
+        if (playerFormat === '2v1' || playerFormat === '2v2-teams') return 'doubles';
+        if (playerFormat === '3v1' || playerFormat === '3v3-teams') return 'triples';
+        if (playerFormat === '4ffa') return 'freeforall';
+        // Also infer from the format string
+        if (this.format?.includes('doubles')) return 'doubles';
+        if (this.format?.includes('triples')) return 'triples';
+        if (this.format?.includes('freeforall')) return 'freeforall';
         return 'singles';
     }
     /**

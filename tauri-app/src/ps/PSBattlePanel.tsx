@@ -644,8 +644,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const [currentTurn, setCurrentTurn] = useState<number>(0); // Track current turn for duplicate prevention
   const [currentRqid, setCurrentRqid] = useState<number | null>(null); // Track request ID
   const [moveBoosts, setMoveBoosts] = useState({ mega: false, z: false, max: false, tera: false });
+  const [teamPreviewLeads, setTeamPreviewLeads] = useState<number[]>([]); // Multi-lead selection for doubles/triples
   const protocolConverterRef = useRef(new ProtocolConverter());
   const requestRef = useRef<PSBattleRequest | null>(null);
+  const waitingForOpponentRef = useRef(false);
   // Store the last valid move request so we can restore it on cancel
   const lastMoveRequestRef = useRef<PSBattleRequest | null>(null);
   const lastMoveChoicesRef = useRef<any>(null);
@@ -716,6 +718,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   useEffect(() => {
     requestRef.current = request;
   }, [request]);
+
+  useEffect(() => {
+    waitingForOpponentRef.current = waitingForOpponent;
+  }, [waitingForOpponent]);
 
   useEffect(() => {
     currentTurnRef.current = currentTurn;
@@ -861,6 +867,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
   const startAnimationWait = useCallback((battle: any) => {
     if (!battle || !battle.scene) {
+      setWaitingForAnimations(false);
+      return;
+    }
+
+    // If we already have an actionable request pending and aren't waiting for opponent,
+    // don't block the UI with animation wait — let the user interact immediately.
+    const currentReq = requestRef.current;
+    if (currentReq && !waitingForOpponentRef.current &&
+        (currentReq.requestType === 'move' || currentReq.requestType === 'switch' ||
+         currentReq.requestType === 'team' || currentReq.forceSwitch)) {
+      PS_DEBUG && console.log('[PSBattlePanel] Skipping animation wait - actionable request already pending:', currentReq.requestType);
       setWaitingForAnimations(false);
       return;
     }
@@ -2342,6 +2359,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
       // New prompt means we should exit animation wait state
       setWaitingForAnimations(false);
+      // Cancel any pending animation check timer to prevent it from re-enabling
+      // waitingForAnimations after this prompt cleared it (race condition fix)
+      if (animationCheckRef.current) {
+        window.clearTimeout(animationCheckRef.current);
+        animationCheckRef.current = null;
+      }
       
       // If this is just a waiting notification with a roomId, don't process it
       if (data.waitingFor !== undefined && !data.prompt) {
@@ -3181,6 +3204,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           order: parts[1].split('').map(Number),
         };
         teamSubmittedRef.current = true;
+        setTeamPreviewLeads([]); // Reset multi-lead selection
         diagLogProtocol('handleChoice', `TEAM SUBMITTED: order=${parts[1]} - now waiting for |start|`);
         break;
         
@@ -3724,16 +3748,54 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       }
     }
     
-    // For team preview, just pick the lead - sends immediately
+    // Determine how many leads need to be selected (1 for singles, 2 for doubles, 3 for triples)
+    const stateRules = lastBattleStateRef.current?.rules;
+    const stateGameType = lastBattleStateRef.current?.gameType;
+    const activeCount = stateRules?.activeCount ?? (stateGameType === 'doubles' ? 2 : stateGameType === 'triples' ? 3 : 1);
+    const leadsNeeded = typeof activeCount === 'number' && activeCount > 1 ? activeCount : 1;
+    const isMultiLead = leadsNeeded > 1;
+    
+    // For single lead, pick immediately. For multi-lead, accumulate selections.
     const handlePick = (index: number) => {
-      // Build team order: chosen lead first, then rest in order
-      const order = [index + 1];
-      for (let j = 1; j <= pokemon.length; j++) {
-        if (j !== index + 1) order.push(j);
+      if (!isMultiLead) {
+        // Singles: Build team order with chosen lead first, then rest in order
+        const order = [index + 1];
+        for (let j = 1; j <= pokemon.length; j++) {
+          if (j !== index + 1) order.push(j);
+        }
+        sendChoice(`team ${order.slice(0, maxTeamSize).join('')}`);
+        return;
       }
-      // Send the team choice - this completes team preview
-      sendChoice(`team ${order.slice(0, maxTeamSize).join('')}`);
+      
+      // Multi-lead: toggle selection
+      setTeamPreviewLeads(prev => {
+        const alreadySelected = prev.includes(index);
+        if (alreadySelected) {
+          // Deselect
+          return prev.filter(i => i !== index);
+        }
+        if (prev.length >= leadsNeeded) {
+          // Already at max - replace the last selection
+          return [...prev.slice(0, -1), index];
+        }
+        const next = [...prev, index];
+        // If we've selected enough leads, auto-submit
+        if (next.length >= leadsNeeded) {
+          // Build order: selected leads first (in selection order), then rest
+          const order = next.map(i => i + 1);
+          for (let j = 1; j <= pokemon.length; j++) {
+            if (!order.includes(j)) order.push(j);
+          }
+          // Delay send slightly so React can render the final selection state
+          setTimeout(() => sendChoice(`team ${order.slice(0, maxTeamSize).join('')}`), 150);
+        }
+        return next;
+      });
     };
+    
+    const leadLabel = leadsNeeded > 1
+      ? `Choose ${leadsNeeded} lead Pokémon (${teamPreviewLeads.length}/${leadsNeeded} selected)`
+      : 'Choose your lead Pokémon';
     
     return (
       <div className="controls">
@@ -3743,7 +3805,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         <div className="switchcontrols">
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <div style={{ minWidth: '280px', flex: '1 1 280px' }}>
-              <h3 className="switchselect">Choose your lead Pokemon</h3>
+              <h3 className="switchselect">{leadLabel}</h3>
               <div className="switchmenu">
                 {pokemon.map((poke: any, i: number) => {
                   const pokeName = poke.name || 
@@ -3754,13 +3816,21 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                   // Get species for icon - try multiple sources
                   const speciesForIcon = poke.speciesForme || poke.species || poke.name || poke.details?.split(',')[0];
                   const tooltipData = `switchpokemon|${i}`;
+                  const selectionIndex = teamPreviewLeads.indexOf(i);
+                  const isSelected = selectionIndex >= 0;
                   return (
                     <button
                       key={i}
-                      className="switchbutton has-tooltip"
+                      className={`switchbutton has-tooltip${isSelected ? ' active' : ''}`}
                       data-tooltip={tooltipData}
                       onClick={() => handlePick(i)}
+                      style={isSelected ? { outline: '2px solid #4af', background: 'rgba(68,170,255,0.15)' } : undefined}
                     >
+                      {isMultiLead && isSelected && (
+                        <span style={{ position: 'absolute', top: 2, right: 6, fontSize: '11px', fontWeight: 'bold', color: '#4af' }}>
+                          #{selectionIndex + 1}
+                        </span>
+                      )}
                       <span className="picon" style={getPokemonIconStyle(speciesForIcon)} />
                       <span className="pokemonname">{pokeName}</span>
                     </button>
@@ -3798,7 +3868,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         </div>
       </div>
     );
-  }, [request, sendChoice, myPlayerId]);
+  }, [request, sendChoice, myPlayerId, teamPreviewLeads]);
   
   // IMPORTANT: Always render the same DOM structure to preserve refs!
   // The PS Battle instance is bound to the DOM elements via refs.
