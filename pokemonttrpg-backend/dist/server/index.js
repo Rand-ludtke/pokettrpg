@@ -1363,8 +1363,10 @@ function beginBattle(room, players, seed, rules) {
             ? state.log.filter((l) => typeof l === 'string' && l.startsWith('|'))
             : buildInitialBattleProtocol(state);
         if (initialEvents.length > 0) {
+            // Send state WITHOUT log to avoid client double-processing events
+            const stateNoLog = { ...state, log: [] };
             io.to(room.id).emit("battleUpdate", {
-                result: { state, events: initialEvents, anim: [] },
+                result: { state: stateNoLog, events: initialEvents, anim: [] },
                 needsSwitch: Array.from(room.forceSwitchNeeded ?? []),
             });
         }
@@ -2507,13 +2509,13 @@ io.on("connection", (socket) => {
             ? state.log.filter((l) => typeof l === 'string' && l.startsWith('|'))
             : buildInitialBattleProtocol(state);
         if (initialEvents.length > 0) {
+            const stateNoLog2 = { ...state, log: [] };
             io.to(room.id).emit("battleUpdate", {
-                result: { state, events: initialEvents, anim: [] },
+                result: { state: stateNoLog2, events: initialEvents, anim: [] },
                 needsSwitch: Array.from(room.forceSwitchNeeded ?? []),
             });
         }
         emitMovePrompts(room, state);
-    });
     socket.on("sendAction", (data) => {
         const room = rooms.get(data.roomId);
         if (!room)

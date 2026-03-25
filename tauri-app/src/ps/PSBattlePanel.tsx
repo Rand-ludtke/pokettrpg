@@ -1563,9 +1563,27 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               try {
                 const req = JSON.parse(args[0]);
                 
+                // Save original active moves before fixRequest can corrupt them
+                const savedActive = req.active ? JSON.parse(JSON.stringify(req.active)) : undefined;
+                
                 // Fix up request using PS's BattleChoiceBuilder
                 if (window.BattleChoiceBuilder?.fixRequest && battle) {
-                  window.BattleChoiceBuilder.fixRequest(req, battle);
+                  try {
+                    window.BattleChoiceBuilder.fixRequest(req, battle);
+                  } catch (fixErr) {
+                    console.warn('[PSBattlePanel] fixRequest failed, restoring original:', fixErr);
+                  }
+                }
+                
+                // Restore moves if fixRequest removed them
+                if (savedActive && req.active) {
+                  for (let si = 0; si < req.active.length; si++) {
+                    if (savedActive[si]?.moves?.length && (!req.active[si]?.moves || req.active[si].moves.length === 0)) {
+                      req.active[si] = savedActive[si];
+                    }
+                  }
+                } else if (savedActive && !req.active) {
+                  req.active = savedActive;
                 }
                 
                 setRequest(req);
@@ -2349,6 +2367,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       }
       
       if (data.roomId !== roomId) return;
+      // Ignore prompts meant for other players
+      if (data.playerId && myPlayerId && data.playerId !== myPlayerId) {
+        PS_DEBUG && console.log('[PSBattlePanel] Ignoring prompt for other player:', data.playerId);
+        return;
+      }
       PS_DEBUG && console.log('[PSBattlePanel] Prompt received:', data);
       
       // DIAGNOSTIC: Log prompt arrival
@@ -2659,6 +2682,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       });
       
       // Fix up request using PS's BattleChoiceBuilder for proper formatting
+      // Save original active data before fixRequest can corrupt it
+      const savedActiveBeforeFix = psRequest.active ? JSON.parse(JSON.stringify(psRequest.active)) : undefined;
       const currentBattle = battleRef.current;
       if (window.BattleChoiceBuilder?.fixRequest && currentBattle) {
         try {
@@ -2669,14 +2694,26 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         }
       }
 
-      // Guard: if fixRequest removed active moves, restore from our computed active
-      if (
+      // Guard: if fixRequest removed active moves from ANY slot, restore them
+      if (requestType === 'move' && savedActiveBeforeFix) {
+        if (!psRequest.active) {
+          psRequest.active = savedActiveBeforeFix;
+          console.warn('[PSBattlePanel] Restored entire active array after fixRequest');
+        } else {
+          for (let si = 0; si < savedActiveBeforeFix.length; si++) {
+            if (savedActiveBeforeFix[si]?.moves?.length && (!psRequest.active[si]?.moves || psRequest.active[si].moves.length === 0)) {
+              psRequest.active[si] = savedActiveBeforeFix[si];
+              console.warn(`[PSBattlePanel] Restored active slot ${si} moves after fixRequest`);
+            }
+          }
+        }
+      } else if (
         requestType === 'move' &&
         (!psRequest.active?.[0]?.moves || psRequest.active[0].moves.length === 0) &&
         fixedActive?.[0]?.moves?.length
       ) {
         psRequest.active = fixedActive;
-        console.warn('[PSBattlePanel] Restored active moves after fixRequest');
+        console.warn('[PSBattlePanel] Restored active moves from fixedActive fallback');
       }
       
       // Get the turn number from state
