@@ -958,8 +958,8 @@ export function LobbyTab() {
           </div>
         </section>
 
-        <aside className="panel" style={{ padding: 12, display: 'grid', gap: 12, borderRadius: 10 }}>
-          <div>
+        <aside className="panel" style={{ padding: 12, display: 'grid', gap: 12, borderRadius: 10, minWidth: 0, overflow: 'hidden' }}>
+          <div style={{ minWidth: 0 }}>
             <h3 style={{ marginTop: 0 }}>Players</h3>
             <ul style={{ margin: 0, paddingLeft: 18 }}>
               {currentRoom?.players?.length ? (
@@ -989,7 +989,7 @@ export function LobbyTab() {
             </ul>
           </div>
 
-          <div style={{ borderTop: '1px solid #333', paddingTop: 12, display: 'grid', gap: 8 }}>
+          <div style={{ borderTop: '1px solid #333', paddingTop: 12, display: 'grid', gap: 8, minWidth: 0, overflowY: 'auto', overflowX: 'hidden' }}>
             <h4 style={{ margin: '0 0 4px 0' }}>Challenges</h4>
             {primaryChallenge ? (
               <div className="dim" style={{ fontSize: '0.85em' }}>
@@ -1000,20 +1000,20 @@ export function LobbyTab() {
             )}
 
             {/* Format Selection */}
-            <label className="dim" style={{ display: 'grid', gap: 6 }}>
+            <label className="dim" style={{ display: 'grid', gap: 6, minWidth: 0 }}>
               Battle Mode
               <select
                 value={battleMode}
                 onChange={e => setBattleMode(e.target.value)}
-                style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee' }}
+                style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #555', background: '#2a2a2a', color: '#eee', maxWidth: '100%' }}
               >
                 {BATTLE_MODE_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label} — {opt.desc}</option>
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
-              <span style={{ fontSize: '0.75em', color: '#888' }}>
+              <span style={{ fontSize: '0.75em', color: '#888', wordBreak: 'break-word' }}>
                 {BATTLE_MODE_OPTIONS.find(opt => opt.value === battleMode)?.desc}
-                {' '}({(BATTLE_MODE_OPTIONS.find(opt => opt.value === battleMode)?.players || 2)} players needed)
+                {' '}({(BATTLE_MODE_OPTIONS.find(opt => opt.value === battleMode)?.players || 2)} players)
               </span>
             </label>
 
@@ -1328,12 +1328,12 @@ export function LobbyTab() {
                       background: primaryChallenge?.id === challenge.id ? 'rgba(0,128,192,0.12)' : 'rgba(0,0,0,0.1)',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                      <strong>{label}</strong>
-                      <span className="dim" style={{ fontSize: '0.8em' }}>• {statusLabel}{slotsLabel}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, minWidth: 0, overflow: 'hidden' }}>
+                      <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{label}</strong>
+                      <span className="dim" style={{ fontSize: '0.8em', flexShrink: 0 }}>• {statusLabel}{slotsLabel}</span>
                       {awaitingMyResponse && <span style={{ marginLeft: 'auto', fontSize: '0.75em', textTransform: 'uppercase' }}>Your response needed</span>}
                     </div>
-                    <div className="dim" style={{ fontSize: '0.85em', marginBottom: 6 }}>
+                    <div className="dim" style={{ fontSize: '0.85em', marginBottom: 6, wordBreak: 'break-word' }}>
                       {ownerLabel} • {targetLabel}
                       {allyLabels.length > 0 && allyLabels.map((al, i) => <span key={i}> • {al}</span>)}
                     </div>
