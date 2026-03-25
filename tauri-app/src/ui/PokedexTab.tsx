@@ -358,17 +358,18 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
   // Get evolution method text
   const getEvoMethod = (evo: Species) => {
     const condition = evo.evoCondition ? ` (${evo.evoCondition})` : '';
+    const lvl = evo.evoLevel ? `Lv. ${evo.evoLevel}` : '';
     switch (evo.evoType) {
-      case 'levelExtra': return `Level up${condition}`;
-      case 'levelFriendship': return `Level up with high friendship${condition}`;
-      case 'levelHold': return `Level up while holding ${evo.evoItem || 'required item'}${condition}`;
+      case 'levelExtra': return lvl ? `${lvl}${condition}` : `Level up${condition}`;
+      case 'levelFriendship': return lvl ? `${lvl} with high friendship${condition}` : `Level up with high friendship${condition}`;
+      case 'levelHold': return `${lvl ? lvl + ' ' : 'Level up '}while holding ${evo.evoItem || 'required item'}${condition}`;
       case 'useItem': return `Use ${evo.evoItem || 'required evolution item'}${condition}`;
-      case 'levelMove': return evo.evoMove ? `Level up while knowing ${evo.evoMove}` : `Level up${condition}`;
+      case 'levelMove': return evo.evoMove ? `${lvl ? lvl + ' while' : 'Level up while'} knowing ${evo.evoMove}${condition}` : `${lvl || 'Level up'}${condition}`;
       case 'trade': return evo.evoItem
-        ? `Trade while using ${evo.evoItem}${condition}`
+        ? `Trade while holding ${evo.evoItem}${condition}`
         : `Trade${condition}`;
       case 'other': return evo.evoCondition ? `Special: ${evo.evoCondition}` : 'Special evolution condition';
-      default: return evo.evoLevel ? `Reach level ${evo.evoLevel}${condition}` : `Level up${condition}`;
+      default: return lvl ? `${lvl}${condition}` : `Level up${condition}`;
     }
   };
 

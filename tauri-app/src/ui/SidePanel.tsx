@@ -459,7 +459,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       const evoCondition = evoEntry.evoCondition;
       const evoMove = evoEntry.evoMove;
 
-      if (evoType === 'levelUp' || evoType === undefined) {
+      if (evoType === 'levelUp' || evoType === 'levelExtra' || evoType === undefined) {
         if (evoLevel) {
           method = `Level ${evoLevel}`;
           detail = `Level to ${evoLevel} or higher`;
@@ -469,6 +469,10 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
           method = 'Level up';
           detail = 'Level up once';
           canEvolve = true;
+        }
+        if (evoCondition) {
+          method += ` (${evoCondition})`;
+          detail += ` — ${evoCondition}`;
         }
         status = canEvolve ? 'green' : 'red';
       } else if (evoType === 'useItem') {
@@ -499,8 +503,23 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
           canEvolve = true;
         }
         status = canEvolve ? 'green' : 'gray';
+      } else if (evoType === 'levelHold') {
+        const holdItem = evoItem || 'required item';
+        requiredItem = evoItem;
+        consumeItem = false;
+        if (evoLevel) {
+          method = `Level ${evoLevel} holding ${holdItem}`;
+          detail = `Level to ${evoLevel}+ while holding ${holdItem}`;
+          canEvolve = currentLevel >= evoLevel;
+          if (!canEvolve) reason = `Needs level ${evoLevel}`;
+        } else {
+          method = `Level up holding ${holdItem}`;
+          detail = `Level up while holding ${holdItem}`;
+          canEvolve = true;
+        }
+        status = canEvolve ? 'green' : 'red';
       } else if (evoType === 'levelMove') {
-        method = `Learn ${evoMove}`;
+        method = evoMove ? `Learn ${evoMove}` : 'Learn required move';
         detail = evoMove ? `Know ${evoMove}` : 'Know required move';
         const moveId = normalizeName(evoMove || '');
         canEvolve = selected.moves.some(m => normalizeName(m.name) === moveId);
