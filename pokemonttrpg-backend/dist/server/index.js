@@ -2516,6 +2516,7 @@ io.on("connection", (socket) => {
             });
         }
         emitMovePrompts(room, state);
+    });
     socket.on("sendAction", (data) => {
         const room = rooms.get(data.roomId);
         if (!room)
