@@ -2634,7 +2634,6 @@ io.on("connection", (socket) => {
                 }
             }
             // Perform immediate forced switch via engine (supports multi-slot choices array)
-            const switchChoices = data.action.choices;
             let res = room.engine.forceSwitch(data.playerId, data.action.toIndex, Array.isArray(switchChoices) ? switchChoices : undefined);
             // Deduplicate switch lines (PS sends private + public copies)
             if (Array.isArray(res.events)) {
