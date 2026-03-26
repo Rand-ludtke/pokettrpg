@@ -3314,10 +3314,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       }
     }
     
-    // Save the current move request/choices before entering waiting state so we can restore on cancel
-    if (shouldWait && actionTypeResolved === 'move' && requestRef.current) {
+    // Save the current request before entering waiting state so we can restore on cancel
+    // Save for both move and switch actions so cancel always shows the move selection UI
+    if (shouldWait && (actionTypeResolved === 'move' || actionTypeResolved === 'switch') && requestRef.current) {
       lastMoveRequestRef.current = requestRef.current;
-      lastMoveChoicesRef.current = choices;
     }
     
     // Track when we started waiting
@@ -3344,15 +3344,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       client.sendAction(roomId, { type: 'cancel' } as any, myPlayerId);
     }
     
-    // Restore the last valid move request and choices so the move selection UI is shown
+    // Restore the last valid move request and rebuild fresh choices so the move selection UI is shown
     if (lastMoveRequestRef.current) {
       PS_DEBUG && console.log('[PSBattlePanel] Restoring last move request on cancel');
       setRequest(lastMoveRequestRef.current);
-      if (lastMoveChoicesRef.current) {
-        setChoices(lastMoveChoicesRef.current);
-        setChoicesVersion(v => v + 1);
-      } else if (window.BattleChoiceBuilder) {
-        // Rebuild choices from the saved request
+      // Always rebuild a fresh BattleChoiceBuilder — the old one has already been used
+      if (window.BattleChoiceBuilder) {
         const newChoices = new window.BattleChoiceBuilder(lastMoveRequestRef.current as any);
         setChoices(newChoices);
         setChoicesVersion(v => v + 1);
