@@ -3629,29 +3629,28 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const oppSideObj = battle.sides?.find((s: any) => s.sideid !== mySide);
     
     // Build target list with PS target locations
-    // PS convention for p1a (slot index 0):
-    //   1 = p1a (self), 2 = p1b (ally), -1 = p2a (foe left), -2 = p2b (foe right)
-    // For p1b (slot index 1):
-    //   1 = p1a (ally), 2 = p1b (self), -1 = p2a (foe left), -2 = p2b (foe right)
+    // PS doubles convention: positive = opponent side, negative = own side
+    //   1 = opponent slot a, 2 = opponent slot b
+    //   -1 = own slot a, -2 = own slot b
     const choiceIndex = choices?.index?.() ?? 0;
     
     const targets: { label: string; loc: number; isFoe: boolean; fainted: boolean }[] = [];
     
-    // Add opponent targets
+    // Add opponent targets (positive locations)
     if (oppSideObj?.active) {
       for (let i = 0; i < oppSideObj.active.length; i++) {
         const mon = oppSideObj.active[i];
         const name = mon?.speciesForme || mon?.species || mon?.name || `Foe slot ${i + 1}`;
         const fainted = !mon || mon.fainted || (mon.hp !== undefined && mon.hp <= 0);
-        targets.push({ label: name, loc: -(i + 1), isFoe: true, fainted });
+        targets.push({ label: name, loc: i + 1, isFoe: true, fainted });
       }
     } else {
       // Fallback if battle sides not available
-      targets.push({ label: 'Foe 1', loc: -1, isFoe: true, fainted: false });
-      targets.push({ label: 'Foe 2', loc: -2, isFoe: true, fainted: false });
+      targets.push({ label: 'Foe 1', loc: 1, isFoe: true, fainted: false });
+      targets.push({ label: 'Foe 2', loc: 2, isFoe: true, fainted: false });
     }
     
-    // Add ally targets (for moves that can target allies)
+    // Add ally targets (negative locations, for moves that can target allies)
     if (mySideObj?.active) {
       for (let i = 0; i < mySideObj.active.length; i++) {
         const mon = mySideObj.active[i];
@@ -3660,7 +3659,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const fainted = mon.fainted || (mon.hp !== undefined && mon.hp <= 0);
         // Only show ally targets if it's a different slot
         if (i !== choiceIndex) {
-          targets.push({ label: name, loc: i + 1, isFoe: false, fainted });
+          targets.push({ label: name, loc: -(i + 1), isFoe: false, fainted });
         }
       }
     }
@@ -3771,16 +3770,24 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const pokemon = request.side.pokemon;
     const isForceSwitch = !!request?.forceSwitch;
     const waitingBlocksSwitch = (waitingForOpponent && !isForceSwitch) || (waitingForAnimations && !isForceSwitch);
-    const activeId = request.active?.[0]?.pokemonId || request.active?.[0]?.id;
-    const activeIndex = pokemon.findIndex((p: any) =>
-      p.active || (activeId && (p.pokemonId === activeId || p.id === activeId))
-    );
+    // In doubles, collect ALL active Pokemon indices (not just slot 0)
+    const activeIndicesSet = new Set<number>();
+    if (request.active && Array.isArray(request.active)) {
+      for (let ai = 0; ai < request.active.length; ai++) {
+        // Find which pokemon corresponds to this active slot
+        for (let pi = 0; pi < pokemon.length; pi++) {
+          if (pokemon[pi].active) {
+            activeIndicesSet.add(pi);
+          }
+        }
+      }
+    }
     const switchable = pokemon
       .map((poke: any, i: number) => ({ poke, index: i }))
-      .filter(({ poke }) => {
+      .filter(({ poke, index }) => {
         const condition = poke.condition || '';
         const isFainted = poke.fainted || condition.includes('fnt') || condition.startsWith('0/');
-        const isActive = poke.active || (activeIndex >= 0 && pokemon[activeIndex] === poke);
+        const isActive = poke.active || activeIndicesSet.has(index);
         return !isActive && !isFainted;
       });
     
