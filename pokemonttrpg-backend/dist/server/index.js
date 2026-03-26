@@ -1597,9 +1597,10 @@ function emitMovePrompts(room, state) {
                     const lastPrompt = room.lastPromptByPlayer[realPlayerId];
                     if (lastPrompt && lastPrompt.turn === turn && lastPrompt.type === promptType) continue;
                     const slotMoves = activeSlots[slotIdx];
+                    const { forceSwitch: _fsSlot, ...psRequestMoveFields } = psRequest;
                     const prompt = alreadyActed
                         ? { wait: true, side: filteredSide, rqid: psRequest.rqid || Date.now() }
-                        : { ...psRequest, requestType: "move", playerId: realPlayerId, rqid: psRequest.rqid || Date.now(), side: filteredSide, active: slotMoves ? [slotMoves] : [], teamSlot: slotIdx };
+                        : { ...psRequestMoveFields, requestType: "move", playerId: realPlayerId, rqid: psRequest.rqid || Date.now(), side: filteredSide, active: slotMoves ? [slotMoves] : [], teamSlot: slotIdx };
                     realSock.emit("promptAction", { roomId: room.id, playerId: realPlayerId, prompt, state });
                     room.lastPromptByPlayer[realPlayerId] = { turn, type: promptType, rqid: prompt.rqid };
                     promptedPlayers.push(realPlayerId);
@@ -1656,6 +1657,10 @@ function emitMovePrompts(room, state) {
                     // Ensure side has our player ID for reference
                     side: baseSide,
                 };
+            // Safety: strip forceSwitch from move prompts to avoid stale data
+            if (prompt.forceSwitch && prompt.requestType === 'move') {
+                delete prompt.forceSwitch;
+            }
             sock.emit("promptAction", {
                 roomId: room.id,
                 playerId: player.id,
@@ -2605,7 +2610,7 @@ io.on("connection", (socket) => {
             const forceSwitchState = room.engine.getState();
             const forceSwitchPlayer = forceSwitchState.players.find(p => p.id === data.playerId);
             const switchChoices = data.action.choices;
-            const isMultiSlot = Array.isArray(switchChoices) && switchChoices.length > 1;
+            const isMultiSlot = Array.isArray(switchChoices) && switchChoices.length >= 1;
             if (forceSwitchPlayer) {
                 if (isMultiSlot) {
                     // Validate each choice in multi-slot forceSwitch

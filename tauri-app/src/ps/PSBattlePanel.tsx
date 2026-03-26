@@ -3146,6 +3146,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         subAction = {
           type: 'switch',
           toIndex: parseInt(mcParts[1], 10) - 1,
+          slotIndex: choiceIndex,
         };
       }
       
@@ -3166,7 +3167,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const allDone = choices?.isDone?.() || false;
       if (allDone) {
         const multiAction: any = isForceSwitchScenario
-          ? { type: 'switch', choices: [...pendingSlotChoicesRef.current].map((c, i) => ({ ...c, slotIndex: i })) }
+          ? { type: 'switch', choices: [...pendingSlotChoicesRef.current] }
           : { type: 'multi-choice', choices: [...pendingSlotChoicesRef.current] };
         pendingSlotChoicesRef.current = [];
         

@@ -270,7 +270,7 @@ class SyncPSEngine {
         const events = [];
         const anim = [];
         // Multi-slot force switch: choices = [{slotIndex, toIndex}, ...]
-        if (Array.isArray(choices) && choices.length > 1) {
+        if (Array.isArray(choices) && choices.length >= 1) {
             const req = this.getRequest(playerId);
             const switchParts = [];
             for (let i = 0; i < (req?.forceSwitch?.length || 0); i++) {

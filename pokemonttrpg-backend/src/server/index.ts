@@ -1727,9 +1727,10 @@ function emitMovePrompts(room: Room, state: BattleState) {
           if (lastPrompt && lastPrompt.turn === turn && lastPrompt.type === promptType) continue;
 
           const slotMoves = activeSlots[slotIdx];
+          const { forceSwitch: _fsSlot, ...psRequestMoveFields } = psRequest;
           const prompt = alreadyActed
             ? { wait: true, side: filteredSide, rqid: psRequest.rqid || Date.now() }
-            : { ...psRequest, requestType: "move" as const, playerId: realPlayerId, rqid: psRequest.rqid || Date.now(), side: filteredSide, active: slotMoves ? [slotMoves] : [], bossSlot: slotIdx };
+            : { ...psRequestMoveFields, requestType: "move" as const, playerId: realPlayerId, rqid: psRequest.rqid || Date.now(), side: filteredSide, active: slotMoves ? [slotMoves] : [], bossSlot: slotIdx };
           realSock.emit("promptAction", { roomId: room.id, playerId: realPlayerId, prompt, state });
           room.lastPromptByPlayer![realPlayerId] = { turn, type: promptType, rqid: (prompt as any).rqid };
           promptedPlayers.push(realPlayerId);
@@ -1793,6 +1794,10 @@ function emitMovePrompts(room: Room, state: BattleState) {
             // Ensure side has our player ID for reference
             side: baseSide,
           };
+      // Safety: strip forceSwitch from move prompts to avoid stale data
+      if ((prompt as any).forceSwitch && (prompt as any).requestType === 'move') {
+        delete (prompt as any).forceSwitch;
+      }
       
       sock.emit("promptAction", {
         roomId: room.id,
@@ -2735,7 +2740,7 @@ io.on("connection", (socket: Socket) => {
       const forceSwitchState = room.engine.getState();
       const forceSwitchPlayer = forceSwitchState.players.find(p => p.id === data.playerId);
       const switchChoices = (data.action as any).choices;
-      const isMultiSlot = Array.isArray(switchChoices) && switchChoices.length > 1;
+      const isMultiSlot = Array.isArray(switchChoices) && switchChoices.length >= 1;
       if (forceSwitchPlayer) {
         if (isMultiSlot) {
           // Validate each choice in multi-slot forceSwitch
