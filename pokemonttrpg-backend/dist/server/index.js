@@ -2712,7 +2712,7 @@ io.on("connection", (socket) => {
                     actorPlayerId: data.playerId,
                     choices: mcChoices.map((c) => {
                         if (c.type === "move") {
-                            return { type: "move", moveId: c.moveId, moveIndex: c.moveIndex, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
+                            return { type: "move", moveId: c.moveId, moveIndex: c.moveIndex, targetLoc: c.targetLoc, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
                         }
                         if (c.type === "switch") {
                             return { type: "switch", toIndex: c.toIndex ?? c.switchTo };

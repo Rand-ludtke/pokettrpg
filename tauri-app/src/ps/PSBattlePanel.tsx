@@ -312,23 +312,28 @@ function generateBattleProtocol(
   if (isStart) {
     PS_DEBUG && console.log('[DIAG-PROTOCOL] [generateBattleProtocol] isStart=true - WILL GENERATE |start| and |turn|');
     lines.push('|start');
-    // Switch in the active Pokemon for each side
+    // Switch in the active Pokemon for each side (handles doubles/triples via activeIndices)
+    const slotLetters = ['a', 'b', 'c', 'd', 'e', 'f'];
     state.players.forEach((player: any, idx: number) => {
       const side = `p${idx + 1}`;
-      const activeIndex = player.activeIndex || 0;
-      const activePoke = player.team?.[activeIndex];
-      
-      if (activePoke) {
+      const activeIndices: number[] = player.activeIndices || [player.activeIndex || 0];
+      for (let slotIdx = 0; slotIdx < activeIndices.length; slotIdx++) {
+        const ai = activeIndices[slotIdx];
+        if (ai < 0) continue;
+        const activePoke = player.team?.[ai];
+        if (!activePoke) continue;
         const nickname = activePoke.nickname || activePoke.name;
         const species = activePoke.species || activePoke.name;
         const level = activePoke.level || 100;
         const gender = activePoke.gender === 'M' ? ', M' : (activePoke.gender === 'F' ? ', F' : '');
+        const shiny = (activePoke as any).shiny ? ', shiny' : '';
         const hp = activePoke.currentHP ?? activePoke.maxHP ?? 100;
         const maxHP = activePoke.maxHP ?? 100;
         
         // Format: |switch|p1a: Nickname|Species, L50, M|HP/MaxHP
-        const details = `${species}, L${level}${gender}`;
-        lines.push(`|switch|${side}a: ${nickname}|${details}|${hp}/${maxHP}`);
+        const details = `${species}, L${level}${gender}${shiny}`;
+        const slot = slotLetters[slotIdx] || 'a';
+        lines.push(`|switch|${side}${slot}: ${nickname}|${details}|${hp}/${maxHP}`);
       }
     });
     
@@ -644,6 +649,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const [currentTurn, setCurrentTurn] = useState<number>(0); // Track current turn for duplicate prevention
   const [currentRqid, setCurrentRqid] = useState<number | null>(null); // Track request ID
   const [moveBoosts, setMoveBoosts] = useState({ mega: false, z: false, max: false, tera: false });
+  const [pendingMoveForTarget, setPendingMoveForTarget] = useState<{ moveIndex: number; moveName: string } | null>(null);
   const [teamPreviewLeads, setTeamPreviewLeads] = useState<number[]>([]); // Multi-lead selection for doubles/triples
   const protocolConverterRef = useRef(new ProtocolConverter());
   const requestRef = useRef<PSBattleRequest | null>(null);
@@ -3049,6 +3055,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   useEffect(() => {
     if (request?.requestType === 'move') {
       setMoveBoosts({ mega: false, z: false, max: false, tera: false });
+      setPendingMoveForTarget(null);
     }
   }, [request?.rqid]);
   
@@ -3537,7 +3544,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               key={i}
               className={`movebutton has-tooltip type-${typeName}${disabled ? ' disabled' : ''}`}
               disabled={disabled}
-              onClick={() => sendChoice(`move ${i + 1}`)}
+              onClick={() => {
+                // In doubles+, single-target moves need target selection
+                const moveTarget = move.target || dexMove?.target || 'normal';
+                const needsTarget = isMultiSlot && ['normal', 'any', 'adjacentFoe', 'adjacentAlly', 'adjacentAllyOrSelf'].includes(moveTarget);
+                if (needsTarget) {
+                  setPendingMoveForTarget({ moveIndex: i + 1, moveName });
+                } else {
+                  setPendingMoveForTarget(null);
+                  sendChoice(`move ${i + 1}`);
+                }
+              }}
               data-tooltip={tooltipData}
               title={tooltipText}
               aria-disabled={disabled}
@@ -3600,6 +3617,133 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       </div>
     );
   }, [request, sendChoice, moveBoosts, waitingForAnimations, choices, choicesVersion]);
+  
+  // Render target selector for doubles/triples
+  const renderTargetSelector = useMemo(() => {
+    if (!pendingMoveForTarget) return null;
+    const battle = battleRef.current;
+    if (!battle) return null;
+    
+    // Determine my side and active pokemon
+    const mySideObj = battle.sides?.find((s: any) => s.sideid === mySide);
+    const oppSideObj = battle.sides?.find((s: any) => s.sideid !== mySide);
+    
+    // Build target list with PS target locations
+    // PS convention for p1a (slot index 0):
+    //   1 = p1a (self), 2 = p1b (ally), -1 = p2a (foe left), -2 = p2b (foe right)
+    // For p1b (slot index 1):
+    //   1 = p1a (ally), 2 = p1b (self), -1 = p2a (foe left), -2 = p2b (foe right)
+    const choiceIndex = choices?.index?.() ?? 0;
+    
+    const targets: { label: string; loc: number; isFoe: boolean; fainted: boolean }[] = [];
+    
+    // Add opponent targets
+    if (oppSideObj?.active) {
+      for (let i = 0; i < oppSideObj.active.length; i++) {
+        const mon = oppSideObj.active[i];
+        const name = mon?.speciesForme || mon?.species || mon?.name || `Foe slot ${i + 1}`;
+        const fainted = !mon || mon.fainted || (mon.hp !== undefined && mon.hp <= 0);
+        targets.push({ label: name, loc: -(i + 1), isFoe: true, fainted });
+      }
+    } else {
+      // Fallback if battle sides not available
+      targets.push({ label: 'Foe 1', loc: -1, isFoe: true, fainted: false });
+      targets.push({ label: 'Foe 2', loc: -2, isFoe: true, fainted: false });
+    }
+    
+    // Add ally targets (for moves that can target allies)
+    if (mySideObj?.active) {
+      for (let i = 0; i < mySideObj.active.length; i++) {
+        const mon = mySideObj.active[i];
+        if (!mon) continue;
+        const name = mon.speciesForme || mon.species || mon.name || `Ally slot ${i + 1}`;
+        const fainted = mon.fainted || (mon.hp !== undefined && mon.hp <= 0);
+        // Only show ally targets if it's a different slot
+        if (i !== choiceIndex) {
+          targets.push({ label: name, loc: i + 1, isFoe: false, fainted });
+        }
+      }
+    }
+    
+    return (
+      <div style={{
+        padding: '6px 8px',
+        background: 'rgba(0,0,0,0.6)',
+        borderRadius: '6px',
+        margin: '4px 0',
+      }}>
+        <div style={{ fontSize: '12px', color: '#ffa', marginBottom: '4px', fontWeight: 'bold', textAlign: 'center' }}>
+          Target for {pendingMoveForTarget.moveName}?
+        </div>
+        <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {targets.filter(t => t.isFoe).map((t) => (
+            <button
+              key={`target-${t.loc}`}
+              disabled={t.fainted}
+              onClick={() => {
+                setPendingMoveForTarget(null);
+                sendChoice(`move ${pendingMoveForTarget.moveIndex} ${t.loc}`);
+              }}
+              style={{
+                padding: '6px 12px',
+                fontSize: '12px',
+                borderRadius: '4px',
+                border: '1px solid #c44',
+                background: t.fainted ? '#333' : '#a22',
+                color: t.fainted ? '#666' : '#fff',
+                cursor: t.fainted ? 'not-allowed' : 'pointer',
+                opacity: t.fainted ? 0.5 : 1,
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {targets.some(t => !t.isFoe) && (
+          <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '4px' }}>
+            {targets.filter(t => !t.isFoe).map((t) => (
+              <button
+                key={`target-${t.loc}`}
+                disabled={t.fainted}
+                onClick={() => {
+                  setPendingMoveForTarget(null);
+                  sendChoice(`move ${pendingMoveForTarget.moveIndex} ${t.loc}`);
+                }}
+                style={{
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  borderRadius: '4px',
+                  border: '1px solid #4a4',
+                  background: t.fainted ? '#333' : '#2a6',
+                  color: t.fainted ? '#666' : '#fff',
+                  cursor: t.fainted ? 'not-allowed' : 'pointer',
+                  opacity: t.fainted ? 0.5 : 1,
+                }}
+              >
+                {t.label} (ally)
+              </button>
+            ))}
+          </div>
+        )}
+        <div style={{ textAlign: 'center', marginTop: '4px' }}>
+          <button
+            onClick={() => setPendingMoveForTarget(null)}
+            style={{
+              padding: '3px 10px',
+              fontSize: '11px',
+              borderRadius: '3px',
+              border: '1px solid #666',
+              background: '#444',
+              color: '#ccc',
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }, [pendingMoveForTarget, mySide, choices, choicesVersion, sendChoice]);
   
   // Render switch buttons
   const renderSwitchButtons = useMemo(() => {
@@ -4038,6 +4182,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                   )}
                 </div>
                 {renderMoveButtons}
+                {renderTargetSelector}
                 {renderSwitchButtons}
               </>
             )}

@@ -451,13 +451,18 @@ export class ProtocolConverter {
     if (!this.initialized) {
       lines.push(...stateToProtocol(state));
       
-      // Send initial switches for each player's active
+      // Send initial switches for each player's active (handles doubles/triples via activeIndices)
+      const slotLetters = ['a', 'b', 'c', 'd', 'e', 'f'];
       state.players.forEach((player, idx) => {
         const side = `p${idx + 1}`;
-        const active = player.team[player.activeIndex];
-        if (active) {
-          lines.push(...switchToProtocol(side, active));
-        }
+        const activeIndices: number[] = (player as any).activeIndices || [player.activeIndex || 0];
+        activeIndices.forEach((ai, slotIdx) => {
+          if (ai < 0) return;
+          const active = player.team[ai];
+          if (active) {
+            lines.push(...switchToProtocol(side, active, slotLetters[slotIdx] || 'a'));
+          }
+        });
       });
       
       this.initialized = true;
