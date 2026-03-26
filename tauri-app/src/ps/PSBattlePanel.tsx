@@ -3150,12 +3150,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       }
       
       if (subAction) {
+        // Advance BattleChoiceBuilder first to validate the choice
+        if (choices) {
+          const addError = choices.addChoice(resolvedChoice);
+          if (typeof addError === 'string') {
+            PS_DEBUG && console.log('[PSBattlePanel] Multi-slot addChoice rejected:', addError);
+            return;
+          }
+        }
         pendingSlotChoicesRef.current = [...pendingSlotChoicesRef.current, subAction];
-      }
-      
-      // Advance BattleChoiceBuilder
-      if (choices) {
-        choices.addChoice(resolvedChoice);
         setChoicesVersion(v => v + 1);
       }
       
@@ -3782,13 +3785,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         }
       }
     }
+    // In multi-slot forceSwitch, exclude Pokemon already chosen for a prior slot
+    // BattleChoiceBuilder tracks this in alreadySwitchingIn (1-based indices)
+    const alreadySwitchingIn: number[] = choices?.alreadySwitchingIn || [];
     const switchable = pokemon
       .map((poke: any, i: number) => ({ poke, index: i }))
       .filter(({ poke, index }) => {
         const condition = poke.condition || '';
         const isFainted = poke.fainted || condition.includes('fnt') || condition.startsWith('0/');
         const isActive = poke.active || activeIndicesSet.has(index);
-        return !isActive && !isFainted;
+        const alreadyChosen = alreadySwitchingIn.includes(index + 1); // 1-based
+        return !isActive && !isFainted && !alreadyChosen;
       });
     
     return (
@@ -3864,7 +3871,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         })}
       </div>
     );
-  }, [request, sendChoice, waitingForOpponent, waitingForAnimations]);
+  }, [request, sendChoice, waitingForOpponent, waitingForAnimations, choices, choicesVersion]);
   
   // Render team preview
   const renderTeamPreview = useMemo(() => {
@@ -4149,7 +4156,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             {/* Force-switch takes priority over animations - player needs to act immediately */}
             {(request?.forceSwitch || request?.requestType === 'switch') && !request?.teamPreview && (
               <>
-                <div className="whatdo">Choose a Pokemon to send out:</div>
+                <div className="whatdo">
+                  {(request?.forceSwitch?.filter(Boolean)?.length ?? 0) > 1
+                    ? `Choose replacement ${(choices?.index?.() ?? 0) + 1} of ${request?.forceSwitch?.filter(Boolean)?.length}:`
+                    : 'Choose a Pokemon to send out:'}
+                </div>
                 {renderSwitchButtons}
               </>
             )}

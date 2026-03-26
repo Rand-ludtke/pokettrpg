@@ -2601,16 +2601,36 @@ io.on("connection", (socket) => {
             if (data.action.type !== "switch") {
                 return socket.emit("error", { error: "must switch due to faint" });
             }
-            // Validate switch target is not fainted
+            // Validate switch target(s) - multi-slot sends choices array, single-slot sends toIndex
             const forceSwitchState = room.engine.getState();
             const forceSwitchPlayer = forceSwitchState.players.find(p => p.id === data.playerId);
+            const switchChoices = data.action.choices;
+            const isMultiSlot = Array.isArray(switchChoices) && switchChoices.length > 1;
             if (forceSwitchPlayer) {
-                const targetMon = forceSwitchPlayer.team[data.action.toIndex];
-                if (!targetMon || targetMon.currentHP <= 0) {
-                    return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
-                }
-                if (data.action.toIndex === forceSwitchPlayer.activeIndex) {
-                    return socket.emit("error", { error: "cannot switch to the same Pokemon" });
+                if (isMultiSlot) {
+                    // Validate each choice in multi-slot forceSwitch
+                    const usedIndices = new Set();
+                    for (const c of switchChoices) {
+                        if (c.type !== 'switch' || typeof c.toIndex !== 'number') {
+                            return socket.emit("error", { error: "invalid multi-slot switch choice" });
+                        }
+                        const targetMon = forceSwitchPlayer.team[c.toIndex];
+                        if (!targetMon || targetMon.currentHP <= 0) {
+                            return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
+                        }
+                        if (usedIndices.has(c.toIndex)) {
+                            return socket.emit("error", { error: "cannot switch two slots to the same Pokemon" });
+                        }
+                        usedIndices.add(c.toIndex);
+                    }
+                } else {
+                    const targetMon = forceSwitchPlayer.team[data.action.toIndex];
+                    if (!targetMon || targetMon.currentHP <= 0) {
+                        return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
+                    }
+                    if (data.action.toIndex === forceSwitchPlayer.activeIndex) {
+                        return socket.emit("error", { error: "cannot switch to the same Pokemon" });
+                    }
                 }
             }
             // Perform immediate forced switch via engine (supports multi-slot choices array)
