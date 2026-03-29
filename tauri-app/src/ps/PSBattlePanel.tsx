@@ -151,6 +151,60 @@ function parseActiveSwitchLine(line: string): { side: 'p1' | 'p2'; name: string 
   return { side: match[1] as 'p1' | 'p2', name: match[2].trim() };
 }
 
+/**
+ * SlotMatrix — scalable data structure for N-slot battles (singles/doubles/triples).
+ * Partitions a side's Pokemon into active, benched, and fainted arrays.
+ * Each entry preserves the original sideIndex (position in side.pokemon[]).
+ * Active entries also track their slotIndex (0=a, 1=b, 2=c) for move/choice mapping.
+ */
+interface SlotMatrixEntry {
+  pokemon: any;
+  sideIndex: number;      // Index in request.side.pokemon[]
+  name: string;           // Resolved display name
+}
+
+interface SlotMatrix {
+  active: Array<SlotMatrixEntry & { slotIndex: number }>;  // On-field Pokemon with slot position
+  benched: SlotMatrixEntry[];                                // Available to switch in
+  fainted: SlotMatrixEntry[];                                // KO'd
+  /** Get the active Pokemon for a given choice slot (0-indexed) */
+  activeAt(choiceIndex: number): (SlotMatrixEntry & { slotIndex: number }) | undefined;
+  /** Get display name for a given choice slot */
+  nameAt(choiceIndex: number): string;
+}
+
+function buildSlotMatrix(pokemon: any[] | undefined): SlotMatrix {
+  const active: SlotMatrix['active'] = [];
+  const benched: SlotMatrix['benched'] = [];
+  const fainted: SlotMatrix['fainted'] = [];
+
+  if (pokemon) {
+    let slotIndex = 0;
+    for (let i = 0; i < pokemon.length; i++) {
+      const p = pokemon[i];
+      const condition = p?.condition || '';
+      const isFainted = p?.fainted || condition.includes('fnt') || /^0\b/.test(condition);
+      const name = p?.ident?.split(': ')[1] || p?.details?.split(',')[0] || p?.name || p?.species || 'Pokemon';
+
+      if (p?.active) {
+        active.push({ pokemon: p, sideIndex: i, slotIndex: slotIndex++, name });
+      } else if (isFainted) {
+        fainted.push({ pokemon: p, sideIndex: i, name });
+      } else {
+        benched.push({ pokemon: p, sideIndex: i, name });
+      }
+    }
+  }
+
+  return {
+    active,
+    benched,
+    fainted,
+    activeAt(choiceIndex: number) { return active[choiceIndex]; },
+    nameAt(choiceIndex: number) { return active[choiceIndex]?.name || 'your Pokemon'; },
+  };
+}
+
 // Derive a stable ID from prompt pokemon data
 // Server prompt uses ident like "p1: Charizard" but no id field
 function derivePokemonId(poke: any): string | undefined {
@@ -2158,10 +2212,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             if (activeName) {
               const activeIndex = findPokemonIndexByName(currentRequest.side.pokemon, activeName);
               const activePokemon = activeIndex >= 0 ? currentRequest.side.pokemon[activeIndex] : null;
+              
+              // In doubles, don't rebuild active for protocol switches — the prompt already has correct multi-slot active.
+              // Only rebuild in singles (1 active slot) when the active ID doesn't match.
+              const isDoublesActive = (currentRequest.active?.length || 0) > 1;
               const currentActiveId = currentRequest.active?.[0]?.id || currentRequest.active?.[0]?.pokemonId;
               const desiredActiveId = activePokemon?.id || activePokemon?.pokemonId;
 
-              if (activePokemon && desiredActiveId && currentActiveId !== desiredActiveId) {
+              if (!isDoublesActive && activePokemon && desiredActiveId && currentActiveId !== desiredActiveId) {
                 console.warn('[PSBattlePanel] Rebuilding request.active from protocol switch:', {
                   currentActiveId,
                   desiredActiveId,
@@ -2447,16 +2505,26 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       
       // Enrich Pokemon data with stats from state (tooltips need serverPokemon.stats)
       const activeIndexFromState = playerFromState?.activeIndex ?? 0;
-      const activeIndexFromPrompt = rawPokemonData.findIndex((p: any) => p?.active);
+      // In doubles, multiple Pokemon can be active - collect ALL active indices
+      const activeIndicesFromPrompt: number[] = [];
+      rawPokemonData.forEach((p: any, idx: number) => { if (p?.active) activeIndicesFromPrompt.push(idx); });
+      const activeIndexFromPrompt = activeIndicesFromPrompt.length > 0 ? activeIndicesFromPrompt[0] : -1;
       const activeIndexFromProtocol = lastKnownActiveName
         ? findPokemonIndexByName(rawPokemonData, lastKnownActiveName)
         : -1;
       const activeIndexToUse = activeIndexFromPrompt >= 0
         ? activeIndexFromPrompt
         : (activeIndexFromProtocol >= 0 ? activeIndexFromProtocol : activeIndexFromState);
+      // Build set of all active indices for doubles support
+      const activeIndicesSet = new Set<number>(
+        activeIndicesFromPrompt.length > 0
+          ? activeIndicesFromPrompt
+          : [activeIndexToUse]
+      );
       PS_DEBUG && console.log('[PSBattlePanel] Building pokemonData with activeIndexFromState:', activeIndexFromState, {
         activeIndexFromProtocol,
         activeIndexToUse,
+        activeIndicesSet: [...activeIndicesSet],
         lastKnownActiveName,
         rawPokemonCount: rawPokemonData?.length,
         stateTeamCount: playerFromState?.team?.length,
@@ -2493,7 +2561,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const derivedStats = buildStatsFromBase(baseStats, level);
 
         // Build complete Pokemon data with stats
-        const isActive = idx === activeIndexToUse;
+        const isActive = activeIndicesSet.has(idx);
         if (isActive) {
           PS_DEBUG && console.log('[PSBattlePanel] Marking pokemon as active:', poke.name || poke.id, 'at index', idx);
         }
@@ -2559,18 +2627,27 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       
       // Even if we don't need to rebuild, ensure the active has the correct id/pokemonId
       // The server's prompt.active doesn't include id, so we derive it from the active Pokemon in side data
+      // In doubles, derive per-slot IDs from the active Pokemon at each slot index
+      const activeIndicesArray = [...activeIndicesSet];
       const activePokemonFromSide = pokemonData[activeIndexToUse];
       const correctActiveId = activePokemonFromSide?.id || activePokemonFromSide?.pokemonId;
       
       if (!shouldRebuildActive && hasPromptActiveMoves && correctActiveId) {
         // Enrich existing active with id but keep moves and flags from prompt
-        fixedActive = fixedActive.map((active: any, idx: number) => ({
-          ...active,
-          id: correctActiveId,
-          pokemonId: correctActiveId,
-        }));
+        // In doubles, each active slot gets the ID of the corresponding active Pokemon
+        fixedActive = fixedActive.map((active: any, slotIdx: number) => {
+          const pokeIdx = activeIndicesArray[slotIdx] ?? activeIndexToUse;
+          const slotPoke = pokemonData[pokeIdx];
+          const slotId = slotPoke?.id || slotPoke?.pokemonId || correctActiveId;
+          return {
+            ...active,
+            id: slotId,
+            pokemonId: slotId,
+          };
+        });
         PS_DEBUG && console.log('[PSBattlePanel] Enriched active with correct id:', {
           correctActiveId,
+          activeIndicesArray,
           activePokemonName: activePokemonFromSide?.name,
           moves: fixedActive[0]?.moves?.length,
           canMegaEvo: fixedActive[0]?.canMegaEvo,
@@ -2586,6 +2663,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           activeIndexFromState,
           activeIndexFromProtocol,
           activeIndexToUse,
+          activeIndicesArray,
           lastKnownActiveName,
           activePokemonName: activePokemonFromSide?.name,
           mismatch: promptActiveId !== correctActiveId,
@@ -2593,54 +2671,63 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         });
 
         // If prompt has wrong active Pokemon OR NO active pokemon, rebuild active array from side data
+        // In doubles, rebuild ALL active slots (not just the first)
         if (activePokemonFromSide && (promptActiveId !== correctActiveId || !fixedActive || fixedActive.length === 0)) {
           console.warn('[PSBattlePanel] Active Pokemon mismatch or missing! Rebuilding active array from side data');
           
-          // Find the original state pokemon to get move PP (use name-based matching)
-          const statePokeForActive = findMatchingStatePoke(activePokemonFromSide, playerFromState?.team || []);
+          const rebuiltSlots: any[] = [];
+          const slotsToRebuild = activeIndicesArray.length > 0 ? activeIndicesArray : [activeIndexToUse];
+          for (let slotIdx = 0; slotIdx < slotsToRebuild.length; slotIdx++) {
+            const pokeIdx = slotsToRebuild[slotIdx];
+            const slotPokemon = pokemonData[pokeIdx];
+            if (!slotPokemon) continue;
+            
+            const slotId = slotPokemon.id || slotPokemon.pokemonId;
+            // Find the original state pokemon to get move PP (use name-based matching)
+            const statePokeForSlot = findMatchingStatePoke(slotPokemon, playerFromState?.team || []);
+            
+            // Use state moves (objects with PP) if available, otherwise fall back to side moves (strings)
+            const promptPoke = rawPokemonData[pokeIdx];
+            const promptMoves = promptPoke?.moves || [];
+            const movesSource = statePokeForSlot?.moves || (promptMoves.length > 0 ? promptMoves : slotPokemon.moves) || [];
+            
+            const slotMoves = movesSource.map((m: any) => {
+              const isString = typeof m === 'string';
+              const moveId = isString ? m : (m.id || m.name?.toLowerCase().replace(/\s+/g, ''));
+              const moveName = isString ? m : m.name;
+              return {
+                id: moveId,
+                name: moveName,
+                pp: isString ? 32 : (m.pp ?? 32),
+                maxpp: isString ? 32 : (m.maxpp ?? 32),
+                target: isString ? 'normal' : (m.target || 'normal'),
+                disabled: isString ? false : (m.disabled || false),
+              };
+            });
+            
+            const promptActiveFlags = fixedActive?.[slotIdx] || prompt?.active?.[slotIdx] || {};
+            const isTrapped = promptActiveFlags.trapped || false;
+            const isMaybeTrapped = promptActiveFlags.maybeTrapped || false;
+            const canMegaEvo = promptActiveFlags.canMegaEvo ?? slotPokemon?.canMegaEvo ?? statePokeForSlot?.canMegaEvo;
+            const canZMove = promptActiveFlags.canZMove ?? slotPokemon?.canZMove ?? statePokeForSlot?.canZMove;
+            const canDynamax = promptActiveFlags.canDynamax ?? slotPokemon?.canDynamax ?? statePokeForSlot?.canDynamax;
+            const canTerastallize = promptActiveFlags.canTerastallize ?? promptActiveFlags.canTera ?? slotPokemon?.canTerastallize ?? slotPokemon?.canTera ?? statePokeForSlot?.canTerastallize ?? statePokeForSlot?.canTera;
+            
+            rebuiltSlots.push({
+              id: slotId,
+              pokemonId: slotId,
+              moves: slotMoves,
+              canSwitch: !isTrapped,
+              trapped: isTrapped,
+              maybeTrapped: isMaybeTrapped,
+              canMegaEvo,
+              canZMove,
+              canDynamax,
+              canTerastallize,
+            });
+          }
           
-          // Use state moves (objects with PP) if available, otherwise fall back to side moves (strings)
-          // Also check prompt.side.pokemon for moves with PP
-          const promptPoke = rawPokemonData[activeIndexToUse];
-          const promptMoves = promptPoke?.moves || [];
-          const movesSource = statePokeForActive?.moves || (promptMoves.length > 0 ? promptMoves : activePokemonFromSide.moves) || [];
-          
-          const correctMoves = movesSource.map((m: any) => {
-             // Handle both string moves (from side data) and object moves (from state)
-             const isString = typeof m === 'string';
-             const moveId = isString ? m : (m.id || m.name?.toLowerCase().replace(/\s+/g, ''));
-             const moveName = isString ? m : m.name;
-             // If we only have a string, we can't know PP, so default to 32. 
-             // Ideally statePokeForActive provides the full object.
-             return {
-              id: moveId,
-              name: moveName,
-              pp: isString ? 32 : (m.pp ?? 32),
-              maxpp: isString ? 32 : (m.maxpp ?? 32),
-              target: isString ? 'normal' : (m.target || 'normal'),
-              disabled: isString ? false : (m.disabled || false),
-            };
-          });
-          
-          const promptActiveFlags = fixedActive?.[0] || prompt?.active?.[0] || {};
-          const isTrapped = promptActiveFlags.trapped || false;
-          const isMaybeTrapped = promptActiveFlags.maybeTrapped || false;
-          const canMegaEvo = promptActiveFlags.canMegaEvo ?? activePokemonFromSide?.canMegaEvo ?? statePokeForActive?.canMegaEvo;
-          const canZMove = promptActiveFlags.canZMove ?? activePokemonFromSide?.canZMove ?? statePokeForActive?.canZMove;
-          const canDynamax = promptActiveFlags.canDynamax ?? activePokemonFromSide?.canDynamax ?? statePokeForActive?.canDynamax;
-          const canTerastallize = promptActiveFlags.canTerastallize ?? promptActiveFlags.canTera ?? activePokemonFromSide?.canTerastallize ?? activePokemonFromSide?.canTera ?? statePokeForActive?.canTerastallize ?? statePokeForActive?.canTera;
-          fixedActive = [{
-            id: correctActiveId,
-            pokemonId: correctActiveId,
-            moves: correctMoves,
-            canSwitch: !isTrapped,
-            trapped: isTrapped,
-            maybeTrapped: isMaybeTrapped,
-            canMegaEvo,
-            canZMove,
-            canDynamax,
-            canTerastallize,
-          }];
+          fixedActive = rebuiltSlots.length > 0 ? rebuiltSlots : fixedActive;
           PS_DEBUG && console.log('[PSBattlePanel] Rebuilt active with PP data:', fixedActive);
         }
       }
@@ -3455,25 +3542,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     if (!request?.active?.[choiceIndex]) return null;
     
     const moves = Array.isArray(request.active[choiceIndex].moves) ? request.active[choiceIndex].moves : [];
-    const activeId = request.active?.[choiceIndex]?.pokemonId || request.active?.[choiceIndex]?.id;
-    // Find the Nth active Pokemon in side data (0th active = slot a, 1st = slot b, etc.)
-    const activePokemonIndex = (() => {
-      const pokemon = request.side?.pokemon || [];
-      // If activeId matches, use that directly
-      if (activeId) {
-        const idx = pokemon.findIndex((p: any) => p.pokemonId === activeId || p.id === activeId);
-        if (idx >= 0) return idx;
-      }
-      // Otherwise find the Nth active Pokemon
-      let activeCount = 0;
-      for (let i = 0; i < pokemon.length; i++) {
-        if (pokemon[i]?.active) {
-          if (activeCount === choiceIndex) return i;
-          activeCount++;
-        }
-      }
-      return 0;
-    })();
+    // Use SlotMatrix to find the correct active Pokemon for this choice slot
+    const matrix = buildSlotMatrix(request.side?.pokemon);
+    const slotEntry = matrix.activeAt(choiceIndex);
+    const activePokemonIndex = slotEntry?.sideIndex ?? 0;
     const activePokemon = request.side?.pokemon?.[activePokemonIndex];
 
     const activeSpeciesLabel = activePokemon?.speciesForme || activePokemon?.species || activePokemon?.name || '';
@@ -3819,26 +3891,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const pokemon = request.side.pokemon;
     const isForceSwitch = !!request?.forceSwitch;
     const waitingBlocksSwitch = (waitingForOpponent && !isForceSwitch) || (waitingForAnimations && !isForceSwitch);
-    // In doubles, collect ALL active Pokemon indices
-    // pokemon[i].active is true for ALL currently-active pokemon on our side
-    const activeIndicesSet = new Set<number>();
-    for (let pi = 0; pi < pokemon.length; pi++) {
-      if (pokemon[pi].active) {
-        activeIndicesSet.add(pi);
-      }
-    }
+    // Use SlotMatrix for scalable active/benched/fainted partitioning
+    const matrix = buildSlotMatrix(pokemon);
     // In multi-slot forceSwitch, exclude Pokemon already chosen for a prior slot
     // BattleChoiceBuilder tracks this in alreadySwitchingIn (1-based indices)
     const alreadySwitchingIn: number[] = choices?.alreadySwitchingIn || [];
-    const switchable = pokemon
-      .map((poke: any, i: number) => ({ poke, index: i }))
-      .filter(({ poke, index }) => {
-        const condition = poke.condition || '';
-        const isFainted = poke.fainted || condition.includes('fnt') || condition.startsWith('0/');
-        const isActive = poke.active || activeIndicesSet.has(index);
-        const alreadyChosen = alreadySwitchingIn.includes(index + 1); // 1-based
-        return !isActive && !isFainted && !alreadyChosen;
-      });
+    const switchable = matrix.benched.filter(entry => {
+      const alreadyChosen = alreadySwitchingIn.includes(entry.sideIndex + 1); // 1-based
+      return !alreadyChosen;
+    });
     
     return (
       <div className="switchmenu">
@@ -3852,20 +3913,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             Warning: You may be trapped!
           </p>
         )}
-        {switchable.map(({ poke, index }) => {
-          // Skip active Pokemon (unless forced switch)
-          const isActive = poke.active && !request.forceSwitch?.[0];
+        {switchable.map((entry) => {
+          const poke = entry.pokemon;
+          const index = entry.sideIndex;
           
           // Parse HP - condition can be "120/120", "0/100", or "0 fnt"
           const condition = poke.condition || '100/100';
           let current = 0;
           let max = 100;
-          let isFainted = poke.fainted || false;
           
           if (condition.includes('fnt')) {
-            isFainted = true;
             current = 0;
-            // Try to extract max from condition like "0 fnt"
             const parts = condition.split('/');
             if (parts.length > 1) {
               max = parseInt(parts[1].split(' ')[0], 10) || 100;
@@ -3874,11 +3932,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             const parts = condition.split('/');
             current = parseInt(parts[0], 10) || 0;
             max = parseInt(parts[1]?.split(' ')[0], 10) || 100;
-            if (current <= 0) isFainted = true;
           }
           
           const hpPercent = max > 0 ? Math.round((current / max) * 100) : 0;
-          const disabled = waitingBlocksSwitch || isActive || isFainted;
+          const disabled = waitingBlocksSwitch;
           
           // Get Pokemon name from various sources
           const pokeName = poke.name || 
@@ -4239,44 +4296,30 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                     <em>Waiting for animations... (preview below)</em>
                   ) : (
                     <>What will {
-                      (() => {
-                        const ci = choices?.index?.() ?? 0;
-                        const pokemon = request.side?.pokemon || [];
-                        // Find the Nth active Pokemon (0th = slot a, 1st = slot b)
-                        let activeCount = 0;
-                        for (let i = 0; i < pokemon.length; i++) {
-                          if (pokemon[i]?.active) {
-                            if (activeCount === ci) {
-                              const p = pokemon[i];
-                              return p.ident?.split(': ')[1] || p.details?.split(',')[0] || p.name || 'your Pokemon';
-                            }
-                            activeCount++;
-                          }
-                        }
-                        return 'your Pokemon';
-                      })()
+                      buildSlotMatrix(request.side?.pokemon).nameAt(choices?.index?.() ?? 0)
                     } do?</>
                   )}
                 </div>
                 {renderMoveButtons}
-                {/* Back button for doubles: go back to slot 1's move when choosing slot 2+ */}
+                {/* Back button for multi-slot: go back to previous slot's choices */}
                 {(choices?.index?.() ?? 0) > 0 && (request?.active?.length ?? 1) > 1 && (
                   <div style={{ textAlign: 'center', padding: '4px 0' }}>
                     <button
                       className="button"
                       style={{ padding: '4px 12px', fontSize: '12px' }}
                       onClick={() => {
-                        // Rebuild fresh BattleChoiceBuilder to go back to slot 1
+                        // Rebuild fresh BattleChoiceBuilder to restart from slot 1
                         if (window.BattleChoiceBuilder && request) {
                           const newChoices = new window.BattleChoiceBuilder(request as any);
                           setChoices(newChoices);
                           setChoicesVersion(v => v + 1);
                           pendingSlotChoicesRef.current = [];
                           setMoveBoosts({ mega: false, z: false, max: false, tera: false });
+                          setPendingMoveForTarget(null);
                         }
                       }}
                     >
-                      <i className="fa fa-chevron-left" aria-hidden="true" /> Back to Slot 1
+                      <i className="fa fa-chevron-left" aria-hidden="true" /> Back to {buildSlotMatrix(request.side?.pokemon).nameAt(0)}
                     </button>
                   </div>
                 )}
