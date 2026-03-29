@@ -441,6 +441,7 @@ this.activeAnimations=this.activeAnimations.add(elem);
 };_proto.
 
 startAnimations=function startAnimations(){
+console.log('[BattleAnimations] startAnimations');
 this.$fx.empty();
 this.activeAnimations=$();
 this.timeOffset=0;
@@ -452,8 +453,14 @@ if(this.minDelay||this.timeOffset){
 this.$delay.delay(Math.max(this.minDelay,this.timeOffset));
 this.activeAnimations=this.activeAnimations.add(this.$delay);
 }
-if(!this.activeAnimations.length)return undefined;
-return this.activeAnimations.promise();
+if(!this.activeAnimations.length) {
+    console.log('[BattleAnimations] finishAnimations: NO animations');
+    return undefined;
+}
+console.log('[BattleAnimations] finishAnimations: Returning promise for ' + this.activeAnimations.length + ' animations');
+var p = this.activeAnimations.promise();
+p.done(function() { console.log('[BattleAnimations] finishAnimations promise RESOLVED'); });
+return p;
 };_proto.
 
 

@@ -3587,8 +3587,8 @@ break;
 }
 case'player':{
 var _side4=this.getSide(args[1]);
-_side4.setName(args[2]);
-if(args[3])_side4.setAvatar(args[3]);
+// Pass avatar to setName to avoid rollTrainerSprites() being called unnecessarily
+_side4.setName(args[2],args[3]);
 if(args[4])_side4.rating=args[4];
 if(this.joinButtons)this.scene.hideJoinButtons();
 this.log(args);
@@ -3912,7 +3912,8 @@ if(this.seeking!==null)return true;
 return!(this.paused&&this.turn>=0);
 };_proto3.
 nextStep=function nextStep(){var _this2=this;
-if(!this.shouldStep())return;
+console.log('[Battle.nextStep] START', { step: this.currentStep, len: this.stepQueue.length, paused: this.paused, stopped: this.scene.stopped, waiting: this.waitForAnimations });
+if(!this.shouldStep()) { console.log('[Battle.nextStep] ABORT shouldStep=false'); return; }
 
 var time=Date.now();
 this.scene.startAnimations();
@@ -3923,6 +3924,7 @@ do{
 
 this.waitForAnimations=true;
 if(this.currentStep>=this.stepQueue.length){var _this$subscription11;
+console.log('[Battle.nextStep] Queue End');
 this.atQueueEnd=true;
 if(!this.ended&&this.isReplay)this.prematureEnd();
 this.stopSeeking();
@@ -3933,15 +3935,19 @@ this.scene.updateBgm();
 return;
 }
 
-this.run(this.stepQueue[this.currentStep]);
+var currentStepLine = this.stepQueue[this.currentStep];
+console.log('[Battle.nextStep] RUNNING', currentStepLine);
+this.run(currentStepLine);
 this.currentStep++;
 if(this.waitForAnimations===true){
 animations=this.scene.finishAnimations();
+console.log('[Battle.nextStep] finishAnimations result present:', !!animations);
 }else if(this.waitForAnimations==='simult'){
 this.scene.timeOffset=0;
 }
 
 if(Date.now()-time>300){
+console.log('[Battle.nextStep] LOOP BREAK (timeout)');
 interruptionCount=this.scene.interruptionCount;
 setTimeout(function(){
 if(interruptionCount===_this2.scene.interruptionCount){
@@ -3958,12 +3964,19 @@ this.scene.pause();
 return;
 }
 
-if(!animations)return;
+if(!animations){
+    console.log('[Battle.nextStep] Loop done, no animations? shouldStep:', this.shouldStep());
+    return;
+}
 
+console.log('[Battle.nextStep] WAITING FOR ANIMATIONS');
 interruptionCount=this.scene.interruptionCount;
 animations.done(function(){
+console.log('[Battle.nextStep] ANIMATIONS DONE callback');
 if(interruptionCount===_this2.scene.interruptionCount){
 _this2.nextStep();
+} else {
+    console.log('[Battle.nextStep] Interruption count mismatch', { expected: interruptionCount, actual: _this2.scene.interruptionCount });
 }
 });
 };_proto3.

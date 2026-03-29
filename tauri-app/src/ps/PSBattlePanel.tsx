@@ -179,6 +179,8 @@ function buildSlotMatrix(pokemon: any[] | undefined): SlotMatrix {
   const fainted: SlotMatrix['fainted'] = [];
 
   if (pokemon) {
+    // First pass: count how many Pokemon have `active: true` to determine slot ordering
+    // The slotIndex tracks position among ALL active-flagged Pokemon (including fainted)
     let slotIndex = 0;
     for (let i = 0; i < pokemon.length; i++) {
       const p = pokemon[i];
@@ -187,7 +189,13 @@ function buildSlotMatrix(pokemon: any[] | undefined): SlotMatrix {
       const name = p?.ident?.split(': ')[1] || p?.details?.split(',')[0] || p?.name || p?.species || 'Pokemon';
 
       if (p?.active) {
-        active.push({ pokemon: p, sideIndex: i, slotIndex: slotIndex++, name });
+        if (isFainted) {
+          // Fainted but was in an active slot — track the slot index but put in fainted
+          fainted.push({ pokemon: p, sideIndex: i, name });
+        } else {
+          active.push({ pokemon: p, sideIndex: i, slotIndex, name });
+        }
+        slotIndex++; // increment for all active-flagged, even fainted ones
       } else if (isFainted) {
         fainted.push({ pokemon: p, sideIndex: i, name });
       } else {
@@ -200,8 +208,8 @@ function buildSlotMatrix(pokemon: any[] | undefined): SlotMatrix {
     active,
     benched,
     fainted,
-    activeAt(choiceIndex: number) { return active[choiceIndex]; },
-    nameAt(choiceIndex: number) { return active[choiceIndex]?.name || 'your Pokemon'; },
+    activeAt(choiceIndex: number) { return active.find(a => a.slotIndex === choiceIndex) || active[choiceIndex]; },
+    nameAt(choiceIndex: number) { const a = active.find(e => e.slotIndex === choiceIndex) || active[choiceIndex]; return a?.name || 'your Pokemon'; },
   };
 }
 

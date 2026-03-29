@@ -3587,8 +3587,9 @@ export class Battle {
 		}
 		case 'player': {
 			let side = this.getSide(args[1]);
-			side.setName(args[2]);
-			if (args[3]) side.setAvatar(args[3]);
+			// Pass avatar to setName to avoid rollTrainerSprites() being called unnecessarily
+			// setName(name, avatar?) will call setAvatar if avatar is truthy
+			side.setName(args[2], args[3]);
 			if (args[4]) side.rating = args[4];
 			if (this.joinButtons) this.scene.hideJoinButtons();
 			this.log(args);
