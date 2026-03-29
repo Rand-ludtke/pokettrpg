@@ -2654,6 +2654,21 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         maxTeamSize: prompt?.maxTeamSize,
         rqid: prompt?.rqid,
       };
+      // In doubles, nullify active entries for fainted/empty slots so BattleChoiceBuilder auto-passes them
+      if (psRequest.requestType === 'move' && Array.isArray(psRequest.active) && psRequest.active.length > 1) {
+        const sidePokemon = psRequest.side?.pokemon || [];
+        const activePokes: any[] = [];
+        for (const p of sidePokemon) {
+          if (p?.active) activePokes.push(p);
+        }
+        for (let si = 0; si < psRequest.active.length; si++) {
+          const slotPoke = activePokes[si];
+          // If no active Pokemon for this slot, or it's fainted (condition starts with '0'), nullify
+          if (!slotPoke || /^0\b/.test(slotPoke.condition || '')) {
+            psRequest.active[si] = null as any;
+          }
+        }
+      }
       if (psRequest.requestType === 'switch' && (!psRequest.forceSwitch || psRequest.forceSwitch.length === 0)) {
         const activeCount = psRequest.side?.pokemon?.filter((p: any) => p.active).length || 1;
         psRequest.forceSwitch = Array.from({ length: activeCount }, () => true);
@@ -2707,6 +2722,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           console.warn('[PSBattlePanel] Restored entire active array after fixRequest');
         } else {
           for (let si = 0; si < savedActiveBeforeFix.length; si++) {
+            // If fixRequest deliberately nullified a slot (fainted Pokemon), leave it null
+            // so that BattleChoiceBuilder.fillPasses() can auto-pass it
+            if (psRequest.active[si] === null || psRequest.active[si] === undefined) continue;
             if (savedActiveBeforeFix[si]?.moves?.length && (!psRequest.active[si]?.moves || psRequest.active[si].moves.length === 0)) {
               psRequest.active[si] = savedActiveBeforeFix[si];
               console.warn(`[PSBattlePanel] Restored active slot ${si} moves after fixRequest`);
@@ -2865,6 +2883,20 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         setChoicesVersion(v => v + 1);
         pendingSlotChoicesRef.current = []; // Clear pending multi-slot choices on new request
         PS_DEBUG && console.log('[PSBattlePanel] Built BattleChoiceBuilder choices');
+
+        // Auto-send pass when no choices are needed (e.g. forceSwitch with no bench)
+        // PS's BattleChoiceBuilder.fillPasses() auto-fills 'pass' for all slots when
+        // noMoreSwitchChoices() is true, making isDone() immediately true.
+        if (isForceSwitchPrompt && newChoices.isDone?.() && newChoices.isEmpty?.()) {
+          PS_DEBUG && console.log('[PSBattlePanel] ForceSwitch with no bench — auto-sending pass');
+          diagLogProtocol('promptAction', 'ForceSwitch auto-pass (no bench pokemon available)');
+          // Small delay to let state settle before sending
+          setTimeout(() => {
+            client.sendAction(roomId, { type: 'switch', choices: [] }, myPlayerId);
+            setWaitingForOpponent(true);
+          }, 100);
+          return;
+        }
       }
       
       // If battle not ready yet, queue the event for later (but DON'T generate protocol)
@@ -3424,9 +3456,24 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     const moves = Array.isArray(request.active[choiceIndex].moves) ? request.active[choiceIndex].moves : [];
     const activeId = request.active?.[choiceIndex]?.pokemonId || request.active?.[choiceIndex]?.id;
-    const activePokemonIndex = request.side?.pokemon?.findIndex((p: any) =>
-      p.active || (activeId && (p.pokemonId === activeId || p.id === activeId))
-    ) ?? 0;
+    // Find the Nth active Pokemon in side data (0th active = slot a, 1st = slot b, etc.)
+    const activePokemonIndex = (() => {
+      const pokemon = request.side?.pokemon || [];
+      // If activeId matches, use that directly
+      if (activeId) {
+        const idx = pokemon.findIndex((p: any) => p.pokemonId === activeId || p.id === activeId);
+        if (idx >= 0) return idx;
+      }
+      // Otherwise find the Nth active Pokemon
+      let activeCount = 0;
+      for (let i = 0; i < pokemon.length; i++) {
+        if (pokemon[i]?.active) {
+          if (activeCount === choiceIndex) return i;
+          activeCount++;
+        }
+      }
+      return 0;
+    })();
     const activePokemon = request.side?.pokemon?.[activePokemonIndex];
 
     const activeSpeciesLabel = activePokemon?.speciesForme || activePokemon?.species || activePokemon?.name || '';
@@ -3749,9 +3796,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const renderSwitchButtons = useMemo(() => {
     if (!request?.side?.pokemon) return null;
     
-    // Check if trapped - if so, show message instead of switch buttons
-    const isTrapped = request.active?.[0]?.trapped;
-    const isMaybeTrapped = request.active?.[0]?.maybeTrapped;
+    // Check if trapped - in doubles, check the CURRENT slot being selected
+    const currentSlot = choices?.index?.() ?? 0;
+    const isTrapped = request.active?.[currentSlot]?.trapped;
+    const isMaybeTrapped = request.active?.[currentSlot]?.maybeTrapped;
     
     if (isTrapped && !request.forceSwitch) {
       return (
@@ -3771,16 +3819,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const pokemon = request.side.pokemon;
     const isForceSwitch = !!request?.forceSwitch;
     const waitingBlocksSwitch = (waitingForOpponent && !isForceSwitch) || (waitingForAnimations && !isForceSwitch);
-    // In doubles, collect ALL active Pokemon indices (not just slot 0)
+    // In doubles, collect ALL active Pokemon indices
+    // pokemon[i].active is true for ALL currently-active pokemon on our side
     const activeIndicesSet = new Set<number>();
-    if (request.active && Array.isArray(request.active)) {
-      for (let ai = 0; ai < request.active.length; ai++) {
-        // Find which pokemon corresponds to this active slot
-        for (let pi = 0; pi < pokemon.length; pi++) {
-          if (pokemon[pi].active) {
-            activeIndicesSet.add(pi);
-          }
-        }
+    for (let pi = 0; pi < pokemon.length; pi++) {
+      if (pokemon[pi].active) {
+        activeIndicesSet.add(pi);
       }
     }
     // In multi-slot forceSwitch, exclude Pokemon already chosen for a prior slot
@@ -3942,11 +3986,18 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     }
     
     // Determine how many leads need to be selected (1 for singles, 2 for doubles, 3 for triples)
+    // Check both the battle state ref AND the request's maxTeamSize/gameType info
     const stateRules = lastBattleStateRef.current?.rules;
     const stateGameType = lastBattleStateRef.current?.gameType;
-    const activeCount = stateRules?.activeCount ?? (stateGameType === 'doubles' ? 2 : stateGameType === 'triples' ? 3 : 1);
+    // Also check request-level hints for game type (prompt may carry state with gameType)
+    const requestGameType = (request as any)?.state?.gameType || (request as any)?.gameType;
+    const requestActiveCount = (request as any)?.state?.rules?.activeCount;
+    const effectiveGameType = stateGameType || requestGameType;
+    const effectiveActiveCount = stateRules?.activeCount ?? requestActiveCount;
+    const activeCount = effectiveActiveCount ?? (effectiveGameType === 'doubles' ? 2 : effectiveGameType === 'triples' ? 3 : 1);
     const leadsNeeded = typeof activeCount === 'number' && activeCount > 1 ? activeCount : 1;
     const isMultiLead = leadsNeeded > 1;
+    PS_DEBUG && console.log('[PSBattlePanel] Team preview lead calc:', { stateGameType, requestGameType, effectiveActiveCount, leadsNeeded, isMultiLead });
     
     // For single lead, pick immediately. For multi-lead, accumulate selections.
     const handlePick = (index: number) => {
@@ -4188,16 +4239,47 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                     <em>Waiting for animations... (preview below)</em>
                   ) : (
                     <>What will {
-                      // Get active Pokemon name from various possible sources
-                      request.side?.pokemon?.find((p: any) => p.active)?.ident?.split(': ')[1] ||
-                      request.side?.pokemon?.[0]?.ident?.split(': ')[1] ||
-                      request.side?.pokemon?.[0]?.details?.split(',')[0] ||
-                      request.active?.[0]?.name ||
-                      'your Pokemon'
+                      (() => {
+                        const ci = choices?.index?.() ?? 0;
+                        const pokemon = request.side?.pokemon || [];
+                        // Find the Nth active Pokemon (0th = slot a, 1st = slot b)
+                        let activeCount = 0;
+                        for (let i = 0; i < pokemon.length; i++) {
+                          if (pokemon[i]?.active) {
+                            if (activeCount === ci) {
+                              const p = pokemon[i];
+                              return p.ident?.split(': ')[1] || p.details?.split(',')[0] || p.name || 'your Pokemon';
+                            }
+                            activeCount++;
+                          }
+                        }
+                        return 'your Pokemon';
+                      })()
                     } do?</>
                   )}
                 </div>
                 {renderMoveButtons}
+                {/* Back button for doubles: go back to slot 1's move when choosing slot 2+ */}
+                {(choices?.index?.() ?? 0) > 0 && (request?.active?.length ?? 1) > 1 && (
+                  <div style={{ textAlign: 'center', padding: '4px 0' }}>
+                    <button
+                      className="button"
+                      style={{ padding: '4px 12px', fontSize: '12px' }}
+                      onClick={() => {
+                        // Rebuild fresh BattleChoiceBuilder to go back to slot 1
+                        if (window.BattleChoiceBuilder && request) {
+                          const newChoices = new window.BattleChoiceBuilder(request as any);
+                          setChoices(newChoices);
+                          setChoicesVersion(v => v + 1);
+                          pendingSlotChoicesRef.current = [];
+                          setMoveBoosts({ mega: false, z: false, max: false, tera: false });
+                        }
+                      }}
+                    >
+                      <i className="fa fa-chevron-left" aria-hidden="true" /> Back to Slot 1
+                    </button>
+                  </div>
+                )}
                 {renderTargetSelector}
                 {renderSwitchButtons}
               </>

@@ -1162,6 +1162,7 @@ function buildRosterEntries(state: any, request: any, side: SideId, sidePlayerId
   const playerIdx = side === 'p1' ? 0 : 1;
   const player = playerCandidates[playerIdx];
   registerActiveHint(player?.activeIndex);
+  registerActiveHint(player?.activeIndices); // doubles/triples: array of active indices
   registerActiveHint(player?.active);
 
   registerActiveHint(state?.sides?.[playerIdx]?.active);

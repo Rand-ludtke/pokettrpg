@@ -617,6 +617,7 @@ export class PoketTRPGClient {
 
     socket.on('error', (err: any) => {
       const message = typeof err === 'string' ? err : err?.message || 'Unknown error';
+      this.cancelPendingSendAction();
       this.emitter.emit('error', { message });
     });
 
@@ -750,10 +751,9 @@ export class PoketTRPGClient {
     });
 
     socket.on('promptAction', (payload: PromptActionPayload) => {
-      // Server confirmed action receipt (wait prompt) or sent a new prompt
-      if ((payload as any)?.prompt?.wait || (payload as any)?.waitingFor !== undefined) {
-        this.cancelPendingSendAction();
-      }
+      // Any prompt from the server means our action was received or a new
+      // phase started — cancel the retry timer so we don't re-send stale actions.
+      this.cancelPendingSendAction();
       if (payload?.roomId) {
         this.battlePrompts.set(payload.roomId, payload);
         if ((payload as any).needsSwitch !== undefined) this.updateNeedsSwitch(payload.roomId, (payload as any).needsSwitch);
