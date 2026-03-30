@@ -1,3 +1,14 @@
+## 1.5.4
+
+### Fixes
+- Fixed boss/team mode allies being treated as spectators: server now sends `ourSide` with prompt, client uses it when player isn't in state.players.
+- Fixed spectator detection so boss/team allies can see and interact with battle UI.
+
+## 1.5.3
+
+### Fixes
+- Fixed forceSwitch fainted-active Pokémon categorization in SlotMatrix for doubles battles.
+
 ## 1.5.2
 
 ### Boss Battles
