@@ -28,7 +28,11 @@ interface PSBattleRequest {
   };
   forceSwitch?: boolean[];
   teamPreview?: boolean;
+  previewActiveCount?: number;
+  teamPreviewParticipants?: Record<string, Array<{ playerId: string; name: string; trainerSprite?: string; team: any[]; previewActiveCount?: number }>>;
   maxTeamSize?: number;
+  activeCount?: number;
+  gameType?: string;
   rqid?: number;
 }
 
@@ -273,7 +277,8 @@ function generateTeamPreviewProtocol(
   state: any,
   maxTeamSize: number = 6,
   localPlayerId?: string,
-  localTrainerSprite?: string
+  localTrainerSprite?: string,
+  previewCountOverride?: number,
 ): string[] {
   if (!state || !state.players) {
     PS_DEBUG && console.log('[PSBattlePanel] generateTeamPreviewProtocol - no state or players');
@@ -281,7 +286,7 @@ function generateTeamPreviewProtocol(
   }
   
   const lines: string[] = [];
-  const previewCount = state?.rules?.activeCount ?? state?.rules?.active?.count ?? 1;
+  const previewCount = previewCountOverride ?? state?.previewActiveCount ?? state?.rules?.activeCount ?? state?.rules?.active?.count ?? 1;
   
   PS_DEBUG && console.log('[PSBattlePanel] Generating team preview protocol for', state.players.length, 'players');
   PS_DEBUG && console.log('[DIAG-PROTOCOL] [generateTeamPreviewProtocol] CALLED - will generate local team preview lines');
@@ -1478,7 +1483,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             active: prompt?.active,
             forceSwitch: prompt?.forceSwitch,
             teamPreview: effectiveTeamPreview,
+            previewActiveCount: prompt?.previewActiveCount ?? prompt?.state?.previewActiveCount,
+            teamPreviewParticipants: prompt?.teamPreviewParticipants ?? prompt?.state?.teamPreviewParticipants,
             maxTeamSize: prompt?.maxTeamSize,
+            activeCount: prompt?.previewActiveCount ?? prompt?.state?.previewActiveCount ?? prompt?.state?.rules?.activeCount,
+            gameType: prompt?.state?.gameType,
           };
           PS_DEBUG && console.log('[PSBattlePanel] Setting request from cached prompt:', {
             requestType: psRequest.requestType,
@@ -1498,6 +1507,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           // Set my side from prompt
           if (playerIdx >= 0) {
             setMySide(playerIdx === 0 ? 'p1' : 'p2');
+          } else if (sideData?.id === 'p1' || sideData?.id === 'p2') {
+            setMySide(sideData.id);
           }
           
           // Do not generate team preview protocol here; let server events drive the scene
@@ -2109,6 +2120,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                   requestType: 'team',
                   teamPreview: true,
                   maxTeamSize: result?.state?.rules?.teamSize || 6,
+                  activeCount: result?.state?.rules?.activeCount,
+                  gameType: result?.state?.gameType,
                   side: sideData,
                 };
                 PS_DEBUG && console.log('[PSBattlePanel] Built team preview request from battleUpdate state', {
@@ -2754,7 +2767,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         active: fixedActive,
         forceSwitch: prompt?.forceSwitch,
         teamPreview: effectiveTeamPreview,
+        previewActiveCount: prompt?.previewActiveCount ?? prompt?.state?.previewActiveCount,
+        teamPreviewParticipants: prompt?.teamPreviewParticipants ?? prompt?.state?.teamPreviewParticipants,
         maxTeamSize: prompt?.maxTeamSize,
+        activeCount: prompt?.previewActiveCount ?? prompt?.state?.previewActiveCount ?? prompt?.state?.rules?.activeCount,
+        gameType: prompt?.state?.gameType,
         rqid: prompt?.rqid,
       };
       // In doubles, nullify active entries for fainted/empty slots so BattleChoiceBuilder auto-passes them
@@ -3010,7 +3027,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // Don't queue events anymore - let battleUpdate handle protocol
         if (effectiveTeamPreview && !teamPreviewFedRef.current && !startEventReceivedRef.current) {
           const previewState = data.state || client.getBattleState(roomId);
-          const previewLines = generateTeamPreviewProtocol(previewState, prompt?.maxTeamSize || 6, myPlayerId, localTrainerSprite);
+          const previewLines = generateTeamPreviewProtocol(previewState, prompt?.maxTeamSize || 6, myPlayerId, localTrainerSprite, prompt?.previewActiveCount ?? prompt?.state?.previewActiveCount);
           PS_DEBUG && console.log('[PSBattlePanel] Stashing team preview protocol (battle not ready):', previewLines.length);
           diagLogProtocol('promptAction', `Stashing ${previewLines.length} team preview lines`);
           pendingTeamPreviewLinesRef.current = previewLines;
@@ -3023,7 +3040,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // BUT don't inject if |start| has already been received (battle has begun)
       if (effectiveTeamPreview && currentBattle && battleReadyRef.current && !teamPreviewFedRef.current && !startEventReceivedRef.current) {
         const previewState = data.state || client.getBattleState(roomId);
-        const previewLines = generateTeamPreviewProtocol(previewState, prompt?.maxTeamSize || 6, myPlayerId, localTrainerSprite);
+        const previewLines = generateTeamPreviewProtocol(previewState, prompt?.maxTeamSize || 6, myPlayerId, localTrainerSprite, prompt?.previewActiveCount ?? prompt?.state?.previewActiveCount);
         PS_DEBUG && console.log('[PSBattlePanel] Injecting team preview protocol lines:', previewLines.length, { previewState });
         diagLogProtocol('promptAction-teamPreview', `Injecting ${previewLines.length} team preview lines (battle IS ready)`);
         for (const line of previewLines) {
@@ -4004,11 +4021,18 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const pokemon = request.side.pokemon;
     const maxTeamSize = request.maxTeamSize || 6;
     const battleState = lastBattleStateRef.current;
-    const mySide = mySideRef.current;
+    const mySide = mySideRef.current || request.side?.id;
+    const previewParticipants = request.teamPreviewParticipants || battleState?.teamPreviewParticipants || {};
+    const myParticipantGroups = mySide ? (previewParticipants[mySide] || []) : [];
+    const opponentParticipantGroups = Object.entries(previewParticipants)
+      .filter(([sideId]) => sideId !== mySide)
+      .flatMap(([, participants]) => Array.isArray(participants) ? participants : []);
     let opponentTeam: any[] = [];
     let opponentMissing = false;
 
-    if (battleState?.players?.length) {
+    if (opponentParticipantGroups.length > 0) {
+      opponentTeam = opponentParticipantGroups.flatMap((participant: any) => participant.team || []);
+    } else if (battleState?.players?.length) {
       let opponentIndex = -1;
       if (mySide === 'p1') opponentIndex = 1;
       if (mySide === 'p2') opponentIndex = 0;
@@ -4066,12 +4090,41 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     // Also check request-level hints for game type (prompt may carry state with gameType)
     const requestGameType = (request as any)?.state?.gameType || (request as any)?.gameType;
     const requestActiveCount = (request as any)?.state?.rules?.activeCount;
-    const effectiveGameType = stateGameType || requestGameType;
-    const effectiveActiveCount = stateRules?.activeCount ?? requestActiveCount;
+    const effectiveGameType = request.gameType || stateGameType || requestGameType;
+    const effectiveActiveCount = request.previewActiveCount ?? request.activeCount ?? stateRules?.activeCount ?? requestActiveCount;
     const activeCount = effectiveActiveCount ?? (effectiveGameType === 'doubles' ? 2 : effectiveGameType === 'triples' ? 3 : 1);
     const leadsNeeded = typeof activeCount === 'number' && activeCount > 1 ? activeCount : 1;
     const isMultiLead = leadsNeeded > 1;
     PS_DEBUG && console.log('[PSBattlePanel] Team preview lead calc:', { stateGameType, requestGameType, effectiveActiveCount, leadsNeeded, isMultiLead });
+
+    const renderParticipantGroups = (groups: any[]) => {
+      if (!groups.length) return null;
+      return (
+        <div style={{ display: 'grid', gap: '10px', marginBottom: '10px' }}>
+          {groups.map((participant: any) => (
+            <div key={participant.playerId} style={{ border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                <div style={{ fontWeight: 600 }}>{participant.name}</div>
+                {participant.previewActiveCount > 1 && <div style={{ fontSize: '11px', opacity: 0.7 }}>controls {participant.previewActiveCount}</div>}
+              </div>
+              <div className="switchmenu">
+                {(participant.team || []).map((poke: any, i: number) => {
+                  const speciesForIcon = poke.species || poke.name || poke.originalName;
+                  const pokeName = poke.name || poke.nickname || poke.species || poke.originalName || 'Pokemon';
+                  return (
+                    <div key={`${participant.playerId}-${i}`} className="switchbutton" style={{ cursor: 'default' }}>
+                      <span className="picon" style={getPokemonIconStyle(speciesForIcon)} />
+                      <span className="pokemonname">{pokeName}</span>
+                    </div>
+                  );
+                })}
+                <div style={{ clear: 'left' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    };
     
     // For single lead, pick immediately. For multi-lead, accumulate selections.
     const handlePick = (index: number) => {
@@ -4124,6 +4177,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <div style={{ minWidth: '280px', flex: '1 1 280px' }}>
               <h3 className="switchselect">{leadLabel}</h3>
+              {myParticipantGroups.length > 1 && renderParticipantGroups(myParticipantGroups)}
               <div className="switchmenu">
                 {pokemon.map((poke: any, i: number) => {
                   const pokeName = poke.name || 
@@ -4160,6 +4214,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             {opponentTeam.length > 0 ? (
               <div style={{ minWidth: '240px', flex: '1 1 240px' }}>
                 <h3 className="switchselect">Opponent&apos;s team</h3>
+                {opponentParticipantGroups.length > 0 && renderParticipantGroups(opponentParticipantGroups)}
                 <div className="switchmenu">
                   {opponentTeam.map((poke: any, i: number) => {
                     const pokeName = poke.name || poke.nickname || poke.species || poke.originalName || 'Pokemon';

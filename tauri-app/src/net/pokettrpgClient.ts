@@ -160,6 +160,8 @@ export type ClientEvents = {
   battleStarted: { roomId: string; state: any };
   battleStartError: { roomId: string; message: string };
   teamPreviewStarted: { roomId: string };
+  teamPreviewSubmitted: { playerId?: string; roomId?: string };
+  teamPreviewProgress: any;
   battleUpdate: { roomId: string; update: BattleStatePayload };
   phase: { roomId: string; payload: PhasePayload };
   promptAction: PromptActionPayload;
@@ -722,6 +724,18 @@ export class PoketTRPGClient {
     socket.on('teamPreviewStarted', ({ roomId }: { roomId: string }) => {
       if (!roomId) return;
       this.emitter.emit('teamPreviewStarted', { roomId });
+    });
+
+    socket.on('teamPreviewSubmitted', (payload: { playerId?: string; roomId?: string }) => {
+      this.cancelPendingSendAction();
+      this.emitter.emit('teamPreviewSubmitted', payload);
+    });
+
+    socket.on('teamPreviewProgress', (payload: any) => {
+      if (payload?.playerId === this.user?.id) {
+        this.cancelPendingSendAction();
+      }
+      this.emitter.emit('teamPreviewProgress', payload);
     });
 
     socket.on('battleUpdate', (update: any) => {
