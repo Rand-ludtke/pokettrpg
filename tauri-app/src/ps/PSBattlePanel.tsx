@@ -1894,8 +1894,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               }
               // Drop if this Pokemon is ALREADY the active Pokemon on this side
               const side = parsed.side === 'p1' ? battle.p1 : battle.p2;
-              const currentActive = side?.active?.[0];
-              if (currentActive && toID(currentActive.name) === toID(parsed.name)) {
+              const alreadyActive = side?.active?.some((a: any) => a && toID(a.name) === toID(parsed.name));
+              if (alreadyActive) {
                 diagLogProtocol('battleUpdate', `Dropping redundant switch for ${key} (already active)`);
                 continue;
               }

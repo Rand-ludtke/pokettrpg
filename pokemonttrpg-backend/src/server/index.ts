@@ -1692,7 +1692,8 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
   const state = room.engine.initializeBattle(hydratedPlayers, {
     seed: battleSeed,
     startConditions: rules?.startConditions,
-  });
+    autoTeamPreview: true,
+  } as any);
   // Attach gametype to state for client protocol rendering
   if (room.engine instanceof SyncPSEngine) {
     // Derive gameType from the actual format the engine is using
@@ -2871,7 +2872,8 @@ io.on("connection", (socket: Socket) => {
     const state = room.engine.initializeBattle(hydratedPlayers, {
       seed: battleSeed,
       startConditions: data.rules?.startConditions,
-    });
+      autoTeamPreview: true,
+    } as any);
     if (typeof state.turn === "number" && state.turn < 1) {
       state.turn = 1;
     }
