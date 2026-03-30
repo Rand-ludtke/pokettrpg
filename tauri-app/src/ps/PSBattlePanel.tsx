@@ -1413,7 +1413,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // If we have a cached prompt, set up the request for UI (but don't generate protocol)
         if (cachedState?.players && myPlayerId) {
           const isPlayer = cachedState.players.some((p: any) => p?.id === myPlayerId || p?.name === myPlayerId);
-          setIsSpectator(!isPlayer);
+          // Don't mark as spectator yet — in boss/team modes the ally isn't in state.players
+          // The promptAction handler will set isSpectator=false when a real prompt arrives
+          if (isPlayer) setIsSpectator(false);
         } else if (!myPlayerId) {
           setIsSpectator(true);
         }
@@ -1740,7 +1742,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         lastBattleStateRef.current = result.state;
         if (result.state.players && myPlayerId) {
           const isPlayer = result.state.players.some((p: any) => p?.id === myPlayerId || p?.name === myPlayerId);
-          setIsSpectator(!isPlayer);
+          // Don't mark as spectator — in boss/team modes the ally isn't in state.players
+          if (isPlayer) setIsSpectator(false);
         } else if (!myPlayerId) {
           setIsSpectator(true);
         }
@@ -2502,7 +2505,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const playerIndex = data.state?.players?.findIndex((p: any) => p.id === playerId) ?? -1;
       const playerFromState = playerIndex >= 0 ? data.state?.players?.[playerIndex] : null;
       const sideName = prompt?.side?.name || playerFromState?.name || '';
-      const ourSide = playerIndex >= 0 ? (playerIndex === 0 ? 'p1' : 'p2') : null;
+      // Use server-provided ourSide (boss/team modes) when player isn't in state.players
+      const ourSide = playerIndex >= 0 ? (playerIndex === 0 ? 'p1' : 'p2') : (data.ourSide as 'p1' | 'p2' | null) || null;
+      // Receiving a real prompt for our playerId means we are NOT a spectator
+      if (playerId && myPlayerId && playerId === myPlayerId && !prompt?.wait) {
+        setIsSpectator(false);
+      }
       const lastKnownActiveName = ourSide ? lastActiveBySideRef.current[ourSide] : undefined;
       if (lastKnownActiveName) {
         PS_DEBUG && console.log('[PSBattlePanel] Using last known active from protocol:', {
@@ -2883,7 +2891,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
 
       // Determine our side (p1 or p2) - we already computed playerIndex above
-      if (playerIndex >= 0 && ourSide) {
+      // In boss/team modes, playerIndex may be -1 but ourSide set via data.ourSide
+      if (ourSide) {
         PS_DEBUG && console.log('[PSBattlePanel] Determined side from prompt:', ourSide, 'for player', playerId);
         setMySide(ourSide);
         

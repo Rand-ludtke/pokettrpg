@@ -1680,7 +1680,7 @@ function emitMovePrompts(room: Room, state: BattleState) {
               bossSlot: slotIdx,
             };
 
-        realSock.emit("promptAction", { roomId: room.id, playerId: realPlayerId, prompt, state });
+        realSock.emit("promptAction", { roomId: room.id, playerId: realPlayerId, prompt, state, ourSide: sideId });
 
         room.lastPromptByPlayer![realPlayerId] = { turn, type: promptType, rqid: (prompt as any).rqid };
         promptedPlayers.push(realPlayerId);
@@ -1731,7 +1731,7 @@ function emitMovePrompts(room: Room, state: BattleState) {
           const prompt = alreadyActed
             ? { wait: true, side: filteredSide, rqid: psRequest.rqid || Date.now() }
             : { ...psRequestMoveFields, requestType: "move" as const, playerId: realPlayerId, rqid: psRequest.rqid || Date.now(), side: filteredSide, active: slotMoves ? [slotMoves] : [], bossSlot: slotIdx };
-          realSock.emit("promptAction", { roomId: room.id, playerId: realPlayerId, prompt, state });
+          realSock.emit("promptAction", { roomId: room.id, playerId: realPlayerId, prompt, state, ourSide: sideConfig.sideId });
           room.lastPromptByPlayer![realPlayerId] = { turn, type: promptType, rqid: (prompt as any).rqid };
           promptedPlayers.push(realPlayerId);
         }

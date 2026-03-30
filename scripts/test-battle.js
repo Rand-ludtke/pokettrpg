@@ -4,7 +4,7 @@
  */
 const { io } = require("d:\\GitHub\\pokettrpg\\pokemonttrpg-backend\\node_modules\\socket.io-client");
 
-const SERVER_URL = "http://localhost:3099";
+const SERVER_URL = process.env.TEST_SERVER_URL || "http://localhost:3099";
 
 function makeTeam(prefix, count = 3) {
   const species = ["Charizard", "Blastoise", "Venusaur", "Pikachu", "Gengar", "Alakazam"];
