@@ -1159,6 +1159,8 @@ function startTeamPreview(room, players, rules) {
     room.teamPreviewPlayers = players;
     room.teamPreviewOrders = {};
     room.teamPreviewRules = rules;
+    room.teamPreviewRealPlayerIds = undefined;
+    room.teamPreviewPlayerTeams = undefined;
     // Determine active count from format for team preview
     const format = rules?.format || 'singles';
     let activeCount = rules?.activeCount || 1;
@@ -1178,79 +1180,146 @@ function startTeamPreview(room, players, rules) {
         gameType = 'freeforall';
     // Emit teamPreviewStarted FIRST so client can mount the battle tab before receiving prompts
     io.to(room.id).emit("teamPreviewStarted", { roomId: room.id });
-    // Send team preview request to each player (after tab is mounted)
-    for (let i = 0; i < players.length; i++) {
-        const player = players[i];
-        const playerSocket = room.players.find(p => p.id === player.id)?.socketId;
-        if (!playerSocket)
-            continue;
-        const sock = io.sockets.sockets.get(playerSocket);
+    // Helper: build team preview state payload for a given player's perspective
+    const buildStatePayload = (perspectivePlayerId, perspectiveSide, perspectiveTeam) => ({
+        gameType,
+        rules: { activeCount, teamSize: rules?.maxTeamSize || Math.min(6, perspectiveTeam.length) },
+        players: players.map((p, pIdx) => ({
+            id: p.id,
+            name: p.name || p.id,
+            trainerSprite: p.trainerSprite,
+            avatar: p.avatar ?? p.trainerSprite,
+            activeIndex: 0,
+            team: p.team.map((mon) => ({
+                id: mon.id, pokemonId: mon.id,
+                name: mon.nickname || mon.name || mon.species,
+                species: mon.species || mon.name,
+                nickname: mon.nickname, level: mon.level || 50,
+                types: mon.types, gender: mon.gender, shiny: mon.shiny, item: mon.item,
+                sprite: mon.sprite, backSprite: mon.backSprite,
+                spriteChoiceId: mon.spriteChoiceId, spriteChoiceLabel: mon.spriteChoiceLabel,
+                cosmeticForm: mon.cosmeticForm, fusion: mon.fusion, hatId: mon.hatId,
+            })),
+        })),
+    });
+    // Helper: emit a team preview prompt to a single player
+    const emitTeamPreviewToPlayer = (playerId, side, team, maxTeamSize) => {
+        const rpSock = room.players.filter(p => p.id === playerId).map(p => p.socketId).find(sid => io.sockets.sockets.has(sid));
+        if (!rpSock)
+            return;
+        const sock = io.sockets.sockets.get(rpSock);
         if (!sock)
-            continue;
-        // Find opponent(s) for team preview display
-        const opponents = players.filter((p, idx) => idx !== i);
-        const maxTeamSize = rules?.maxTeamSize || Math.min(6, player.team.length);
+            return;
         sock.emit("promptAction", {
             roomId: room.id,
             requestType: "teampreview",
-            playerId: player.id,
-            side: `p${i + 1}`,
+            playerId,
+            side,
+            ourSide: side,
             prompt: {
                 teamPreview: true,
                 maxTeamSize,
                 side: {
-                    id: `p${i + 1}`,
-                    name: player.name || player.id,
-                    pokemon: player.team.map((p, idx) => ({
-                        id: p.id,
-                        pokemonId: p.id,
-                        ident: `p${i + 1}: ${p.name || p.species}`,
+                    id: side,
+                    name: room.players.find(p => p.id === playerId)?.username || playerId,
+                    pokemon: team.map((p, idx) => ({
+                        id: p.id, pokemonId: p.id,
+                        ident: `${side}: ${p.name || p.species}`,
                         details: `${p.species}, L${p.level || 50}`,
                         condition: `${p.currentHP || p.stats?.hp || 100}/${p.stats?.hp || 100}`,
                         active: idx === 0,
-                        stats: p.stats,
-                        moves: p.moves,
-                        baseAbility: p.ability,
-                        item: p.item,
+                        stats: p.stats, moves: p.moves,
+                        baseAbility: p.ability, item: p.item,
                         pokeball: p.pokeball || "pokeball",
                     })),
                 },
             },
-            // Include all players' teams so opponent can be displayed
-            state: {
-                gameType,
-                rules: { activeCount, teamSize: maxTeamSize },
-                players: players.map((p, pIdx) => ({
-                    id: p.id,
-                    name: p.name || p.id,
-                    trainerSprite: p.trainerSprite,
-                    avatar: p.avatar ?? p.trainerSprite,
-                    activeIndex: 0,
-                    team: p.team.map((mon) => ({
-                        id: mon.id,
-                        pokemonId: mon.id,
-                        // Use mon.name as the species (in our type system, 'name' IS the species, 'nickname' is for display)
-                        name: mon.nickname || mon.name || mon.species,
-                        species: mon.species || mon.name, // Ensure species is always set
-                        nickname: mon.nickname,
-                        level: mon.level || 50,
-                        types: mon.types,
-                        gender: mon.gender,
-                        shiny: mon.shiny,
-                        item: mon.item,
-                        // Preserve sprite data so opponent sees custom/fusion sprites in team preview
-                        sprite: mon.sprite,
-                        backSprite: mon.backSprite,
-                        spriteChoiceId: mon.spriteChoiceId,
-                        spriteChoiceLabel: mon.spriteChoiceLabel,
-                        cosmeticForm: mon.cosmeticForm,
-                        fusion: mon.fusion,
-                        hatId: mon.hatId,
-                    })),
-                })),
-            },
+            state: buildStatePayload(playerId, side, team),
         });
+    };
+    // Collect the real player IDs that need to submit team preview
+    const realPlayerIds = [];
+    const playerTeams = {};
+    // Boss mode: split merged side's team preview to individual allies
+    if (room.bossMode) {
+        const mergedPlayerIdx = players.findIndex(p => p.id === room.bossMode.mergedPlayerId);
+        const mergedPlayer = mergedPlayerIdx >= 0 ? players[mergedPlayerIdx] : null;
+        const mergedSideId = room.bossMode.mergedSide; // e.g. "p2"
+        // Send team preview to non-merged players (the boss) normally
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+            if (player.id === room.bossMode.mergedPlayerId)
+                continue; // Handle merged side below
+            const side = `p${i + 1}`;
+            const maxTeamSize = rules?.maxTeamSize || Math.min(6, player.team.length);
+            emitTeamPreviewToPlayer(player.id, side, player.team, maxTeamSize);
+            realPlayerIds.push(player.id);
+            playerTeams[player.id] = player;
+        }
+        // Split the merged side's team to individual allies
+        if (mergedPlayer) {
+            for (const slotInfo of room.bossMode.playerSlots) {
+                const realPlayerId = slotInfo.playerId;
+                // Filter to only this player's Pokemon from the merged team
+                const ownedPokemonIds = new Set();
+                for (const [pokId, ownerId] of room.bossMode.pokemonOwnership) {
+                    if (ownerId === realPlayerId)
+                        ownedPokemonIds.add(pokId);
+                }
+                const ownedTeam = mergedPlayer.team.filter((p) => ownedPokemonIds.has(p.id));
+                const maxTeamSize = rules?.maxTeamSize || Math.min(6, ownedTeam.length);
+                emitTeamPreviewToPlayer(realPlayerId, mergedSideId, ownedTeam, maxTeamSize);
+                realPlayerIds.push(realPlayerId);
+                // Store a virtual player for this ally with just their owned Pokemon
+                playerTeams[realPlayerId] = { ...mergedPlayer, id: realPlayerId, team: ownedTeam };
+            }
+        }
+        console.log(`[Server] Boss mode team preview: real players = [${realPlayerIds.join(', ')}]`);
     }
+    // Team battle mode: split both sides' team previews to individual allies
+    else if (room.teamBattleMode) {
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+            const sideConfig = room.teamBattleMode.sides.find(s => s.mergedPlayerId === player.id);
+            if (!sideConfig) {
+                // Not a merged side (shouldn't happen in team battle, but handle gracefully)
+                const side = `p${i + 1}`;
+                const maxTeamSize = rules?.maxTeamSize || Math.min(6, player.team.length);
+                emitTeamPreviewToPlayer(player.id, side, player.team, maxTeamSize);
+                realPlayerIds.push(player.id);
+                playerTeams[player.id] = player;
+                continue;
+            }
+            // Split to individual players on this side
+            for (const slotInfo of sideConfig.playerSlots) {
+                const realPlayerId = slotInfo.playerId;
+                const ownedPokemonIds = new Set();
+                for (const [pokId, ownerId] of sideConfig.pokemonOwnership) {
+                    if (ownerId === realPlayerId)
+                        ownedPokemonIds.add(pokId);
+                }
+                const ownedTeam = player.team.filter((p) => ownedPokemonIds.has(p.id));
+                const maxTeamSize = rules?.maxTeamSize || Math.min(6, ownedTeam.length);
+                emitTeamPreviewToPlayer(realPlayerId, sideConfig.sideId, ownedTeam, maxTeamSize);
+                realPlayerIds.push(realPlayerId);
+                playerTeams[realPlayerId] = { ...player, id: realPlayerId, team: ownedTeam };
+            }
+        }
+        console.log(`[Server] Team battle mode team preview: real players = [${realPlayerIds.join(', ')}]`);
+    }
+    // Normal mode: send to each engine player directly
+    else {
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+            const side = `p${i + 1}`;
+            const maxTeamSize = rules?.maxTeamSize || Math.min(6, player.team.length);
+            emitTeamPreviewToPlayer(player.id, side, player.team, maxTeamSize);
+            realPlayerIds.push(player.id);
+            playerTeams[player.id] = player;
+        }
+    }
+    room.teamPreviewRealPlayerIds = realPlayerIds;
+    room.teamPreviewPlayerTeams = playerTeams;
 }
 function applyTeamOrder(player, order) {
     if (!order || !order.length)
@@ -1277,20 +1346,97 @@ function checkTeamPreviewComplete(room) {
     console.log(`[checkTeamPreviewComplete] phase=${room.phase}, hasPlayers=${!!room.teamPreviewPlayers}, hasOrders=${!!room.teamPreviewOrders}`);
     if (room.phase !== "team-preview" || !room.teamPreviewPlayers || !room.teamPreviewOrders)
         return;
-    console.log(`[checkTeamPreviewComplete] Players:`, room.teamPreviewPlayers.map(p => p.id));
+    // Use real player IDs if available (boss/team modes), otherwise use engine player IDs
+    const requiredIds = room.teamPreviewRealPlayerIds || room.teamPreviewPlayers.map(p => p.id);
+    console.log(`[checkTeamPreviewComplete] Required players:`, requiredIds);
     console.log(`[checkTeamPreviewComplete] Orders submitted:`, Object.keys(room.teamPreviewOrders));
-    const allSubmitted = room.teamPreviewPlayers.every(p => room.teamPreviewOrders[p.id]);
+    const allSubmitted = requiredIds.every(id => room.teamPreviewOrders[id]);
     console.log(`[checkTeamPreviewComplete] allSubmitted=${allSubmitted}`);
     if (!allSubmitted)
         return;
-    // Apply team orders and start the battle
-    const orderedPlayers = room.teamPreviewPlayers.map(player => {
-        const order = room.teamPreviewOrders[player.id];
-        return applyTeamOrder(player, order);
-    });
+    let orderedPlayers;
+    // Boss mode: rebuild the merged team from individual ally reorders
+    if (room.bossMode && room.teamPreviewPlayerTeams) {
+        orderedPlayers = room.teamPreviewPlayers.map((player, idx) => {
+            if (player.id === room.bossMode.mergedPlayerId) {
+                // Rebuild merged team: apply each ally's reorder to their sub-team, then re-interleave
+                const reorderedSubTeams = [];
+                for (const slotInfo of room.bossMode.playerSlots) {
+                    const realPlayerId = slotInfo.playerId;
+                    const subPlayer = room.teamPreviewPlayerTeams[realPlayerId];
+                    if (!subPlayer)
+                        continue;
+                    const order = room.teamPreviewOrders[realPlayerId];
+                    const reordered = applyTeamOrder(subPlayer, order);
+                    reorderedSubTeams.push(reordered.team);
+                }
+                // Re-interleave: [p1[0], p2[0], p1[1], p2[1], ...]
+                const mergedTeam = [];
+                const maxLen = Math.max(...reorderedSubTeams.map(t => t.length));
+                for (let slot = 0; slot < maxLen; slot++) {
+                    for (const subTeam of reorderedSubTeams) {
+                        if (slot < subTeam.length)
+                            mergedTeam.push(subTeam[slot]);
+                    }
+                }
+                const clone = JSON.parse(JSON.stringify(player));
+                clone.team = mergedTeam;
+                clone.activeIndex = 0;
+                return clone;
+            }
+            else {
+                // Non-merged player (boss): apply their order directly
+                const order = room.teamPreviewOrders[player.id];
+                return applyTeamOrder(player, order);
+            }
+        });
+    }
+    // Team battle mode: rebuild both merged sides
+    else if (room.teamBattleMode && room.teamPreviewPlayerTeams) {
+        orderedPlayers = room.teamPreviewPlayers.map((player, idx) => {
+            const sideConfig = room.teamBattleMode.sides.find(s => s.mergedPlayerId === player.id);
+            if (sideConfig) {
+                const reorderedSubTeams = [];
+                for (const slotInfo of sideConfig.playerSlots) {
+                    const realPlayerId = slotInfo.playerId;
+                    const subPlayer = room.teamPreviewPlayerTeams[realPlayerId];
+                    if (!subPlayer)
+                        continue;
+                    const order = room.teamPreviewOrders[realPlayerId];
+                    const reordered = applyTeamOrder(subPlayer, order);
+                    reorderedSubTeams.push(reordered.team);
+                }
+                const mergedTeam = [];
+                const maxLen = Math.max(...reorderedSubTeams.map(t => t.length));
+                for (let slot = 0; slot < maxLen; slot++) {
+                    for (const subTeam of reorderedSubTeams) {
+                        if (slot < subTeam.length)
+                            mergedTeam.push(subTeam[slot]);
+                    }
+                }
+                const clone = JSON.parse(JSON.stringify(player));
+                clone.team = mergedTeam;
+                clone.activeIndex = 0;
+                return clone;
+            }
+            else {
+                const order = room.teamPreviewOrders[player.id];
+                return applyTeamOrder(player, order);
+            }
+        });
+    }
+    // Normal mode: apply orders directly
+    else {
+        orderedPlayers = room.teamPreviewPlayers.map(player => {
+            const order = room.teamPreviewOrders[player.id];
+            return applyTeamOrder(player, order);
+        });
+    }
     // Clear team preview state
     room.teamPreviewPlayers = undefined;
     room.teamPreviewOrders = undefined;
+    room.teamPreviewRealPlayerIds = undefined;
+    room.teamPreviewPlayerTeams = undefined;
     const rules = room.teamPreviewRules;
     room.teamPreviewRules = undefined;
     // Start the actual battle
@@ -2537,6 +2683,7 @@ io.on("connection", (socket) => {
         }
         // Handle team preview phase
         if (room.phase === "team-preview") {
+            const totalRequired = room.teamPreviewRealPlayerIds?.length || room.teamPreviewPlayers?.length || 2;
             if (data.action.type === "team" && Array.isArray(data.action.order)) {
                 console.log(`[Server] Team preview order received from ${data.playerId}:`, data.action.order);
                 if (!room.teamPreviewOrders)
@@ -2546,7 +2693,7 @@ io.on("connection", (socket) => {
                 io.to(room.id).emit("teamPreviewProgress", {
                     playerId: data.playerId,
                     submitted: Object.keys(room.teamPreviewOrders).length,
-                    total: room.teamPreviewPlayers?.length || 2
+                    total: totalRequired
                 });
                 checkTeamPreviewComplete(room);
                 return;
@@ -2555,14 +2702,15 @@ io.on("connection", (socket) => {
                 // Auto-submit with default order
                 if (!room.teamPreviewOrders)
                     room.teamPreviewOrders = {};
-                const playerData = room.teamPreviewPlayers?.find(p => p.id === data.playerId);
+                // Look up from per-player teams first (boss/team mode), then engine players
+                const playerData = room.teamPreviewPlayerTeams?.[data.playerId] || room.teamPreviewPlayers?.find(p => p.id === data.playerId);
                 const defaultOrder = playerData?.team.map((_, i) => i + 1) || [1, 2, 3, 4, 5, 6];
                 room.teamPreviewOrders[data.playerId] = defaultOrder;
                 socket.emit("teamPreviewSubmitted", { playerId: data.playerId });
                 io.to(room.id).emit("teamPreviewProgress", {
                     playerId: data.playerId,
                     submitted: Object.keys(room.teamPreviewOrders).length,
-                    total: room.teamPreviewPlayers?.length || 2
+                    total: totalRequired
                 });
                 checkTeamPreviewComplete(room);
                 return;
