@@ -1568,6 +1568,7 @@ function beginBattle(room, players, seed, rules) {
         const state = room.engine.initializeBattle(hydratedPlayers, {
             seed: battleSeed,
             startConditions: rules?.startConditions,
+            autoTeamPreview: true,
         });
         // Attach gametype to state for client protocol rendering
         if (room.engine instanceof sync_ps_engine_1.default) {
@@ -1590,6 +1591,26 @@ function beginBattle(room, players, seed, rules) {
         room.phase = "normal";
         room.forceSwitchNeeded = new Set();
         console.log(`[Server] Emitting battleStarted for room ${room.id}`);
+        // Attach boss/team participant info so the client can render split trainer blocks
+        if (room.bossMode) {
+            const participantsByPlayer = {};
+            const mergedSide = room.bossMode.mergedSide;
+            participantsByPlayer[mergedSide] = room.bossMode.playerSlots.map((slotInfo) => {
+                const roomPlayer = room.players.find(p => p.id === slotInfo.playerId);
+                const pokemonIds = [];
+                for (const [pokId, ownerId] of room.bossMode.pokemonOwnership) {
+                    if (ownerId === slotInfo.playerId)
+                        pokemonIds.push(pokId);
+                }
+                return {
+                    playerId: slotInfo.playerId,
+                    name: roomPlayer?.username || slotInfo.playerId,
+                    trainerSprite: roomPlayer?.trainerSprite,
+                    pokemonIds,
+                };
+            });
+            state.bossParticipants = participantsByPlayer;
+        }
         io.to(room.id).emit("battleStarted", { roomId: room.id, state });
         // Emit initial protocol events before prompting for moves.
         // Always emit a battleUpdate with the initial protocol so the client's PS Battle
@@ -1744,6 +1765,20 @@ function emitMovePrompts(room, state) {
                 skippedPlayers.push({ id: player.id, reason: "no PS request for merged side" });
                 continue;
             }
+            // Build details→ownerIds map on first encounter (initial PS array matches our merge order)
+            if (!room.bossMode.detailsOwnerMap && psRequest.side?.pokemon?.length) {
+                room.bossMode.detailsOwnerMap = new Map();
+                const ownerByIdx = room.bossMode.pokemonOwnershipByIndex || [];
+                for (let i = 0; i < psRequest.side.pokemon.length; i++) {
+                    const details = psRequest.side.pokemon[i]?.details;
+                    const owner = ownerByIdx[i];
+                    if (details && owner) {
+                        const arr = room.bossMode.detailsOwnerMap.get(details) || [];
+                        arr.push(owner);
+                        room.bossMode.detailsOwnerMap.set(details, arr);
+                    }
+                }
+            }
             const activeSlots = psRequest.active || [];
             for (const slotInfo of room.bossMode.playerSlots) {
                 const realPlayerId = slotInfo.playerId;
@@ -1757,20 +1792,17 @@ function emitMovePrompts(room, state) {
                 const realSock = io.sockets.sockets.get(rpSock);
                 if (!realSock)
                     continue;
-                // Filter side pokemon to only those owned by this player
-                const ownedPokemonIds = new Set();
-                for (const [pokId, ownerId] of room.bossMode.pokemonOwnership) {
-                    if (ownerId === realPlayerId)
-                        ownedPokemonIds.add(pokId);
-                }
                 const sideIndex = state.players.indexOf(player);
                 const sideId = `p${sideIndex + 1}`;
                 const filteredSide = psRequest.side ? {
                     ...psRequest.side,
                     playerId: realPlayerId,
                     pokemon: (psRequest.side.pokemon || []).filter((p) => {
-                        // Only include pokemon owned by this player
-                        return ownedPokemonIds.has(p.pokemonId || p.id);
+                        // allowAllySwap: show all allied Pokemon; otherwise only owned
+                        if (room.bossMode.allowAllySwap)
+                            return true;
+                        const owners = room.bossMode.detailsOwnerMap?.get(p.details) || [];
+                        return owners.includes(realPlayerId);
                     }),
                 } : undefined;
                 const promptType = alreadyActed ? "wait" : "move";
@@ -1807,6 +1839,20 @@ function emitMovePrompts(room, state) {
                     skippedPlayers.push({ id: player.id, reason: "no PS request for team side" });
                     continue;
                 }
+                // Build details→ownerIds map on first encounter
+                if (!sideConfig.detailsOwnerMap && psRequest.side?.pokemon?.length) {
+                    sideConfig.detailsOwnerMap = new Map();
+                    const ownerByIdx = sideConfig.pokemonOwnershipByIndex || [];
+                    for (let i = 0; i < psRequest.side.pokemon.length; i++) {
+                        const details = psRequest.side.pokemon[i]?.details;
+                        const owner = ownerByIdx[i];
+                        if (details && owner) {
+                            const arr = sideConfig.detailsOwnerMap.get(details) || [];
+                            arr.push(owner);
+                            sideConfig.detailsOwnerMap.set(details, arr);
+                        }
+                    }
+                }
                 const activeSlots = psRequest.active || [];
                 for (const slotInfo of sideConfig.playerSlots) {
                     const realPlayerId = slotInfo.playerId;
@@ -1820,15 +1866,13 @@ function emitMovePrompts(room, state) {
                     const realSock = io.sockets.sockets.get(rpSock);
                     if (!realSock)
                         continue;
-                    const ownedPokemonIds = new Set();
-                    for (const [pokId, ownerId] of sideConfig.pokemonOwnership) {
-                        if (ownerId === realPlayerId)
-                            ownedPokemonIds.add(pokId);
-                    }
                     const filteredSide = psRequest.side ? {
                         ...psRequest.side,
                         playerId: realPlayerId,
-                        pokemon: (psRequest.side.pokemon || []).filter((p) => ownedPokemonIds.has(p.pokemonId || p.id)),
+                        pokemon: (psRequest.side.pokemon || []).filter((p) => {
+                            const owners = sideConfig.detailsOwnerMap?.get(p.details) || [];
+                            return owners.includes(realPlayerId);
+                        }),
                     } : undefined;
                     const promptType = alreadyActed ? "wait" : "move";
                     const lastPrompt = room.lastPromptByPlayer[realPlayerId];
@@ -2154,26 +2198,28 @@ function launchChallenge(sourceRoom, challenge) {
             const payloads = participants.map(p => sanitizePlayerPayload(p.playerPayload, p));
             const mergedTeam = [];
             const ownership = new Map();
+            const ownershipByIndex = [];
             const maxLen = Math.max(...payloads.map(p => p.team.length));
             for (let slot = 0; slot < maxLen; slot++) {
                 for (const p of payloads) {
                     if (slot < p.team.length) {
                         mergedTeam.push(p.team[slot]);
                         ownership.set(p.team[slot].id, p.id);
+                        ownershipByIndex.push(p.id);
                     }
                 }
             }
             const merged = { ...payloads[0], name: participants.map(p => p.username).join(' & '), team: mergedTeam };
             const playerSlots = participants.map((p, idx) => ({ playerId: p.playerId, slot: idx }));
-            return { merged, ownership, playerSlots, leadPayload: payloads[0] };
+            return { merged, ownership, ownershipByIndex, playerSlots, leadPayload: payloads[0] };
         };
         const side1 = buildMergedSide(side1Participants, 'p1');
         const side2 = buildMergedSide(side2Participants, 'p2');
         // Store team-battle multi-control info on both sides
         battleRoom.teamBattleMode = {
             sides: [
-                { sideId: 'p1', mergedPlayerId: side1.leadPayload.id, playerSlots: side1.playerSlots, pokemonOwnership: side1.ownership },
-                { sideId: 'p2', mergedPlayerId: side2.leadPayload.id, playerSlots: side2.playerSlots, pokemonOwnership: side2.ownership },
+                { sideId: 'p1', mergedPlayerId: side1.leadPayload.id, playerSlots: side1.playerSlots, pokemonOwnership: side1.ownership, pokemonOwnershipByIndex: side1.ownershipByIndex },
+                { sideId: 'p2', mergedPlayerId: side2.leadPayload.id, playerSlots: side2.playerSlots, pokemonOwnership: side2.ownership, pokemonOwnershipByIndex: side2.ownershipByIndex },
             ],
         };
         playersPayload = [side1.merged, side2.merged];
@@ -2190,11 +2236,13 @@ function launchChallenge(sourceRoom, challenge) {
         const maxTeamLen = Math.max(...alliedPayloads.map(p => p.team.length));
         const mergedTeam = [];
         const pokemonOwnership = new Map();
+        const pokemonOwnershipByIndex = [];
         for (let slot = 0; slot < maxTeamLen; slot++) {
             for (const alliedPayload of alliedPayloads) {
                 if (slot < alliedPayload.team.length) {
                     mergedTeam.push(alliedPayload.team[slot]);
                     pokemonOwnership.set(alliedPayload.team[slot].id, alliedPayload.id);
+                    pokemonOwnershipByIndex.push(alliedPayload.id);
                 }
             }
         }
@@ -2213,6 +2261,8 @@ function launchChallenge(sourceRoom, challenge) {
             mergedPlayerId: alliedPayloads[0].id,
             playerSlots,
             pokemonOwnership,
+            pokemonOwnershipByIndex,
+            allowAllySwap: !!challenge.rules?.allowAllySwap,
         };
         playersPayload = [ownerPayload, mergedChallengerPayload];
         console.log(`[Server] Boss battle launched: ${challenge.owner.username} vs ${alliedSideName} (${mergedTeam.length} mons merged)`);
@@ -2694,6 +2744,7 @@ io.on("connection", (socket) => {
         const state = room.engine.initializeBattle(hydratedPlayers, {
             seed: battleSeed,
             startConditions: data.rules?.startConditions,
+            autoTeamPreview: true,
         });
         if (typeof state.turn === "number" && state.turn < 1) {
             state.turn = 1;

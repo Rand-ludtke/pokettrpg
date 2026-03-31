@@ -3210,25 +3210,21 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             if (trainerEl && allies && allies.length > 1) {
               const tooltipSideIdx = isMergedNear ? localTooltipSideIndex : opponentTooltipSideIndex;
               const allTeam = isMergedNear ? sidePokemon : opponentTeam;
-              // Build split HTML
+              // Build compact split layout — name + pokemon icons only, no trainer sprites
               trainerEl.innerHTML = '';
+              trainerEl.style.cssText += 'overflow-y:auto;max-height:100%;';
               let pokemonOffset = 0;
               for (const ally of allies) {
                 const block = document.createElement('div');
-                block.style.cssText = 'margin-bottom:6px;';
+                block.style.cssText = 'margin-bottom:2px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.15);';
                 const nameEl = document.createElement('strong');
                 nameEl.textContent = ally.name;
-                nameEl.style.cssText = 'display:block;font-size:0.9em;';
+                nameEl.style.cssText = 'display:block;font-size:0.75em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
                 block.appendChild(nameEl);
-                if (ally.trainerSprite) {
-                  const sprite = document.createElement('div');
-                  sprite.className = 'trainersprite';
-                  sprite.style.backgroundImage = `url(/pokettrpg/vendor/showdown/sprites/trainers/${ally.trainerSprite}.png)`;
-                  block.appendChild(sprite);
-                }
                 // Add this ally's pokemon icons
                 const iconsDiv = document.createElement('div');
                 iconsDiv.className = 'teamicons';
+                iconsDiv.style.cssText = 'line-height:1;';
                 const allyTeamCount = ally.pokemonIds.length;
                 for (let pi = 0; pi < allyTeamCount; pi++) {
                   const poke = allTeam[pokemonOffset + pi];
