@@ -665,6 +665,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const hasReceivedProtocolRef = useRef(false);
   const mySideRef = useRef<'p1' | 'p2' | null>(null); // Ref for mySide to use in callbacks
   const lastBattleStateRef = useRef<any | null>(null); // Track latest battle state for UI rendering
+  const bossParticipantsRef = useRef<Record<string, { playerId: string; name: string; trainerSprite?: string; pokemonIds: string[] }[]> | null>(null);
   const lastSentChoiceRef = useRef<{ turn: number; choice: string; rqid: number | null } | null>(null);
   // Track when we've just sent an action - don't drop server responses immediately after
   const actionSentTimestampRef = useRef<number>(0);
@@ -2406,6 +2407,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       
       const state = data.state;
       
+      // Store boss participant info for split trainer display
+      if (state?.bossParticipants) {
+        bossParticipantsRef.current = state.bossParticipants;
+      }
+      
       // Determine which side we are first
       let ourSide: 'p1' | 'p2' = 'p1';
       if (myPlayerId && state?.players) {
@@ -3190,6 +3196,68 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const opponentTooltipSideIndex = localTooltipSideIndex === 0 ? 1 : 0;
         applyToTrainer('.trainer-near', sidePokemon, localTooltipSideIndex);
         applyToTrainer('.trainer-far', opponentTeam, opponentTooltipSideIndex);
+
+        // Split merged-side trainer bar into per-ally blocks for boss battles
+        const participants = bossParticipantsRef.current;
+        if (participants && battleFrameRef.current) {
+          // Figure out which side is the merged side and which trainer bar it maps to
+          const mergedSide = Object.keys(participants)[0] as 'p1' | 'p2' | undefined;
+          if (mergedSide) {
+            const isMergedNear = mySideId === mergedSide;
+            const trainerSelector = isMergedNear ? '.trainer-near' : '.trainer-far';
+            const trainerEl = battleFrameRef.current.querySelector(trainerSelector) as HTMLElement | null;
+            const allies = participants[mergedSide];
+            if (trainerEl && allies && allies.length > 1) {
+              const tooltipSideIdx = isMergedNear ? localTooltipSideIndex : opponentTooltipSideIndex;
+              const allTeam = isMergedNear ? sidePokemon : opponentTeam;
+              // Build split HTML
+              trainerEl.innerHTML = '';
+              let pokemonOffset = 0;
+              for (const ally of allies) {
+                const block = document.createElement('div');
+                block.style.cssText = 'margin-bottom:6px;';
+                const nameEl = document.createElement('strong');
+                nameEl.textContent = ally.name;
+                nameEl.style.cssText = 'display:block;font-size:0.9em;';
+                block.appendChild(nameEl);
+                if (ally.trainerSprite) {
+                  const sprite = document.createElement('div');
+                  sprite.className = 'trainersprite';
+                  sprite.style.backgroundImage = `url(/pokettrpg/vendor/showdown/sprites/trainers/${ally.trainerSprite}.png)`;
+                  block.appendChild(sprite);
+                }
+                // Add this ally's pokemon icons
+                const iconsDiv = document.createElement('div');
+                iconsDiv.className = 'teamicons';
+                const allyTeamCount = ally.pokemonIds.length;
+                for (let pi = 0; pi < allyTeamCount; pi++) {
+                  const poke = allTeam[pokemonOffset + pi];
+                  if (!poke) continue;
+                  const span = document.createElement('span');
+                  span.className = 'picon has-tooltip';
+                  span.setAttribute('data-tooltip', `pokemon|${tooltipSideIdx}|${pokemonOffset + pi}`);
+                  const speciesForIcon = poke.speciesForme || poke.species || poke.name || poke.details?.split(',')[0];
+                  const style = getPokemonIconStyle(speciesForIcon);
+                  Object.assign(span.style, style);
+                  const label = poke.name || poke.nickname || poke.species || 'Pokemon';
+                  span.setAttribute('aria-label', label);
+                  const condition = typeof poke.condition === 'string' ? poke.condition : '';
+                  const hp = typeof poke.hp === 'number' ? poke.hp : (poke as any).currentHP;
+                  const isFainted = !!poke.fainted || (typeof hp === 'number' && hp <= 0) || condition.includes('fnt');
+                  if (isFainted) {
+                    span.classList.add('fainted');
+                    span.style.opacity = '0.3';
+                    span.style.filter = 'grayscale(1)';
+                  }
+                  iconsDiv.appendChild(span);
+                }
+                block.appendChild(iconsDiv);
+                trainerEl.appendChild(block);
+                pokemonOffset += allyTeamCount;
+              }
+            }
+          }
+        }
       };
 
       window.setTimeout(applyTeamIcons, 0);
@@ -3594,9 +3662,12 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const canDynamax = !!request.active[choiceIndex].canDynamax;
     const canTera = !!(request.active[choiceIndex].canTerastallize ?? request.active[choiceIndex].canTera ?? activePokemon?.canTerastallize ?? activePokemon?.canTera);
     
-    // Multi-slot indicator
+    // Doubles/triples targeting: need target selector even if ally only controls 1 slot
     const totalSlots = request.active?.length || 1;
     const isMultiSlot = totalSlots > 1;
+    const battleGameType = battleRef.current?.gameType || lastBattleStateRef.current?.gameType || 'singles';
+    const isDoublesPlus = battleGameType === 'doubles' || battleGameType === 'triples' || battleGameType === 'multi' || battleGameType === 'freeforall';
+    const needsTargeting = isMultiSlot || isDoublesPlus;
     
     // Get the active Pokemon's index for tooltips
     const fullMoveData = activePokemon?.moves || [];
@@ -3701,7 +3772,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               onClick={() => {
                 // In doubles+, single-target moves need target selection
                 const moveTarget = move.target || dexMove?.target || 'normal';
-                const needsTarget = isMultiSlot && ['normal', 'any', 'adjacentFoe', 'adjacentAlly', 'adjacentAllyOrSelf'].includes(moveTarget);
+                const needsTarget = needsTargeting && ['normal', 'any', 'adjacentFoe', 'adjacentAlly', 'adjacentAllyOrSelf'].includes(moveTarget);
                 if (needsTarget) {
                   setPendingMoveForTarget({ moveIndex: i + 1, moveName });
                 } else {

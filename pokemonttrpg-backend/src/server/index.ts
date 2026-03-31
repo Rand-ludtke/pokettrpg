@@ -99,6 +99,7 @@ export interface Room {
     mergedPlayerId: string;    // the engine player ID for the merged side (owner's ID)
     playerSlots: { playerId: string; slot: number }[];  // real player → active slot index
     pokemonOwnership: Map<string, string>;  // pokemonId → real player ID
+    allowAllySwap?: boolean;  // if true, allies can switch in each other's Pokemon
   };
   // Team battle metadata: both sides have multiple real players (2v2-teams, 3v3-teams)
   teamBattleMode?: {
@@ -1712,6 +1713,25 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
   room.phase = "normal";
   room.forceSwitchNeeded = new Set();
   console.log(`[Server] Emitting battleStarted for room ${room.id}`);
+  // Attach boss/team participant info so the client can render split trainer blocks
+  if (room.bossMode) {
+    const participantsByPlayer: Record<string, { playerId: string; name: string; trainerSprite?: string; pokemonIds: string[] }[]> = {};
+    const mergedSide = room.bossMode.mergedSide;
+    participantsByPlayer[mergedSide] = room.bossMode.playerSlots.map((slotInfo) => {
+      const roomPlayer = room.players.find(p => p.id === slotInfo.playerId);
+      const pokemonIds: string[] = [];
+      for (const [pokId, ownerId] of room.bossMode!.pokemonOwnership) {
+        if (ownerId === slotInfo.playerId) pokemonIds.push(pokId);
+      }
+      return {
+        playerId: slotInfo.playerId,
+        name: roomPlayer?.username || slotInfo.playerId,
+        trainerSprite: roomPlayer?.trainerSprite,
+        pokemonIds,
+      };
+    });
+    (state as any).bossParticipants = participantsByPlayer;
+  }
   io.to(room.id).emit("battleStarted", { roomId: room.id, state });
 
   // Emit initial protocol events before prompting for moves.
@@ -1903,7 +1923,8 @@ function emitMovePrompts(room: Room, state: BattleState) {
           ...psRequest.side,
           playerId: realPlayerId,
           pokemon: (psRequest.side.pokemon || []).filter((p: any) => {
-            // Only include pokemon owned by this player
+            // allowAllySwap: show all allied Pokemon; otherwise only owned
+            if (room.bossMode!.allowAllySwap) return true;
             return ownedPokemonIds.has(p.pokemonId || p.id);
           }),
         } : undefined;
@@ -2402,6 +2423,7 @@ function launchChallenge(sourceRoom: Room, challenge: Challenge) {
       mergedPlayerId: alliedPayloads[0].id,
       playerSlots,
       pokemonOwnership,
+      allowAllySwap: !!challenge.rules?.allowAllySwap,
     };
 
     playersPayload = [ownerPayload, mergedChallengerPayload];

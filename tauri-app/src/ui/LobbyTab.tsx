@@ -231,6 +231,7 @@ export function LobbyTab() {
   // Enhanced custom game options - all clauses OFF by default
   const [selectedClauses, setSelectedClauses] = useState<Set<string>>(new Set());
   const [trueBoss, setTrueBoss] = useState<boolean>(false);
+  const [allowAllySwap, setAllowAllySwap] = useState<boolean>(false);
   const [teamSize, setTeamSize] = useState<number>(6);
   const [teamPreviewEnabled, setTeamPreviewEnabled] = useState<boolean>(true);
   const [activeCount, setActiveCount] = useState<number>(1);
@@ -737,6 +738,7 @@ export function LobbyTab() {
       format: challengeFormat,
       battleMode: battleMode,
       trueBoss: isBossFormat && trueBoss ? true : undefined,
+      allowAllySwap: isBossFormat && allowAllySwap ? true : undefined,
       clauses: Array.from(selectedClauses),
       customRules: challengeRules.trim() || undefined,
       displayString: fullRulesDisplay || undefined,
@@ -1018,13 +1020,18 @@ export function LobbyTab() {
             </label>
 
             {/* Boss True Boss toggle */}
-            {(() => { const m = BATTLE_MODE_OPTIONS.find(opt => opt.value === battleMode); return m && (m.playerFormat === '2v1' || m.playerFormat === '3v1' || m.playerFormat === '5v1'); })() && (
+            {(() => { const m = BATTLE_MODE_OPTIONS.find(opt => opt.value === battleMode); return m && (m.playerFormat === '2v1' || m.playerFormat === '3v1' || m.playerFormat === '5v1'); })() && (<>
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85em' }}>
                 <input type="checkbox" checked={trueBoss} onChange={e => setTrueBoss(e.target.checked)} />
                 True Boss Fight
                 <span className="dim" style={{ fontSize: '0.8em' }}>(Boss only sends out 1 Pokémon — each challenger sends 1)</span>
               </label>
-            )}
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85em' }}>
+                <input type="checkbox" checked={allowAllySwap} onChange={e => setAllowAllySwap(e.target.checked)} />
+                Allow Ally Swap
+                <span className="dim" style={{ fontSize: '0.8em' }}>(Allies can switch in each other&apos;s Pokémon)</span>
+              </label>
+            </>)}
 
             {/* Advanced Options Toggle */}
             <button
