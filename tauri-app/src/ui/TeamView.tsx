@@ -17,8 +17,14 @@ export function TeamView({ team, onRemove, onMove }: {
             e.dataTransfer.setData('text/plain', String(idx));
             e.dataTransfer.effectAllowed = 'move';
           };
-          const onDragOver = (e: React.DragEvent) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
+          const onDragOver = (e: React.DragEvent) => {
+            // Let PC-to-team drags bubble to parent handler
+            if (e.dataTransfer.types.includes('application/x-pc-drag')) return;
+            e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+          };
           const onDrop = (e: React.DragEvent) => {
+            // Let PC-to-team drags bubble to parent handler
+            if (e.dataTransfer.types.includes('application/x-pc-drag')) return;
             e.preventDefault();
             const fromStr = e.dataTransfer.getData('text/plain');
             const from = fromStr ? parseInt(fromStr, 10) : NaN;

@@ -92,7 +92,6 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   const [showHatPicker, setShowHatPicker] = useState<boolean>(false);
   const [importText, setImportText] = useState<string>('');
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-  const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showdownEditField, setShowdownEditField] = useState<'level'|'gender'|'shiny'|'tera'|'species'|'item'|'ability'|null>(null);
   const [showdownFieldValue, setShowdownFieldValue] = useState<string>('');
   const [showdownEditMoveIndex, setShowdownEditMoveIndex] = useState<number | null>(null);
@@ -2024,7 +2023,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             <section ref={basicsRef}>
               <h4>Basics</h4>
               <div style={{marginTop:8, display:'flex', gap:8, flexWrap:'wrap'}}>
-                <button onClick={()=> setShowAddModal(true)} disabled={!onAdd}>&gt; Add to Team</button>
+                <button onClick={()=> { if (onAdd && selected) onAdd(selected); }} disabled={!onAdd}>&gt; Add to Team</button>
               </div>
 
               <div style={{display:'grid', gap:8}}>
@@ -2259,14 +2258,10 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       {!editMode && (
         <div style={{marginTop:4, display:'flex', gap:8, flexWrap:'wrap', justifyContent:'space-between', alignItems:'center'}}>
           <div style={{display:'flex', gap:8}}>
-            <button onClick={()=> setShowAddModal(true)} disabled={!onAdd}>&gt; Add to Team</button>
+            <button onClick={()=> { if (onAdd && selected) onAdd(selected); }} disabled={!onAdd}>&gt; Add to Team</button>
           </div>
           <div className="dim" style={{fontSize:'0.75em'}}>Tip: Click Stats / Ability / Moves to edit.</div>
         </div>
-      )}
-
-      {showAddModal && selected && (
-        <AddToTeamModal onClose={()=> setShowAddModal(false)} onPick={(p, teamId)=>{ onAdd && onAdd(p, teamId); setShowAddModal(false); }} selected={selected} />
       )}
     </aside>
   );

@@ -23,7 +23,7 @@ const ROOT = path.resolve(__dirname, "..");
 const BASE_SPRITES = path.join(ROOT, ".fusion-sprites-local", "Other", "BaseSprites");
 const IFDEX_JSON = path.join(ROOT, "scripts", "ifdex_names.json");
 const DEX_JSON = path.join(ROOT, "scripts", "pokemon_names.json");
-const PORT = 4400;
+const PORT = Number(process.env.PORT) || 4400;
 
 // ── Load dex data ────────────────────────────────────────────────────────────
 let ifDex = {};
