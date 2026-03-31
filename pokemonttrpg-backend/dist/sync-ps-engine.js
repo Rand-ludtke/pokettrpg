@@ -376,6 +376,10 @@ class SyncPSEngine {
         if (this.hasUnlimitedTeraClause()) {
             this.resetTerastallizeForAll();
         }
+        // If Multi Mega Evolution clause is enabled, re-enable canMegaEvo for eligible Pokemon after each turn
+        if (this.hasMultiMegaClause()) {
+            this.resetMegaEvoForAll();
+        }
         return { state: this.state, events, anim };
     }
     /**
@@ -417,6 +421,43 @@ class SyncPSEngine {
             }
         }
         console.log(`[SyncPSEngine] resetTerastallizeForAll complete - reset ${resetCount} Pokemon`);
+    }
+    /**
+     * Check if the multi mega evolution clause is enabled
+     */
+    hasMultiMegaClause() {
+        const clauses = this.rules?.clauses;
+        const clauseList = Array.isArray(clauses)
+            ? clauses.map((c) => String(c).toLowerCase())
+            : (typeof clauses === 'string' ? clauses.split(/\s*,\s*/) : []);
+        const customRules = String(this.rules?.customRules || this.rules?.displayString || '').toLowerCase();
+        const hasClause = clauseList.includes('multimega') || customRules.includes('multimega');
+        console.log(`[SyncPSEngine] hasMultiMegaClause check: clauses=${JSON.stringify(clauses)}, result=${hasClause}`);
+        return hasClause;
+    }
+    /**
+     * Re-enable canMegaEvo for eligible Pokemon (for multi mega clause)
+     * Uses PS's own canMegaEvo() to recompute eligibility.
+     * Pokemon that already mega evolved will naturally return null.
+     */
+    resetMegaEvoForAll() {
+        if (!this.battle)
+            return;
+        console.log('[SyncPSEngine] resetMegaEvoForAll called - re-enabling mega for eligible Pokemon');
+        let resetCount = 0;
+        for (const side of this.battle.sides) {
+            for (const pokemon of side.pokemon || []) {
+                // Re-compute canMegaEvo using PS's own function
+                // Already-mega Pokemon will return null (species changed, item check fails)
+                const newMega = this.battle.actions.canMegaEvo(pokemon);
+                if (newMega) {
+                    pokemon.canMegaEvo = newMega;
+                    resetCount++;
+                    console.log(`[SyncPSEngine] Reset canMegaEvo for ${pokemon.name || pokemon.species}: ${newMega}`);
+                }
+            }
+        }
+        console.log(`[SyncPSEngine] resetMegaEvoForAll complete - reset ${resetCount} Pokemon`);
     }
     /**
      * Collect new log entries from PS battle
