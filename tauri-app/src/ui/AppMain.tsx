@@ -24,7 +24,7 @@ import { BugReporter } from './BugReporter';
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
-type Tab = 'pc' | 'team' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | 'notes' | { kind: 'psbattle'; id: string; title: string };
+type Tab = 'pc' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | 'notes' | { kind: 'psbattle'; id: string; title: string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -415,7 +415,6 @@ export function App() {
           <div className="brand">&gt; POKÉMON TTRPG v1.5.4</div>
         <nav className="tabs">
           <button className={tab === 'pc' ? 'active' : ''} onClick={() => setTab('pc')}>PC</button>
-          <button className={tab === 'team' ? 'active' : ''} onClick={() => setTab('team')}>Team</button>
           <button className={tab === 'battle' ? 'active' : ''} onClick={() => setTab('battle')}>Battle</button>
           <button className={tab === 'lobby' ? 'active' : ''} onClick={() => setTab('lobby')}>Lobby</button>
           <button className={tab === 'fusion' ? 'active' : ''} onClick={() => setTab('fusion')}>Fusion</button>
@@ -500,6 +499,129 @@ export function App() {
                 setSelected(null); setSelectedIndex(null);
               }}
             />
+            <CollapsiblePanel title="Team" icon="👥" defaultOpen>
+              <div
+                onDragOver={(e) => {
+                  if (e.dataTransfer.types.includes('application/x-pc-drag')) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                  }
+                }}
+                onDrop={(e) => {
+                  const raw = e.dataTransfer.getData('application/x-pc-drag');
+                  if (!raw) return;
+                  e.preventDefault();
+                  const { fromBox, indices } = JSON.parse(raw) as { fromBox: number; indices: number[] };
+                  const mons = indices.map(i => boxes[fromBox]?.[i]).filter(Boolean) as BattlePokemon[];
+                  for (const m of mons) addToTeam(m);
+                  setPcMulti({ enabled: false, indices: [] });
+                }}
+              >
+                <TeamView team={team} onRemove={removeFromTeam} onMove={(from, to) => {
+                  const active = activeTeam; if (!active || from === to) return;
+                  const arr = active.members.slice();
+                  const [m] = arr.splice(from, 1);
+                  arr.splice(to, 0, m);
+                  const newTeams = teams.teams.map(t => t.id === active.id ? { ...t, members: arr } : t);
+                  setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id);
+                }} />
+              </div>
+              <section className="panel" style={{ marginTop: 12 }}>
+                <h2>Teams</h2>
+                {teams.teams.length === 0 && <div className="dim">No teams yet.</div>}
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 6 }}>
+                  {teams.teams.map(t => {
+                    const maxSize = getTeamMaxSize(t);
+                    const typeLabel = t.type === 'ttrpg' ? 'Custom' : 'Standard';
+                    const sizeLabel = maxSize === Infinity ? '∞' : maxSize;
+                    return (
+                    <li key={t.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gridTemplateRows: 'auto auto', gap: 8, alignItems: 'center' }}>
+                      <div style={{ gridColumn: '1 / 2', gridRow: '1' }}>
+                        <strong>{t.name}</strong> {teams.activeId === t.id && <span className="dim">(active)</span>}
+                        <div className="dim" style={{ fontSize: '0.9em' }}>
+                          {t.members.length} / {sizeLabel} 
+                          <span style={{ marginLeft: 6, fontSize: '0.85em', padding: '1px 5px', borderRadius: 4, background: t.type === 'ttrpg' ? 'rgba(180,100,255,0.2)' : 'rgba(100,200,100,0.2)', border: t.type === 'ttrpg' ? '1px solid rgba(180,100,255,0.4)' : '1px solid rgba(100,200,100,0.4)' }}>
+                            {typeLabel}
+                          </span>
+                        </div>
+                      </div>
+                      <button className="mini" style={{ gridColumn: '2', gridRow: '1' }} onClick={() => {
+                        const nn = prompt('Rename team', t.name);
+                        if (nn == null) return; const name = nn.trim(); if (!name) return;
+                        const newTeams = teams.teams.map(x => x.id === t.id ? { ...x, name } : x);
+                        setTeams({ teams: newTeams, activeId: teams.activeId }); saveTeams(newTeams, teams.activeId);
+                      }}>Rename</button>
+                      <button className="mini" style={{ gridColumn: '3', gridRow: '1' }} onClick={() => {
+                        const copy = { ...t, id: createTeam(`${t.name} (copy)`).id, name: `${t.name} (copy)` };
+                        const newTeams = [...teams.teams, copy];
+                        setTeams({ teams: newTeams, activeId: teams.activeId }); saveTeams(newTeams, teams.activeId);
+                      }}>Duplicate</button>
+                      <button className="mini" style={{ gridColumn: '4', gridRow: '1' }} onClick={() => {
+                        const copy = { ...t, id: createTeam(`${t.name} (copy)`).id, name: `${t.name} (copy)` };
+                        const newTeams = [...teams.teams, copy];
+                        setTeams({ teams: newTeams, activeId: copy.id }); saveTeams(newTeams, copy.id);
+                      }}>Duplicate as Active</button>
+                      <button className="mini" style={{ gridColumn: '5', gridRow: '1' }} onClick={() => {
+                        if (!confirm('Delete this team?')) return;
+                        const list = teams.teams.filter(x => x.id !== t.id);
+                        const newActive = teams.activeId === t.id ? (list[0]?.id || null) : teams.activeId;
+                        setTeams({ teams: list, activeId: newActive }); saveTeams(list, newActive);
+                      }}>Delete</button>
+                      <button onClick={() => {
+                        const nextActive = t.id;
+                        setTeams(prev => {
+                          const currentTeams = prev.teams;
+                          saveTeams(currentTeams, nextActive);
+                          return { teams: currentTeams, activeId: nextActive };
+                        });
+                      }} disabled={teams.activeId === t.id} style={{ gridColumn: '1 / -1', gridRow: '2' }}>Set Active</button>
+                    </li>
+                  );})}
+                </ul>
+                <div style={{ marginTop: 12, padding: 10, border: '1px solid #444', borderRadius: 6, background: 'rgba(0,0,0,0.2)' }}>
+                  <div style={{ marginBottom: 8, fontWeight: 600, fontSize: '0.9em', color: '#aaa' }}>Create New Team</div>
+                  <div style={{ display: 'grid', gap: 8 }}>
+                    <input id="newTeamName" placeholder={`Team ${teams.teams.length + 1}`} style={{ padding: '6px 8px' }} />
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.85em', cursor: 'pointer' }}>
+                        <input type="radio" name="teamType" id="teamTypeStandard" defaultChecked style={{ cursor: 'pointer' }} />
+                        <span>Standard (6 max)</span>
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.85em', cursor: 'pointer' }}>
+                        <input type="radio" name="teamType" id="teamTypeCustom" style={{ cursor: 'pointer' }} />
+                        <span>Custom</span>
+                      </label>
+                      <input 
+                        type="number" 
+                        id="customTeamSize" 
+                        placeholder="Size" 
+                        min={1} 
+                        max={100} 
+                        defaultValue={12}
+                        style={{ width: 60, padding: '4px 6px', fontSize: '0.85em' }} 
+                        title="Max Pokemon for custom team"
+                      />
+                    </div>
+                    <button onClick={() => {
+                      const nameEl = document.getElementById('newTeamName') as HTMLInputElement | null;
+                      const customRadio = document.getElementById('teamTypeCustom') as HTMLInputElement | null;
+                      const sizeEl = document.getElementById('customTeamSize') as HTMLInputElement | null;
+                      const nameRaw = (nameEl?.value || '').trim() || `Team ${teams.teams.length + 1}`;
+                      const isCustom = customRadio?.checked || false;
+                      const customSize = Math.min(100, Math.max(1, parseInt(sizeEl?.value || '12', 10) || 12));
+                      const t = createTeam(nameRaw, isCustom ? { type: 'ttrpg', maxSize: customSize } : { type: 'standard' });
+                      const newTeams = [...teams.teams, t];
+                      setTeams({ teams: newTeams, activeId: t.id }); 
+                      saveTeams(newTeams, t.id);
+                      if (nameEl) nameEl.value = '';
+                    }}>+ Create Team</button>
+                  </div>
+                </div>
+              </section>
+              <div style={{ marginTop: 8 }}>
+                <ImportExport onImport={(t) => { const active = activeTeam; if (!active) return; const newTeams = teams.teams.map(x => x.id === active.id ? { ...x, members: t.slice(0, 6) } : x); setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id); }} maxCount={6} exportList={team} exportLabel="Export Team" />
+              </div>
+            </CollapsiblePanel>
             <CollapsiblePanel title="Import / Export" icon="📥">
               <ImportExport
                 onImport={(t) => addAcrossBoxes(t)}
@@ -625,112 +747,6 @@ export function App() {
               setSelectedIndex(null);
             }}
           />
-        </div>
-      )}
-
-      {tab === 'team' && (
-        <div className="team-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <TeamView team={team} onRemove={removeFromTeam} onMove={(from, to) => {
-            const active = activeTeam; if (!active || from === to) return;
-            const arr = active.members.slice();
-            const [m] = arr.splice(from, 1);
-            arr.splice(to, 0, m);
-            const newTeams = teams.teams.map(t => t.id === active.id ? { ...t, members: arr } : t);
-            setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id);
-          }} />
-          <section className="panel">
-            <h2>Teams</h2>
-            {teams.teams.length === 0 && <div className="dim">No teams yet.</div>}
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 6 }}>
-              {teams.teams.map(t => {
-                const maxSize = getTeamMaxSize(t);
-                const typeLabel = t.type === 'ttrpg' ? 'Custom' : 'Standard';
-                const sizeLabel = maxSize === Infinity ? '∞' : maxSize;
-                return (
-                <li key={t.id} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gridTemplateRows: 'auto auto', gap: 8, alignItems: 'center' }}>
-                  <div style={{ gridColumn: '1 / 2', gridRow: '1' }}>
-                    <strong>{t.name}</strong> {teams.activeId === t.id && <span className="dim">(active)</span>}
-                    <div className="dim" style={{ fontSize: '0.9em' }}>
-                      {t.members.length} / {sizeLabel} 
-                      <span style={{ marginLeft: 6, fontSize: '0.85em', padding: '1px 5px', borderRadius: 4, background: t.type === 'ttrpg' ? 'rgba(180,100,255,0.2)' : 'rgba(100,200,100,0.2)', border: t.type === 'ttrpg' ? '1px solid rgba(180,100,255,0.4)' : '1px solid rgba(100,200,100,0.4)' }}>
-                        {typeLabel}
-                      </span>
-                    </div>
-                  </div>
-                  <button className="mini" style={{ gridColumn: '2', gridRow: '1' }} onClick={() => {
-                    const nn = prompt('Rename team', t.name);
-                    if (nn == null) return; const name = nn.trim(); if (!name) return;
-                    const newTeams = teams.teams.map(x => x.id === t.id ? { ...x, name } : x);
-                    setTeams({ teams: newTeams, activeId: teams.activeId }); saveTeams(newTeams, teams.activeId);
-                  }}>Rename</button>
-                  <button className="mini" style={{ gridColumn: '3', gridRow: '1' }} onClick={() => {
-                    const copy = { ...t, id: createTeam(`${t.name} (copy)`).id, name: `${t.name} (copy)` };
-                    const newTeams = [...teams.teams, copy];
-                    setTeams({ teams: newTeams, activeId: teams.activeId }); saveTeams(newTeams, teams.activeId);
-                  }}>Duplicate</button>
-                  <button className="mini" style={{ gridColumn: '4', gridRow: '1' }} onClick={() => {
-                    const copy = { ...t, id: createTeam(`${t.name} (copy)`).id, name: `${t.name} (copy)` };
-                    const newTeams = [...teams.teams, copy];
-                    setTeams({ teams: newTeams, activeId: copy.id }); saveTeams(newTeams, copy.id);
-                  }}>Duplicate as Active</button>
-                  <button className="mini" style={{ gridColumn: '5', gridRow: '1' }} onClick={() => {
-                    if (!confirm('Delete this team?')) return;
-                    const list = teams.teams.filter(x => x.id !== t.id);
-                    const newActive = teams.activeId === t.id ? (list[0]?.id || null) : teams.activeId;
-                    setTeams({ teams: list, activeId: newActive }); saveTeams(list, newActive);
-                  }}>Delete</button>
-                  <button onClick={() => {
-                    const nextActive = t.id;
-                    setTeams(prev => {
-                      const currentTeams = prev.teams;
-                      saveTeams(currentTeams, nextActive);
-                      return { teams: currentTeams, activeId: nextActive };
-                    });
-                  }} disabled={teams.activeId === t.id} style={{ gridColumn: '1 / -1', gridRow: '2' }}>Set Active</button>
-                </li>
-              );})}
-            </ul>
-            <div style={{ marginTop: 12, padding: 10, border: '1px solid #444', borderRadius: 6, background: 'rgba(0,0,0,0.2)' }}>
-              <div style={{ marginBottom: 8, fontWeight: 600, fontSize: '0.9em', color: '#aaa' }}>Create New Team</div>
-              <div style={{ display: 'grid', gap: 8 }}>
-                <input id="newTeamName" placeholder={`Team ${teams.teams.length + 1}`} style={{ padding: '6px 8px' }} />
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.85em', cursor: 'pointer' }}>
-                    <input type="radio" name="teamType" id="teamTypeStandard" defaultChecked style={{ cursor: 'pointer' }} />
-                    <span>Standard (6 max)</span>
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.85em', cursor: 'pointer' }}>
-                    <input type="radio" name="teamType" id="teamTypeCustom" style={{ cursor: 'pointer' }} />
-                    <span>Custom</span>
-                  </label>
-                  <input 
-                    type="number" 
-                    id="customTeamSize" 
-                    placeholder="Size" 
-                    min={1} 
-                    max={100} 
-                    defaultValue={12}
-                    style={{ width: 60, padding: '4px 6px', fontSize: '0.85em' }} 
-                    title="Max Pokemon for custom team"
-                  />
-                </div>
-                <button onClick={() => {
-                  const nameEl = document.getElementById('newTeamName') as HTMLInputElement | null;
-                  const customRadio = document.getElementById('teamTypeCustom') as HTMLInputElement | null;
-                  const sizeEl = document.getElementById('customTeamSize') as HTMLInputElement | null;
-                  const nameRaw = (nameEl?.value || '').trim() || `Team ${teams.teams.length + 1}`;
-                  const isCustom = customRadio?.checked || false;
-                  const customSize = Math.min(100, Math.max(1, parseInt(sizeEl?.value || '12', 10) || 12));
-                  const t = createTeam(nameRaw, isCustom ? { type: 'ttrpg', maxSize: customSize } : { type: 'standard' });
-                  const newTeams = [...teams.teams, t];
-                  setTeams({ teams: newTeams, activeId: t.id }); 
-                  saveTeams(newTeams, t.id);
-                  if (nameEl) nameEl.value = '';
-                }}>+ Create Team</button>
-              </div>
-            </div>
-          </section>
-          <ImportExport onImport={(t) => { const active = activeTeam; if (!active) return; const newTeams = teams.teams.map(x => x.id === active.id ? { ...x, members: t.slice(0, 6) } : x); setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id); }} maxCount={6} exportList={team} exportLabel="Export Team" />
         </div>
       )}
 
