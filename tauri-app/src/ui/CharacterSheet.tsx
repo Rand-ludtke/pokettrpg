@@ -28,6 +28,7 @@ type Character = {
 	stats: Stats;
 	inventory: InventorySection[];
 	money: number;
+	rations: number;
 	personality: string;
 	typeSpecialty: string;
 	traits: Trait[];
@@ -90,6 +91,7 @@ function migrate(raw: any): Character {
 			stats: { strength: 0, athletics: 0, intelligence: 0, speech: 0, fortitude: 0, luck: 0 },
 			inventory: DEFAULT_SECTIONS,
 			money: 0,
+			rations: 0,
 			personality: '',
 			typeSpecialty: '',
 			traits: [],
@@ -113,6 +115,7 @@ function migrate(raw: any): Character {
 			},
 			inventory: Array.isArray(raw.inventory) && raw.inventory.length ? raw.inventory.map((s: any, idx: number) => ({ key: s.key || `sec${idx}`, label: s.label || `Section ${idx+1}`, lines: String(s.lines || '') })) : DEFAULT_SECTIONS,
 			money: Number(raw.money || 0),
+			rations: Number(raw.rations || 0),
 			personality: String(raw.personality || ''),
 			typeSpecialty: String(raw.typeSpecialty || ''),
 			traits: Array.isArray(raw.traits) ? raw.traits.map((t: any) => ({ name: String(t?.name || ''), description: String(t?.description || '') })) : [],
@@ -130,6 +133,7 @@ function migrate(raw: any): Character {
 		stats: { strength: 0, athletics: 0, intelligence: 0, speech: 0, fortitude: 0, luck: 0 },
 		inventory: DEFAULT_SECTIONS,
 		money: 0,
+		rations: 0,
 		personality: String(raw.notes || ''),
 		typeSpecialty: '',
 		traits: [],
@@ -167,6 +171,7 @@ export function CharacterSheet() {
 	const [newItemCount, setNewItemCount] = useState<number>(1);
 	const [moneyDelta, setMoneyDelta] = useState<number>(0);
 	const [showMoneyControls, setShowMoneyControls] = useState(false);
+	const [showRationsControls, setShowRationsControls] = useState(false);
 	// Trainer visual state (shared sprite with Lobby via localStorage; optional custom image for sheet)
 	const [trainerSprite, setTrainerSpriteId] = useState<string>(() => {
 		try {
@@ -196,6 +201,9 @@ export function CharacterSheet() {
 		if (!amt) return;
 		adjustMoney(sign * amt);
 		setMoneyDelta(0);
+	};
+	const adjustRations = (delta: number) => {
+		setCh(prev => ({ ...prev, rations: Math.max(0, Number(prev.rations || 0) + delta) }));
 	};
 	// Item data (for icons + descriptions)
 	const [itemData, setItemData] = useState<Record<string, any>>({});
@@ -513,6 +521,31 @@ export function CharacterSheet() {
 									<button className="mini secondary" onClick={()=> applyMoneyDelta(-1)}>Remove</button>
 								</div>
 								</>)}
+							</div>
+						</div>
+						<div>
+							<div className="dim" style={{textAlign:'center'}}>Rations</div>
+							<div style={{ display:'grid', gap:6, justifyItems:'center' }}>
+								<div
+									style={{display:'flex', alignItems:'center', justifyContent:'center', gap:6, cursor:'pointer', userSelect:'none', padding:'4px 8px', borderRadius:8, background: showRationsControls ? 'rgba(0,255,128,0.08)' : 'transparent', border: showRationsControls ? '1px solid var(--accent)' : '1px solid transparent', transition:'all .15s'}}
+									onClick={() => setShowRationsControls(v => !v)}
+									title="Click to add/remove rations"
+								>
+									<span style={{fontSize:'1.1em'}}>🍖</span>
+									<span style={{ minWidth: 40, textAlign:'right', fontVariantNumeric:'tabular-nums', fontWeight:600 }}>
+										{Number(ch.rations||0)}
+									</span>
+								</div>
+								{showRationsControls && (
+								<div style={{ display:'grid', gridTemplateColumns:'repeat(3, auto)', gap:4 }}>
+									{[1, 5, 10].map(step => (
+										<div key={step} style={{ display:'grid', gap:2, justifyItems:'center' }}>
+											<button className="mini" onClick={()=> adjustRations(step)} title={`Add ${step}`}>+{step}</button>
+											<button className="mini secondary" onClick={()=> adjustRations(-step)} title={`Remove ${step}`}>-{step}</button>
+										</div>
+									))}
+								</div>
+								)}
 							</div>
 						</div>
 					</div>
