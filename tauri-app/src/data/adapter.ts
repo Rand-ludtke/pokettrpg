@@ -471,10 +471,18 @@ export function prepareBattle(p: Pokemon): BattlePokemon {
   const computed = computeRealStats(p);
   // Use TTRPG HP formula instead of Showdown's during battles
   const maxHp = calculateHp(p.baseStats.hp, p.level || 1);
+  // Preserve existing HP if the Pokemon already has currentHp/maxHp set
+  const existing = p as any;
+  let currentHp = maxHp;
+  if (typeof existing.currentHp === 'number' && typeof existing.maxHp === 'number' && existing.maxHp > 0 && existing.currentHp < existing.maxHp) {
+    // Scale the HP ratio to the new maxHp
+    const ratio = existing.currentHp / existing.maxHp;
+    currentHp = Math.max(0, Math.round(ratio * maxHp));
+  }
   return {
     ...p,
     maxHp,
-    currentHp: maxHp,
+    currentHp,
     computedStats: { hp: computed.hp, atk: computed.atk, def: computed.def, spa: computed.spa, spd: computed.spd, spe: computed.spe },
     statStages: { atk: 0, def: 0, spAtk: 0, spDef: 0, speed: 0 },
   };
