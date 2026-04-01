@@ -3015,14 +3015,33 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // PS's BattleChoiceBuilder.fillPasses() auto-fills 'pass' for all slots when
         // noMoreSwitchChoices() is true, making isDone() immediately true.
         if (isForceSwitchPrompt && newChoices.isDone?.() && newChoices.isEmpty?.()) {
-          PS_DEBUG && console.log('[PSBattlePanel] ForceSwitch with no bench — auto-sending pass');
-          diagLogProtocol('promptAction', 'ForceSwitch auto-pass (no bench pokemon available)');
-          // Small delay to let state settle before sending
-          setTimeout(() => {
-            client.sendAction(roomId, { type: 'switch', choices: [] }, myPlayerId);
-            setWaitingForOpponent(true);
-          }, 100);
-          return;
+          // Double-check: are there ACTUALLY no switchable bench Pokemon?
+          // BattleChoiceBuilder can misclassify Pokemon when the request format
+          // doesn't exactly match what PS expects, so verify ourselves.
+          const sidePokemon = psRequest.side?.pokemon || [];
+          const hasHealthyBench = sidePokemon.some((p: any) => {
+            const condition = p?.condition || '';
+            const isFainted = p?.fainted || condition.includes('fnt') || /^0\b/.test(condition);
+            const isActive = !!p?.active;
+            return !isFainted && !isActive;
+          });
+
+          if (hasHealthyBench) {
+            // BattleChoiceBuilder incorrectly thinks no bench available.
+            // Override: rebuild without relying on BattleChoiceBuilder's auto-pass.
+            console.warn('[PSBattlePanel] ForceSwitch: BattleChoiceBuilder auto-passed but healthy bench exists - overriding');
+            diagLogProtocol('promptAction', 'ForceSwitch auto-pass OVERRIDDEN (healthy bench exists)');
+            // Don't auto-pass — let the user choose from the switch buttons
+          } else {
+            PS_DEBUG && console.log('[PSBattlePanel] ForceSwitch with no bench — auto-sending pass');
+            diagLogProtocol('promptAction', 'ForceSwitch auto-pass (no bench pokemon available)');
+            // Small delay to let state settle before sending
+            setTimeout(() => {
+              client.sendAction(roomId, { type: 'switch', choices: [] }, myPlayerId);
+              setWaitingForOpponent(true);
+            }, 100);
+            return;
+          }
         }
       }
       
@@ -4065,6 +4084,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                   style={{ width: `${hpPercent}%` }}
                 />
               </span>
+              <span className="pokemon-hp-text" style={{ fontSize: '0.8em', opacity: 0.85, marginLeft: 4, whiteSpace: 'nowrap' }}>{current}/{max}</span>
               {poke.status && <span className={`status status-${poke.status}`}>{poke.status.toUpperCase()}</span>}
             </button>
           );
@@ -4343,6 +4363,41 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       >
         {/* Battle animation frame - PS will create innerbattle content via scene.reset() */}
         <div className="battle" ref={battleFrameRef} />
+
+        {/* Active Pokemon HP display overlay */}
+        {!loading && !error && request?.side?.pokemon && (() => {
+          const matrix = buildSlotMatrix(request.side.pokemon);
+          const activeEntries = matrix.active;
+          if (activeEntries.length === 0) return null;
+          return (
+            <div className="active-hp-overlay" style={{
+              position: 'absolute', top: 4, left: 4, right: 4,
+              display: 'flex', justifyContent: 'space-between', pointerEvents: 'none',
+              zIndex: 10, fontSize: '0.8em',
+            }}>
+              {activeEntries.map((entry) => {
+                const p = entry.pokemon;
+                const condition = p?.condition || '';
+                const parts = condition.includes('fnt') ? ['0', '100'] : condition.split('/');
+                const cur = parseInt(parts[0], 10) || 0;
+                const mx = parseInt(parts[1]?.split(' ')[0], 10) || 100;
+                const pct = mx > 0 ? Math.round((cur / mx) * 100) : 0;
+                const color = pct > 50 ? '#4caf50' : pct > 20 ? '#ff9800' : '#f44336';
+                const name = entry.name || p?.species || 'Active';
+                return (
+                  <div key={entry.sideIndex} style={{
+                    background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '2px 8px',
+                    borderRadius: 4, display: 'flex', alignItems: 'center', gap: 4,
+                  }}>
+                    <span>{name}</span>
+                    <span style={{ color, fontWeight: 'bold' }}>{cur}/{mx}</span>
+                    <span style={{ color, fontSize: '0.85em' }}>({pct}%)</span>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         <div className="foehint" />
 
