@@ -526,6 +526,22 @@ export function App() {
                   setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id);
                 }} />
               </div>
+              {team.some(m => m.currentHp < m.maxHp) && (
+                <button style={{marginTop:8}} onClick={() => {
+                  const healed = team.map(m => ({ ...m, currentHp: m.maxHp }));
+                  setTeams(prev => {
+                    const updated = prev.teams.map(t => t.id === (activeTeam?.id) ? { ...t, members: healed } : t);
+                    saveTeams(updated, prev.activeId);
+                    return { teams: updated, activeId: prev.activeId };
+                  });
+                  setBoxes(prev => prev.map(box => box.map(p => {
+                    if (!p) return p;
+                    const match = healed.find(h => h.name === p.name);
+                    return match ? { ...p, currentHp: p.maxHp } : p;
+                  })));
+                  if (selected && healed.find(h => h.name === selected.name)) setSelected({ ...selected, currentHp: selected.maxHp });
+                }}>Full Heal Team</button>
+              )}
               <section className="panel" style={{ marginTop: 12 }}>
                 <h2>Teams</h2>
                 {teams.teams.length === 0 && <div className="dim">No teams yet.</div>}
@@ -684,6 +700,15 @@ export function App() {
                   <button className="secondary mini" onClick={invertSelectionInPcBox}>Invert</button>
                   <button className="secondary mini" onClick={() => setPcMulti(prev => ({ ...prev, indices: [] }))} disabled={pcMulti.indices.length === 0}>Clear Selection</button>
                 </div>
+                <button style={{marginTop:8}} onClick={() => {
+                  setBoxes(prev => prev.map(box => box.map(p => p ? { ...p, currentHp: p.maxHp } : p)));
+                  setTeams(prev => {
+                    const updated = prev.teams.map(t => ({ ...t, members: t.members.map(m => ({ ...m, currentHp: m.maxHp })) }));
+                    saveTeams(updated, prev.activeId);
+                    return { teams: updated, activeId: prev.activeId };
+                  });
+                  if (selected) setSelected({ ...selected, currentHp: selected.maxHp });
+                }}>Full Heal All Pokémon</button>
               </div>
             </CollapsiblePanel>
             <DiceLevelingPanel
@@ -745,6 +770,22 @@ export function App() {
               });
               setSelected(null);
               setSelectedIndex(null);
+            }}
+            onHeal={(amount) => {
+              if (!selected || selectedIndex == null) return;
+              const healed = { ...selected, currentHp: amount === 'full' ? selected.maxHp : Math.min(selected.maxHp, selected.currentHp + amount) };
+              setBoxes(prev => prev.map((box, i) => {
+                if (i !== boxIndex) return box;
+                const nb = box.slice();
+                nb[selectedIndex] = healed;
+                return nb;
+              }));
+              setTeams(prev => {
+                const updated = prev.teams.map(t => ({ ...t, members: t.members.map(m => m.name === selected.name ? { ...m, currentHp: healed.currentHp } as BattlePokemon : m) }));
+                saveTeams(updated, prev.activeId);
+                return { teams: updated, activeId: prev.activeId };
+              });
+              setSelected(healed);
             }}
           />
         </div>

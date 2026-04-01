@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
-import { rmSync, existsSync, mkdirSync, cpSync, readdirSync, writeFileSync } from 'node:fs';
+import { rmSync, existsSync, mkdirSync, cpSync, readdirSync, writeFileSync, createReadStream, statSync } from 'node:fs';
 
 // Tauri expects a fixed port, fail if that port is not available
 export default defineConfig(({ mode }) => {
@@ -13,6 +13,59 @@ export default defineConfig(({ mode }) => {
     publicDir: 'public',
     plugins: [
       react(),
+      {
+        name: 'serve-fusion-sprites',
+        configureServer(server) {
+          const fusionRoot = path.resolve(__dirname, '..', '.fusion-sprites-local');
+          const searchDirs = (() => {
+            const dirs: string[] = [];
+            if (!existsSync(fusionRoot)) return dirs;
+            // CustomBattlers first (most common), then bucket dirs, then root
+            const cb = path.join(fusionRoot, 'CustomBattlers');
+            if (existsSync(cb)) dirs.push(cb);
+            try {
+              for (const entry of readdirSync(fusionRoot, { withFileTypes: true })) {
+                if (entry.isDirectory() && /^head-/.test(entry.name))
+                  dirs.push(path.join(fusionRoot, entry.name));
+              }
+            } catch {}
+            const gen = path.join(fusionRoot, 'generated');
+            if (existsSync(gen)) dirs.push(gen);
+            const custom = path.join(fusionRoot, 'custom');
+            if (existsSync(custom)) dirs.push(custom);
+            const other = path.join(fusionRoot, 'Other');
+            if (existsSync(other)) dirs.push(other);
+            dirs.push(fusionRoot); // flat root last
+            return dirs;
+          })();
+
+          server.middlewares.use((req, res, next) => {
+            if (!req.url) return next();
+            // Match /fusion/sprites/:filename or /fusion-sprites/:filename
+            const m = req.url.match(/^\/(?:fusion\/sprites|fusion-sprites)\/([^?]+)/);
+            if (!m) return next();
+            const filename = path.basename(decodeURIComponent(m[1]));
+            if (!/\.(png|gif)$/i.test(filename)) return next();
+
+            for (const dir of searchDirs) {
+              const filePath = path.join(dir, filename);
+              if (existsSync(filePath)) {
+                try {
+                  const stat = statSync(filePath);
+                  res.setHeader('Content-Type', filename.endsWith('.gif') ? 'image/gif' : 'image/png');
+                  res.setHeader('Content-Length', stat.size);
+                  res.setHeader('Cache-Control', 'public, max-age=86400');
+                  res.statusCode = 200;
+                  createReadStream(filePath).pipe(res);
+                  return;
+                } catch {}
+              }
+            }
+            res.statusCode = 404;
+            res.end();
+          });
+        },
+      },
       {
         name: 'prune-ps-from-dist',
         closeBundle() {

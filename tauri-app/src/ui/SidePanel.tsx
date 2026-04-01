@@ -62,7 +62,7 @@ function moveTooltip(move: any): string {
   return (move.shortDesc || move.desc || `${name}${category}`) as string;
 }
 
-export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected }: {
+export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected, onHeal }: {
   selected: BattlePokemon | null;
   boxes?: Array<Array<BattlePokemon | null>>;
   onAdd: (p: BattlePokemon, teamId?: string) => void;
@@ -70,6 +70,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   onAddToSlot?: (p: BattlePokemon) => void;
   onReplaceSelected?: (p: BattlePokemon) => void;
   onDeleteSelected?: () => void;
+  onHeal?: (amount: number | 'full') => void;
 }) {
   if (!selected) return (
     <NoSelectionPanel onAddToSlot={onAddToSlot} onAdd={onAdd} />
@@ -98,6 +99,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   const [showdownMoveValue, setShowdownMoveValue] = useState<string>('');
   const [moveBrowserSlot, setMoveBrowserSlot] = useState<number | null>(null);
   const [moveBrowserFilter, setMoveBrowserFilter] = useState<string>('');
+  const [healAmount, setHealAmount] = useState<string>('');
   const [showdownEditStats, setShowdownEditStats] = useState<boolean>(false);
   const [showdownEvs, setShowdownEvs] = useState<{ hp: number; atk: number; def: number; spa: number; spd: number; spe: number }>({
     hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0,
@@ -1307,6 +1309,13 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             <strong>HP</strong>: {ttrpgCurrHp}/{ttrpgMaxHp}
           </div>
           <div className="hpbar large" style={{marginTop:2}} title={`HP ${selected.currentHp}/${selected.maxHp}`}><span style={{ width: `${hpPct}%` }} /></div>
+          {onHeal && selected.currentHp < selected.maxHp && (
+            <div style={{display:'flex', gap:6, alignItems:'center', marginTop:4, flexWrap:'wrap'}}>
+              <button className="mini" onClick={() => onHeal('full')}>Full Heal</button>
+              <input type="number" min={1} value={healAmount} onChange={e => setHealAmount(e.target.value)} placeholder="HP" style={{width:60}} />
+              <button className="mini" disabled={!healAmount || Number(healAmount) <= 0} onClick={() => { onHeal(Number(healAmount)); setHealAmount(''); }}>Heal</button>
+            </div>
+          )}
 
           <div className="stats" style={{border:'1px solid #444', padding:'4px 6px', borderRadius:6, cursor:'pointer', flexShrink:0}} onClick={()=> jumpToSection('mechanics')} title="Click to edit mechanics">
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6}}>
@@ -1585,6 +1594,11 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                     {abilityOpts.length ? (
                       <select value={showdownFieldValue} onChange={e=>setShowdownFieldValue(e.target.value)} style={{width:'100%'}}>
                         {abilityOpts.map(a => <option key={a} value={a}>{a}</option>)}
+                        {dex && (() => {
+                          const illegal = Object.values(dex.abilities).map((a:any) => a.name).sort().filter((a:string) => !abilityOpts.includes(a));
+                          if (!illegal.length) return null;
+                          return <>{[<option key="__sep" disabled>──── Other Abilities ────</option>, ...illegal.map((a:string) => <option key={`il-${a}`} value={a}>{a}</option>)]}</>;
+                        })()}
                       </select>
                     ) : (
                       <input value={showdownFieldValue} onChange={e=>setShowdownFieldValue(e.target.value)} style={{width:'100%'}} />
@@ -2063,6 +2077,11 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   <div className="label"><strong>Ability</strong></div>
                   <select value={abilitySel} onChange={e=>setAbilitySel(e.target.value)} disabled={!speciesInput.trim()}>
                     {abilityOpts.map(a => <option key={a} value={a}>{a}</option>)}
+                    {dex && (() => {
+                      const illegal = Object.values(dex.abilities).map((a:any) => a.name).sort().filter((a:string) => !abilityOpts.includes(a));
+                      if (!illegal.length) return null;
+                      return <>{[<option key="__sep" disabled>──── Other Abilities ────</option>, ...illegal.map((a:string) => <option key={`il-${a}`} value={a}>{a}</option>)]}</>;
+                    })()}
                   </select>
                 </label>
                 <label>
@@ -2366,6 +2385,11 @@ function AddNewPanel({ onAdd }: { onAdd?: (p: BattlePokemon) => void }) {
             <div className="label"><strong>Ability</strong></div>
             <select value={ability} onChange={e=>setAbility(e.target.value)} disabled={!species.trim()}>
               {abilityOptions.map(a => <option key={a} value={a}>{a}</option>)}
+              {dex && (() => {
+                const illegal = Object.values(dex.abilities).map((a:any) => a.name).sort().filter((a:string) => !abilityOptions.includes(a));
+                if (!illegal.length) return null;
+                return <>{[<option key="__sep" disabled>──── Other Abilities ────</option>, ...illegal.map((a:string) => <option key={`il-${a}`} value={a}>{a}</option>)]}</>;
+              })()}
             </select>
           </label>
           <label>
