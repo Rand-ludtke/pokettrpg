@@ -659,6 +659,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const deferredPostStartLinesRef = useRef<string[]>([]); // Hold post-|start| lines until team order is submitted
   const latestPromptTurnRef = useRef<number>(0);
   const latestPromptRqidRef = useRef<number | null>(null);
+  const blankActionRecoveryKeyRef = useRef<string>('');
   const teamSubmittedRef = useRef(false);
   const lastActiveBySideRef = useRef<{ p1?: string; p2?: string }>({});
   const lastActiveUpdateRef = useRef<number>(0);
@@ -800,6 +801,36 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   useEffect(() => {
     currentTurnRef.current = currentTurn;
   }, [currentTurn]);
+
+  // Safety net: if we have a move request but no active slot/move choices,
+  // ask the server for a fresh battle state + prompt so the action UI recovers.
+  useEffect(() => {
+    if (!client || !roomId || !request) return;
+    if ((request as any).requestType !== 'move') {
+      blankActionRecoveryKeyRef.current = '';
+      return;
+    }
+    const choiceIndex = choices?.index?.() ?? 0;
+    const activeSlot = request.active?.[choiceIndex];
+    const hasActiveSlot = !!activeSlot;
+    const hasMoveList = Array.isArray(activeSlot?.moves) && activeSlot.moves.length > 0;
+    if (hasActiveSlot || hasMoveList) {
+      blankActionRecoveryKeyRef.current = '';
+      return;
+    }
+    const turn = latestPromptTurnRef.current || currentTurnRef.current || 0;
+    const rqid = (request as any)?.rqid ?? latestPromptRqidRef.current ?? 'none';
+    const recoveryKey = `${turn}:${rqid}`;
+    if (blankActionRecoveryKeyRef.current === recoveryKey) return;
+    blankActionRecoveryKeyRef.current = recoveryKey;
+    console.warn('[PSBattlePanel] Blank move request (no active slot) - requesting fresh prompt', {
+      turn,
+      rqid,
+      requestType: (request as any)?.requestType,
+      activeLen: request.active?.length,
+    });
+    client.requestBattleState(roomId);
+  }, [client, roomId, request, choices]);
 
   useEffect(() => {
     if (!client?.on) return;
@@ -3689,7 +3720,24 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const renderMoveButtons = useMemo(() => {
     // For multi-slot (doubles/triples), show moves for the current choice index
     const choiceIndex = choices?.index?.() ?? 0;
-    if (!request?.active?.[choiceIndex]) return null;
+    if (!request?.active?.[choiceIndex]) {
+      return (
+        <div className="movemenu" style={{ padding: 8 }}>
+          <div className="dim" style={{ fontSize: '0.85em', marginBottom: 6 }}>
+            Move choices are missing for this prompt.
+          </div>
+          <button
+            className="button"
+            onClick={() => {
+              console.warn('[PSBattlePanel] Manual refresh: requestBattleState due to missing move choices');
+              client?.requestBattleState(roomId);
+            }}
+          >
+            Refresh Choices
+          </button>
+        </div>
+      );
+    }
     
     const moves = Array.isArray(request.active[choiceIndex].moves) ? request.active[choiceIndex].moves : [];
     // Use SlotMatrix to find the correct active Pokemon for this choice slot
@@ -4124,7 +4172,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         })}
       </div>
     );
-  }, [request, sendChoice, waitingForOpponent, waitingForAnimations, choices, choicesVersion]);
+  }, [request, sendChoice, waitingForOpponent, waitingForAnimations, choices, choicesVersion, client, roomId]);
   
   // Render team preview
   const renderTeamPreview = useMemo(() => {

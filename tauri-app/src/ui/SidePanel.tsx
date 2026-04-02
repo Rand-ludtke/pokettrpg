@@ -121,6 +121,14 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     return selected.species || (selected as any).originalName || selected.name;
   }, [selected]);
 
+  const getAbilityOptionLabel = useCallback((abilityName: string) => {
+    const normalized = normalizeName(abilityName);
+    const ability = dex?.abilities?.[normalized]
+      || Object.values(dex?.abilities || {}).find((a: any) => normalizeName((a as any)?.name || '') === normalized);
+    const desc = (ability as any)?.shortDesc || (ability as any)?.desc || '';
+    return desc ? `${abilityName} - ${desc}` : abilityName;
+  }, [dex]);
+
   const pcSpeciesPool = useMemo(() => {
     const seen = new Set<string>();
     for (const box of boxes || []) {
@@ -1624,10 +1632,10 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                       <input value={showdownFieldValue} onChange={e=>setShowdownFieldValue(e.target.value)} style={{width:'100%'}} placeholder="Type any ability..." />
                     )}
                     <datalist id="showdown-abilities">
-                      {abilityOpts.map(a => <option key={a} value={a} label={`✓ ${a}`} />)}
+                      {abilityOpts.map(a => <option key={a} value={a} label={getAbilityOptionLabel(a)} />)}
                       {dex && (() => {
                         const illegal = Object.values(dex.abilities).map((a:any) => a.name).sort().filter((a:string) => !abilityOpts.includes(a));
-                        return illegal.map((a:string) => <option key={`il-${a}`} value={a} />);
+                        return illegal.map((a:string) => <option key={`il-${a}`} value={a} label={getAbilityOptionLabel(a)} />);
                       })()}
                     </datalist>
                     <button className="mini" onClick={(e)=>{ e.stopPropagation(); commitShowdownEdit(); }}>✓</button>
@@ -1635,10 +1643,6 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   </div>
                 ) : (
                   <div style={{fontWeight:'bold', fontSize:'0.9em'}}>{selected.ability || '—'}</div>
-                )}
-                {/* Ability description */}
-                {abilityDesc && showdownEditField !== 'ability' && (
-                  <div style={{fontSize:'0.8em', marginTop:2, color:'#ccc'}}>{abilityDesc}</div>
                 )}
               </div>
             </div>
@@ -2134,10 +2138,10 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   <div className="label"><strong>Ability</strong> <span style={{fontSize:'0.75em',opacity:0.6}}>(type any name)</span></div>
                   <input list="abilities-list" value={abilitySel} onChange={e=>setAbilitySel(e.target.value)} disabled={!speciesInput.trim()} placeholder="Type or select ability..." />
                   <datalist id="abilities-list">
-                    {abilityOpts.map(a => <option key={a} value={a} label={`✓ ${a}`} />)}
+                    {abilityOpts.map(a => <option key={a} value={a} label={getAbilityOptionLabel(a)} />)}
                     {dex && (() => {
                       const illegal = Object.values(dex.abilities).map((a:any) => a.name).sort().filter((a:string) => !abilityOpts.includes(a));
-                      return illegal.map((a:string) => <option key={`il-${a}`} value={a} />);
+                      return illegal.map((a:string) => <option key={`il-${a}`} value={a} label={getAbilityOptionLabel(a)} />);
                     })()}
                   </datalist>
                 </label>
