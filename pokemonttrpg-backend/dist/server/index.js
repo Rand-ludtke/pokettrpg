@@ -2441,8 +2441,18 @@ function startForceSwitchTimer(room) {
     room.forceSwitchTimer = setTimeout(() => {
         if (!room.engine || !room.forceSwitchNeeded || room.forceSwitchNeeded.size === 0)
             return;
+        console.log(`[ForceSwitch] Timer fired. Remaining: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
         // Auto-switch remaining players to first healthy bench
         for (const pid of Array.from(room.forceSwitchNeeded)) {
+            // Skip phantom entries - player's active Pokemon is alive, no switch needed
+            const timerState = room.engine.getState();
+            const timerPl = timerState.players.find(p => p.id === pid);
+            const timerActive = timerPl?.team[timerPl?.activeIndex ?? -1];
+            if (timerActive && timerActive.currentHP > 0) {
+                console.log(`[ForceSwitch] Timer: Removing phantom entry for ${pid} (active HP=${timerActive.currentHP})`);
+                room.forceSwitchNeeded.delete(pid);
+                continue;
+            }
             let benchIndex = -1;
             // Prefer PS request's side.pokemon for accurate faint/active status
             const psReq = room.engine.getRequest(pid);
@@ -2965,6 +2975,20 @@ io.on("connection", (socket) => {
             }
             room.replay.push({ turn: res.state.turn, events: res.events, anim: res.anim, phase: "force-switch" });
             room.forceSwitchNeeded.delete(data.playerId);
+            // Clean up phantom force-switch entries: if a remaining player's active Pokemon
+            // is alive, they don't actually need to switch (stale engine request).
+            {
+                const cleanupState = room.engine.getState();
+                for (const pid of Array.from(room.forceSwitchNeeded)) {
+                    const pl = cleanupState.players.find(p => p.id === pid);
+                    const act = pl?.team[pl?.activeIndex ?? -1];
+                    if (act && act.currentHP > 0) {
+                        console.log(`[ForceSwitch] Removing phantom entry for ${pid} (active HP=${act.currentHP})`);
+                        room.forceSwitchNeeded.delete(pid);
+                    }
+                }
+            }
+            console.log(`[ForceSwitch] After cleanup: forceSwitchNeeded=${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
             {
                 const s = room.engine.getState();
                 io.to(room.id).emit("battleUpdate", { result: res, needsSwitch: Array.from(room.forceSwitchNeeded), deadline: room.forceSwitchDeadline ?? null, rooms: { trick: s.field.room, magic: s.field.magicRoom, wonder: s.field.wonderRoom } });
@@ -2977,6 +3001,7 @@ io.on("connection", (socket) => {
                 room.lastPromptByPlayer = {};
                 // Emit new move prompts so players can choose their next action
                 const freshState = room.engine.getState();
+                console.log(`[ForceSwitch] Calling emitMovePrompts for turn ${freshState.turn}`);
                 emitMovePrompts(room, freshState);
             }
             return;

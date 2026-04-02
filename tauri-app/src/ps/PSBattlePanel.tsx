@@ -4465,6 +4465,24 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                     } do?</>
                   )}
                 </div>
+                {/* Ability display */}
+                {(() => {
+                  const ci = choices?.index?.() ?? 0;
+                  const mat = buildSlotMatrix(request.side?.pokemon);
+                  const se = mat.activeAt(ci);
+                  const ap = request.side?.pokemon?.[se?.sideIndex ?? 0];
+                  const abilityName = ap?.baseAbility || ap?.ability || '';
+                  if (!abilityName) return null;
+                  const abilDex = (window as any).BattleAbilities || {};
+                  const abilId = abilityName.toLowerCase().replace(/[^a-z0-9]/g, '');
+                  const abilData = abilDex[abilId];
+                  const desc = abilData?.shortDesc || abilData?.desc || '';
+                  return (
+                    <div style={{ textAlign:'center', padding:'2px 6px', fontSize:'11px', color:'#cda', background:'rgba(60,60,40,0.4)', borderRadius:4, marginBottom:2 }} title={desc}>
+                      <strong>Ability:</strong> {abilityName}{desc ? ` — ${desc}` : ''}
+                    </div>
+                  );
+                })()}
                 {renderMoveButtons}
                 {/* Back button for multi-slot: go back to previous slot's choices */}
                 {(choices?.index?.() ?? 0) > 0 && (request?.active?.length ?? 1) > 1 && (

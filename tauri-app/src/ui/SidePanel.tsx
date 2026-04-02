@@ -93,7 +93,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   const [showHatPicker, setShowHatPicker] = useState<boolean>(false);
   const [importText, setImportText] = useState<string>('');
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
-  const [showdownEditField, setShowdownEditField] = useState<'level'|'gender'|'shiny'|'tera'|'species'|'item'|'ability'|null>(null);
+  const [showdownEditField, setShowdownEditField] = useState<'level'|'gender'|'shiny'|'tera'|'species'|'item'|'ability'|'nickname'|null>(null);
   const [showdownFieldValue, setShowdownFieldValue] = useState<string>('');
   const [showdownEditMoveIndex, setShowdownEditMoveIndex] = useState<number | null>(null);
   const [showdownMoveValue, setShowdownMoveValue] = useState<string>('');
@@ -790,7 +790,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     onReplaceSelected && onReplaceSelected(withVisualState(bp, !speciesChanged));
   };
 
-  const startShowdownEdit = (field: 'level'|'gender'|'shiny'|'tera'|'species'|'item'|'ability', value: string) => {
+  const startShowdownEdit = (field: 'level'|'gender'|'shiny'|'tera'|'species'|'item'|'ability'|'nickname', value: string) => {
     setShowdownEditField(field);
     setShowdownFieldValue(value);
     setShowdownEditMoveIndex(null);
@@ -820,6 +820,8 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       applyShowdownUpdate({ item: showdownFieldValue || '' });
     } else if (field === 'ability') {
       applyShowdownUpdate({ ability: showdownFieldValue || selected.ability || '' });
+    } else if (field === 'nickname') {
+      applyShowdownUpdate({ name: showdownFieldValue || selected.name });
     }
     cancelShowdownEdit();
   };
@@ -1059,7 +1061,24 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
         {/* Name and info */}
         <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between'}}>
           <div style={{flex: 1}}>
-            <h2 style={{margin:'0 0 2px 0', fontSize: '1.1em'}}>{selected.name}</h2>
+            <h2
+              style={{margin:'0 0 2px 0', fontSize: '1.1em', cursor:'pointer'}}
+              onClick={() => startShowdownEdit('nickname', selected.name)}
+              title="Click to rename"
+            >{selected.name}</h2>
+            {showdownEditField === 'nickname' && (
+              <div style={{display:'flex',gap:4,alignItems:'center',marginBottom:4}}>
+                <input
+                  autoFocus
+                  value={showdownFieldValue}
+                  onChange={e => setShowdownFieldValue(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') commitShowdownEdit(); if (e.key === 'Escape') cancelShowdownEdit(); }}
+                  style={{flex:1, padding:'2px 4px', fontSize:'0.9em'}}
+                />
+                <button className="mini" onClick={commitShowdownEdit}>✓</button>
+                <button className="mini" onClick={cancelShowdownEdit}>✕</button>
+              </div>
+            )}
             {/* Show level+type for TTRPG mode, just nickname for Showdown */}
             {panelMode === 'compact' && (
               <div style={{fontSize:'0.8em', marginTop:0}} className="dim">Lv {selected.level} • {selected.types.join(' / ')}</div>
@@ -2274,7 +2293,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             ) : <div className="dim">{emptyText}</div>
           );
           return (
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr',gap:8}}>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr 1fr',gap:8}}>
               <div>
                 <div><strong>4x</strong></div>
                 {renderIcons(te.quadWeak, 'None')}
@@ -2282,6 +2301,10 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
               <div>
                 <div><strong>2x</strong></div>
                 {renderIcons(te.weak, 'None')}
+              </div>
+              <div>
+                <div><strong>1x</strong></div>
+                {renderIcons(te.neutral, 'None')}
               </div>
               <div>
                 <div><strong>1/2x</strong></div>
@@ -2584,12 +2607,13 @@ const TYPE_CHART: Record<string, Record<string, number>> = {
   fairy: { fighting: 2, dragon: 2, dark: 2, fire: 0.5, poison: 0.5, steel: 0.5 },
 };
 
-function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]; weak: string[]; resist: string[]; quadResist: string[]; immune: string[] } {
+function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]; weak: string[]; neutral: string[]; resist: string[]; quadResist: string[]; immune: string[] } {
   const TYPES = Object.keys(TYPE_CHART);
   const toId = (t: string) => normalizeName(t);
   const def = defenderTypes.map(t => toId(t));
   const quadWeak: string[] = [];
   const weak: string[] = [];
+  const neutral: string[] = [];
   const resist: string[] = [];
   const quadResist: string[] = [];
   const immune: string[] = [];
@@ -2602,12 +2626,13 @@ function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]
     if (mult === 0) immune.push(atk);
     else if (mult === 4) quadWeak.push(atk);
     else if (mult > 1) weak.push(atk);
+    else if (mult === 1) neutral.push(atk);
     else if (mult === 0.25) quadResist.push(atk);
     else if (mult < 1) resist.push(atk);
   }
   const sort = (a: string, b: string) => a.localeCompare(b);
-  quadWeak.sort(sort); weak.sort(sort); resist.sort(sort); quadResist.sort(sort); immune.sort(sort);
-  return { quadWeak, weak, resist, quadResist, immune };
+  quadWeak.sort(sort); weak.sort(sort); neutral.sort(sort); resist.sort(sort); quadResist.sort(sort); immune.sort(sort);
+  return { quadWeak, weak, neutral, resist, quadResist, immune };
 }
 
 /** No-selection view: toggle between "Add Pokémon" and "Create Fusion" */
