@@ -3115,12 +3115,41 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         onBattleEnd(winner);
       }
     });
+
+    // Safety net: if phase changes to "normal" but no promptAction arrives within 5s,
+    // request the server to re-send battle state and prompts.
+    let promptSafetyTimer: ReturnType<typeof setTimeout> | null = null;
+    const offPhase = client.on('phase', ({ roomId: phaseRoomId, payload }) => {
+      if (phaseRoomId !== roomId) return;
+      if (payload?.phase === 'normal') {
+        // Phase changed to normal — expect a promptAction soon
+        if (promptSafetyTimer) clearTimeout(promptSafetyTimer);
+        promptSafetyTimer = setTimeout(() => {
+          console.log('[PSBattlePanel] Safety net: no promptAction received 5s after phase=normal, requesting re-prompt');
+          client.requestBattleState(roomId);
+          promptSafetyTimer = null;
+        }, 5000);
+      }
+    });
+    // If a real prompt arrives, cancel the safety timer
+    const offPromptSafety = client.on('promptAction', (rawData) => {
+      const d = rawData as any;
+      if (d.roomId !== roomId) return;
+      if (d.playerId && myPlayerId && d.playerId !== myPlayerId) return;
+      if (promptSafetyTimer) {
+        clearTimeout(promptSafetyTimer);
+        promptSafetyTimer = null;
+      }
+    });
     
     return () => {
       offUpdate();
       offStart();
       offPrompt();
       offEnd();
+      offPhase();
+      offPromptSafety();
+      if (promptSafetyTimer) clearTimeout(promptSafetyTimer);
     };
   }, [client, roomId, myPlayerId, onBattleEnd, isReplay]);
   
@@ -4465,24 +4494,6 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                     } do?</>
                   )}
                 </div>
-                {/* Ability display */}
-                {(() => {
-                  const ci = choices?.index?.() ?? 0;
-                  const mat = buildSlotMatrix(request.side?.pokemon);
-                  const se = mat.activeAt(ci);
-                  const ap = request.side?.pokemon?.[se?.sideIndex ?? 0];
-                  const abilityName = ap?.baseAbility || ap?.ability || '';
-                  if (!abilityName) return null;
-                  const abilDex = (window as any).BattleAbilities || {};
-                  const abilId = abilityName.toLowerCase().replace(/[^a-z0-9]/g, '');
-                  const abilData = abilDex[abilId];
-                  const desc = abilData?.shortDesc || abilData?.desc || '';
-                  return (
-                    <div style={{ textAlign:'center', padding:'2px 6px', fontSize:'11px', color:'#cda', background:'rgba(60,60,40,0.4)', borderRadius:4, marginBottom:2 }} title={desc}>
-                      <strong>Ability:</strong> {abilityName}{desc ? ` — ${desc}` : ''}
-                    </div>
-                  );
-                })()}
                 {renderMoveButtons}
                 {/* Back button for multi-slot: go back to previous slot's choices */}
                 {(choices?.index?.() ?? 0) > 0 && (request?.active?.length ?? 1) > 1 && (

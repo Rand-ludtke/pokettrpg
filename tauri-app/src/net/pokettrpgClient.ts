@@ -1492,6 +1492,11 @@ export class PoketTRPGClient {
     this.battleNeedsSwitch.set(roomId, payload);
   }
 
+  /** Request the server to re-send battle state and prompts for a room */
+  requestBattleState(roomId: string) {
+    this.socket?.emit('requestBattleState', { roomId });
+  }
+
   /** Rejoin all battle rooms where we have active state — triggers server reconnect recovery */
   private rejoinActiveBattleRooms() {
     // Rejoin lobby

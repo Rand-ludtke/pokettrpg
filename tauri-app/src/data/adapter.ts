@@ -1279,6 +1279,32 @@ export function saveCustomSprite(id: string, slot: SpriteSlot, dataUrl: string) 
   all[id] = { ...(all[id] || {}), [slot]: dataUrl };
   try { localStorage.setItem(LS_CUSTOM_SPRITES, JSON.stringify(all)); } catch {}
 }
+/** Remove all custom sprites for a given Pokemon ID, or all custom sprites if id is omitted. */
+export function clearCustomSprites(id?: string) {
+  if (id) {
+    const all = getCustomSprites();
+    const normalizedId = normalizeName(id);
+    delete all[id];
+    delete all[normalizedId];
+    try { localStorage.setItem(LS_CUSTOM_SPRITES, JSON.stringify(all)); } catch {}
+  } else {
+    try { localStorage.removeItem(LS_CUSTOM_SPRITES); } catch {}
+  }
+}
+/** Remove saved sprite-set preference for a Pokemon. */
+export function clearSpriteSettings(id?: string) {
+  if (id) {
+    try {
+      const raw = JSON.parse(localStorage.getItem('ttrpg.spriteSettings') || '{}');
+      const normalizedId = normalizeName(id);
+      delete raw[id];
+      delete raw[normalizedId];
+      localStorage.setItem('ttrpg.spriteSettings', JSON.stringify(raw));
+    } catch {}
+  } else {
+    try { localStorage.removeItem('ttrpg.spriteSettings'); } catch {}
+  }
+}
 
 async function fetchImageAsDataUrl(url: string, timeoutMs = 10000): Promise<string | null> {
   try {

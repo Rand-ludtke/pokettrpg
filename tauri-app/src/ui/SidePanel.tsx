@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
-import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, type PokemonSpriteOption } from '../data/adapter';
+import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, type PokemonSpriteOption } from '../data/adapter';
 import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
 import { FusionCreator } from './FusionCreator';
 import { SpriteModeToggle, VariantPicker } from './SpriteVariantSelector';
@@ -1232,6 +1232,14 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             <button className="mini" onClick={() => applySpriteOption('')} title="Clear individual sprite and use default fallback">
               Reset
             </button>
+            <button className="mini" onClick={() => {
+              const species = selected.species || selected.name;
+              clearCustomSprites(species);
+              clearSpriteSettings(species);
+              applySpriteOption('');
+            }} title="Remove all saved/cached custom sprites for this Pokemon">
+              Clear Saved
+            </button>
             {spriteOptionsLoading && <span className="dim">Loading...</span>}
           </div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxHeight: 220, overflowY: 'auto', paddingRight: 2 }}>
@@ -1627,6 +1635,10 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   </div>
                 ) : (
                   <div style={{fontWeight:'bold', fontSize:'0.9em'}}>{selected.ability || '—'}</div>
+                )}
+                {/* Ability description */}
+                {abilityDesc && showdownEditField !== 'ability' && (
+                  <div style={{fontSize:'0.8em', marginTop:2, color:'#ccc'}}>{abilityDesc}</div>
                 )}
               </div>
             </div>

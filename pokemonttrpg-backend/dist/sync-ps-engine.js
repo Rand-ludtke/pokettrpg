@@ -856,15 +856,15 @@ class SyncPSEngine {
             if (!side || !cfg)
                 continue;
             const hazards = cfg.sideHazards || {};
-            try { if (hazards.stealthRock) side.addSideCondition?.("stealthrock"); } catch(e) { console.warn('[SyncPS] stealthrock addSideCondition failed:', e?.message); }
-            try { if (hazards.stickyWeb) side.addSideCondition?.("stickyweb"); } catch(e) { console.warn('[SyncPS] stickyweb addSideCondition failed:', e?.message); }
+            try { if (hazards.stealthRock) side.addSideCondition?.("stealthrock", "debug"); } catch(e) { console.warn('[SyncPS] stealthrock addSideCondition failed:', e?.message); }
+            try { if (hazards.stickyWeb) side.addSideCondition?.("stickyweb", "debug"); } catch(e) { console.warn('[SyncPS] stickyweb addSideCondition failed:', e?.message); }
             const spikes = this.clampInt(hazards.spikesLayers, 0, 3, 0);
             for (let layer = 0; layer < spikes; layer++) {
-                try { side.addSideCondition?.("spikes"); } catch(e) { console.warn('[SyncPS] spikes addSideCondition failed:', e?.message); }
+                try { side.addSideCondition?.("spikes", "debug"); } catch(e) { console.warn('[SyncPS] spikes addSideCondition failed:', e?.message); }
             }
             const tspikes = this.clampInt(hazards.toxicSpikesLayers, 0, 2, 0);
             for (let layer = 0; layer < tspikes; layer++) {
-                try { side.addSideCondition?.("toxicspikes"); } catch(e) { console.warn('[SyncPS] toxicspikes addSideCondition failed:', e?.message); }
+                try { side.addSideCondition?.("toxicspikes", "debug"); } catch(e) { console.warn('[SyncPS] toxicspikes addSideCondition failed:', e?.message); }
             }
             const sideConds = cfg.sideConditions || {};
             this.addSideConditionWithDuration(side, "tailwind", sideConds.tailwindTurns);
@@ -890,7 +890,7 @@ class SyncPSEngine {
         if (acceptable[id] !== psId)
             return;
         try {
-            this.battle.field.addPseudoWeather?.(psId, null);
+            this.battle.field.addPseudoWeather?.(psId, "debug");
             const turns = this.clampInt(rawTurns, 1, 99, 5);
             const ps = this.battle.field.pseudoWeather?.[psId];
             if (ps) {
@@ -898,21 +898,20 @@ class SyncPSEngine {
                 ps.durationLeft = turns;
             }
         }
-        catch { }
+        catch (e) { console.warn(`[SyncPS] addPseudoWeather(${psId}) failed:`, e?.message); }
     }
     addSideConditionWithDuration(side, psConditionId, rawTurns) {
         const turns = this.clampInt(rawTurns, 0, 99, 0);
         if (turns <= 0)
             return;
         try {
-            side.addSideCondition?.(psConditionId, null);
+            side.addSideCondition?.(psConditionId, "debug");
             const state = side.sideConditions?.[psConditionId];
             if (state) {
                 state.duration = turns;
-                state.durationLeft = turns;
             }
         }
-        catch { }
+        catch (e) { console.warn(`[SyncPS] addSideConditionWithDuration(${psConditionId}) failed:`, e?.message); }
     }
     toPSWeatherId(id) {
         const map = {

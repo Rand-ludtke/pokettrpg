@@ -1911,8 +1911,8 @@ function deduplicateSwitchLines(events: string[]): string[] {
 }
 
 // Emit move prompts to all players in a battle
-function emitMovePrompts(room: Room, state: BattleState) {
-  if (!room.engine) return;
+function emitMovePrompts(room: Room, state: BattleState): number {
+  if (!room.engine) return 0;
   const turn = state.turn || 1;
   if (!room.lastPromptByPlayer) room.lastPromptByPlayer = {};
   
@@ -2096,8 +2096,6 @@ function emitMovePrompts(room: Room, state: BattleState) {
     }
     const alreadyActed = !!room.turnBuffer[player.id];
     
-    promptedPlayers.push(player.id);
-    
     const sideIndex = state.players.indexOf(player);
     const sideId = `p${sideIndex + 1}`;
     
@@ -2136,6 +2134,7 @@ function emitMovePrompts(room: Room, state: BattleState) {
         prompt,
         state: state,
       });
+      promptedPlayers.push(player.id);
 
       room.lastPromptByPlayer[player.id] = {
         turn,
@@ -2223,6 +2222,7 @@ function emitMovePrompts(room: Room, state: BattleState) {
       prompt,
       state: state,
     });
+    promptedPlayers.push(player.id);
 
     room.lastPromptByPlayer[player.id] = {
       turn,
@@ -2232,6 +2232,7 @@ function emitMovePrompts(room: Room, state: BattleState) {
   }
   
   console.log(`[Server] emitMovePrompts turn=${turn}: prompted=${JSON.stringify(promptedPlayers)} skipped=${JSON.stringify(skippedPlayers)}`);
+  return promptedPlayers.length;
 }
 
 // Emit force-switch prompts to players who need to switch due to fainted Pokemon
@@ -3171,8 +3172,31 @@ io.on("connection", (socket: Socket) => {
         room.lastPromptByPlayer = {};
         // Emit new move prompts so players can choose their next action
         const freshState = room.engine.getState();
-        console.log(`[ForceSwitch] Calling emitMovePrompts for turn ${freshState.turn}`);
-        emitMovePrompts(room, freshState);
+        console.log(`[ForceSwitch] Calling emitMovePrompts for turn ${freshState.turn}, players=${freshState.players.map((p: any) => p.id)}, roomPlayers=${room.players.map(p => p.id + ':' + p.socketId.slice(0,6))}`);
+        let promptCount = 0;
+        try {
+          promptCount = emitMovePrompts(room, freshState);
+        } catch (err: any) {
+          console.error(`[ForceSwitch] emitMovePrompts THREW:`, err?.stack || err);
+        }
+        // Safety net: if emitMovePrompts didn't send to all players, retry after a short delay
+        const expectedPlayers = freshState.players.length;
+        if (promptCount < expectedPlayers) {
+          console.log(`[ForceSwitch] Only prompted ${promptCount}/${expectedPlayers} players — scheduling safety re-prompt`);
+          const roomId = room.id;
+          setTimeout(() => {
+            const r = rooms.get(roomId);
+            if (!r || !r.engine || r.phase !== "normal") return;
+            if (Object.keys(r.turnBuffer).length > 0) return; // someone already acted
+            console.log(`[ForceSwitch] Safety re-prompt firing for room ${roomId}`);
+            r.lastPromptByPlayer = {};
+            try {
+              emitMovePrompts(r, r.engine.getState());
+            } catch (err: any) {
+              console.error(`[ForceSwitch] Safety re-prompt THREW:`, err?.stack || err);
+            }
+          }, 2000);
+        }
       }
       return;
     }
@@ -3509,6 +3533,8 @@ io.on("connection", (socket: Socket) => {
     if (!room || !room.engine || !room.battleStarted) return;
     const state = room.engine.getState();
     socket.emit("battleStarted", { roomId: room.id, state });
+    // Clear dedup so re-prompt isn't blocked
+    room.lastPromptByPlayer = {};
     emitMovePrompts(room, state);
   });
 
