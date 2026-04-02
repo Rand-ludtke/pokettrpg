@@ -3489,7 +3489,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       case 'team':
         action = {
           type: 'team',
-          order: parts[1].split('').map(Number),
+          order: parts[1].includes(',') ? parts[1].split(',').map(Number) : parts[1].split('').map(Number),
         };
         teamSubmittedRef.current = true;
         setTeamPreviewLeads([]); // Reset multi-lead selection
@@ -4225,7 +4225,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         for (let j = 1; j <= pokemon.length; j++) {
           if (j !== index + 1) order.push(j);
         }
-        sendChoice(`team ${order.slice(0, maxTeamSize).join('')}`);
+        sendChoice(`team ${order.slice(0, maxTeamSize).join(',')}`);
         return;
       }
       
@@ -4249,7 +4249,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             if (!order.includes(j)) order.push(j);
           }
           // Delay send slightly so React can render the final selection state
-          setTimeout(() => sendChoice(`team ${order.slice(0, maxTeamSize).join('')}`), 150);
+          setTimeout(() => sendChoice(`team ${order.slice(0, maxTeamSize).join(',')}`), 150);
         }
         return next;
       });
@@ -4368,40 +4368,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         {/* Battle animation frame - PS will create innerbattle content via scene.reset() */}
         <div className="battle" ref={battleFrameRef} />
 
-        {/* Active Pokemon HP display overlay */}
-        {!loading && !error && request?.side?.pokemon && (() => {
-          const matrix = buildSlotMatrix(request.side.pokemon);
-          const activeEntries = matrix.active;
-          if (activeEntries.length === 0) return null;
-          return (
-            <div className="active-hp-overlay" style={{
-              position: 'absolute', top: 4, left: 4, right: 4,
-              display: 'flex', justifyContent: 'space-between', pointerEvents: 'none',
-              zIndex: 10, fontSize: '0.8em',
-            }}>
-              {activeEntries.map((entry) => {
-                const p = entry.pokemon;
-                const condition = p?.condition || '';
-                const parts = condition.includes('fnt') ? ['0', '100'] : condition.split('/');
-                const cur = parseInt(parts[0], 10) || 0;
-                const mx = parseInt(parts[1]?.split(' ')[0], 10) || 100;
-                const pct = mx > 0 ? Math.round((cur / mx) * 100) : 0;
-                const color = pct > 50 ? '#4caf50' : pct > 20 ? '#ff9800' : '#f44336';
-                const name = entry.name || p?.species || 'Active';
-                return (
-                  <div key={entry.sideIndex} style={{
-                    background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '2px 8px',
-                    borderRadius: 4, display: 'flex', alignItems: 'center', gap: 4,
-                  }}>
-                    <span>{name}</span>
-                    <span style={{ color, fontWeight: 'bold' }}>{cur}/{mx}</span>
-                    <span style={{ color, fontSize: '0.85em' }}>({pct}%)</span>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })()}
+
 
         <div className="foehint" />
 

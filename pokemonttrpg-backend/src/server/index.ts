@@ -1746,6 +1746,42 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
   const initialEvents = hasStart
     ? (state.log as string[]).filter((l: string) => typeof l === 'string' && l.startsWith('|'))
     : buildInitialBattleProtocol(state);
+
+  // Generate protocol lines for start conditions (weather/terrain/hazards/screens)
+  // so the PS client on the frontend renders them properly.
+  const startConditions = rules?.startConditions;
+  if (startConditions) {
+    const scLines: string[] = [];
+    const weatherMap: Record<string, string> = { rain: 'RainDance', raindance: 'RainDance', sun: 'SunnyDay', sunnyday: 'SunnyDay', sand: 'Sandstorm', sandstorm: 'Sandstorm', snow: 'Snow', hail: 'Hail' };
+    const terrainMap: Record<string, string> = { electric: 'Electric Terrain', electricterrain: 'Electric Terrain', grassy: 'Grassy Terrain', grassyterrain: 'Grassy Terrain', psychic: 'Psychic Terrain', psychicterrain: 'Psychic Terrain', misty: 'Misty Terrain', mistyterrain: 'Misty Terrain' };
+    const wId = (startConditions.field?.weather?.id || '').toLowerCase();
+    if (wId && wId !== 'none' && weatherMap[wId]) scLines.push(`|-weather|${weatherMap[wId]}|[from] StartCondition`);
+    const tId = (startConditions.field?.terrain?.id || '').toLowerCase();
+    if (tId && tId !== 'none' && terrainMap[tId]) scLines.push(`|-fieldstart|move: ${terrainMap[tId]}|[from] StartCondition`);
+    if ((startConditions.field?.room?.id || '').toLowerCase() === 'trickroom') scLines.push(`|-fieldstart|move: Trick Room|[from] StartCondition`);
+    if ((startConditions.field?.magicRoom?.id || '').toLowerCase() === 'magicroom') scLines.push(`|-fieldstart|move: Magic Room|[from] StartCondition`);
+    if ((startConditions.field?.wonderRoom?.id || '').toLowerCase() === 'wonderroom') scLines.push(`|-fieldstart|move: Wonder Room|[from] StartCondition`);
+    for (let i = 0; i < 2; i++) {
+      const cfg = (Array.isArray(startConditions.sides) ? startConditions.sides[i] : undefined) ?? (i === 0 ? startConditions.side1 : startConditions.side2);
+      if (!cfg) continue;
+      const side = `p${i + 1}`;
+      const h = cfg.sideHazards || {};
+      if (h.stealthRock) scLines.push(`|-sidestart|${side}|move: Stealth Rock`);
+      const spikes = Math.min(3, Math.max(0, h.spikesLayers || 0));
+      for (let l = 0; l < spikes; l++) scLines.push(`|-sidestart|${side}|Spikes`);
+      const tspikes = Math.min(2, Math.max(0, h.toxicSpikesLayers || 0));
+      for (let l = 0; l < tspikes; l++) scLines.push(`|-sidestart|${side}|move: Toxic Spikes`);
+      if (h.stickyWeb) scLines.push(`|-sidestart|${side}|move: Sticky Web`);
+      const sc = cfg.sideConditions || {};
+      if (sc.reflectTurns > 0) scLines.push(`|-sidestart|${side}|Reflect`);
+      if (sc.lightScreenTurns > 0) scLines.push(`|-sidestart|${side}|Light Screen`);
+      if (sc.tailwindTurns > 0) scLines.push(`|-sidestart|${side}|move: Tailwind`);
+    }
+    if (scLines.length > 0) {
+      initialEvents.push(...scLines);
+    }
+  }
+
   if (initialEvents.length > 0) {
     const stateNoLog = { ...state, log: [] };
     io.to(room.id).emit("battleUpdate", {
@@ -2044,21 +2080,23 @@ function emitMovePrompts(room: Room, state: BattleState) {
       continue;
     }
     
+    // Get the PS engine's native request FIRST - it's the authoritative source.
+    // After a forced switch, PS knows the new active Pokemon even if our state mirror is stale.
+    let psRequest: any = null;
+    if (room.engine instanceof SyncPSEngine) {
+      psRequest = room.engine.getRequest(player.id);
+    }
+    
+    // Only skip if active is fainted AND PS doesn't have a valid request for this player.
+    // PS request takes priority because our state mirror's activeIndex can be stale after switches.
     const active = player.team[player.activeIndex];
-    if (!active || active.currentHP <= 0) {
+    if ((!active || active.currentHP <= 0) && !(psRequest && psRequest.side)) {
       skippedPlayers.push({ id: player.id, reason: "active fainted" });
       continue;
     }
     const alreadyActed = !!room.turnBuffer[player.id];
     
     promptedPlayers.push(player.id);
-    
-    // Get the PS engine's native request - this has the correct pokemon array ordering
-    // PS reorders the pokemon array after switches so active is always at index 0
-    let psRequest: any = null;
-    if (room.engine instanceof SyncPSEngine) {
-      psRequest = room.engine.getRequest(player.id);
-    }
     
     const sideIndex = state.players.indexOf(player);
     const sideId = `p${sideIndex + 1}`;
@@ -2554,14 +2592,18 @@ const FORCE_SWITCH_TIMEOUT_MS = Number(process.env.FORCE_SWITCH_TIMEOUT_MS || 45
 export function computeNeedsSwitch(state: import("../types").BattleState, engine?: SyncPSEngine): string[] {
   const out: string[] = [];
   for (const pl of state.players) {
-    // First check if PS engine says this player needs a force switch
+    const active = pl.team[pl.activeIndex];
+    // If the active Pokemon has HP > 0, no switch is needed.
+    // The engine's activeRequest can retain a stale forceSwitch after commitDecisions
+    // auto-resolved the faint switch, so trust state over engine request here.
+    if (active && active.currentHP > 0) continue;
+    // Active is fainted - check engine first, then state fallback
     if (engine && engine.needsForceSwitch(pl.id)) {
       out.push(pl.id);
       continue;
     }
     // Fallback: check our state mirror
-    const active = pl.team[pl.activeIndex];
-    if (active.currentHP <= 0 && pl.team.some((m, idx) => idx !== pl.activeIndex && m.currentHP > 0)) {
+    if (active && active.currentHP <= 0 && pl.team.some((m, idx) => idx !== pl.activeIndex && m.currentHP > 0)) {
       out.push(pl.id);
     }
   }
@@ -2575,13 +2617,28 @@ function startForceSwitchTimer(room: Room) {
     if (!room.engine || !room.forceSwitchNeeded || room.forceSwitchNeeded.size === 0) return;
     // Auto-switch remaining players to first healthy bench
     for (const pid of Array.from(room.forceSwitchNeeded)) {
-      const state = room.engine.getState();
-      const pl = state.players.find(p => p.id === pid);
-      if (!pl) continue;
-      const benchIndex = pl.team.findIndex((m, idx) => idx !== pl.activeIndex && m.currentHP > 0);
+      let benchIndex = -1;
+      // Prefer PS request's side.pokemon for accurate faint/active status
+      const psReq = room.engine.getRequest(pid);
+      if (psReq?.side?.pokemon) {
+        benchIndex = psReq.side.pokemon.findIndex((p: any) => !p.active && !String(p.condition || '').includes('fnt'));
+        console.log(`[ForceSwitch] Auto-switch ${pid}: PS request found benchIndex=${benchIndex}`);
+      }
+      // Fallback to state mirror
+      if (benchIndex < 0) {
+        const state = room.engine.getState();
+        const pl = state.players.find(p => p.id === pid);
+        if (pl) {
+          benchIndex = pl.team.findIndex((m, idx) => idx !== pl.activeIndex && m.currentHP > 0);
+          console.log(`[ForceSwitch] Auto-switch ${pid}: state mirror benchIndex=${benchIndex}, activeIndex=${pl.activeIndex}`);
+        }
+      }
       if (benchIndex >= 0) {
         const res = room.engine.forceSwitch(pid, benchIndex);
         room.replay.push({ turn: res.state.turn, events: res.events, anim: res.anim, phase: "force-switch", auto: true });
+        room.forceSwitchNeeded.delete(pid);
+      } else {
+        console.warn(`[ForceSwitch] Auto-switch ${pid}: no valid bench Pokemon found, skipping`);
         room.forceSwitchNeeded.delete(pid);
       }
     }
@@ -2590,6 +2647,8 @@ function startForceSwitchTimer(room: Room) {
       room.phase = "normal";
       io.to(room.id).emit("phase", { phase: room.phase });
       clearForceSwitchTimer(room);
+      // Clear prompt dedup so the next emitMovePrompts isn't blocked
+      room.lastPromptByPlayer = {};
       // Emit new move prompts so players can choose their next action
       const freshState = room.engine.getState();
       emitMovePrompts(room, freshState);
@@ -2731,7 +2790,8 @@ function processTurnWithBuffer(room: Room) {
     clearForceSwitchTimer(room);
     clearTurnTimer(room);
   } else if (needsSwitch.length === 0) {
-    // Emit new move prompts for the next turn
+    // Clear prompt dedup for the new turn and emit move prompts
+    room.lastPromptByPlayer = {};
     emitMovePrompts(room, result.state);
   }
   } catch (err: any) {
@@ -3083,6 +3143,8 @@ io.on("connection", (socket: Socket) => {
         room.phase = "normal";
         io.to(room.id).emit("phase", { phase: room.phase });
         clearForceSwitchTimer(room);
+        // Clear prompt dedup so the next emitMovePrompts isn't blocked
+        room.lastPromptByPlayer = {};
         // Emit new move prompts so players can choose their next action
         const freshState = room.engine.getState();
         emitMovePrompts(room, freshState);

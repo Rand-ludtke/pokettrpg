@@ -151,6 +151,33 @@ class SyncPSEngine {
             this.syncStateFromPS();
         }
         this.applyStartConditions(options?.startConditions ?? this.rules?.startConditions);
+        this.applyStartingHP(players);
+        // Fix |switch| lines in battle log to show correct (reduced) HP
+        // applyStartingHP runs AFTER autoTeamPreview, which generates |switch| lines
+        // with full HP. Patch the log so collectNewLogEntries captures correct values.
+        if (this.battle && this.battle.log) {
+            for (let sideIdx = 0; sideIdx < 2; sideIdx++) {
+                const psSide = this.battle.sides[sideIdx];
+                if (!psSide) continue;
+                const activePoke = psSide.active?.[0];
+                if (!activePoke) continue;
+                const currentHP = activePoke.hp;
+                const maxHP = activePoke.maxhp;
+                if (currentHP >= maxHP) continue;
+                const sideId = `p${sideIdx + 1}`;
+                for (let li = 0; li < this.battle.log.length; li++) {
+                    const line = this.battle.log[li];
+                    if (line.startsWith(`|switch|${sideId}a:`)) {
+                        const parts = line.split('|');
+                        if (parts.length >= 5) {
+                            parts[parts.length - 1] = `${currentHP}/${maxHP}`;
+                            this.battle.log[li] = parts.join('|');
+                            console.log(`[SyncPSEngine] Fixed |switch| HP for ${sideId}: ${currentHP}/${maxHP}`);
+                        }
+                    }
+                }
+            }
+        }
         this.syncStateFromPS();
         // Capture initial PS log entries (setup, switch-ins, turn start)
         this.collectNewLogEntries();
@@ -168,7 +195,7 @@ class SyncPSEngine {
         const existing = Dex.species.get(speciesName);
         if (existing && existing.exists) return; // already known
         // Build base stats from the mon's stat block
-        const s = mon.stats || {};
+        const s = mon.stats || mon.baseStats || {};
         const baseStats = {
             hp: s.hp || 80, atk: s.atk || 80, def: s.def || 80,
             spa: s.spa || 80, spd: s.spd || 80, spe: s.spe || 80,
@@ -756,6 +783,41 @@ class SyncPSEngine {
         }
         return 1;
     }
+    applyStartingHP(players) {
+        if (!this.battle || !players) return;
+        for (let sideIdx = 0; sideIdx < 2; sideIdx++) {
+            const psSide = this.battle.sides[sideIdx];
+            const playerTeam = players[sideIdx]?.team;
+            if (!psSide || !playerTeam) continue;
+            for (let i = 0; i < psSide.pokemon.length && i < playerTeam.length; i++) {
+                const psMon = psSide.pokemon[i];
+                const origMon = playerTeam[i];
+                if (!psMon || !origMon) continue;
+                const origCurrent = origMon.currentHP;
+                const origMax = origMon.maxHP;
+                if (typeof origCurrent !== 'number' || typeof origMax !== 'number') continue;
+                if (origMax <= 0) continue;
+                if (origCurrent >= origMax) continue;
+                // Scale to PS engine's max HP
+                const psMax = psMon.maxhp || psMon.hp;
+                if (!psMax || psMax <= 0) continue;
+                const ratio = origCurrent / origMax;
+                const newHp = Math.max(0, Math.round(ratio * psMax));
+                console.log(`[SyncPSEngine] Applying starting HP for side ${sideIdx} slot ${i}: ${origCurrent}/${origMax} (${Math.round(ratio * 100)}%) -> ${newHp}/${psMax}`);
+                psMon.hp = newHp;
+                if (newHp <= 0) {
+                    psMon.hp = 0;
+                    psMon.fainted = true;
+                    psMon.status = 'fnt';
+                }
+                // Also update our state mirror
+                if (this.state?.players?.[sideIdx]?.team?.[i]) {
+                    this.state.players[sideIdx].team[i].currentHP = newHp;
+                    this.state.players[sideIdx].team[i].maxHP = psMax;
+                }
+            }
+        }
+    }
     applyStartConditions(start) {
         if (!this.battle || !start)
             return;
@@ -794,16 +856,16 @@ class SyncPSEngine {
             if (!side || !cfg)
                 continue;
             const hazards = cfg.sideHazards || {};
-            if (hazards.stealthRock)
-                side.addSideCondition?.("stealthrock", null);
-            if (hazards.stickyWeb)
-                side.addSideCondition?.("stickyweb", null);
+            try { if (hazards.stealthRock) side.addSideCondition?.("stealthrock"); } catch(e) { console.warn('[SyncPS] stealthrock addSideCondition failed:', e?.message); }
+            try { if (hazards.stickyWeb) side.addSideCondition?.("stickyweb"); } catch(e) { console.warn('[SyncPS] stickyweb addSideCondition failed:', e?.message); }
             const spikes = this.clampInt(hazards.spikesLayers, 0, 3, 0);
-            for (let layer = 0; layer < spikes; layer++)
-                side.addSideCondition?.("spikes", null);
+            for (let layer = 0; layer < spikes; layer++) {
+                try { side.addSideCondition?.("spikes"); } catch(e) { console.warn('[SyncPS] spikes addSideCondition failed:', e?.message); }
+            }
             const tspikes = this.clampInt(hazards.toxicSpikesLayers, 0, 2, 0);
-            for (let layer = 0; layer < tspikes; layer++)
-                side.addSideCondition?.("toxicspikes", null);
+            for (let layer = 0; layer < tspikes; layer++) {
+                try { side.addSideCondition?.("toxicspikes"); } catch(e) { console.warn('[SyncPS] toxicspikes addSideCondition failed:', e?.message); }
+            }
             const sideConds = cfg.sideConditions || {};
             this.addSideConditionWithDuration(side, "tailwind", sideConds.tailwindTurns);
             this.addSideConditionWithDuration(side, "reflect", sideConds.reflectTurns);

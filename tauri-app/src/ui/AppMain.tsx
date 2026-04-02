@@ -526,8 +526,8 @@ export function App() {
                   setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id);
                 }} />
               </div>
-              {team.some(m => m.currentHp < m.maxHp) && (
-                <button style={{marginTop:8}} onClick={() => {
+              <div style={{display:'flex', gap:8, marginTop:8, flexWrap:'wrap'}}>
+                <button disabled={!team.some(m => m.currentHp < m.maxHp)} onClick={() => {
                   const healed = team.map(m => ({ ...m, currentHp: m.maxHp }));
                   setTeams(prev => {
                     const updated = prev.teams.map(t => t.id === (activeTeam?.id) ? { ...t, members: healed } : t);
@@ -541,7 +541,16 @@ export function App() {
                   })));
                   if (selected && healed.find(h => h.name === selected.name)) setSelected({ ...selected, currentHp: selected.maxHp });
                 }}>Full Heal Team</button>
-              )}
+                <button onClick={() => {
+                  setBoxes(prev => prev.map(box => box.map(p => p ? { ...p, currentHp: p.maxHp } : p)));
+                  setTeams(prev => {
+                    const updated = prev.teams.map(t => ({ ...t, members: t.members.map(m => ({ ...m, currentHp: m.maxHp })) }));
+                    saveTeams(updated, prev.activeId);
+                    return { teams: updated, activeId: prev.activeId };
+                  });
+                  if (selected) setSelected({ ...selected, currentHp: selected.maxHp });
+                }}>Full Heal All Pokémon</button>
+              </div>
               <section className="panel" style={{ marginTop: 12 }}>
                 <h2>Teams</h2>
                 {teams.teams.length === 0 && <div className="dim">No teams yet.</div>}
