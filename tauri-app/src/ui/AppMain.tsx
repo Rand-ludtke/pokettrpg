@@ -412,7 +412,7 @@ export function App() {
         </div>
       )}
       <header className="topbar">
-          <div className="brand">&gt; POKÉMON TTRPG v1.5.4</div>
+          <div className="brand">&gt; POKÉMON TTRPG v1.5.5</div>
         <nav className="tabs">
           <button className={tab === 'pc' ? 'active' : ''} onClick={() => setTab('pc')}>PC</button>
           <button className={tab === 'battle' ? 'active' : ''} onClick={() => setTab('battle')}>Battle</button>
@@ -773,7 +773,7 @@ export function App() {
             }}
             onHeal={(amount) => {
               if (!selected || selectedIndex == null) return;
-              const healed = { ...selected, currentHp: amount === 'full' ? selected.maxHp : Math.min(selected.maxHp, selected.currentHp + amount) };
+              const healed = { ...selected, currentHp: amount === 'full' ? selected.maxHp : Math.max(0, Math.min(selected.maxHp, selected.currentHp + amount)) };
               setBoxes(prev => prev.map((box, i) => {
                 if (i !== boxIndex) return box;
                 const nb = box.slice();

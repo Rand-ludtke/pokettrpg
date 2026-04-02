@@ -2906,7 +2906,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // Force-switch prompts should reset action tracking so player can switch
       // This is needed because force-switch happens after a Pokemon faints mid-turn
       if (isForceSwitchPrompt) {
-        PS_DEBUG && console.log('[PSBattlePanel] Force-switch prompt received - resetting action tracking');
+        console.log('[PSBattlePanel] Force-switch prompt received - resetting action tracking', {
+          forceSwitch: psRequest.forceSwitch,
+          sidePokemon: psRequest.side?.pokemon?.length,
+          requestType: psRequest.requestType,
+        });
         lastActionTurnRef.current = -1;
         lastSentChoiceRef.current = null;
         setWaitingForOpponent(false);

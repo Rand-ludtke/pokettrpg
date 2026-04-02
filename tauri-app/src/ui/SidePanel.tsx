@@ -1613,6 +1613,32 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             </div>
           </div>
 
+          {/* HP section */}
+          <div style={{marginTop:6, padding:8, background:'rgba(255,255,255,0.02)', borderRadius:6, border:'1px solid #333'}}>
+            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4}}>
+              <div className="dim" style={{fontSize:'0.75em'}}>HP</div>
+              <div style={{display:'flex', gap:4, alignItems:'center'}}>
+                <span style={{fontSize:'0.85em', fontWeight:'bold', color: hpPct > 50 ? '#4caf50' : hpPct > 20 ? '#ff9800' : '#f44336'}}>{ttrpgCurrHp}/{ttrpgMaxHp}</span>
+                <span className="dim" style={{fontSize:'0.75em'}}>({hpPct}%)</span>
+              </div>
+            </div>
+            <div className="hpbar large" style={{marginTop:2}} title={`HP ${selected.currentHp}/${selected.maxHp}`}><span style={{ width: `${hpPct}%` }} /></div>
+            <div style={{display:'flex', gap:4, alignItems:'center', marginTop:6, flexWrap:'wrap'}}>
+              <button className="mini" title="-10 HP" onClick={() => onHeal && onHeal(-10)} style={{minWidth:32}}>-10</button>
+              <button className="mini" title="-5 HP" onClick={() => onHeal && onHeal(-5)} style={{minWidth:28}}>-5</button>
+              <button className="mini" title="-1 HP" onClick={() => onHeal && onHeal(-1)} style={{minWidth:24}}>-1</button>
+              <button className="mini" title="+1 HP" onClick={() => onHeal && onHeal(1)} style={{minWidth:24}}>+1</button>
+              <button className="mini" title="+5 HP" onClick={() => onHeal && onHeal(5)} style={{minWidth:28}}>+5</button>
+              <button className="mini" title="+10 HP" onClick={() => onHeal && onHeal(10)} style={{minWidth:32}}>+10</button>
+              <button className="mini" title="Full Heal" onClick={() => onHeal && onHeal('full')} style={{marginLeft:'auto'}}>Full Heal</button>
+            </div>
+            <div style={{display:'flex', gap:4, alignItems:'center', marginTop:4}}>
+              <input type="number" min={1} value={healAmount} onChange={e => setHealAmount(e.target.value)} placeholder="Amount" style={{width:70, fontSize:'0.85em'}} />
+              <button className="mini" disabled={!healAmount || Number(healAmount) <= 0} onClick={() => { if (onHeal) { onHeal(Number(healAmount)); setHealAmount(''); } }}>Heal</button>
+              <button className="mini" disabled={!healAmount || Number(healAmount) <= 0} onClick={() => { if (onHeal) { onHeal(-Number(healAmount)); setHealAmount(''); } }}>Damage</button>
+            </div>
+          </div>
+
           {/* Moves section - horizontal list like PS */}
           <div style={{marginTop:6, padding:8, background:'rgba(255,255,255,0.02)', borderRadius:6, border:'1px solid #333'}}>
             <div className="dim" style={{fontSize:'0.75em', marginBottom:4}}>Moves</div>
