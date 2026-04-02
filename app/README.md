@@ -1,3 +1,14 @@
+# DEPRECATED - DO NOT USE
+
+This folder is legacy Electron-era code and is not part of the active application.
+
+Hard rules:
+- Do not edit files in this folder.
+- Do not run builds/dev/tests from this folder.
+- Do not use this folder as architecture or source-of-truth context.
+
+The only active app is in `tauri-app/`.
+
 # Pokémon TTRPG — MVP UI
 
 Retro terminal + Pokédex-style UI for managing PC Boxes, a Team, and a simple Battle statblock.
