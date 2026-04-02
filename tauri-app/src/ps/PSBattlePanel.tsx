@@ -217,6 +217,12 @@ function buildSlotMatrix(pokemon: any[] | undefined): SlotMatrix {
   };
 }
 
+function clampChoiceIndex(rawIndex: number, slotCount: number): number {
+  if (!Number.isFinite(rawIndex) || rawIndex < 0) return 0;
+  if (!Number.isFinite(slotCount) || slotCount <= 0) return 0;
+  return Math.min(rawIndex, slotCount - 1);
+}
+
 // Derive a stable ID from prompt pokemon data
 // Server prompt uses ident like "p1: Charizard" but no id field
 function derivePokemonId(poke: any): string | undefined {
@@ -660,6 +666,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const latestPromptTurnRef = useRef<number>(0);
   const latestPromptRqidRef = useRef<number | null>(null);
   const blankActionRecoveryKeyRef = useRef<string>('');
+  const turnPromptRecoveryTimerRef = useRef<number | null>(null);
   const teamSubmittedRef = useRef(false);
   const lastActiveBySideRef = useRef<{ p1?: string; p2?: string }>({});
   const lastActiveUpdateRef = useRef<number>(0);
@@ -802,6 +809,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     currentTurnRef.current = currentTurn;
   }, [currentTurn]);
 
+  useEffect(() => {
+    return () => {
+      if (turnPromptRecoveryTimerRef.current !== null) {
+        window.clearTimeout(turnPromptRecoveryTimerRef.current);
+        turnPromptRecoveryTimerRef.current = null;
+      }
+    };
+  }, []);
+
   // Safety net: if we have a move request but no active slot/move choices,
   // ask the server for a fresh battle state + prompt so the action UI recovers.
   useEffect(() => {
@@ -810,7 +826,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       blankActionRecoveryKeyRef.current = '';
       return;
     }
-    const choiceIndex = choices?.index?.() ?? 0;
+    const rawChoiceIndex = choices?.index?.() ?? 0;
+    const choiceIndex = clampChoiceIndex(rawChoiceIndex, request.active?.length ?? 0);
     const activeSlot = request.active?.[choiceIndex];
     const hasActiveSlot = !!activeSlot;
     const hasMoveList = Array.isArray(activeSlot?.moves) && activeSlot.moves.length > 0;
@@ -1276,6 +1293,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 // If we used a front sprite as the back sprite fallback (no real back exists),
                 // flag it so PS flips it horizontally
                 if (!isFront && !spriteLookupIds.some((id) => hasRealBackSprite(id))) result.isCustomFront = true;
+              } else if (!isFront && typeof result?.url === 'string') {
+                // For non-canonical species with no back sprite, use front sprite + flip.
+                const dexEntry = (window as any).BattlePokedex?.[speciesId];
+                const hasCanonicalNum = typeof dexEntry?.num === 'number' && dexEntry.num > 0;
+                if (!hasCanonicalNum && result.url.includes('/gen5-back/')) {
+                  result.url = result.url.replace('/gen5-back/', '/gen5/');
+                  result.w = 96;
+                  result.h = 96;
+                  result.pixelated = true;
+                  result.isCustomFront = true;
+                }
               }
             } catch { /* ignore lookup errors */ }
             return result;
@@ -2096,6 +2124,26 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           // Also clear the saved move request since we're on a new turn
           lastMoveRequestRef.current = null;
           lastMoveChoicesRef.current = null;
+
+          if (turnPromptRecoveryTimerRef.current !== null) {
+            window.clearTimeout(turnPromptRecoveryTimerRef.current);
+            turnPromptRecoveryTimerRef.current = null;
+          }
+          turnPromptRecoveryTimerRef.current = window.setTimeout(() => {
+            // If a new turn started but we still do not have a prompt for it,
+            // request a fresh state so action controls do not stay empty.
+            if (isReplay || isSpectator) return;
+            if (waitingForOpponentRef.current) return;
+            const latestPromptTurn = latestPromptTurnRef.current || 0;
+            if (latestPromptTurn < turnNum) {
+              console.warn('[PSBattlePanel] Turn advanced without matching prompt - requesting battle state', {
+                turnNum,
+                latestPromptTurn,
+                requestType: (requestRef.current as any)?.requestType,
+              });
+              client?.requestBattleState(roomId);
+            }
+          }, 1200);
         }
       }
       
@@ -3419,7 +3467,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const isMultiSlot = (activeSlotCount > 1 && !isForceSwitchScenario) || forceSwitchSlotCount > 1;
     
     if (isMultiSlot) {
-      const choiceIndex = choices?.index?.() ?? 0;
+      const rawChoiceIndex = choices?.index?.() ?? 0;
+      const choiceIndex = clampChoiceIndex(rawChoiceIndex, currentRequest?.active?.length ?? 0);
       const mcParts = resolvedChoice.split(' ');
       const mcActionType = mcParts[0];
       
@@ -3719,7 +3768,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   // Render move buttons
   const renderMoveButtons = useMemo(() => {
     // For multi-slot (doubles/triples), show moves for the current choice index
-    const choiceIndex = choices?.index?.() ?? 0;
+    const rawChoiceIndex = choices?.index?.() ?? 0;
+    const choiceIndex = clampChoiceIndex(rawChoiceIndex, request?.active?.length ?? 0);
     if (!request?.active?.[choiceIndex]) {
       return (
         <div className="movemenu" style={{ padding: 8 }}>
@@ -3953,7 +4003,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     // PS doubles convention: positive = opponent side, negative = own side
     //   1 = opponent slot a, 2 = opponent slot b
     //   -1 = own slot a, -2 = own slot b
-    const choiceIndex = choices?.index?.() ?? 0;
+    const rawChoiceIndex = choices?.index?.() ?? 0;
+    const choiceIndex = clampChoiceIndex(rawChoiceIndex, request?.active?.length ?? 0);
     
     const targets: { label: string; loc: number; isFoe: boolean; fainted: boolean }[] = [];
     
