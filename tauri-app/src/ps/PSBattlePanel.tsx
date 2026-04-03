@@ -131,6 +131,12 @@ function resolveTrainerSprite(avatar?: string, fallback?: string): string {
   return 'acetrainer';
 }
 
+function resolveTrainerSpriteImageUrl(avatar?: string, fallback?: string): string {
+  const resolved = resolveTrainerSprite(avatar, fallback);
+  if (isDirectTrainerSprite(resolved)) return resolved;
+  return withPublicBase(`vendor/showdown/sprites/trainers/${resolved}.png`);
+}
+
 function getLocalTrainerSpriteId(client?: { getTrainerSprite?: () => string | null }): string | undefined {
   const fromClient = client?.getTrainerSprite?.();
   const normalizedClient = normalizeTrainerSpriteId(fromClient || undefined);
@@ -2750,8 +2756,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // rebuilding them from side data can cause force-switch slot churn.
       const shouldRebuildActive = requestType === 'move' && (
         !fixedActive ||
-        fixedActive.length === 0 ||
-        (requestType === 'move' && (!hasPromptActiveMoves || fixedActive[0].moves.length === 0))
+        fixedActive.length === 0
       );
       
       // Even if we don't need to rebuild, ensure the active has the correct id/pokemonId
@@ -2802,8 +2807,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
         // If prompt has wrong active Pokemon OR NO active pokemon, rebuild active array from side data
         // In doubles, rebuild ALL active slots (not just the first)
-        if (activePokemonFromSide && (promptActiveId !== correctActiveId || !fixedActive || fixedActive.length === 0)) {
-          console.warn('[PSBattlePanel] Active Pokemon mismatch or missing! Rebuilding active array from side data');
+        if (activePokemonFromSide && (!fixedActive || fixedActive.length === 0)) {
+          console.warn('[PSBattlePanel] Active array missing - rebuilding from side data');
           
           const rebuiltSlots: any[] = [];
           const slotsToRebuild = activeIndicesArray.length > 0 ? activeIndicesArray : [activeIndexToUse];
@@ -3353,7 +3358,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         applyToTrainer('.trainer-near', sidePokemon, localTooltipSideIndex);
         applyToTrainer('.trainer-far', opponentTeam, opponentTooltipSideIndex);
 
-        // Split merged-side trainer bar into per-ally blocks for boss battles
+        // Split merged-side trainer bar into stacked per-ally cards (sprite + name + team icons)
         const participants = bossParticipantsRef.current;
         if (participants && battleFrameRef.current) {
           // Figure out which side is the merged side and which trainer bar it maps to
@@ -3366,17 +3371,25 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             if (trainerEl && allies && allies.length > 1) {
               const tooltipSideIdx = isMergedNear ? localTooltipSideIndex : opponentTooltipSideIndex;
               const allTeam = isMergedNear ? sidePokemon : opponentTeam;
-              // Build compact split layout — name + pokemon icons only, no trainer sprites
+              // Build stacked split layout with each participant's trainer sprite and team icons.
               trainerEl.innerHTML = '';
-              trainerEl.style.cssText += 'overflow-y:auto;max-height:100%;';
+              trainerEl.style.cssText += 'overflow-y:auto;max-height:100%;display:flex;flex-direction:column;gap:4px;';
               let pokemonOffset = 0;
               for (const ally of allies) {
                 const block = document.createElement('div');
-                block.style.cssText = 'margin-bottom:2px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.15);';
+                block.style.cssText = 'padding:2px 0 4px 0;border-bottom:1px solid rgba(255,255,255,0.15);';
+                const header = document.createElement('div');
+                header.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:3px;';
+                const spriteImg = document.createElement('img');
+                spriteImg.src = resolveTrainerSpriteImageUrl(ally.trainerSprite);
+                spriteImg.alt = ally.name || 'Trainer';
+                spriteImg.style.cssText = 'width:24px;height:24px;object-fit:contain;image-rendering:pixelated;flex:0 0 24px;';
                 const nameEl = document.createElement('strong');
                 nameEl.textContent = ally.name;
                 nameEl.style.cssText = 'display:block;font-size:0.75em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-                block.appendChild(nameEl);
+                header.appendChild(spriteImg);
+                header.appendChild(nameEl);
+                block.appendChild(header);
                 // Add this ally's pokemon icons
                 const iconsDiv = document.createElement('div');
                 iconsDiv.className = 'teamicons';
@@ -3891,13 +3904,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const paddedMoves = Array.from({ length: 4 }, (_, i) =>
       moves[i] || { id: `empty-${i}`, name: '—', disabled: true, isPlaceholder: true }
     );
+    const hasMoveEntries = moves.length > 0;
     const hasUsableMove = moves.some((move: any) => {
       if (!move || move.disabled) return false;
       const pp = move.pp;
       if (typeof pp === 'number') return pp > 0;
       return true;
     });
-    const needsStruggle = moves.length === 0 || !hasUsableMove;
+    const missingMoveData = !hasMoveEntries;
+    const needsStruggle = hasMoveEntries && !hasUsableMove;
     
     // Disable all moves during animations (but still show them as preview)
     const animationsBlocking = waitingForAnimations;
@@ -3910,7 +3925,22 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             {activePokemon ? ` — ${activePokemon.speciesForme || activePokemon.species || activePokemon.name || ''}` : ''}
           </div>
         )}
-        {needsStruggle ? (
+        {missingMoveData ? (
+          <div style={{ padding: 8 }}>
+            <div className="dim" style={{ fontSize: '0.85em', marginBottom: 6 }}>
+              Move data is not available for this slot yet.
+            </div>
+            <button
+              className="button"
+              onClick={() => {
+                console.warn('[PSBattlePanel] Refresh requested: missing move data for active slot');
+                client?.requestBattleState(roomId);
+              }}
+            >
+              Refresh Choices
+            </button>
+          </div>
+        ) : needsStruggle ? (
           <button
             className={`movebutton has-tooltip type-Normal${animationsBlocking ? ' disabled' : ''}`}
             disabled={animationsBlocking}
