@@ -4239,12 +4239,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     const pokemon = request.side.pokemon;
     const isForceSwitch = !!request?.forceSwitch;
-    const waitingBlocksSwitch = (waitingForOpponent && !isForceSwitch) || (waitingForAnimations && !isForceSwitch);
+    const isSwitchPrompt = request?.requestType === 'switch';
+    const waitingBlocksSwitch = (waitingForOpponent && !(isForceSwitch || isSwitchPrompt)) || (waitingForAnimations && !(isForceSwitch || isSwitchPrompt));
     // Use SlotMatrix for scalable active/benched/fainted partitioning
     const matrix = buildSlotMatrix(pokemon);
     // In multi-slot forceSwitch, exclude Pokemon already chosen for a prior slot
     // BattleChoiceBuilder tracks this in alreadySwitchingIn (1-based indices)
-    const alreadySwitchingIn: number[] = choices?.alreadySwitchingIn || [];
+    const isSingleSlotPrompt = (request.active?.length || 0) <= 1;
+    const alreadySwitchingIn: number[] = isSingleSlotPrompt ? [] : (choices?.alreadySwitchingIn || []);
     const pendingSwitchingIn: number[] = pendingSlotChoicesRef.current
       .filter((c: any) => c?.type === 'switch' && Number.isFinite(c?.toIndex))
       .map((c: any) => c.toIndex + 1);
