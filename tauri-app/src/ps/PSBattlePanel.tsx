@@ -2746,8 +2746,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       let fixedActive = prompt?.active;
       
       const hasPromptActiveMoves = Array.isArray(fixedActive) && fixedActive.length > 0 && Array.isArray(fixedActive[0]?.moves);
-      // If active is missing or lacks moves, rebuild it (keep prompt.active when it is complete to preserve mega/tera flags)
-      const shouldRebuildActive = (requestType !== 'team' && requestType !== 'wait') && (
+      // Only rebuild active for move prompts. Switch prompts don't need move slots and
+      // rebuilding them from side data can cause force-switch slot churn.
+      const shouldRebuildActive = requestType === 'move' && (
         !fixedActive ||
         fixedActive.length === 0 ||
         (requestType === 'move' && (!hasPromptActiveMoves || fixedActive[0].moves.length === 0))
@@ -2759,8 +2760,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       const activeIndicesArray = [...activeIndicesSet];
       const activePokemonFromSide = pokemonData[activeIndexToUse];
       const correctActiveId = activePokemonFromSide?.id || activePokemonFromSide?.pokemonId;
+      const canMapActiveFromSide = activeIndicesArray.length > 0 || (!!activePokemonFromSide && !!correctActiveId);
       
-      if (!shouldRebuildActive && hasPromptActiveMoves && correctActiveId) {
+      if (!shouldRebuildActive && hasPromptActiveMoves && correctActiveId && canMapActiveFromSide) {
         // Enrich existing active with id but keep moves and flags from prompt
         // In doubles, each active slot gets the ID of the corresponding active Pokemon
         fixedActive = fixedActive.map((active: any, slotIdx: number) => {
@@ -2782,7 +2784,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         });
       }
 
-      if (shouldRebuildActive) {
+      if (shouldRebuildActive && canMapActiveFromSide) {
         const promptActiveId = fixedActive?.[0]?.id || fixedActive?.[0]?.pokemonId;
 
         PS_DEBUG && console.log('[PSBattlePanel] Checking active mismatch:', {
@@ -2972,6 +2974,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         promptRqid &&
         lastSentChoice.rqid === promptRqid
       );
+
+      if (isForceSwitchPrompt && alreadyActedThisPrompt && waitingForOpponent) {
+        PS_DEBUG && console.log('[PSBattlePanel] Ignoring duplicate force-switch prompt while waiting:', {
+          promptTurn,
+          promptRqid,
+          lastSentRqid: lastSentChoice?.rqid,
+        });
+        return;
+      }
 
       if (psRequest.requestType === 'move' && alreadyActedThisPrompt && !isForceSwitchPrompt && waitingForOpponent) {
         PS_DEBUG && console.log('[PSBattlePanel] Ignoring move prompt for already-answered prompt while waiting:', {
@@ -3477,7 +3488,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     // Multi-slot handling (doubles/triples boss battles)
     const activeSlotCount = currentRequest?.active?.length || 1;
-    const forceSwitchSlotCount = currentRequest?.forceSwitch?.length || 0;
+    const forceSwitchFlags = currentRequest?.forceSwitch || [];
+    const forceSwitchSlotCount = forceSwitchFlags.length || 0;
+    const requiredForceSwitchSlots = forceSwitchFlags
+      .map((needs: boolean, idx: number) => (needs ? idx : -1))
+      .filter((idx: number) => idx >= 0);
     const isMultiSlot = (activeSlotCount > 1 && !isForceSwitchScenario) || forceSwitchSlotCount > 1;
     
     if (isMultiSlot) {
@@ -3508,28 +3523,58 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           terastallize: resolvedChoice.includes('terastallize'),
         };
       } else if (mcActionType === 'switch') {
+        const chosenForceSlots = new Set(
+          pendingSlotChoicesRef.current
+            .map((c: any) => (Number.isFinite(c?.slotIndex) ? c.slotIndex : -1))
+            .filter((si: number) => si >= 0)
+        );
+        const nextRequiredForceSlot = requiredForceSwitchSlots.find((si: number) => !chosenForceSlots.has(si));
+        const resolvedSlotIndex = isForceSwitchScenario
+          ? (Number.isFinite(nextRequiredForceSlot) ? nextRequiredForceSlot : choiceIndex)
+          : choiceIndex;
         subAction = {
           type: 'switch',
           toIndex: parseInt(mcParts[1], 10) - 1,
-          slotIndex: choiceIndex,
+          slotIndex: resolvedSlotIndex,
         };
       }
       
       if (subAction) {
-        // Advance BattleChoiceBuilder first to validate the choice
-        if (choices) {
+        // For move prompts, validate/advance via BattleChoiceBuilder.
+        // For force-switch prompts, use explicit required slot tracking so partial
+        // forceSwitch arrays (e.g. [false, true]) don't get stuck waiting.
+        if (!isForceSwitchScenario && choices) {
           const addError = choices.addChoice(resolvedChoice);
           if (typeof addError === 'string') {
             PS_DEBUG && console.log('[PSBattlePanel] Multi-slot addChoice rejected:', addError);
             return;
           }
         }
-        pendingSlotChoicesRef.current = [...pendingSlotChoicesRef.current, subAction];
+        const existingBySlot = new Map<number, any>();
+        for (const c of pendingSlotChoicesRef.current) {
+          const slot = Number.isFinite(c?.slotIndex) ? c.slotIndex : -1;
+          if (slot >= 0) existingBySlot.set(slot, c);
+        }
+        const slot = Number.isFinite(subAction.slotIndex) ? subAction.slotIndex : -1;
+        if (slot >= 0) {
+          existingBySlot.set(slot, subAction);
+          pendingSlotChoicesRef.current = Array.from(existingBySlot.values());
+        } else {
+          pendingSlotChoicesRef.current = [...pendingSlotChoicesRef.current, subAction];
+        }
         setChoicesVersion(v => v + 1);
       }
       
       // Check if all slots are done
-      const allDone = choices?.isDone?.() || false;
+      const selectedForceSlots = new Set(
+        pendingSlotChoicesRef.current
+          .map((c: any) => (Number.isFinite(c?.slotIndex) ? c.slotIndex : -1))
+          .filter((si: number) => si >= 0)
+      );
+      const forceSwitchDone = isForceSwitchScenario
+        ? requiredForceSwitchSlots.every((si: number) => selectedForceSlots.has(si))
+        : false;
+      const allDone = isForceSwitchScenario ? forceSwitchDone : (choices?.isDone?.() || false);
       if (allDone) {
         const orderedChoices = [...pendingSlotChoicesRef.current].sort((a: any, b: any) => {
           const ai = Number.isFinite(a?.slotIndex) ? a.slotIndex : 0;
@@ -3558,7 +3603,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         waitStartTimeRef.current = Date.now();
         setWaitingForOpponent(true);
       } else {
-        PS_DEBUG && console.log(`[PSBattlePanel] Multi-slot: chose for slot ${choiceIndex}, waiting for more (${pendingSlotChoicesRef.current.length}/${activeSlotCount})`);
+        const neededCount = isForceSwitchScenario ? requiredForceSwitchSlots.length : activeSlotCount;
+        PS_DEBUG && console.log(`[PSBattlePanel] Multi-slot: chose for slot ${choiceIndex}, waiting for more (${pendingSlotChoicesRef.current.length}/${neededCount})`);
       }
       
       setMoveBoosts({ mega: false, z: false, max: false, tera: false });
@@ -4169,9 +4215,13 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     // In multi-slot forceSwitch, exclude Pokemon already chosen for a prior slot
     // BattleChoiceBuilder tracks this in alreadySwitchingIn (1-based indices)
     const alreadySwitchingIn: number[] = choices?.alreadySwitchingIn || [];
+    const pendingSwitchingIn: number[] = pendingSlotChoicesRef.current
+      .filter((c: any) => c?.type === 'switch' && Number.isFinite(c?.toIndex))
+      .map((c: any) => c.toIndex + 1);
     const switchable = matrix.benched.filter(entry => {
       const alreadyChosen = alreadySwitchingIn.includes(entry.sideIndex + 1); // 1-based
-      return !alreadyChosen;
+      const pendingChosen = pendingSwitchingIn.includes(entry.sideIndex + 1); // 1-based
+      return !alreadyChosen && !pendingChosen;
     });
     
     return (
