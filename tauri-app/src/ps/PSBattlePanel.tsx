@@ -1305,6 +1305,20 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                   result.isCustomFront = true;
                 }
               }
+
+              if (typeof result?.url === 'string') {
+                // Some custom/non-canonical species do not have ani/home assets.
+                // Fall back to static gen5 sprite so they still render reliably.
+                const dexEntry = (window as any).BattlePokedex?.[speciesId];
+                const hasCanonicalNum = typeof dexEntry?.num === 'number' && dexEntry.num > 0;
+                const hasMissingAnimatedOrHome = result.url.includes('/sprites/ani/') || result.url.includes('/sprites/home/');
+                if (!hasCanonicalNum && hasMissingAnimatedOrHome) {
+                  result.url = withPublicBase(`vendor/showdown/sprites/gen5/${speciesId}.png`);
+                  result.w = 96;
+                  result.h = 96;
+                  result.pixelated = true;
+                }
+              }
             } catch { /* ignore lookup errors */ }
             return result;
           };
@@ -3468,7 +3482,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     if (isMultiSlot) {
       const rawChoiceIndex = choices?.index?.() ?? 0;
-      const choiceIndex = clampChoiceIndex(rawChoiceIndex, currentRequest?.active?.length ?? 0);
+      const choiceSlotCount = isForceSwitchScenario ? forceSwitchSlotCount : activeSlotCount;
+      const choiceIndex = clampChoiceIndex(rawChoiceIndex, choiceSlotCount);
       const mcParts = resolvedChoice.split(' ');
       const mcActionType = mcParts[0];
       
@@ -3483,6 +3498,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const selectedMove = activeMoves[moveIndex];
         subAction = {
           type: 'move',
+          slotIndex: choiceIndex,
           moveIndex,
           moveId: isStruggle ? 'struggle' : (selectedMove?.id || toID(selectedMove?.name || selectedMove?.move || '')),
           targetLoc,
@@ -3515,9 +3531,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // Check if all slots are done
       const allDone = choices?.isDone?.() || false;
       if (allDone) {
+        const orderedChoices = [...pendingSlotChoicesRef.current].sort((a: any, b: any) => {
+          const ai = Number.isFinite(a?.slotIndex) ? a.slotIndex : 0;
+          const bi = Number.isFinite(b?.slotIndex) ? b.slotIndex : 0;
+          return ai - bi;
+        });
         const multiAction: any = isForceSwitchScenario
-          ? { type: 'switch', choices: [...pendingSlotChoicesRef.current] }
-          : { type: 'multi-choice', choices: [...pendingSlotChoicesRef.current] };
+          ? { type: 'switch', choices: orderedChoices }
+          : { type: 'multi-choice', choices: orderedChoices };
         pendingSlotChoicesRef.current = [];
         
         actionSentTimestampRef.current = Date.now();
