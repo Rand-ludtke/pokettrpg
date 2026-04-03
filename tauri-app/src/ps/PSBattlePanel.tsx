@@ -1553,9 +1553,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           
           PS_DEBUG && console.log('[PSBattlePanel] Processing cached prompt with enriched data:', { sideData, prompt });
           
+          const hasForceSwitch = Array.isArray(prompt?.forceSwitch) && prompt.forceSwitch.some((f: boolean) => !!f);
           const requestType = (!teamSubmittedRef.current && !!prompt?.teamPreview)
             ? 'team'
-            : (prompt?.requestType || (prompt?.wait ? 'wait' : (prompt?.forceSwitch ? 'switch' : 'move')));
+            : (hasForceSwitch ? 'switch' : (prompt?.requestType || (prompt?.wait ? 'wait' : 'move')));
           const effectiveTeamPreview = !!prompt?.teamPreview && requestType === 'team' && !teamSubmittedRef.current;
           const psRequest: PSBattleRequest = {
             requestType,
@@ -1811,6 +1812,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // The server sends protocol in data.result.events or data.result.state.log
       // Note: Socket.io emits battleUpdate with { result: {...} } directly
       const result = data.result || data.update?.result;
+      if (result?.state?.bossParticipants) {
+        bossParticipantsRef.current = result.state.bossParticipants;
+      }
       
       // Use the events array if available (preferred - contains only new events)
       // but merge in any missing lines from state.log deltas to avoid gaps.
@@ -2742,9 +2746,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       PS_DEBUG && console.log('[PSBattlePanel] Built sideData with enriched stats:', sideData);
       
       // Determine requestType early for active rebuild check
+      const hasForceSwitch = Array.isArray(prompt?.forceSwitch) && prompt.forceSwitch.some((f: boolean) => !!f);
       const requestType = (!teamSubmittedRef.current && !!prompt?.teamPreview)
         ? 'team'
-        : (prompt?.requestType || (prompt?.wait ? 'wait' : (prompt?.forceSwitch ? 'switch' : 'move')));
+        : (hasForceSwitch ? 'switch' : (prompt?.requestType || (prompt?.wait ? 'wait' : 'move')));
       const effectiveTeamPreview = !!prompt?.teamPreview && requestType === 'team' && !teamSubmittedRef.current;
       
       // FIX: Rebuild active array using correct Pokemon from protocol/state (server sometimes sends wrong or missing active)
@@ -2969,7 +2974,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       // Get the turn number from state
       const promptTurn = data.state?.turn ?? 0;
       const promptRqid = prompt?.rqid ?? Date.now();
-      const isForceSwitchPrompt = !!prompt?.forceSwitch;
+      const isForceSwitchPrompt = hasForceSwitch;
 
       const lastSentChoice = lastSentChoiceRef.current;
       const alreadyActedThisPrompt = !!(
@@ -3370,10 +3375,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             const allies = participants[mergedSide];
             if (trainerEl && allies && allies.length > 1) {
               const tooltipSideIdx = isMergedNear ? localTooltipSideIndex : opponentTooltipSideIndex;
-              const allTeam = isMergedNear ? sidePokemon : opponentTeam;
+              const mergedSideIndex = mergedSide === 'p1' ? 0 : 1;
+              const mergedTeamFromState = battleStatePlayers[mergedSideIndex]?.team || [];
+              const allTeam = mergedTeamFromState.length > 0
+                ? mergedTeamFromState
+                : (isMergedNear ? sidePokemon : opponentTeam);
               // Build stacked split layout with each participant's trainer sprite and team icons.
               trainerEl.innerHTML = '';
-              trainerEl.style.cssText += 'overflow-y:auto;max-height:100%;display:flex;flex-direction:column;gap:4px;';
+              trainerEl.style.cssText += 'overflow:hidden;display:flex;flex-direction:column;gap:2px;';
               let pokemonOffset = 0;
               for (const ally of allies) {
                 const block = document.createElement('div');
