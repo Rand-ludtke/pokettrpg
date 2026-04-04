@@ -3332,163 +3332,171 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const requestSidePokemon = Array.isArray(request.side?.pokemon) ? request.side!.pokemon : [];
     const battleStatePlayers = lastBattleStateRef.current?.players ?? [];
     const mySideId = mySideRef.current || mySide || request.side?.id;
-    const mergedSidePokemon = (() => {
-      const participants = bossParticipantsRef.current;
-      if (!participants || !mySideId || (mySideId !== 'p1' && mySideId !== 'p2')) {
-        return requestSidePokemon;
-      }
-      const allyDefs = participants[mySideId];
-      if (!Array.isArray(allyDefs) || allyDefs.length <= 1) return requestSidePokemon;
 
-      const merged: any[] = [];
-      for (const ally of allyDefs) {
-        const player = battleStatePlayers.find((p: any) => p?.id === ally.playerId || p?.name === ally.name);
-        const playerTeam = Array.isArray(player?.team) ? player.team : [];
-        if (!playerTeam.length) continue;
-
-        const orderedIds = Array.isArray(ally?.pokemonIds) ? ally.pokemonIds.map((id: any) => toID(String(id || ''))) : [];
-        if (!orderedIds.length) {
-          merged.push(...playerTeam);
-          continue;
+    // Helper: normalize any Pokemon object to PS serverPokemon shape for tooltips
+    const normalizeTooltipServerPokemon = (poke: any): any => {
+      if (!poke || typeof poke !== 'object') return poke;
+      const fallbackName = String(poke?.name || poke?.speciesForme || poke?.species || poke?.details?.split(',')[0] || 'Pokemon');
+      const sideId = mySideRef.current || mySide || request.side?.id || 'p1';
+      const ident = typeof poke.ident === 'string' && poke.ident.trim()
+        ? poke.ident
+        : `${sideId}: ${fallbackName}`;
+      const details = typeof poke.details === 'string' && poke.details.trim()
+        ? poke.details
+        : `${fallbackName}, L${resolveLevel(poke, poke?.level) || 100}`;
+      const level = resolveLevel(poke, poke?.level) || 100;
+      const dexBaseStats = (() => {
+        try {
+          const speciesData = (battle as any)?.dex?.species?.get?.(fallbackName)
+            || (battle as any)?.dex?.species?.get?.(toID(fallbackName));
+          return normalizeTooltipServerPokemonBaseStats(speciesData?.baseStats);
+        } catch {
+          return undefined;
         }
-
-        for (const pid of orderedIds) {
-          const match = playerTeam.find((tp: any) => toID(String(derivePokemonId(tp) || tp?.id || tp?.pokemonId || '')) === pid);
-          if (match) merged.push(match);
+      })();
+      const baseStats = (() => {
+        const raw = poke.baseStats || {};
+        const hp = Number(raw.hp);
+        const atk = Number(raw.atk);
+        const def = Number(raw.def);
+        const spa = Number(raw.spa ?? raw.spAtk);
+        const spd = Number(raw.spd ?? raw.spDef);
+        const spe = Number(raw.spe ?? raw.speed);
+        if ([hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) {
+          return { hp, atk, def, spa, spd, spe };
         }
-      }
-      return merged.length > 0 ? merged : requestSidePokemon;
-    })();
-    const tooltipSourcePokemon = mergedSidePokemon.length > 0 ? mergedSidePokemon : requestSidePokemon;
-    switchTooltipIndexMapRef.current = new Map();
-    if (tooltipSourcePokemon.length > 0) {
-      const normalizeTooltipServerPokemon = (poke: any) => {
-        if (!poke || typeof poke !== 'object') return poke;
-        const fallbackName = String(poke?.name || poke?.speciesForme || poke?.species || poke?.details?.split(',')[0] || 'Pokemon');
-        const sideId = mySideRef.current || mySide || request.side?.id || 'p1';
-        const ident = typeof poke.ident === 'string' && poke.ident.trim()
-          ? poke.ident
-          : `${sideId}: ${fallbackName}`;
-        const details = typeof poke.details === 'string' && poke.details.trim()
-          ? poke.details
-          : `${fallbackName}, L${resolveLevel(poke, poke?.level) || 100}`;
-        const level = resolveLevel(poke, poke?.level) || 100;
-        const dexBaseStats = (() => {
-          try {
-            const speciesData = (battle as any)?.dex?.species?.get?.(fallbackName)
-              || (battle as any)?.dex?.species?.get?.(toID(fallbackName));
-            return normalizeTooltipServerPokemonBaseStats(speciesData?.baseStats);
-          } catch {
-            return undefined;
-          }
-        })();
-        const baseStats = (() => {
-          const raw = poke.baseStats || {};
-          const hp = Number(raw.hp);
-          const atk = Number(raw.atk);
-          const def = Number(raw.def);
-          const spa = Number(raw.spa ?? raw.spAtk);
-          const spd = Number(raw.spd ?? raw.spDef);
-          const spe = Number(raw.spe ?? raw.speed);
-          if ([hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) {
-            return { hp, atk, def, spa, spd, spe };
-          }
-          return dexBaseStats;
-        })();
-        const stats = (() => {
-          const raw = poke.stats || {};
-          const hp = Number(raw.hp);
-          const atk = Number(raw.atk);
-          const def = Number(raw.def);
-          const spa = Number(raw.spa ?? raw.spAtk);
-          const spd = Number(raw.spd ?? raw.spDef);
-          const spe = Number(raw.spe ?? raw.speed);
-          if ([hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) {
-            return { hp, atk, def, spa, spd, spe };
-          }
-          return baseStats ? buildStatsFromBase(baseStats, level) : undefined;
-        })();
-        return {
-          ...poke,
-          ident,
-          details,
-          ...(baseStats ? { baseStats } : {}),
-          ...(stats ? { stats } : {}),
-        };
+        return dexBaseStats;
+      })();
+      const stats = (() => {
+        const raw = poke.stats || {};
+        const hp = Number(raw.hp);
+        const atk = Number(raw.atk);
+        const def = Number(raw.def);
+        const spa = Number(raw.spa ?? raw.spAtk);
+        const spd = Number(raw.spd ?? raw.spDef);
+        const spe = Number(raw.spe ?? raw.speed);
+        if ([hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) {
+          return { hp, atk, def, spa, spd, spe };
+        }
+        return baseStats ? buildStatsFromBase(baseStats, level) : undefined;
+      })();
+      // Normalize moves: convert Move[] objects to string[] IDs if needed
+      const moves = (() => {
+        if (!Array.isArray(poke.moves)) return poke.moves;
+        if (poke.moves.length === 0) return poke.moves;
+        if (typeof poke.moves[0] === 'string') return poke.moves;
+        // Convert Move objects to move ID strings
+        return poke.moves.map((m: any) => typeof m === 'string' ? m : (m?.id || toID(m?.name || '') || ''));
+      })();
+      // Normalize HP fields: TTRPG uses currentHP/maxHP, PS uses hp/maxhp
+      const hp = poke.hp ?? poke.currentHP;
+      const maxhp = poke.maxhp ?? poke.maxHP;
+      return {
+        ...poke,
+        ident,
+        details,
+        ...(baseStats ? { baseStats } : {}),
+        ...(stats ? { stats } : {}),
+        ...(moves ? { moves } : {}),
+        ...(hp != null ? { hp } : {}),
+        ...(maxhp != null ? { maxhp } : {}),
+        ...(poke.ability ? { baseAbility: poke.baseAbility || poke.ability } : {}),
       };
+    };
 
-      const activeSlotMappedIndex: number[] = [];
-      const usedSourceIndices = new Set<number>();
-      const nearActives = Array.isArray((battle as any)?.nearSide?.active) ? (battle as any).nearSide.active : [];
-      const sideActives = mySideRef.current === 'p2' ? (battle as any)?.p2?.active : (battle as any)?.p1?.active;
-      const actives = (Array.isArray(sideActives) && sideActives.length > 0) ? sideActives : nearActives;
+    // Detect boss mode: multiple participants on our side
+    const participants = bossParticipantsRef.current;
+    const allyDefs = participants?.[mySideId as string];
+    const isBossMode = Array.isArray(allyDefs) && allyDefs.length > 1;
+    const activeSlotCount = Math.max(Number(request.active?.length || 0), isBossMode ? 2 : 1);
 
-      for (let i = 0; i < actives.length; i++) {
-        const activePoke = actives[i];
-        if (!activePoke) continue;
-        const slot = Number.isFinite(activePoke.slot) ? Number(activePoke.slot) : i;
-        const activeName = String(activePoke.name || '').trim();
-        const activeSpecies = String(activePoke.speciesForme || activePoke.species || activePoke.details?.split(',')[0] || '').trim();
-        const activeIdent = String(activePoke.ident || '').trim();
-        const matchedIndex = tooltipSourcePokemon.findIndex((candidate: any, idx: number) => {
-          if (usedSourceIndices.has(idx)) return false;
-          const candidateIdent = String(candidate?.ident || '').trim();
-          if (activeIdent && candidateIdent && toID(activeIdent) === toID(candidateIdent)) return true;
+    switchTooltipIndexMapRef.current = new Map();
 
-          const candidateName = String(candidate?.name || candidate?.nickname || candidate?.ident?.split(': ')[1] || '').trim();
-          const candidateSpecies = String(candidate?.speciesForme || candidate?.species || candidate?.details?.split(',')[0] || '').trim();
-          if (activeSpecies && candidateSpecies && toID(candidateSpecies) === toID(activeSpecies)) return true;
-          if (activeName && candidateName && toID(candidateName) === toID(activeName)) return true;
-          if (activeName && candidateSpecies && toID(candidateSpecies) === toID(activeName)) return true;
-          return false;
-        });
+    if (isBossMode && requestSidePokemon.length > 0) {
+      // === BOSS MODE: merged side with multiple participants ===
+      // The backend filters request.side.pokemon to only our own Pokemon.
+      // We need myPokemon[slot] to hold the correct data for each active
+      // slot so active tooltips work, while switch buttons remap via
+      // switchTooltipIndexMapRef.
 
-        if (matchedIndex >= 0) {
-          activeSlotMappedIndex[slot] = matchedIndex;
-          usedSourceIndices.add(matchedIndex);
+      // Determine our active slot from participant order
+      // (first participant = slot 0, second = slot 1, etc.)
+      const myParticipantIdx = allyDefs!.findIndex((a: any) =>
+        a.playerId === myPlayerId || a.name === myPlayerId
+      );
+      const mySlot = myParticipantIdx >= 0 ? myParticipantIdx : 0;
+
+      // Our own Pokemon split by active status
+      const ourActive = requestSidePokemon.find((p: any) => p.active);
+      const ourBench = requestSidePokemon.filter((p: any) => !p.active);
+
+      // Try to find each ally's active Pokemon from battle state
+      const allyActiveBySlot: Record<number, any> = {};
+      for (let ai = 0; ai < allyDefs!.length; ai++) {
+        if (ai === myParticipantIdx) continue; // skip ourselves
+        const allyDef = allyDefs![ai];
+        const allyPlayer = battleStatePlayers.find((p: any) =>
+          p?.id === allyDef.playerId || p?.name === allyDef.name
+        );
+        if (allyPlayer?.team && Array.isArray(allyPlayer.team)) {
+          const allyActiveIdx = typeof allyPlayer.activeIndex === 'number' ? allyPlayer.activeIndex : 0;
+          allyActiveBySlot[ai] = allyPlayer.team[allyActiveIdx] || allyPlayer.team[0];
         }
       }
 
-      const remainderIndices = tooltipSourcePokemon
-        .map((_, idx) => idx)
-        .filter((idx) => !usedSourceIndices.has(idx));
-      const activeSlotCount = Math.max(Number(request.active?.length || 0), Number(actives.length || 0), 1);
+      // Build ordered myPokemon: [slot0, slot1, ..., bench0, bench1, ...]
       const ordered: any[] = [];
-      const remainderQueue = [...remainderIndices];
       for (let i = 0; i < activeSlotCount; i++) {
-        const sideIndexCandidate = Number.isFinite(activeSlotMappedIndex[i]) ? activeSlotMappedIndex[i] : remainderQueue.shift();
-        if (!Number.isFinite(sideIndexCandidate)) continue;
-        const sourceIndex = Number(sideIndexCandidate);
-        const tooltipIndex = ordered.length;
-        const sourcePoke = tooltipSourcePokemon[sourceIndex];
-        if (!sourcePoke) continue;
-        ordered.push(normalizeTooltipServerPokemon(sourcePoke));
-
-        const sourceId = derivePokemonId(sourcePoke);
-        if (sourceId) {
-          const requestIdx = requestSidePokemon.findIndex((rp: any) => derivePokemonId(rp) === sourceId);
-          if (requestIdx >= 0) switchTooltipIndexMapRef.current.set(requestIdx, tooltipIndex);
+        if (i === mySlot && ourActive) {
+          ordered.push(normalizeTooltipServerPokemon(ourActive));
+        } else if (allyActiveBySlot[i]) {
+          ordered.push(normalizeTooltipServerPokemon(allyActiveBySlot[i]));
+        } else {
+          // No data for this slot — null lets the tooltip fall back to
+          // the field clientPokemon data (name/types/tracked moves)
+          ordered.push(null);
         }
       }
-      for (const sourceIndex of remainderQueue) {
-        const tooltipIndex = ordered.length;
-        const sourcePoke = tooltipSourcePokemon[sourceIndex];
-        if (!sourcePoke) continue;
-        ordered.push(normalizeTooltipServerPokemon(sourcePoke));
+      // Append our bench Pokemon after active slots
+      const benchStart = ordered.length;
+      for (const benchPoke of ourBench) {
+        ordered.push(normalizeTooltipServerPokemon(benchPoke));
+      }
 
-        const sourceId = derivePokemonId(sourcePoke);
-        if (sourceId) {
-          const requestIdx = requestSidePokemon.findIndex((rp: any) => derivePokemonId(rp) === sourceId);
-          if (requestIdx >= 0 && !switchTooltipIndexMapRef.current.has(requestIdx)) {
-            switchTooltipIndexMapRef.current.set(requestIdx, tooltipIndex);
+      // Map request indices → ordered indices for switch button tooltips
+      requestSidePokemon.forEach((rp: any, reqIdx: number) => {
+        if (rp.active) {
+          switchTooltipIndexMapRef.current.set(reqIdx, mySlot);
+        } else {
+          const benchIdx = ourBench.indexOf(rp);
+          if (benchIdx >= 0) {
+            switchTooltipIndexMapRef.current.set(reqIdx, benchStart + benchIdx);
           }
         }
-      }
-
+      });
       for (let i = 0; i < requestSidePokemon.length; i++) {
         if (!switchTooltipIndexMapRef.current.has(i)) {
           switchTooltipIndexMapRef.current.set(i, i);
         }
+      }
+
+      PS_DEBUG && console.log('[PSBattlePanel] Boss tooltip build:', {
+        mySlot,
+        myParticipantIdx,
+        allySlots: Object.keys(allyActiveBySlot).map(Number),
+        orderedNames: ordered.map((p: any) => p?.name || p?.ident || 'null'),
+        benchStart,
+        switchMap: [...switchTooltipIndexMapRef.current.entries()],
+      });
+
+      battle.myPokemon = ordered;
+      battle.myAllyPokemon = ordered;
+    } else if (requestSidePokemon.length > 0) {
+      // === NON-BOSS MODE: standard battle ===
+      // requestSidePokemon already has actives first in slot order from PS.
+      const ordered = requestSidePokemon.map((p: any) => normalizeTooltipServerPokemon(p));
+      for (let i = 0; i < requestSidePokemon.length; i++) {
+        switchTooltipIndexMapRef.current.set(i, i);
       }
       battle.myPokemon = ordered;
       battle.myAllyPokemon = ordered;
