@@ -83,7 +83,7 @@ function applyWylinRaltsLineFixes(
   baseDex: DexIndex,
 ) {
   // Preserve canonical base entries; the generated Wylin payload currently overrides these incorrectly.
-  for (const key of ['ralts', 'kirlia', 'gardevoir', 'gallade']) {
+  for (const key of ['ralts', 'kirlia', 'gardevoir', 'gallade', 'chatot', 'lechonk']) {
     if (baseDex[key]) mergedDex[key] = { ...baseDex[key] };
   }
 
@@ -298,7 +298,7 @@ function applyWylinRaltsLineFixes(
     abilities: { 0: 'Anger Point' },
     evos: ['Hoggore'],
     evoLevel: 18,
-    spriteid: 'lechonk-wylin',
+    spriteid: 'lechonk-wylian',
     isNonstandard: 'Custom',
     gen: 9,
   });
@@ -1206,10 +1206,14 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
     }
   }
   // Wylin regional formes: "Wylin Gardevoir" → sprite file is "gardevoir-wylin.png"
-  const isWylin = /\bwylin\b/i.test(speciesName) || rawNorm.includes('wylin') || preferredNorm.includes('wylin');
+  const isWylin = /\bwylia?n\b/i.test(speciesName)
+    || rawNorm.includes('wylin')
+    || rawNorm.includes('wylian')
+    || preferredNorm.includes('wylin')
+    || preferredNorm.includes('wylian');
   if (isWylin) {
     const cleaned = String(speciesName || '')
-      .replace(/\bwylin\b/gi, '')
+      .replace(/\bwylia?n\b/gi, '')
       .replace(/[-_]+/g, ' ')
       .replace(/\s{2,}/g, ' ')
       .trim();
@@ -1218,18 +1222,29 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
       || rawNorm.includes('mega')
       || preferredNorm.includes('mega');
     let baseName = cleaned.replace(/\bmega\b/gi, ' ').replace(/\s{2,}/g, ' ').trim();
-    if (!baseName) baseName = rawNorm.replace(/wylin/gi, '').replace(/mega/gi, '').trim();
+    if (!baseName) baseName = rawNorm.replace(/wylian?/gi, '').replace(/mega/gi, '').trim();
     const baseNorm = normalizeName(toAscii(baseName));
+    const regionalTokens = Array.from(new Set([
+      /(\bwylian\b|wylian)/i.test(speciesName) || rawNorm.includes('wylian') || preferredNorm.includes('wylian') ? 'wylian' : '',
+      'wylin',
+    ].filter(Boolean)));
     if (baseNorm) {
-      pushId(`${baseNorm}-wylin`);
-      pushId(`wylin-${baseNorm}`);
       if (mega) {
-        pushId(`${baseNorm}-wylin-mega`);
-        pushId(`${baseNorm}-mega-wylin`);
-        pushId(`wylin-${baseNorm}-mega`);
-        pushId(`mega-${baseNorm}-wylin`);
-        pushId(`${baseNorm}wylinmega`);
-        pushId(`wylin${baseNorm}mega`);
+        for (const region of regionalTokens) {
+          pushId(`${baseNorm}-${region}-mega`);
+          pushId(`${baseNorm}-mega-${region}`);
+          pushId(`${region}-${baseNorm}-mega`);
+          pushId(`mega-${baseNorm}-${region}`);
+          pushId(`${baseNorm}${region}mega`);
+          pushId(`${region}${baseNorm}mega`);
+        }
+      }
+      for (const region of regionalTokens) {
+        pushId(`${baseNorm}-${region}`);
+        pushId(`${region}-${baseNorm}`);
+      }
+      if (mega) {
+        pushId(`${baseNorm}-mega`);
       }
     }
   }
@@ -1300,7 +1315,24 @@ function baseSpritesFolderCandidates(): string[] {
     'Other/BaseSprites/BASE_SPRITES',
     'Other/BASE_SPRITES',
     'Other/BASE_SPRITES/BASE_SPRITES',
+    'other/basesprites',
+    'other/base_sprites',
+    'BaseSprites',
+    'BASE_SPRITES',
   ];
+}
+
+function stripTrailingSpritesSegment(base: string): string {
+  return normalizeBaseUrl(base).replace(/\/sprites$/i, '');
+}
+
+function candidateBasesForFolder(base: string, folder: string): string[] {
+  const normalizedBase = normalizeBaseUrl(base);
+  if (!normalizedBase) return [];
+  const needsSiblingRoot = /^other\//i.test(folder) || /^base_?sprites$/i.test(folder) || /^basesprites$/i.test(folder);
+  if (!needsSiblingRoot) return [normalizedBase];
+  const sibling = stripTrailingSpritesSegment(normalizedBase);
+  return Array.from(new Set([sibling, normalizedBase].filter(Boolean)));
 }
 
 async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex | null> {
@@ -1496,15 +1528,17 @@ export async function listPokemonSpriteOptions(
       if (!entries) continue;
       for (const spriteId of spriteIdsForLookup) {
         if (!entries.has(spriteId)) continue;
-        const optBase = spriteBaseForFolderId(folder, spriteId, bestSpriteBaseForId(spriteId, base));
-        out.push({
-          id: `basesprites:${folder}:${spriteId}`,
-          label: `BaseSprites • ${spriteId}`,
-          spriteId,
-          set: 'gen5',
-          front: `${optBase}/${folder}/${spriteId}.png`,
-          animated: false,
-        });
+        const indexedBase = spriteBaseForFolderId(folder, spriteId, bestSpriteBaseForId(spriteId, base));
+        for (const folderBase of candidateBasesForFolder(indexedBase, folder)) {
+          out.push({
+            id: `basesprites:${folderBase}:${folder}:${spriteId}`,
+            label: `BaseSprites • ${spriteId}`,
+            spriteId,
+            set: 'gen5',
+            front: `${folderBase}/${folder}/${spriteId}.png`,
+            animated: false,
+          });
+        }
       }
     }
   }
@@ -1693,7 +1727,9 @@ export function spriteUrlWithFallback(
       for (const f of folders) {
         const isAni = f.startsWith('ani');
         const ext = isAni ? 'gif' : 'png';
-        candidates.push(`${base}/${f}/${id}.${ext}`);
+        for (const baseCandidate of candidateBasesForFolder(base, f)) {
+          candidates.push(`${baseCandidate}/${f}/${id}.${ext}`);
+        }
       }
     }
   }

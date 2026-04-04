@@ -757,7 +757,10 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
           <dt style={{ fontSize: 9, fontWeight: 'bold', color: '#777' }}>Formes:</dt>
           <dd style={{ margin: 0, padding: '0 0 0 10px' }}>
             {(() => {
-              const baseMon = pokemon.forme ? dexData.pokedex[toID(pokemon.baseSpecies || '')] || pokemon : pokemon;
+              const hasOwnFormes = Array.isArray(pokemon.otherFormes) && pokemon.otherFormes.length > 0;
+              const baseMon = hasOwnFormes
+                ? pokemon
+                : (pokemon.forme ? dexData.pokedex[toID(pokemon.baseSpecies || '')] || pokemon : pokemon);
               const formes = [baseMon, ...(baseMon.otherFormes || []).map(f => dexData.pokedex[toID(f)]).filter(Boolean)];
               return formes.map((mon, i) => (
                 <span key={mon.id}>
