@@ -73,6 +73,18 @@ function buildStatsFromBase(baseStats: any, level: number | undefined): any {
   };
 }
 
+function normalizeTooltipServerPokemonBaseStats(raw: any): any {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const hp = Number(raw.hp);
+  const atk = Number(raw.atk);
+  const def = Number(raw.def);
+  const spa = Number(raw.spa ?? raw.spAtk);
+  const spd = Number(raw.spd ?? raw.spDef);
+  const spe = Number(raw.spe ?? raw.speed);
+  if (![hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) return undefined;
+  return { hp, atk, def, spa, spd, spe };
+}
+
 function resolveSpeciesName(poke: any): string | undefined {
   return poke?.speciesForme || poke?.species || poke?.name || poke?.details?.split(',')[0];
 }
@@ -3318,8 +3330,38 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     // Build slot-aware tooltip arrays so near-side slot lookups (myPokemon[slot])
     // resolve the actual on-field Pokemon in boss/team formats (2v1, etc.).
     const requestSidePokemon = Array.isArray(request.side?.pokemon) ? request.side!.pokemon : [];
+    const battleStatePlayers = lastBattleStateRef.current?.players ?? [];
+    const mySideId = mySideRef.current || mySide || request.side?.id;
+    const mergedSidePokemon = (() => {
+      const participants = bossParticipantsRef.current;
+      if (!participants || !mySideId || (mySideId !== 'p1' && mySideId !== 'p2')) {
+        return requestSidePokemon;
+      }
+      const allyDefs = participants[mySideId];
+      if (!Array.isArray(allyDefs) || allyDefs.length <= 1) return requestSidePokemon;
+
+      const merged: any[] = [];
+      for (const ally of allyDefs) {
+        const player = battleStatePlayers.find((p: any) => p?.id === ally.playerId || p?.name === ally.name);
+        const playerTeam = Array.isArray(player?.team) ? player.team : [];
+        if (!playerTeam.length) continue;
+
+        const orderedIds = Array.isArray(ally?.pokemonIds) ? ally.pokemonIds.map((id: any) => toID(String(id || ''))) : [];
+        if (!orderedIds.length) {
+          merged.push(...playerTeam);
+          continue;
+        }
+
+        for (const pid of orderedIds) {
+          const match = playerTeam.find((tp: any) => toID(String(derivePokemonId(tp) || tp?.id || tp?.pokemonId || '')) === pid);
+          if (match) merged.push(match);
+        }
+      }
+      return merged.length > 0 ? merged : requestSidePokemon;
+    })();
+    const tooltipSourcePokemon = mergedSidePokemon.length > 0 ? mergedSidePokemon : requestSidePokemon;
     switchTooltipIndexMapRef.current = new Map();
-    if (requestSidePokemon.length > 0) {
+    if (tooltipSourcePokemon.length > 0) {
       const normalizeTooltipServerPokemon = (poke: any) => {
         if (!poke || typeof poke !== 'object') return poke;
         const fallbackName = String(poke?.name || poke?.speciesForme || poke?.species || poke?.details?.split(',')[0] || 'Pokemon');
@@ -3331,6 +3373,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           ? poke.details
           : `${fallbackName}, L${resolveLevel(poke, poke?.level) || 100}`;
         const level = resolveLevel(poke, poke?.level) || 100;
+        const dexBaseStats = (() => {
+          try {
+            const speciesData = (battle as any)?.dex?.species?.get?.(fallbackName)
+              || (battle as any)?.dex?.species?.get?.(toID(fallbackName));
+            return normalizeTooltipServerPokemonBaseStats(speciesData?.baseStats);
+          } catch {
+            return undefined;
+          }
+        })();
         const baseStats = (() => {
           const raw = poke.baseStats || {};
           const hp = Number(raw.hp);
@@ -3342,7 +3393,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           if ([hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) {
             return { hp, atk, def, spa, spd, spe };
           }
-          return undefined;
+          return dexBaseStats;
         })();
         const stats = (() => {
           const raw = poke.stats || {};
@@ -3367,7 +3418,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       };
 
       const activeSlotMappedIndex: number[] = [];
-      const usedSideIndices = new Set<number>();
+      const usedSourceIndices = new Set<number>();
       const nearActives = Array.isArray((battle as any)?.nearSide?.active) ? (battle as any).nearSide.active : [];
       const sideActives = mySideRef.current === 'p2' ? (battle as any)?.p2?.active : (battle as any)?.p1?.active;
       const actives = (Array.isArray(sideActives) && sideActives.length > 0) ? sideActives : nearActives;
@@ -3379,8 +3430,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const activeName = String(activePoke.name || '').trim();
         const activeSpecies = String(activePoke.speciesForme || activePoke.species || activePoke.details?.split(',')[0] || '').trim();
         const activeIdent = String(activePoke.ident || '').trim();
-        const matchedIndex = requestSidePokemon.findIndex((candidate: any, idx: number) => {
-          if (usedSideIndices.has(idx)) return false;
+        const matchedIndex = tooltipSourcePokemon.findIndex((candidate: any, idx: number) => {
+          if (usedSourceIndices.has(idx)) return false;
           const candidateIdent = String(candidate?.ident || '').trim();
           if (activeIdent && candidateIdent && toID(activeIdent) === toID(candidateIdent)) return true;
 
@@ -3394,28 +3445,50 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
         if (matchedIndex >= 0) {
           activeSlotMappedIndex[slot] = matchedIndex;
-          usedSideIndices.add(matchedIndex);
+          usedSourceIndices.add(matchedIndex);
         }
       }
 
-      const remainderIndices = requestSidePokemon
+      const remainderIndices = tooltipSourcePokemon
         .map((_, idx) => idx)
-        .filter((idx) => !usedSideIndices.has(idx));
+        .filter((idx) => !usedSourceIndices.has(idx));
       const activeSlotCount = Math.max(Number(request.active?.length || 0), Number(actives.length || 0), 1);
       const ordered: any[] = [];
       const remainderQueue = [...remainderIndices];
       for (let i = 0; i < activeSlotCount; i++) {
         const sideIndexCandidate = Number.isFinite(activeSlotMappedIndex[i]) ? activeSlotMappedIndex[i] : remainderQueue.shift();
         if (!Number.isFinite(sideIndexCandidate)) continue;
-        const sideIndex = Number(sideIndexCandidate);
+        const sourceIndex = Number(sideIndexCandidate);
         const tooltipIndex = ordered.length;
-        ordered.push(normalizeTooltipServerPokemon(requestSidePokemon[sideIndex]));
-        switchTooltipIndexMapRef.current.set(Number(sideIndex), tooltipIndex);
+        const sourcePoke = tooltipSourcePokemon[sourceIndex];
+        if (!sourcePoke) continue;
+        ordered.push(normalizeTooltipServerPokemon(sourcePoke));
+
+        const sourceId = derivePokemonId(sourcePoke);
+        if (sourceId) {
+          const requestIdx = requestSidePokemon.findIndex((rp: any) => derivePokemonId(rp) === sourceId);
+          if (requestIdx >= 0) switchTooltipIndexMapRef.current.set(requestIdx, tooltipIndex);
+        }
       }
-      for (const sideIndex of remainderQueue) {
+      for (const sourceIndex of remainderQueue) {
         const tooltipIndex = ordered.length;
-        ordered.push(normalizeTooltipServerPokemon(requestSidePokemon[sideIndex]));
-        switchTooltipIndexMapRef.current.set(Number(sideIndex), tooltipIndex);
+        const sourcePoke = tooltipSourcePokemon[sourceIndex];
+        if (!sourcePoke) continue;
+        ordered.push(normalizeTooltipServerPokemon(sourcePoke));
+
+        const sourceId = derivePokemonId(sourcePoke);
+        if (sourceId) {
+          const requestIdx = requestSidePokemon.findIndex((rp: any) => derivePokemonId(rp) === sourceId);
+          if (requestIdx >= 0 && !switchTooltipIndexMapRef.current.has(requestIdx)) {
+            switchTooltipIndexMapRef.current.set(requestIdx, tooltipIndex);
+          }
+        }
+      }
+
+      for (let i = 0; i < requestSidePokemon.length; i++) {
+        if (!switchTooltipIndexMapRef.current.has(i)) {
+          switchTooltipIndexMapRef.current.set(i, i);
+        }
       }
       battle.myPokemon = ordered;
       battle.myAllyPokemon = ordered;
@@ -3430,8 +3503,6 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
     // Ensure team icons are fully revealed on both trainer panels
     const sidePokemon = request.side?.pokemon ?? [];
-    const battleStatePlayers = lastBattleStateRef.current?.players ?? [];
-    const mySideId = mySideRef.current || mySide || request.side?.id;
     let opponentTeam: any[] = [];
     if (battleStatePlayers.length > 1) {
       let localIndex = mySideId === 'p2' ? 1 : (mySideId === 'p1' ? 0 : -1);

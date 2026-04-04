@@ -256,14 +256,101 @@ async function patchWylinCustomDexEntries(): Promise<void> {
       wylingardevoir: 'gardevoirwylin',
       wylingardevoirmega: 'gardevoirwylinmega',
       wylingallade: 'galladewylin',
+      wilinralts: 'raltswylin',
+      wilinkirlia: 'kirliawylin',
+      wilingardevoir: 'gardevoirwylin',
+      wilingardevoirmega: 'gardevoirwylinmega',
+      wilingallade: 'galladewylin',
       chatotwylin: 'wylinchatot',
+      wilinchatot: 'wylinchatot',
       lechonkwylin: 'wylinlechonk',
       lechonkwylian: 'wylinlechonk',
+      wilinlechonk: 'wylinlechonk',
       monkiestitdor: 'monkiestidor',
       monkistidor: 'monkiestidor',
     };
     for (const [aliasId, targetId] of Object.entries(forcedAliases)) {
       if (!battleAliases[aliasId]) battleAliases[aliasId] = targetId;
+    }
+
+    // Canonical Wylin regional overrides to avoid placeholder 70-all stats in generated payload.
+    const wylinOverrides: Record<string, any> = {
+      raltswylin: {
+        name: 'Wylin Ralts',
+        num: 280,
+        baseSpecies: 'Ralts',
+        forme: 'Wylin',
+        baseForme: 'Base',
+        types: ['Water', 'Fairy'],
+        baseStats: { hp: 30, atk: 25, def: 25, spa: 35, spd: 55, spe: 20 },
+        abilities: { 0: 'Trace', H: 'Distillation' },
+        spriteid: 'ralts-wylin',
+      },
+      kirliawylin: {
+        name: 'Wylin Kirlia',
+        num: 281,
+        baseSpecies: 'Kirlia',
+        forme: 'Wylin',
+        baseForme: 'Base',
+        prevo: 'Ralts-Wylin',
+        evoLevel: 20,
+        types: ['Water', 'Fairy'],
+        baseStats: { hp: 38, atk: 35, def: 35, spa: 65, spd: 55, spe: 50 },
+        abilities: { 0: 'Trace', 1: 'Dancer', H: 'Distillation' },
+        spriteid: 'kirlia-wylin',
+      },
+      gardevoirwylin: {
+        name: 'Wylin Gardevoir',
+        num: 282,
+        baseSpecies: 'Gardevoir',
+        forme: 'Wylin',
+        baseForme: 'Base',
+        prevo: 'Kirlia-Wylin',
+        evoLevel: 30,
+        types: ['Water', 'Fairy'],
+        baseStats: { hp: 68, atk: 65, def: 65, spa: 125, spd: 115, spe: 80 },
+        abilities: { 0: 'Trace', 1: 'Dancer', H: 'Distillation' },
+        otherFormes: ['Gardevoir-Wylin-Mega'],
+        formeOrder: ['Gardevoir-Wylin', 'Gardevoir-Wylin-Mega'],
+        spriteid: 'gardevoir-wylin',
+      },
+      gardevoirwylinmega: {
+        name: 'Wylin Gardevoir-Mega',
+        num: 282,
+        baseSpecies: 'Gardevoir',
+        forme: 'Mega',
+        baseForme: 'Wylin',
+        changesFrom: 'Gardevoir-Wylin',
+        requiredItem: 'Gardevoirite-W',
+        isMega: true,
+        gender: 'F',
+        types: ['Water', 'Fairy'],
+        baseStats: { hp: 68, atk: 65, def: 85, spa: 165, spd: 135, spe: 100 },
+        abilities: { 0: 'Distillation' },
+        spriteid: 'gardevoir-wylin-mega',
+      },
+      galladewylin: {
+        name: 'Wylin Gallade',
+        num: 475,
+        baseSpecies: 'Gallade',
+        forme: 'Wylin',
+        baseForme: 'Base',
+        prevo: 'Kirlia-Wylin',
+        evoType: 'useItem',
+        evoItem: 'Water Stone',
+        gender: 'M',
+        types: ['Water', 'Fighting'],
+        baseStats: { hp: 68, atk: 125, def: 65, spa: 65, spd: 115, spe: 80 },
+        abilities: { 0: 'Sharpness', 1: 'Dancer', H: 'Distillation' },
+        spriteid: 'gallade-wylin',
+      },
+    };
+    for (const [entryId, override] of Object.entries(wylinOverrides)) {
+      battleDex[entryId] = {
+        ...(battleDex[entryId] || {}),
+        ...override,
+        baseStats: normalizeBaseStats(override.baseStats) || override.baseStats,
+      };
     }
 
     // Keep Dex data pointers in sync for tooltip/species lookups.
