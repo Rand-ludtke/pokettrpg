@@ -682,6 +682,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const lastBattleStateRef = useRef<any | null>(null); // Track latest battle state for UI rendering
   const bossParticipantsRef = useRef<Record<string, { playerId: string; name: string; trainerSprite?: string; pokemonIds: string[] }[]> | null>(null);
   const splitTrainerRenderKeyRef = useRef<string>('');
+  const switchTooltipIndexMapRef = useRef<Map<number, number>>(new Map());
   const lastSentChoiceRef = useRef<{ turn: number; choice: string; rqid: number | null } | null>(null);
   // Track when we've just sent an action - don't drop server responses immediately after
   const actionSentTimestampRef = useRef<number>(0);
@@ -3317,39 +3318,18 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     // Build slot-aware tooltip arrays so near-side slot lookups (myPokemon[slot])
     // resolve the actual on-field Pokemon in boss/team formats (2v1, etc.).
     const requestSidePokemon = Array.isArray(request.side?.pokemon) ? request.side!.pokemon : [];
+    switchTooltipIndexMapRef.current = new Map();
     if (requestSidePokemon.length > 0) {
-      const mergedSide = (() => {
-        const participants = bossParticipantsRef.current;
-        const battleStatePlayers = lastBattleStateRef.current?.players ?? [];
-        const mySideId = mySideRef.current || mySide || request.side?.id;
-        if (!participants || !mySideId || (mySideId !== 'p1' && mySideId !== 'p2')) {
-          return requestSidePokemon;
-        }
-        const allyDefs = participants[mySideId];
-        if (!Array.isArray(allyDefs) || allyDefs.length <= 1) return requestSidePokemon;
-
-        const merged: any[] = [];
-        for (const ally of allyDefs) {
-          const player = battleStatePlayers.find((p: any) => p?.id === ally.playerId || p?.name === ally.name);
-          const playerTeam = Array.isArray(player?.team) ? player.team : [];
-          if (!playerTeam.length) continue;
-
-          const orderedIds = Array.isArray(ally?.pokemonIds) ? ally.pokemonIds.map((id: any) => toID(String(id || ''))) : [];
-          if (!orderedIds.length) {
-            merged.push(...playerTeam);
-            continue;
-          }
-
-          for (const pid of orderedIds) {
-            const match = playerTeam.find((tp: any) => toID(String(derivePokemonId(tp) || tp?.id || tp?.pokemonId || '')) === pid);
-            if (match) merged.push(match);
-          }
-        }
-        return merged.length > 0 ? merged : requestSidePokemon;
-      })();
-
       const normalizeTooltipServerPokemon = (poke: any) => {
         if (!poke || typeof poke !== 'object') return poke;
+        const fallbackName = String(poke?.name || poke?.speciesForme || poke?.species || poke?.details?.split(',')[0] || 'Pokemon');
+        const sideId = mySideRef.current || mySide || request.side?.id || 'p1';
+        const ident = typeof poke.ident === 'string' && poke.ident.trim()
+          ? poke.ident
+          : `${sideId}: ${fallbackName}`;
+        const details = typeof poke.details === 'string' && poke.details.trim()
+          ? poke.details
+          : `${fallbackName}, L${resolveLevel(poke, poke?.level) || 100}`;
         const level = resolveLevel(poke, poke?.level) || 100;
         const baseStats = (() => {
           const raw = poke.baseStats || {};
@@ -3379,13 +3359,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         })();
         return {
           ...poke,
+          ident,
+          details,
           ...(baseStats ? { baseStats } : {}),
           ...(stats ? { stats } : {}),
         };
       };
 
-      const slotMapped: any[] = [];
-      const used = new Set<any>();
+      const activeSlotMappedIndex: number[] = [];
+      const usedSideIndices = new Set<number>();
       const nearActives = Array.isArray((battle as any)?.nearSide?.active) ? (battle as any).nearSide.active : [];
       const sideActives = mySideRef.current === 'p2' ? (battle as any)?.p2?.active : (battle as any)?.p1?.active;
       const actives = (Array.isArray(sideActives) && sideActives.length > 0) ? sideActives : nearActives;
@@ -3394,27 +3376,49 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const activePoke = actives[i];
         if (!activePoke) continue;
         const slot = Number.isFinite(activePoke.slot) ? Number(activePoke.slot) : i;
-        const activeName = String(activePoke.name || activePoke.speciesForme || activePoke.species || '').trim();
+        const activeName = String(activePoke.name || '').trim();
+        const activeSpecies = String(activePoke.speciesForme || activePoke.species || activePoke.details?.split(',')[0] || '').trim();
+        const activeIdent = String(activePoke.ident || '').trim();
+        const matchedIndex = requestSidePokemon.findIndex((candidate: any, idx: number) => {
+          if (usedSideIndices.has(idx)) return false;
+          const candidateIdent = String(candidate?.ident || '').trim();
+          if (activeIdent && candidateIdent && toID(activeIdent) === toID(candidateIdent)) return true;
 
-        const byMerged = findMatchingStatePoke({ name: activeName, species: activeName }, mergedSide);
-        const byRequest = findMatchingStatePoke({ name: activeName, species: activeName }, requestSidePokemon);
-        const matched = byMerged || byRequest;
-        if (matched) {
-          slotMapped[slot] = matched;
-          used.add(matched);
+          const candidateName = String(candidate?.name || candidate?.nickname || candidate?.ident?.split(': ')[1] || '').trim();
+          const candidateSpecies = String(candidate?.speciesForme || candidate?.species || candidate?.details?.split(',')[0] || '').trim();
+          if (activeSpecies && candidateSpecies && toID(candidateSpecies) === toID(activeSpecies)) return true;
+          if (activeName && candidateName && toID(candidateName) === toID(activeName)) return true;
+          if (activeName && candidateSpecies && toID(candidateSpecies) === toID(activeName)) return true;
+          return false;
+        });
+
+        if (matchedIndex >= 0) {
+          activeSlotMappedIndex[slot] = matchedIndex;
+          usedSideIndices.add(matchedIndex);
         }
       }
 
-      const remainder = mergedSide.filter((p: any) => !used.has(p));
+      const remainderIndices = requestSidePokemon
+        .map((_, idx) => idx)
+        .filter((idx) => !usedSideIndices.has(idx));
       const activeSlotCount = Math.max(Number(request.active?.length || 0), Number(actives.length || 0), 1);
       const ordered: any[] = [];
-      const remainderQueue = [...remainder];
+      const remainderQueue = [...remainderIndices];
       for (let i = 0; i < activeSlotCount; i++) {
-        ordered.push(normalizeTooltipServerPokemon(slotMapped[i] || remainderQueue.shift()));
+        const sideIndexCandidate = Number.isFinite(activeSlotMappedIndex[i]) ? activeSlotMappedIndex[i] : remainderQueue.shift();
+        if (!Number.isFinite(sideIndexCandidate)) continue;
+        const sideIndex = Number(sideIndexCandidate);
+        const tooltipIndex = ordered.length;
+        ordered.push(normalizeTooltipServerPokemon(requestSidePokemon[sideIndex]));
+        switchTooltipIndexMapRef.current.set(Number(sideIndex), tooltipIndex);
       }
-      for (const p of remainderQueue) ordered.push(normalizeTooltipServerPokemon(p));
-      battle.myPokemon = ordered.filter(Boolean);
-      battle.myAllyPokemon = ordered.filter(Boolean);
+      for (const sideIndex of remainderQueue) {
+        const tooltipIndex = ordered.length;
+        ordered.push(normalizeTooltipServerPokemon(requestSidePokemon[sideIndex]));
+        switchTooltipIndexMapRef.current.set(Number(sideIndex), tooltipIndex);
+      }
+      battle.myPokemon = ordered;
+      battle.myAllyPokemon = ordered;
     }
 
     if (battle.scene?.updateSidebars) {
@@ -4456,13 +4460,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                           poke.species ||
                           'Pokemon';
           
+          const tooltipIndex = switchTooltipIndexMapRef.current.get(index) ?? index;
           return (
             <button
               key={index}
               className={`switchbutton has-tooltip${disabled ? ' disabled' : ''}`}
               disabled={disabled}
               onClick={() => sendChoice(`switch ${index + 1}`)}
-              data-tooltip={`switchpokemon|${index}`}
+              data-tooltip={`switchpokemon|${tooltipIndex}`}
               aria-disabled={disabled}
             >
               <span
