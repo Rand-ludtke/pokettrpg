@@ -952,9 +952,20 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
                 style={{ width: 96, height: 96, imageRendering: 'pixelated' }} 
                 onError={(e) => {
                   const img = e.currentTarget as HTMLImageElement;
-                  if (img.dataset.fallback) return;
-                  img.dataset.fallback = '1';
-                  img.src = adapter.spriteUrl(spriteId, false, { setOverride: 'gen5' });
+                  const existing = (img as any).__spriteFallback as ReturnType<typeof adapter.spriteUrlWithFallback> | undefined;
+                  if (existing) {
+                    existing.handleError();
+                    return;
+                  }
+                  const chain = adapter.spriteUrlWithFallback(spriteId, (nextUrl: string) => {
+                    img.src = nextUrl;
+                  }, { shiny: false });
+                  (img as any).__spriteFallback = chain;
+                  if (chain.src === img.src) {
+                    chain.handleError();
+                  } else {
+                    img.src = chain.src;
+                  }
                 }}
               />
               <div style={{ fontSize: 10, color: '#777' }}>Normal</div>
@@ -966,12 +977,20 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
                 style={{ width: 96, height: 96, imageRendering: 'pixelated' }} 
                 onError={(e) => {
                   const img = e.currentTarget as HTMLImageElement;
-                  if (img.dataset.fallback) return;
-                  img.dataset.fallback = '1';
-                  const next = adapter.spriteUrlWithFallback(spriteId, (nextUrl: string) => {
+                  const existing = (img as any).__spriteFallback as ReturnType<typeof adapter.spriteUrlWithFallback> | undefined;
+                  if (existing) {
+                    existing.handleError();
+                    return;
+                  }
+                  const chain = adapter.spriteUrlWithFallback(spriteId, (nextUrl: string) => {
                     img.src = nextUrl;
                   }, { shiny: true });
-                  img.src = next.src;
+                  (img as any).__spriteFallback = chain;
+                  if (chain.src === img.src) {
+                    chain.handleError();
+                  } else {
+                    img.src = chain.src;
+                  }
                 }}
               />
               <div style={{ fontSize: 10, color: '#777' }}>Shiny</div>

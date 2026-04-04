@@ -672,6 +672,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const latestPromptTurnRef = useRef<number>(0);
   const latestPromptRqidRef = useRef<number | null>(null);
   const blankActionRecoveryKeyRef = useRef<string>('');
+  const blankActionRecoveryAtRef = useRef<number>(0);
   const turnPromptRecoveryTimerRef = useRef<number | null>(null);
   const teamSubmittedRef = useRef(false);
   const lastActiveBySideRef = useRef<{ p1?: string; p2?: string }>({});
@@ -680,6 +681,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const mySideRef = useRef<'p1' | 'p2' | null>(null); // Ref for mySide to use in callbacks
   const lastBattleStateRef = useRef<any | null>(null); // Track latest battle state for UI rendering
   const bossParticipantsRef = useRef<Record<string, { playerId: string; name: string; trainerSprite?: string; pokemonIds: string[] }[]> | null>(null);
+  const splitTrainerRenderKeyRef = useRef<string>('');
   const lastSentChoiceRef = useRef<{ turn: number; choice: string; rqid: number | null } | null>(null);
   // Track when we've just sent an action - don't drop server responses immediately after
   const actionSentTimestampRef = useRef<number>(0);
@@ -845,7 +847,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const rqid = (request as any)?.rqid ?? latestPromptRqidRef.current ?? 'none';
     const recoveryKey = `${turn}:${rqid}`;
     if (blankActionRecoveryKeyRef.current === recoveryKey) return;
+    const now = Date.now();
+    if (now - blankActionRecoveryAtRef.current < 1500) return;
     blankActionRecoveryKeyRef.current = recoveryKey;
+    blankActionRecoveryAtRef.current = now;
     console.warn('[PSBattlePanel] Blank move request (no active slot) - requesting fresh prompt', {
       turn,
       rqid,
@@ -1252,9 +1257,26 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               // 1) Check battle state for per-Pokemon custom sprite URLs (e.g. 5a, 5b choices from PC)
               const battleState = lastBattleStateRef.current;
               if (battleState?.players) {
-                for (const player of battleState.players) {
+                const sideIdRaw = String((pokemon as any)?.side?.id || (pokemon as any)?.side?.sideid || (pokemon as any)?.sideid || '').toLowerCase();
+                const sideMatch = sideIdRaw.match(/^p([12])/);
+                const preferredPlayerIdx = sideMatch ? (parseInt(sideMatch[1], 10) - 1) : -1;
+                const preferredPlayers: any[] = [];
+                if (preferredPlayerIdx >= 0 && battleState.players[preferredPlayerIdx]) {
+                  preferredPlayers.push(battleState.players[preferredPlayerIdx]);
+                }
+                const otherPlayers = (battleState.players || []).filter((p: any) => !preferredPlayers.includes(p));
+                const searchPlayers = [...preferredPlayers, ...otherPlayers];
+                const battlerName = normalizeName(String((pokemon as any)?.name || (pokemon as any)?.speciesForme || (pokemon as any)?.species || ''));
+
+                for (const player of searchPlayers) {
                   const team = player.team || player.pokemon || [];
-                  for (const mon of team) {
+                  const speciesMatches = team.filter((mon: any) => normalizeName(mon.species || mon.name || '') === speciesId);
+                  const nameMatchedMon = battlerName
+                    ? speciesMatches.find((mon: any) => normalizeName(mon.name || mon.nickname || mon.species || '') === battlerName)
+                    : undefined;
+                  const candidateMons = nameMatchedMon ? [nameMatchedMon, ...speciesMatches.filter((m: any) => m !== nameMatchedMon)] : speciesMatches;
+
+                  for (const mon of candidateMons) {
                     const monId = normalizeName(mon.species || mon.name || '');
                     if (monId === speciesId) {
                       const directUrl = isFront
@@ -3380,6 +3402,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               const allTeam = mergedTeamFromState.length > 0
                 ? mergedTeamFromState
                 : (isMergedNear ? sidePokemon : opponentTeam);
+              const tooltipSourceTeam = isMergedNear ? sidePokemon : opponentTeam;
+              const renderKey = JSON.stringify({
+                mergedSide,
+                allies: allies.map((a) => ({ id: a.playerId, sprite: a.trainerSprite || '', mons: a.pokemonIds || [] })),
+                team: allTeam.map((p: any) => `${toID(p?.speciesForme || p?.species || p?.name || '')}:${String(p?.condition || p?.currentHP || '')}`),
+              });
+              // Always rebuild this block to avoid stale single-trainer DOM after PS scene redraws.
+              splitTrainerRenderKeyRef.current = renderKey;
               // Build stacked split layout with each participant's trainer sprite and team icons.
               trainerEl.innerHTML = '';
               trainerEl.style.cssText += 'overflow:hidden;display:flex;flex-direction:column;gap:2px;';
@@ -3407,9 +3437,20 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 for (let pi = 0; pi < allyTeamCount; pi++) {
                   const poke = allTeam[pokemonOffset + pi];
                   if (!poke) continue;
+                  const tooltipIndex = (() => {
+                    const pokeName = poke?.name || poke?.nickname || poke?.ident?.split(': ')[1] || poke?.details?.split(',')[0] || poke?.species || '';
+                    const fromName = findPokemonIndexByName(tooltipSourceTeam, pokeName);
+                    if (fromName >= 0) return fromName;
+                    const derivedId = derivePokemonId(poke);
+                    if (derivedId) {
+                      const fromId = tooltipSourceTeam.findIndex((tp: any) => derivePokemonId(tp) === derivedId);
+                      if (fromId >= 0) return fromId;
+                    }
+                    return pokemonOffset + pi;
+                  })();
                   const span = document.createElement('span');
                   span.className = 'picon has-tooltip';
-                  span.setAttribute('data-tooltip', `pokemon|${tooltipSideIdx}|${pokemonOffset + pi}`);
+                  span.setAttribute('data-tooltip', `pokemon|${tooltipSideIdx}|${tooltipIndex}`);
                   const speciesForIcon = poke.speciesForme || poke.species || poke.name || poke.details?.split(',')[0];
                   const style = getPokemonIconStyle(speciesForIcon);
                   Object.assign(span.style, style);
