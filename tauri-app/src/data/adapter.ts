@@ -136,6 +136,11 @@ function applyWylinRaltsLineFixes(
   normalizeSpeciesKey('wylianlechonk', 'wylinlechonk', 'Wylin Lechonk');
   normalizeSpeciesKey('monkiestitdor', 'monkistidor', 'Monkistidor');
 
+  const patchSpecies = (key: string, patch: Partial<DexSpecies>) => {
+    const current = (mergedDex[key] || {}) as DexSpecies;
+    mergedDex[key] = { ...current, ...patch } as DexSpecies;
+  };
+
   mergedAbilities.distillation = {
     name: 'Distillation',
     shortDesc: 'Poison-type moves used by or targeting this Pokemon become Water-type.',
@@ -267,6 +272,61 @@ function applyWylinRaltsLineFixes(
     spriteid: 'gallade-wylin',
   };
 
+  patchSpecies('wylinchatot', {
+    name: 'Wylin Chatot',
+    num: 441,
+    baseSpecies: 'Chatot',
+    forme: 'Wylin',
+    baseForme: 'Base',
+    changesFrom: 'Chatot',
+    types: ['Normal', 'Flying'],
+    baseStats: { hp: 71, atk: 40, def: 60, spa: 90, spd: 60, spe: 90 },
+    abilities: { 0: 'Soundproof', H: 'Prankster' },
+    spriteid: 'chatot-wylin',
+    isNonstandard: 'Custom',
+    gen: 9,
+  });
+  patchSpecies('wylinlechonk', {
+    name: 'Wylin Lechonk',
+    num: 915,
+    baseSpecies: 'Lechonk',
+    forme: 'Wylin',
+    baseForme: 'Base',
+    changesFrom: 'Lechonk',
+    types: ['Fighting'],
+    baseStats: { hp: 64, atk: 55, def: 30, spa: 25, spd: 30, spe: 45 },
+    abilities: { 0: 'Anger Point' },
+    evos: ['Hoggore'],
+    evoLevel: 18,
+    spriteid: 'lechonk-wylin',
+    isNonstandard: 'Custom',
+    gen: 9,
+  });
+  patchSpecies('hoggore', {
+    name: 'Hoggore',
+    num: 916,
+    prevo: 'Lechonk-Wylin',
+    types: ['Fighting', 'Ground'],
+    baseStats: { hp: 70, atk: 130, def: 60, spa: 40, spd: 45, spe: 105 },
+    abilities: { 0: 'Anger Point', 1: 'Intimidate' },
+    spriteid: 'hoggore',
+    isNonstandard: 'Custom',
+    gen: 9,
+  });
+  patchSpecies('monkistidor', {
+    name: 'Monkistidor',
+    evos: ['Gortez', 'Monquisitor'],
+    evoLevel: 20,
+    types: ['Normal'],
+    baseStats: { hp: 30, atk: 40, def: 40, spa: 40, spd: 40, spe: 30 },
+    abilities: { 0: 'Battle Armor' },
+    spriteid: 'monkistidor',
+    isNonstandard: 'Custom',
+    gen: 9,
+  });
+  patchSpecies('gortez', { name: 'Gortez', prevo: 'Monkistidor' });
+  patchSpecies('monquisitor', { name: 'Monquisitor', prevo: 'Monkistidor' });
+
   // Link base entries to their Wylin formes for proper Dex form navigation.
   const ensureOtherForme = (baseKey: string, formeName: string) => {
     const baseEntry = mergedDex[baseKey];
@@ -281,6 +341,8 @@ function applyWylinRaltsLineFixes(
   ensureOtherForme('kirlia', 'Kirlia-Wylin');
   ensureOtherForme('gardevoir', 'Gardevoir-Wylin');
   ensureOtherForme('gallade', 'Gallade-Wylin');
+  ensureOtherForme('chatot', 'Chatot-Wylin');
+  ensureOtherForme('lechonk', 'Lechonk-Wylin');
 
   mergedLs.raltswylin = {
     learnset: {
@@ -292,6 +354,13 @@ function applyWylinRaltsLineFixes(
       drainingkiss: ['9L12'],
       aquaring: ['9L15'],
       lifedew: ['9L18'],
+      moonlight: ['9L22'],
+      mistyterrain: ['9L26'],
+      raindance: ['9M'],
+      calmmind: ['9M'],
+      icywind: ['9M'],
+      healingwish: ['9E'],
+      memento: ['9E'],
     },
   };
   mergedLs.kirliawylin = {
@@ -302,6 +371,13 @@ function applyWylinRaltsLineFixes(
       raindance: ['9L30'],
       sparklingaria: ['9L34'],
       calmmind: ['9L38'],
+      recover: ['9L44'],
+      dazzlinggleam: ['9M'],
+      psychic: ['9M'],
+      shadowball: ['9M'],
+      trick: ['9M'],
+      disable: ['9E'],
+      destinybond: ['9E'],
     },
   };
   mergedLs.gardevoirwylin = {
@@ -312,6 +388,11 @@ function applyWylinRaltsLineFixes(
       moonblast: ['9L49'],
       hydrovortex: ['9L55'],
       quiverdance: ['9L62'],
+      psychic: ['9M'],
+      thunderbolt: ['9M'],
+      icebeam: ['9M'],
+      focusblast: ['9M'],
+      trickroom: ['9M'],
     },
   };
   mergedLs.gardevoirwylinmega = {
@@ -327,6 +408,43 @@ function applyWylinRaltsLineFixes(
       liquidation: ['9L49'],
       brineblade: ['9L55'],
       closecombat: ['9L62'],
+      poisonjab: ['9M'],
+      xscissor: ['9M'],
+      nightslash: ['9M'],
+      brickbreak: ['9M'],
+      psychocut: ['9E'],
+    },
+  };
+
+  mergedLs.wylinchatot = {
+    learnset: {
+      chatter: ['9L1'], peck: ['9L1'], wingattack: ['9L5'], round: ['9L7'], sing: ['9L10'],
+      swagger: ['9L12'], swear: ['9L17'], partingshot: ['9L26'], protect: ['9L36'],
+      slur: ['9L48'], tailwind: ['9L50'], taunt: ['9L56'], followme: ['9L60'],
+      uturn: ['9M'], hypervoice: ['9M'], roost: ['9M'], substitute: ['9M'],
+      nastyplot: ['9E'], boomburst: ['9E'],
+    },
+  };
+  mergedLs.wylinlechonk = {
+    learnset: {
+      tackle: ['9L1'], sandattack: ['9L1'], takedown: ['9L4'], mudslap: ['9L6'], headbutt: ['9L8'],
+      bodyslam: ['9L16'], maul: ['9L23'], headcharge: ['9L36'], headlongrush: ['9L46'], closecombat: ['9L56'],
+      bulldoze: ['9M'], earthquake: ['9M'], lowkick: ['9M'], rockslide: ['9M'],
+      yawn: ['9E'], curse: ['9E'],
+    },
+  };
+  mergedLs.hoggore = {
+    learnset: {
+      tackle: ['9L1'], sandattack: ['9L1'], takedown: ['9L4'], mudslap: ['9L6'], headbutt: ['9L8'],
+      bodyslam: ['9L16'], maul: ['9L23'], headcharge: ['9L36'], headlongrush: ['9L46'], closecombat: ['9L56'],
+      earthquake: ['9M'], stompingtantrum: ['9M'], ironhead: ['9M'], wildcharge: ['9M'],
+    },
+  };
+  mergedLs.monkistidor = {
+    learnset: {
+      scratch: ['9L1'], growl: ['9L1'], pound: ['9L3'], metalsound: ['9L5'], bite: ['9L8'], sandattack: ['9L10'],
+      irondefense: ['9L16'], conquer: ['9L20'], inquisit: ['9L20'], takedown: ['9L23'], doubleedge: ['9L40'], gigaimpact: ['9L50'],
+      thief: ['9M'], lowkick: ['9M'], taunt: ['9M'], foulplay: ['9M'], fakeout: ['9E'], quickguard: ['9E'],
     },
   };
 
@@ -1047,6 +1165,7 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
   pushId(preferred);
   // Legacy pattern without hyphen (older code path); keep as a fallback
   const rawNorm = normalizeName(toAscii(speciesName));
+  const preferredNorm = normalizeName(preferred);
   pushId(rawNorm);
   // Insurgence Delta forms are commonly named as deltaxxx (no hyphen) in sprite packs.
   if (/\bdelta\b/i.test(speciesName) || /-delta/i.test(preferred) || rawNorm.startsWith('delta')) {
@@ -1087,14 +1206,19 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
     }
   }
   // Wylin regional formes: "Wylin Gardevoir" → sprite file is "gardevoir-wylin.png"
-  if (/\bwylin\b/i.test(speciesName)) {
+  const isWylin = /\bwylin\b/i.test(speciesName) || rawNorm.includes('wylin') || preferredNorm.includes('wylin');
+  if (isWylin) {
     const cleaned = String(speciesName || '')
       .replace(/\bwylin\b/gi, '')
       .replace(/[-_]+/g, ' ')
       .replace(/\s{2,}/g, ' ')
       .trim();
-    const mega = /\bmega\b/i.test(cleaned) || /-mega/i.test(preferred);
-    const baseName = cleaned.replace(/\bmega\b/gi, ' ').replace(/\s{2,}/g, ' ').trim();
+    const mega = /\bmega\b/i.test(cleaned)
+      || /-mega/i.test(preferred)
+      || rawNorm.includes('mega')
+      || preferredNorm.includes('mega');
+    let baseName = cleaned.replace(/\bmega\b/gi, ' ').replace(/\s{2,}/g, ' ').trim();
+    if (!baseName) baseName = rawNorm.replace(/wylin/gi, '').replace(/mega/gi, '').trim();
     const baseNorm = normalizeName(toAscii(baseName));
     if (baseNorm) {
       pushId(`${baseNorm}-wylin`);
@@ -1105,6 +1229,7 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
         pushId(`wylin-${baseNorm}-mega`);
         pushId(`mega-${baseNorm}-wylin`);
         pushId(`${baseNorm}wylinmega`);
+        pushId(`wylin${baseNorm}mega`);
       }
     }
   }
@@ -1167,6 +1292,15 @@ export async function resyncSpriteCatalog(options?: {
 /** Look up the best sprite base for a specific folder+id combination (prefers the base that indexed it). */
 function spriteBaseForFolderId(folder: string, spriteId: string, fallback: string): string {
   return gSpriteIdBaseMap.get(`${folder}:${spriteId}`) || fallback;
+}
+
+function baseSpritesFolderCandidates(): string[] {
+  return [
+    'Other/BaseSprites',
+    'Other/BaseSprites/BASE_SPRITES',
+    'Other/BASE_SPRITES',
+    'Other/BASE_SPRITES/BASE_SPRITES',
+  ];
 }
 
 async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex | null> {
@@ -1333,12 +1467,16 @@ export async function listPokemonSpriteOptions(
     return a.localeCompare(b, undefined, { sensitivity: 'base' });
   });
 
+  const spriteIdsForLookup = shiny
+    ? Array.from(new Set(sortedVariantIds.flatMap((id) => [id.endsWith('-shiny') ? id : `${id}-shiny`, id])))
+    : sortedVariantIds;
+
   const out: PokemonSpriteOption[] = [];
 
   // Local custom sprites for this species/form come first.
   const customFrontSlots: SpriteSlot[] = shiny ? ['shiny', 'gen5-shiny', 'front', 'gen5'] : ['front', 'gen5', 'shiny', 'gen5-shiny'];
   const customBackSlots: SpriteSlot[] = shiny ? ['back-shiny', 'gen5-back-shiny', 'back', 'gen5-back'] : ['back', 'gen5-back', 'back-shiny', 'gen5-back-shiny'];
-  for (const id of sortedVariantIds) {
+  for (const id of spriteIdsForLookup) {
     const customFront = customFrontSlots.map(slot => getCustomSprite(id, slot)).find(Boolean);
     if (!customFront) continue;
     const customBack = customBackSlots.map(slot => getCustomSprite(id, slot)).find(Boolean);
@@ -1350,6 +1488,25 @@ export async function listPokemonSpriteOptions(
       front: customFront,
       back: customBack,
     });
+  }
+
+  if (folderIndex) {
+    for (const folder of baseSpritesFolderCandidates()) {
+      const entries = folderIndex[folder];
+      if (!entries) continue;
+      for (const spriteId of spriteIdsForLookup) {
+        if (!entries.has(spriteId)) continue;
+        const optBase = spriteBaseForFolderId(folder, spriteId, bestSpriteBaseForId(spriteId, base));
+        out.push({
+          id: `basesprites:${folder}:${spriteId}`,
+          label: `BaseSprites • ${spriteId}`,
+          spriteId,
+          set: 'gen5',
+          front: `${optBase}/${folder}/${spriteId}.png`,
+          animated: false,
+        });
+      }
+    }
   }
 
   // Expose numeric BaseSprites option (from .fusion-sprites-local/Other/BaseSprites via backend /sprites cache).
@@ -1375,7 +1532,7 @@ export async function listPokemonSpriteOptions(
     const frontEntries = folderIndex?.[def.front];
     const backEntries = def.back ? folderIndex?.[def.back] : undefined;
     if (strictExisting && !frontEntries) continue;
-    for (const spriteId of sortedVariantIds) {
+    for (const spriteId of spriteIdsForLookup) {
       if (frontEntries && !frontEntries.has(spriteId)) continue;
       // Use the base that actually indexed this sprite ID; fall back to API for numerics, static otherwise
       const optBase = def.front
@@ -1481,7 +1638,10 @@ export function spriteUrlWithFallback(
   const settings = getSpriteSettings();
   const chosen = options?.setOverride ?? settings.set;
   const useAni = settings.animated && chosen === 'gen5';
-  const idList = spriteIdCandidates(speciesId, options?.cosmetic);
+  const idListRaw = spriteIdCandidates(speciesId, options?.cosmetic);
+  const idList = shiny
+    ? Array.from(new Set(idListRaw.flatMap((id) => [id.endsWith('-shiny') ? id : `${id}-shiny`, id])))
+    : idListRaw;
 
   // Candidate folders by priority
   const folders: string[] = [];
@@ -1496,6 +1656,9 @@ export function spriteUrlWithFallback(
   // Always add static gen5 as a fallback so backend BaseSprites (served under gen5/) are reachable.
   const staticGen5 = spriteFolderForSet('gen5', shiny, back, false);
   if (staticGen5 && !folders.includes(staticGen5)) folders.push(staticGen5);
+  for (const folder of baseSpritesFolderCandidates()) {
+    if (!folders.includes(folder)) folders.push(folder);
+  }
 
   // Insert custom sprite data URL at the front if available (try every candidate id)
   const candidates: string[] = [];
