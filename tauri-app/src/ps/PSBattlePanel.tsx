@@ -3348,6 +3348,42 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         return merged.length > 0 ? merged : requestSidePokemon;
       })();
 
+      const normalizeTooltipServerPokemon = (poke: any) => {
+        if (!poke || typeof poke !== 'object') return poke;
+        const level = resolveLevel(poke, poke?.level) || 100;
+        const baseStats = (() => {
+          const raw = poke.baseStats || {};
+          const hp = Number(raw.hp);
+          const atk = Number(raw.atk);
+          const def = Number(raw.def);
+          const spa = Number(raw.spa ?? raw.spAtk);
+          const spd = Number(raw.spd ?? raw.spDef);
+          const spe = Number(raw.spe ?? raw.speed);
+          if ([hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) {
+            return { hp, atk, def, spa, spd, spe };
+          }
+          return undefined;
+        })();
+        const stats = (() => {
+          const raw = poke.stats || {};
+          const hp = Number(raw.hp);
+          const atk = Number(raw.atk);
+          const def = Number(raw.def);
+          const spa = Number(raw.spa ?? raw.spAtk);
+          const spd = Number(raw.spd ?? raw.spDef);
+          const spe = Number(raw.spe ?? raw.speed);
+          if ([hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) {
+            return { hp, atk, def, spa, spd, spe };
+          }
+          return baseStats ? buildStatsFromBase(baseStats, level) : undefined;
+        })();
+        return {
+          ...poke,
+          ...(baseStats ? { baseStats } : {}),
+          ...(stats ? { stats } : {}),
+        };
+      };
+
       const slotMapped: any[] = [];
       const used = new Set<any>();
       const nearActives = Array.isArray((battle as any)?.nearSide?.active) ? (battle as any).nearSide.active : [];
@@ -3370,8 +3406,15 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       }
 
       const remainder = mergedSide.filter((p: any) => !used.has(p));
-      battle.myPokemon = [...slotMapped, ...remainder];
-      battle.myAllyPokemon = [...slotMapped, ...remainder];
+      const activeSlotCount = Math.max(Number(request.active?.length || 0), Number(actives.length || 0), 1);
+      const ordered: any[] = [];
+      const remainderQueue = [...remainder];
+      for (let i = 0; i < activeSlotCount; i++) {
+        ordered.push(normalizeTooltipServerPokemon(slotMapped[i] || remainderQueue.shift()));
+      }
+      for (const p of remainderQueue) ordered.push(normalizeTooltipServerPokemon(p));
+      battle.myPokemon = ordered.filter(Boolean);
+      battle.myAllyPokemon = ordered.filter(Boolean);
     }
 
     if (battle.scene?.updateSidebars) {
