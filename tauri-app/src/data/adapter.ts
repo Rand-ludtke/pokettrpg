@@ -33,6 +33,7 @@ export type DexSpecies = {
   gen?: number;
   spriteid?: string;
   changesFrom?: string;
+  isMega?: boolean;
 };
 
 export type MoveEntry = { name: string; type: string; basePower: number; category: 'Physical'|'Special'|'Status'; accuracy?: number | true; secondary?: any; secondaries?: any[]; desc?: string; shortDesc?: string };
@@ -48,6 +49,306 @@ export type AliasesIndex = Record<string, string>;
 
 let gBundledSprites: Record<string, Partial<Record<string, string>>> = {};
 let gPreferBackendSpriteIds = new Set<string>();
+
+function isSagePlaceholderText(value: unknown): boolean {
+  const text = String(value || '').trim().toLowerCase();
+  return text === 'pokemon sage custom move.'
+    || text === 'pokemon sage custom item.'
+    || text === 'pokemon sage custom ability.'
+    || text === 'sage custom move.'
+    || text === 'sage custom item.'
+    || text === 'sage custom ability.';
+}
+
+function fillMissingDescriptions<T extends { name?: string; desc?: string; shortDesc?: string }>(
+  table: Record<string, T>,
+  fallbackBuilder: (entry: T) => string,
+) {
+  for (const entry of Object.values(table || {})) {
+    if (!entry || typeof entry !== 'object') continue;
+    const shortBad = !entry.shortDesc || isSagePlaceholderText(entry.shortDesc);
+    const descBad = !entry.desc || isSagePlaceholderText(entry.desc);
+    if (!shortBad && !descBad) continue;
+    const fallback = fallbackBuilder(entry);
+    if (shortBad) entry.shortDesc = fallback;
+    if (descBad) entry.desc = fallback;
+  }
+}
+
+function applyWylinRaltsLineFixes(
+  mergedDex: DexIndex,
+  mergedLs: LearnsetsIndex,
+  mergedMoves: MoveIndex,
+  mergedAbilities: AbilityIndex,
+  baseDex: DexIndex,
+) {
+  // Preserve canonical base entries; the generated Wylin payload currently overrides these incorrectly.
+  for (const key of ['ralts', 'kirlia', 'gardevoir', 'gallade']) {
+    if (baseDex[key]) mergedDex[key] = { ...baseDex[key] };
+  }
+
+  const rogueEntries = [
+    // Old malformed/duplicate generated IDs.
+    'raltswylin',
+    'kirliawylin',
+    'gardevoirwylin',
+    'gardevoirwylinmega',
+    'galladewylin',
+    // Previous temporary custom IDs from older adapter patches.
+    'wylinralts',
+    'wylinkirlia',
+    'wylingardevoir',
+    'wylingardevoirmega',
+    'wylingallade',
+    // Known noisy title-like variants.
+    'wylingardevoirthebellydancer',
+    'wylingalladetheswashbuckler',
+  ];
+  for (const key of rogueEntries) {
+    delete mergedDex[key];
+    delete mergedLs[key];
+  }
+
+  // Normalize known misspellings from Wylin source text.
+  const normalizeSpeciesKey = (fromKey: string, toKey: string, properName: string) => {
+    const fromNorm = normalizeName(fromKey);
+    const toNorm = normalizeName(toKey);
+    const fromExisting = Object.keys(mergedDex).find((k) => normalizeName(k) === fromNorm);
+    if (!fromExisting) return;
+
+    const toExisting = Object.keys(mergedDex).find((k) => normalizeName(k) === toNorm);
+    if (!toExisting) {
+      mergedDex[toKey] = { ...(mergedDex[fromExisting] || {}), name: properName };
+      if (mergedLs[fromExisting]) mergedLs[toKey] = mergedLs[fromExisting];
+    }
+    delete mergedDex[fromExisting];
+    delete mergedLs[fromExisting];
+
+    // Repair evo/prevo links that still point to the misspelled name.
+    for (const entry of Object.values(mergedDex)) {
+      if (!entry) continue;
+      if (entry.prevo && normalizeName(entry.prevo) === fromNorm) entry.prevo = properName;
+      if (Array.isArray(entry.evos)) {
+        entry.evos = entry.evos.map((e) => normalizeName(e) === fromNorm ? properName : e);
+      }
+    }
+  };
+  normalizeSpeciesKey('wylianlechonk', 'wylinlechonk', 'Wylin Lechonk');
+  normalizeSpeciesKey('monkiestitdor', 'monkistidor', 'Monkistidor');
+
+  mergedAbilities.distillation = {
+    name: 'Distillation',
+    shortDesc: 'Poison-type moves used by or targeting this Pokemon become Water-type.',
+    desc: 'Poison-type moves become Water-type when this Pokemon uses them or is targeted by them.',
+  };
+
+  mergedMoves.hydrovortex = {
+    name: 'Hydro-Vortex',
+    type: 'Water',
+    category: 'Special',
+    basePower: 80,
+    accuracy: 100,
+    shortDesc: 'Traps target for 4-5 turns and deals 1/8 max HP each turn.',
+    desc: 'Traps the target for 4-5 turns. Trapped target loses 1/8 of its max HP at end of each turn.',
+  };
+  mergedMoves.oasisembrace = {
+    name: 'Oasis Embrace',
+    type: 'Water',
+    category: 'Special',
+    basePower: 100,
+    accuracy: 100,
+    shortDesc: 'Traps target and drains HP each turn while trap persists.',
+    desc: 'Traps the target for 4-5 turns. Target loses 1/8 max HP each turn while user restores 1/16 max HP.',
+  };
+  mergedMoves.brineblade = {
+    name: 'Brine Blade',
+    type: 'Water',
+    category: 'Physical',
+    basePower: 65,
+    accuracy: 100,
+    shortDesc: 'Slicing move. Power doubles if target is below 50% HP.',
+    desc: 'A slicing Water-type move. If the target has less than half of its max HP, this move deals double damage.',
+  };
+  mergedMoves.vibrantdance = {
+    name: 'Vibrant Dance',
+    type: 'Water',
+    category: 'Special',
+    basePower: 80,
+    accuracy: 100,
+    shortDesc: '50% chance to raise user Sp. Atk by 1.',
+    desc: 'Has a 50% chance to raise the user\'s Special Attack by 1 stage.',
+  };
+
+  // Wylin line should be proper regional formes, not separate high-number species.
+  mergedDex.raltswylin = {
+    name: 'Wylin Ralts',
+    num: 280,
+    baseSpecies: 'Ralts',
+    forme: 'Wylin',
+    baseForme: 'Base',
+    types: ['Water', 'Fairy'],
+    baseStats: { hp: 30, atk: 25, def: 25, spa: 35, spd: 55, spe: 20 },
+    abilities: { 0: 'Trace', H: 'Distillation' },
+    evos: ['Kirlia-Wylin'],
+    color: 'White',
+    isNonstandard: 'Custom',
+    gen: 9,
+    spriteid: 'ralts-wylin',
+  };
+  mergedDex.kirliawylin = {
+    name: 'Wylin Kirlia',
+    num: 281,
+    baseSpecies: 'Kirlia',
+    forme: 'Wylin',
+    baseForme: 'Base',
+    prevo: 'Ralts-Wylin',
+    evoLevel: 20,
+    evos: ['Gardevoir-Wylin', 'Gallade-Wylin'],
+    types: ['Water', 'Fairy'],
+    baseStats: { hp: 38, atk: 35, def: 35, spa: 65, spd: 55, spe: 50 },
+    abilities: { 0: 'Trace', 1: 'Dancer', H: 'Distillation' },
+    color: 'White',
+    isNonstandard: 'Custom',
+    gen: 9,
+    spriteid: 'kirlia-wylin',
+  };
+  mergedDex.gardevoirwylin = {
+    name: 'Wylin Gardevoir',
+    num: 282,
+    baseSpecies: 'Gardevoir',
+    forme: 'Wylin',
+    baseForme: 'Base',
+    prevo: 'Kirlia-Wylin',
+    evoLevel: 30,
+    otherFormes: ['Gardevoir-Wylin-Mega'],
+    formeOrder: ['Gardevoir-Wylin', 'Gardevoir-Wylin-Mega'],
+    types: ['Water', 'Fairy'],
+    baseStats: { hp: 68, atk: 65, def: 65, spa: 125, spd: 115, spe: 80 },
+    abilities: { 0: 'Trace', 1: 'Dancer', H: 'Distillation' },
+    color: 'White',
+    isNonstandard: 'Custom',
+    gen: 9,
+    spriteid: 'gardevoir-wylin',
+  };
+  mergedDex.gardevoirwylinmega = {
+    name: 'Wylin Gardevoir-Mega',
+    num: 282,
+    baseSpecies: 'Gardevoir',
+    forme: 'Mega',
+    baseForme: 'Wylin',
+    changesFrom: 'Gardevoir-Wylin',
+    requiredItem: 'Gardevoirite-W',
+    isMega: true,
+    gender: 'F',
+    types: ['Water', 'Fairy'],
+    baseStats: { hp: 68, atk: 65, def: 85, spa: 165, spd: 135, spe: 100 },
+    abilities: { 0: 'Distillation' },
+    color: 'White',
+    isNonstandard: 'Custom',
+    gen: 9,
+    spriteid: 'gardevoir-wylin-mega',
+  };
+  mergedDex.galladewylin = {
+    name: 'Wylin Gallade',
+    num: 475,
+    baseSpecies: 'Gallade',
+    forme: 'Wylin',
+    baseForme: 'Base',
+    prevo: 'Kirlia-Wylin',
+    evoType: 'useItem',
+    evoItem: 'Water Stone',
+    gender: 'M',
+    types: ['Water', 'Fighting'],
+    baseStats: { hp: 68, atk: 125, def: 65, spa: 65, spd: 115, spe: 80 },
+    abilities: { 0: 'Sharpness', 1: 'Dancer', H: 'Distillation' },
+    color: 'White',
+    isNonstandard: 'Custom',
+    gen: 9,
+    spriteid: 'gallade-wylin',
+  };
+
+  // Link base entries to their Wylin formes for proper Dex form navigation.
+  const ensureOtherForme = (baseKey: string, formeName: string) => {
+    const baseEntry = mergedDex[baseKey];
+    if (!baseEntry) return;
+    const existing = new Set((baseEntry.otherFormes || []).map((f) => normalizeName(f)));
+    if (!existing.has(normalizeName(formeName))) {
+      baseEntry.otherFormes = [...(baseEntry.otherFormes || []), formeName];
+    }
+    mergedDex[baseKey] = baseEntry;
+  };
+  ensureOtherForme('ralts', 'Ralts-Wylin');
+  ensureOtherForme('kirlia', 'Kirlia-Wylin');
+  ensureOtherForme('gardevoir', 'Gardevoir-Wylin');
+  ensureOtherForme('gallade', 'Gallade-Wylin');
+
+  mergedLs.raltswylin = {
+    learnset: {
+      watergun: ['9L1'],
+      growl: ['9L1'],
+      disarmingvoice: ['9L3'],
+      chillingwater: ['9L6'],
+      hypnosis: ['9L9'],
+      drainingkiss: ['9L12'],
+      aquaring: ['9L15'],
+      lifedew: ['9L18'],
+    },
+  };
+  mergedLs.kirliawylin = {
+    learnset: {
+      teeterdance: ['9L1'],
+      bubblebeam: ['9L23'],
+      charm: ['9L26'],
+      raindance: ['9L30'],
+      sparklingaria: ['9L34'],
+      calmmind: ['9L38'],
+    },
+  };
+  mergedLs.gardevoirwylin = {
+    learnset: {
+      vibrantdance: ['9L1'],
+      aquaring: ['9L35'],
+      muddywater: ['9L42'],
+      moonblast: ['9L49'],
+      hydrovortex: ['9L55'],
+      quiverdance: ['9L62'],
+    },
+  };
+  mergedLs.gardevoirwylinmega = {
+    learnset: {
+      oasisembrace: ['9L1'],
+    },
+  };
+  mergedLs.galladewylin = {
+    learnset: {
+      aquacutter: ['9L1'],
+      swordsdance: ['9L35'],
+      sacredsword: ['9L42'],
+      liquidation: ['9L49'],
+      brineblade: ['9L55'],
+      closecombat: ['9L62'],
+    },
+  };
+
+  // Remove accidental duplicate species entries that share the same display name.
+  const canonicalByName: Record<string, string> = {
+    [normalizeName('Wylin Ralts')]: 'raltswylin',
+    [normalizeName('Wylin Kirlia')]: 'kirliawylin',
+    [normalizeName('Wylin Gardevoir')]: 'gardevoirwylin',
+    [normalizeName('Wylin Gardevoir-Mega')]: 'gardevoirwylinmega',
+    [normalizeName('Wylin Gallade')]: 'galladewylin',
+    [normalizeName('Wylin Lechonk')]: 'wylinlechonk',
+    [normalizeName('Monkistidor')]: 'monkistidor',
+  };
+  for (const [key, entry] of Object.entries(mergedDex)) {
+    const targetKey = canonicalByName[normalizeName(String(entry?.name || ''))];
+    if (!targetKey) continue;
+    if (normalizeName(key) !== normalizeName(targetKey)) {
+      delete mergedDex[key];
+      delete mergedLs[key];
+    }
+  }
+}
 
 export function normalizeName(id: string) {
   return id.replace(/[^a-z0-9]/gi, '').toLowerCase();
@@ -353,6 +654,18 @@ export async function loadShowdownDex(options?: { base?: string }) {
   const mergedItems = { ...mergedBaseItems, ...customItems } as ItemIndex;
   const mergedMoves = { ...mergedBaseMoves, ...customMoves } as MoveIndex;
   const mergedAbilities = { ...mergedBaseAbilities, ...customAbilities } as AbilityIndex;
+
+  applyWylinRaltsLineFixes(mergedDex, mergedLs, mergedMoves, mergedAbilities, pokedex as DexIndex);
+
+  fillMissingDescriptions(mergedMoves, (move) => {
+    const category = String((move as any)?.category || 'Status');
+    const type = String((move as any)?.type || 'Normal');
+    const power = Number((move as any)?.basePower || 0);
+    if (category === 'Status') return `${type}-type status move.`;
+    return `${type}-type ${category.toLowerCase()} move with ${power} base power.`;
+  });
+  fillMissingDescriptions(mergedItems, () => 'Custom item. Full effect text is not available in this data pack.');
+  fillMissingDescriptions(mergedAbilities, (ability) => `${String(ability?.name || 'Custom Ability')} ability.`);
   // Cache aliases globally for species resolution
   try {
     gAliases = {};
@@ -361,6 +674,20 @@ export async function loadShowdownDex(options?: { base?: string }) {
       const v = String((raw as any)[k] || '');
       if (!v) continue;
       gAliases[normalizeName(k)] = normalizeName(v);
+    }
+    const builtinAliases: Record<string, string> = {
+      // Wylin regional forms and common query order.
+      wylinralts: 'raltswylin',
+      wylinkirlia: 'kirliawylin',
+      wylingardevoir: 'gardevoirwylin',
+      wylingardevoirmega: 'gardevoirwylinmega',
+      wylingallade: 'galladewylin',
+      // Canonicalized typo corrections from source text.
+      wylianlechonk: 'wylinlechonk',
+      monkiestitdor: 'monkistidor',
+    };
+    for (const [k, v] of Object.entries(builtinAliases)) {
+      if (!gAliases[normalizeName(k)]) gAliases[normalizeName(k)] = normalizeName(v);
     }
   } catch { gAliases = {}; }
   const result = {
@@ -766,11 +1093,27 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
       .replace(/[-_]+/g, ' ')
       .replace(/\s{2,}/g, ' ')
       .trim();
-    const baseNorm = normalizeName(toAscii(cleaned));
+    const mega = /\bmega\b/i.test(cleaned) || /-mega/i.test(preferred);
+    const baseName = cleaned.replace(/\bmega\b/gi, ' ').replace(/\s{2,}/g, ' ').trim();
+    const baseNorm = normalizeName(toAscii(baseName));
     if (baseNorm) {
       pushId(`${baseNorm}-wylin`);
       pushId(`wylin-${baseNorm}`);
+      if (mega) {
+        pushId(`${baseNorm}-wylin-mega`);
+        pushId(`${baseNorm}-mega-wylin`);
+        pushId(`wylin-${baseNorm}-mega`);
+        pushId(`mega-${baseNorm}-wylin`);
+        pushId(`${baseNorm}wylinmega`);
+      }
     }
+  }
+
+  if (/-mega/i.test(preferred)) {
+    const noMega = preferred.replace(/-mega/ig, '');
+    pushId(`${noMega}-mega`);
+    pushId(`mega-${noMega}`);
+    pushId(`${noMega}mega`);
   }
   // For Calyrex rider forms, ensure short variant is present explicitly
   if (/calyrex/i.test(speciesName)) {
@@ -791,6 +1134,35 @@ let gSpriteIndexPromise: Promise<SpriteFolderIndex | null> | null = null;
 
 /** Maps "folder:spriteId" → first base URL that contributed it. Used to generate correct URLs. */
 let gSpriteIdBaseMap: Map<string, string> = new Map();
+
+export function invalidateSpriteRuntimeCaches(): void {
+  gSpriteIndexPromise = null;
+  gSpriteIdBaseMap = new Map();
+}
+
+export async function resyncSpriteCatalog(options?: {
+  clearLocalOverrides?: boolean;
+  forceBackendReindex?: boolean;
+}): Promise<void> {
+  if (options?.clearLocalOverrides) {
+    clearCustomSprites();
+    clearSpriteSettings();
+  }
+  invalidateSpriteRuntimeCaches();
+
+  if (options?.forceBackendReindex) {
+    const apiBase = (() => {
+      try { return normalizeBaseUrl(localStorage.getItem('ttrpg.apiBase')); } catch { return ''; }
+    })();
+    if (apiBase) {
+      try {
+        await fetch(`${apiBase}/sprites/reindex?force=1`, { method: 'POST' });
+      } catch {}
+    }
+  }
+
+  await loadSpriteFolderIndex();
+}
 
 /** Look up the best sprite base for a specific folder+id combination (prefers the base that indexed it). */
 function spriteBaseForFolderId(folder: string, spriteId: string, fallback: string): string {

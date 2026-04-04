@@ -383,6 +383,24 @@ export function App() {
     return () => window.removeEventListener('navigateToLobby', handler);
   }, []);
 
+  useEffect(() => {
+    if (tab !== 'pc') return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (pcMulti.indices.length === 0) return;
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+
+      const target = e.target as HTMLElement | null;
+      const tag = String(target?.tagName || '').toLowerCase();
+      const isTypingTarget = tag === 'input' || tag === 'textarea' || tag === 'select' || !!target?.isContentEditable;
+      if (isTypingTarget) return;
+
+      e.preventDefault();
+      confirmPcMultiDelete();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [tab, pcMulti.indices.length, confirmPcMultiDelete]);
+
   function changeSelectedAbility(nextAbility: string) {
     if (selected == null || selectedIndex == null) return;
     setBoxes(prev => prev.map((box, i) => {

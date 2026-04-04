@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
-import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, type PokemonSpriteOption } from '../data/adapter';
+import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, resyncSpriteCatalog, type PokemonSpriteOption } from '../data/adapter';
 import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
 import { FusionCreator } from './FusionCreator';
 import { SpriteModeToggle, VariantPicker } from './SpriteVariantSelector';
@@ -1247,6 +1247,22 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
               applySpriteOption('');
             }} title="Remove all saved/cached custom sprites for this Pokemon">
               Clear Saved
+            </button>
+            <button
+              className="mini"
+              onClick={async () => {
+                setSpriteOptionsLoading(true);
+                try {
+                  await resyncSpriteCatalog({ forceBackendReindex: true });
+                  onReplaceSelected && onReplaceSelected({ ...(selected as any) });
+                  setSpriteChangeKey((k) => k + 1);
+                } finally {
+                  setSpriteOptionsLoading(false);
+                }
+              }}
+              title="Rebuild backend sprite index and refresh local sprite cache"
+            >
+              Reindex
             </button>
             {spriteOptionsLoading && <span className="dim">Loading...</span>}
           </div>
