@@ -3432,15 +3432,45 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
 
       // Try to find each ally's active Pokemon from battle state
       const allyActiveBySlot: Record<number, any> = {};
+      // In boss mode, all allies share a merged player in state.players.
+      // Find the merged side's player so we can look up ally Pokemon by pokemonIds.
+      const mergedSidePlayer = battleStatePlayers.find((p: any) => {
+        // The merged player is the one on our side (matches any ally's ID or our side ID)
+        return allyDefs!.some((a: any) => a.playerId === p?.id || a.name === p?.name);
+      });
+      const mergedTeam: any[] = mergedSidePlayer?.team && Array.isArray(mergedSidePlayer.team) ? mergedSidePlayer.team : [];
+
       for (let ai = 0; ai < allyDefs!.length; ai++) {
         if (ai === myParticipantIdx) continue; // skip ourselves
         const allyDef = allyDefs![ai];
+
+        // First try: find the ally as a separate player in state.players
         const allyPlayer = battleStatePlayers.find((p: any) =>
           p?.id === allyDef.playerId || p?.name === allyDef.name
         );
         if (allyPlayer?.team && Array.isArray(allyPlayer.team)) {
           const allyActiveIdx = typeof allyPlayer.activeIndex === 'number' ? allyPlayer.activeIndex : 0;
           allyActiveBySlot[ai] = allyPlayer.team[allyActiveIdx] || allyPlayer.team[0];
+          continue;
+        }
+
+        // Fallback: ally shares the merged player's team — find their Pokemon by pokemonIds
+        if (mergedTeam.length > 0 && Array.isArray(allyDef.pokemonIds) && allyDef.pokemonIds.length > 0) {
+          const allyPokemonIds = new Set(allyDef.pokemonIds.map((id: string) => toID(id)));
+          const allyTeamMembers = mergedTeam.filter((p: any) => {
+            const pid = toID(String(derivePokemonId(p) || p?.id || p?.pokemonId || ''));
+            return pid && allyPokemonIds.has(pid);
+          });
+          if (allyTeamMembers.length > 0) {
+            // Pick the active one (first non-fainted, or just the first)
+            const activeMember = allyTeamMembers.find((p: any) => p.active) || allyTeamMembers[0];
+            allyActiveBySlot[ai] = activeMember;
+            continue;
+          }
+          // Last resort: use merged team index (ally slot 1 → second Pokemon in merged team)
+          if (mergedTeam[ai]) {
+            allyActiveBySlot[ai] = mergedTeam[ai];
+          }
         }
       }
 

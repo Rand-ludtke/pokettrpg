@@ -222,6 +222,84 @@ function normalizeBaseStats(raw: any): any {
   return { hp, atk, def, spa, spd, spe };
 }
 
+/**
+ * Patch Sage and Insurgence regional Pokedex, moves, abilities, and items into the PS
+ * BattlePokedex / BattleMovedex / BattleAbilities / BattleItems globals so tooltips
+ * can look up base stats and other data for custom species.
+ */
+async function patchSageAndInsurgenceDexEntries(): Promise<void> {
+  const fetchOptionalJson = async (path: string) => {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+
+  const [sagePokedex, sageMoves, sageAbilities, sageItems,
+         insPokedex, insAbilities, insItems] = await Promise.all([
+    fetchOptionalJson(withPublicBase('data/sage/generated/pokedex.sage.json')),
+    fetchOptionalJson(withPublicBase('data/sage/generated/moves.custom.sage.json')),
+    fetchOptionalJson(withPublicBase('data/sage/generated/abilities.custom.sage.json')),
+    fetchOptionalJson(withPublicBase('data/sage/generated/items.custom.sage.json')),
+    fetchOptionalJson(withPublicBase('data/insurgence/generated/pokedex.insurgence.json')),
+    fetchOptionalJson(withPublicBase('data/insurgence/generated/abilities.custom.insurgence.json')),
+    fetchOptionalJson(withPublicBase('data/insurgence/generated/items.custom.insurgence.json')),
+  ]);
+
+  const battleDex = ((window as any).BattlePokedex = (window as any).BattlePokedex || {});
+  const battleMovedex = ((window as any).BattleMovedex = (window as any).BattleMovedex || {});
+  const battleAbilities = ((window as any).BattleAbilities = (window as any).BattleAbilities || {});
+  const battleItems = ((window as any).BattleItems = (window as any).BattleItems || {});
+  let applied = 0;
+
+  // Helper to merge a source object into a target PS global
+  const mergeEntries = (source: Record<string, any> | null, target: Record<string, any>, label: string, patchBaseStats?: boolean) => {
+    if (!source || typeof source !== 'object') return 0;
+    let count = 0;
+    for (const [rawKey, rawEntry] of Object.entries(source)) {
+      const keyId = toPSId(rawKey);
+      if (!keyId) continue;
+      const entry = { ...(rawEntry || {}) };
+      if (patchBaseStats) {
+        const bs = normalizeBaseStats(entry.baseStats);
+        if (bs) entry.baseStats = bs;
+      }
+      // Only add if not already present (don't overwrite base Gen 9 data)
+      if (!target[keyId]) {
+        target[keyId] = entry;
+      } else if (patchBaseStats && entry.baseStats && !target[keyId].baseStats) {
+        // Fill in missing baseStats on existing entries
+        target[keyId] = { ...target[keyId], ...entry };
+      }
+      count++;
+    }
+    return count;
+  };
+
+  applied += mergeEntries(sagePokedex, battleDex, 'Sage dex', true);
+  applied += mergeEntries(insPokedex, battleDex, 'Insurgence dex', true);
+  applied += mergeEntries(sageMoves, battleMovedex, 'Sage moves');
+  applied += mergeEntries(sageAbilities, battleAbilities, 'Sage abilities');
+  applied += mergeEntries(sageItems, battleItems, 'Sage items');
+  applied += mergeEntries(insAbilities, battleAbilities, 'Insurgence abilities');
+  applied += mergeEntries(insItems, battleItems, 'Insurgence items');
+
+  // Keep Dex data pointers in sync for tooltip/species lookups
+  if ((window as any).Dex?.data) {
+    (window as any).Dex.data.Pokedex = battleDex;
+    if ((window as any).Dex.data.Movedex !== undefined) (window as any).Dex.data.Movedex = battleMovedex;
+    if ((window as any).Dex.data.Abilities !== undefined) (window as any).Dex.data.Abilities = battleAbilities;
+    if ((window as any).Dex.data.Items !== undefined) (window as any).Dex.data.Items = battleItems;
+  }
+
+  if (applied > 0) {
+    console.log(`[PS Loader] Patched Sage/Insurgence custom entries: ${applied} total`);
+  }
+}
+
 async function patchWylinCustomDexEntries(): Promise<void> {
   try {
     const response = await fetch(withPublicBase('data/more-pokemon/generated/wylin-customs.generated.json'));
@@ -593,6 +671,7 @@ export async function loadPokemonShowdown(): Promise<void> {
       }
     }
     await patchWylinCustomDexEntries();
+    await patchSageAndInsurgenceDexEntries();
     patchSagePlaceholderDexEntries();
     console.log('[PS Loader] Data files loaded');
     
