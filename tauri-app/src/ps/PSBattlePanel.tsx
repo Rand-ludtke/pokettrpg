@@ -3413,7 +3413,6 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               // Build stacked split layout with each participant's trainer sprite and team icons.
               trainerEl.innerHTML = '';
               trainerEl.style.cssText += 'overflow:hidden;display:flex;flex-direction:column;gap:2px;';
-              let pokemonOffset = 0;
               for (const ally of allies) {
                 const block = document.createElement('div');
                 block.style.cssText = 'padding:2px 0 4px 0;border-bottom:1px solid rgba(255,255,255,0.15);';
@@ -3433,11 +3432,20 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 const iconsDiv = document.createElement('div');
                 iconsDiv.className = 'teamicons';
                 iconsDiv.style.cssText = 'line-height:1;';
-                const allyTeamCount = ally.pokemonIds.length;
-                for (let pi = 0; pi < allyTeamCount; pi++) {
-                  const poke = allTeam[pokemonOffset + pi];
+                const allyPokemonIds = Array.isArray(ally.pokemonIds) ? ally.pokemonIds : [];
+                for (let pi = 0; pi < allyPokemonIds.length; pi++) {
+                  const allyPid = String(allyPokemonIds[pi] || '');
+                  const poke = allTeam.find((candidate: any) => {
+                    const candidateId = String(derivePokemonId(candidate) || candidate?.id || candidate?.pokemonId || '');
+                    return candidateId && toID(candidateId) === toID(allyPid);
+                  }) || allTeam[pi];
                   if (!poke) continue;
                   const tooltipIndex = (() => {
+                    const fromParticipantId = tooltipSourceTeam.findIndex((tp: any) => {
+                      const tpId = String(derivePokemonId(tp) || tp?.id || tp?.pokemonId || '');
+                      return tpId && allyPid && toID(tpId) === toID(allyPid);
+                    });
+                    if (fromParticipantId >= 0) return fromParticipantId;
                     const pokeName = poke?.name || poke?.nickname || poke?.ident?.split(': ')[1] || poke?.details?.split(',')[0] || poke?.species || '';
                     const fromName = findPokemonIndexByName(tooltipSourceTeam, pokeName);
                     if (fromName >= 0) return fromName;
@@ -3446,7 +3454,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                       const fromId = tooltipSourceTeam.findIndex((tp: any) => derivePokemonId(tp) === derivedId);
                       if (fromId >= 0) return fromId;
                     }
-                    return pokemonOffset + pi;
+                    return pi;
                   })();
                   const span = document.createElement('span');
                   span.className = 'picon has-tooltip';
@@ -3468,7 +3476,6 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 }
                 block.appendChild(iconsDiv);
                 trainerEl.appendChild(block);
-                pokemonOffset += allyTeamCount;
               }
             }
           }

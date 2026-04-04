@@ -123,6 +123,161 @@ const PS_STYLES = [
   `${PS_BASE}/style/sim-types.css`,
 ];
 
+function isSagePlaceholderText(value: unknown): boolean {
+  const text = String(value || '').trim().toLowerCase();
+  return text === 'pokemon sage custom move.' || text === 'pokemon sage custom item.' || text === 'pokemon sage custom ability.';
+}
+
+function buildMoveFallbackDescription(move: any): string {
+  const category = String(move?.category || 'Status');
+  const type = String(move?.type || 'Normal');
+  const priority = Number(move?.priority || 0);
+  const accuracy = move?.accuracy;
+
+  const priorityText = priority > 0
+    ? ` Priority +${priority}.`
+    : priority < 0
+      ? ` Priority ${priority}.`
+      : '';
+
+  if (category === 'Status') {
+    const accText = accuracy === true
+      ? ' Does not check accuracy.'
+      : typeof accuracy === 'number'
+        ? ` ${accuracy}% accuracy.`
+        : '';
+    return `${type}-type status move.${accText}${priorityText}`.trim();
+  }
+
+  const power = typeof move?.basePower === 'number' ? move.basePower : 0;
+  const accText = accuracy === true
+    ? ' Always hits.'
+    : typeof accuracy === 'number'
+      ? ` ${accuracy}% accuracy.`
+      : '';
+  return `${type}-type ${category.toLowerCase()} move with ${power} base power.${accText}${priorityText}`.trim();
+}
+
+function patchSagePlaceholderDexEntries(): void {
+  const movedex = (window as any).BattleMovedex;
+  if (movedex && typeof movedex === 'object') {
+    for (const move of Object.values(movedex)) {
+      if (!move || typeof move !== 'object') continue;
+      if (!isSagePlaceholderText((move as any).shortDesc) && !isSagePlaceholderText((move as any).desc)) continue;
+      const fallback = buildMoveFallbackDescription(move);
+      if (isSagePlaceholderText((move as any).shortDesc) || !(move as any).shortDesc) {
+        (move as any).shortDesc = fallback;
+      }
+      if (isSagePlaceholderText((move as any).desc) || !(move as any).desc) {
+        (move as any).desc = fallback;
+      }
+    }
+  }
+
+  const items = (window as any).BattleItems;
+  if (items && typeof items === 'object') {
+    for (const item of Object.values(items)) {
+      if (!item || typeof item !== 'object') continue;
+      if (!isSagePlaceholderText((item as any).shortDesc) && !isSagePlaceholderText((item as any).desc)) continue;
+      const fallback = 'Pokemon Sage item. Full effect text is not available in the current data pack.';
+      if (isSagePlaceholderText((item as any).shortDesc) || !(item as any).shortDesc) {
+        (item as any).shortDesc = fallback;
+      }
+      if (isSagePlaceholderText((item as any).desc) || !(item as any).desc) {
+        (item as any).desc = fallback;
+      }
+    }
+  }
+
+  const abilities = (window as any).BattleAbilities;
+  if (abilities && typeof abilities === 'object') {
+    for (const ability of Object.values(abilities)) {
+      if (!ability || typeof ability !== 'object') continue;
+      if (!isSagePlaceholderText((ability as any).shortDesc) && !isSagePlaceholderText((ability as any).desc)) continue;
+      const name = String((ability as any).name || 'Custom Ability');
+      const fallback = `${name} ability. Full effect text is not available in the current data pack.`;
+      if (isSagePlaceholderText((ability as any).shortDesc) || !(ability as any).shortDesc) {
+        (ability as any).shortDesc = fallback;
+      }
+      if (isSagePlaceholderText((ability as any).desc) || !(ability as any).desc) {
+        (ability as any).desc = fallback;
+      }
+    }
+  }
+}
+
+function toPSId(value: unknown): string {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function normalizeBaseStats(raw: any): any {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const hp = Number(raw.hp);
+  const atk = Number(raw.atk);
+  const def = Number(raw.def);
+  const spa = Number(raw.spa ?? raw.spAtk);
+  const spd = Number(raw.spd ?? raw.spDef);
+  const spe = Number(raw.spe ?? raw.speed);
+  if (![hp, atk, def, spa, spd, spe].every((n) => Number.isFinite(n))) return undefined;
+  return { hp, atk, def, spa, spd, spe };
+}
+
+async function patchWylinCustomDexEntries(): Promise<void> {
+  try {
+    const response = await fetch(withPublicBase('data/more-pokemon/generated/wylin-customs.generated.json'));
+    if (!response.ok) return;
+    const payload = await response.json();
+    const dex = (payload && typeof payload === 'object' ? (payload as any).dex : null) || {};
+    if (!dex || typeof dex !== 'object') return;
+
+    const battleDex = ((window as any).BattlePokedex = (window as any).BattlePokedex || {});
+    const battleAliases = ((window as any).BattleAliases = (window as any).BattleAliases || {});
+    let applied = 0;
+
+    for (const [rawKey, rawEntry] of Object.entries(dex as Record<string, any>)) {
+      const keyId = toPSId(rawKey);
+      if (!keyId) continue;
+      const entry = { ...(rawEntry || {}) };
+      const baseStats = normalizeBaseStats(entry.baseStats);
+      if (baseStats) entry.baseStats = baseStats;
+      battleDex[keyId] = { ...(battleDex[keyId] || {}), ...entry };
+      applied++;
+
+      const nameId = toPSId(entry.name);
+      if (nameId && nameId !== keyId && !battleAliases[nameId]) {
+        battleAliases[nameId] = keyId;
+      }
+    }
+
+    // Critical aliases for regional and typo-prone Wylin forms.
+    const forcedAliases: Record<string, string> = {
+      wylinralts: 'raltswylin',
+      wylinkirlia: 'kirliawylin',
+      wylingardevoir: 'gardevoirwylin',
+      wylingardevoirmega: 'gardevoirwylinmega',
+      wylingallade: 'galladewylin',
+      chatotwylin: 'wylinchatot',
+      lechonkwylin: 'wylinlechonk',
+      lechonkwylian: 'wylinlechonk',
+      monkiestitdor: 'monkiestidor',
+      monkistidor: 'monkiestidor',
+    };
+    for (const [aliasId, targetId] of Object.entries(forcedAliases)) {
+      if (!battleAliases[aliasId]) battleAliases[aliasId] = targetId;
+    }
+
+    // Keep Dex data pointers in sync for tooltip/species lookups.
+    if ((window as any).Dex?.data) {
+      (window as any).Dex.data.Pokedex = battleDex;
+      (window as any).Dex.data.Aliases = { ...((window as any).Dex.data.Aliases || {}), ...battleAliases };
+    }
+
+    console.log(`[PS Loader] Patched Wylin custom dex entries: ${applied}`);
+  } catch (err) {
+    console.warn('[PS Loader] Wylin custom dex patch skipped:', err);
+  }
+}
+
 function testImage(url: string, timeoutMs = 4000): Promise<boolean> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -350,6 +505,8 @@ export async function loadPokemonShowdown(): Promise<void> {
         // Don't throw - data files are important but not critical for basic functionality
       }
     }
+    await patchWylinCustomDexEntries();
+    patchSagePlaceholderDexEntries();
     console.log('[PS Loader] Data files loaded');
     
     // Verify critical globals exist
