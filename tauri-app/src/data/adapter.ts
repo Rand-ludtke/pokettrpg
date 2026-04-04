@@ -134,7 +134,8 @@ function applyWylinRaltsLineFixes(
     }
   };
   normalizeSpeciesKey('wylianlechonk', 'wylinlechonk', 'Wylin Lechonk');
-  normalizeSpeciesKey('monkiestitdor', 'monkistidor', 'Monkistidor');
+  normalizeSpeciesKey('monkiestitdor', 'monkiestidor', 'Monkiestidor');
+  normalizeSpeciesKey('monkistidor', 'monkiestidor', 'Monkiestidor');
 
   const patchSpecies = (key: string, patch: Partial<DexSpecies>) => {
     const current = (mergedDex[key] || {}) as DexSpecies;
@@ -313,19 +314,19 @@ function applyWylinRaltsLineFixes(
     isNonstandard: 'Custom',
     gen: 9,
   });
-  patchSpecies('monkistidor', {
-    name: 'Monkistidor',
+  patchSpecies('monkiestidor', {
+    name: 'Monkiestidor',
     evos: ['Gortez', 'Monquisitor'],
     evoLevel: 20,
     types: ['Normal'],
     baseStats: { hp: 30, atk: 40, def: 40, spa: 40, spd: 40, spe: 30 },
     abilities: { 0: 'Battle Armor' },
-    spriteid: 'monkistidor',
+    spriteid: 'monkiestidor',
     isNonstandard: 'Custom',
     gen: 9,
   });
-  patchSpecies('gortez', { name: 'Gortez', prevo: 'Monkistidor' });
-  patchSpecies('monquisitor', { name: 'Monquisitor', prevo: 'Monkistidor' });
+  patchSpecies('gortez', { name: 'Gortez', prevo: 'Monkiestidor' });
+  patchSpecies('monquisitor', { name: 'Monquisitor', prevo: 'Monkiestidor' });
 
   // Link base entries to their Wylin formes for proper Dex form navigation.
   const ensureOtherForme = (baseKey: string, formeName: string) => {
@@ -440,13 +441,19 @@ function applyWylinRaltsLineFixes(
       earthquake: ['9M'], stompingtantrum: ['9M'], ironhead: ['9M'], wildcharge: ['9M'],
     },
   };
-  mergedLs.monkistidor = {
+  mergedLs.monkiestidor = {
     learnset: {
       scratch: ['9L1'], growl: ['9L1'], pound: ['9L3'], metalsound: ['9L5'], bite: ['9L8'], sandattack: ['9L10'],
       irondefense: ['9L16'], conquer: ['9L20'], inquisit: ['9L20'], takedown: ['9L23'], doubleedge: ['9L40'], gigaimpact: ['9L50'],
       thief: ['9M'], lowkick: ['9M'], taunt: ['9M'], foulplay: ['9M'], fakeout: ['9E'], quickguard: ['9E'],
     },
   };
+  // Keep alternate key spellings in sync so move lookups work regardless of form/name normalization.
+  mergedLs.chatotwylin = mergedLs.wylinchatot;
+  mergedLs.lechonkwylin = mergedLs.wylinlechonk;
+  mergedLs.lechonkwylian = mergedLs.wylinlechonk;
+  mergedLs.monkistidor = mergedLs.monkiestidor;
+  mergedLs.monkiestitdor = mergedLs.monkiestidor;
 
   // Remove accidental duplicate species entries that share the same display name.
   const canonicalByName: Record<string, string> = {
@@ -456,7 +463,7 @@ function applyWylinRaltsLineFixes(
     [normalizeName('Wylin Gardevoir-Mega')]: 'gardevoirwylinmega',
     [normalizeName('Wylin Gallade')]: 'galladewylin',
     [normalizeName('Wylin Lechonk')]: 'wylinlechonk',
-    [normalizeName('Monkistidor')]: 'monkistidor',
+    [normalizeName('Monkiestidor')]: 'monkiestidor',
   };
   for (const [key, entry] of Object.entries(mergedDex)) {
     const targetKey = canonicalByName[normalizeName(String(entry?.name || ''))];
@@ -800,9 +807,18 @@ export async function loadShowdownDex(options?: { base?: string }) {
       wylingardevoir: 'gardevoirwylin',
       wylingardevoirmega: 'gardevoirwylinmega',
       wylingallade: 'galladewylin',
+      raltswylin: 'raltswylin',
+      kirliawylin: 'kirliawylin',
+      gardevoirwylin: 'gardevoirwylin',
+      gardevoirwylinmega: 'gardevoirwylinmega',
+      galladewylin: 'galladewylin',
+      chatotwylin: 'wylinchatot',
+      lechonkwylin: 'wylinlechonk',
+      lechonkwylian: 'wylinlechonk',
       // Canonicalized typo corrections from source text.
       wylianlechonk: 'wylinlechonk',
-      monkiestitdor: 'monkistidor',
+      monkiestitdor: 'monkiestidor',
+      monkistidor: 'monkiestidor',
     };
     for (const [k, v] of Object.entries(builtinAliases)) {
       if (!gAliases[normalizeName(k)]) gAliases[normalizeName(k)] = normalizeName(v);
@@ -1335,6 +1351,31 @@ function candidateBasesForFolder(base: string, folder: string): string[] {
   return Array.from(new Set([sibling, normalizedBase].filter(Boolean)));
 }
 
+function expandSpriteIdsForShiny(ids: string[]): string[] {
+  const out: string[] = [];
+  const pushId = (id: string) => {
+    const v = String(id || '').trim();
+    if (!v) return;
+    if (!out.includes(v)) out.push(v);
+  };
+  for (const id of ids) {
+    const v = String(id || '').trim();
+    if (!v) continue;
+    pushId(v);
+    if (/-shiny/i.test(v)) {
+      pushId(v.replace(/-shiny/ig, '-mega-shiny'));
+      pushId(v.replace(/-shiny/ig, '-shiny-mega'));
+      continue;
+    }
+    pushId(`${v}-shiny`);
+    if (/-mega/i.test(v)) {
+      pushId(v.replace(/-mega/ig, '-mega-shiny'));
+      pushId(v.replace(/-mega/ig, '-shiny-mega'));
+    }
+  }
+  return out;
+}
+
 async function loadSpriteFolderIndex(base?: string): Promise<SpriteFolderIndex | null> {
   if (gSpriteIndexPromise) return gSpriteIndexPromise;
   gSpriteIndexPromise = (async () => {
@@ -1499,9 +1540,7 @@ export async function listPokemonSpriteOptions(
     return a.localeCompare(b, undefined, { sensitivity: 'base' });
   });
 
-  const spriteIdsForLookup = shiny
-    ? Array.from(new Set(sortedVariantIds.flatMap((id) => [id.endsWith('-shiny') ? id : `${id}-shiny`, id])))
-    : sortedVariantIds;
+  const spriteIdsForLookup = shiny ? expandSpriteIdsForShiny(sortedVariantIds) : sortedVariantIds;
 
   const out: PokemonSpriteOption[] = [];
 
@@ -1673,9 +1712,7 @@ export function spriteUrlWithFallback(
   const chosen = options?.setOverride ?? settings.set;
   const useAni = settings.animated && chosen === 'gen5';
   const idListRaw = spriteIdCandidates(speciesId, options?.cosmetic);
-  const idList = shiny
-    ? Array.from(new Set(idListRaw.flatMap((id) => [id.endsWith('-shiny') ? id : `${id}-shiny`, id])))
-    : idListRaw;
+  const idList = shiny ? expandSpriteIdsForShiny(idListRaw) : idListRaw;
 
   // Candidate folders by priority
   const folders: string[] = [];

@@ -968,7 +968,10 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
                   const img = e.currentTarget as HTMLImageElement;
                   if (img.dataset.fallback) return;
                   img.dataset.fallback = '1';
-                  img.src = adapter.spriteUrl(spriteId, true, { setOverride: 'gen5' });
+                  const next = adapter.spriteUrlWithFallback(spriteId, (nextUrl: string) => {
+                    img.src = nextUrl;
+                  }, { shiny: true });
+                  img.src = next.src;
                 }}
               />
               <div style={{ fontSize: 10, color: '#777' }}>Shiny</div>
