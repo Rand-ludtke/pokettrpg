@@ -3313,10 +3313,65 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     // PS tooltips read from battle.request to get Pokemon data
     battle.request = request;
-    
-    // Also set myPokemon for tooltips to work with switch buttons
-    if (request.side?.pokemon) {
-      battle.myPokemon = request.side.pokemon;
+
+    // Build slot-aware tooltip arrays so near-side slot lookups (myPokemon[slot])
+    // resolve the actual on-field Pokemon in boss/team formats (2v1, etc.).
+    const requestSidePokemon = Array.isArray(request.side?.pokemon) ? request.side!.pokemon : [];
+    if (requestSidePokemon.length > 0) {
+      const mergedSide = (() => {
+        const participants = bossParticipantsRef.current;
+        const battleStatePlayers = lastBattleStateRef.current?.players ?? [];
+        const mySideId = mySideRef.current || mySide || request.side?.id;
+        if (!participants || !mySideId || (mySideId !== 'p1' && mySideId !== 'p2')) {
+          return requestSidePokemon;
+        }
+        const allyDefs = participants[mySideId];
+        if (!Array.isArray(allyDefs) || allyDefs.length <= 1) return requestSidePokemon;
+
+        const merged: any[] = [];
+        for (const ally of allyDefs) {
+          const player = battleStatePlayers.find((p: any) => p?.id === ally.playerId || p?.name === ally.name);
+          const playerTeam = Array.isArray(player?.team) ? player.team : [];
+          if (!playerTeam.length) continue;
+
+          const orderedIds = Array.isArray(ally?.pokemonIds) ? ally.pokemonIds.map((id: any) => toID(String(id || ''))) : [];
+          if (!orderedIds.length) {
+            merged.push(...playerTeam);
+            continue;
+          }
+
+          for (const pid of orderedIds) {
+            const match = playerTeam.find((tp: any) => toID(String(derivePokemonId(tp) || tp?.id || tp?.pokemonId || '')) === pid);
+            if (match) merged.push(match);
+          }
+        }
+        return merged.length > 0 ? merged : requestSidePokemon;
+      })();
+
+      const slotMapped: any[] = [];
+      const used = new Set<any>();
+      const nearActives = Array.isArray((battle as any)?.nearSide?.active) ? (battle as any).nearSide.active : [];
+      const sideActives = mySideRef.current === 'p2' ? (battle as any)?.p2?.active : (battle as any)?.p1?.active;
+      const actives = (Array.isArray(sideActives) && sideActives.length > 0) ? sideActives : nearActives;
+
+      for (let i = 0; i < actives.length; i++) {
+        const activePoke = actives[i];
+        if (!activePoke) continue;
+        const slot = Number.isFinite(activePoke.slot) ? Number(activePoke.slot) : i;
+        const activeName = String(activePoke.name || activePoke.speciesForme || activePoke.species || '').trim();
+
+        const byMerged = findMatchingStatePoke({ name: activeName, species: activeName }, mergedSide);
+        const byRequest = findMatchingStatePoke({ name: activeName, species: activeName }, requestSidePokemon);
+        const matched = byMerged || byRequest;
+        if (matched) {
+          slotMapped[slot] = matched;
+          used.add(matched);
+        }
+      }
+
+      const remainder = mergedSide.filter((p: any) => !used.has(p));
+      battle.myPokemon = [...slotMapped, ...remainder];
+      battle.myAllyPokemon = [...slotMapped, ...remainder];
     }
 
     if (battle.scene?.updateSidebars) {
