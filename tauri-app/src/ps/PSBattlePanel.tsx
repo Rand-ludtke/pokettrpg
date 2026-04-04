@@ -3435,8 +3435,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           });
         };
 
-        const localTooltipSideIndex = mySideId === 'p2' ? 1 : 0;
-        const opponentTooltipSideIndex = localTooltipSideIndex === 0 ? 1 : 0;
+        // BattleTooltips expects side index from viewer perspective:
+        // near side (local/view side) = 0, far side (opponent) = 1.
+        const localTooltipSideIndex = 0;
+        const opponentTooltipSideIndex = 1;
         applyToTrainer('.trainer-near', sidePokemon, localTooltipSideIndex);
         applyToTrainer('.trainer-far', opponentTeam, opponentTooltipSideIndex);
 
