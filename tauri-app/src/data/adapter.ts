@@ -1003,8 +1003,33 @@ export function prepareBattle(p: Pokemon): BattlePokemon {
     const ratio = existing.currentHp / existing.maxHp;
     currentHp = Math.max(0, Math.round(ratio * maxHp));
   }
+  // For fusion Pokemon without an explicit sprite, resolve from fusion data
+  let sprite = p.sprite;
+  if (!sprite && p.fusion?.headId && p.fusion?.bodyId) {
+    const sf = p.fusion.spriteFile;
+    if (sf) {
+      if (/^(data:|https?:\/\/)/i.test(sf)) {
+        sprite = sf;
+      } else {
+        // Bare filename — resolve to backend URL
+        const bases = getFusionApiBases();
+        sprite = bases.length ? `${bases[0]}/fusion/sprites/${sf}` : `/fusion-sprites/${sf}`;
+      }
+    } else {
+      // No spriteFile chosen — use first candidate from fallback chain
+      const custom = getCustomFusionSprite(p.fusion.headId, p.fusion.bodyId, 'front');
+      if (custom) {
+        sprite = custom;
+      } else {
+        const bases = getFusionApiBases();
+        const stem = `${p.fusion.headId}.${p.fusion.bodyId}`;
+        sprite = bases.length ? `${bases[0]}/fusion/sprites/${stem}v1.png` : `/fusion-sprites/${stem}.png`;
+      }
+    }
+  }
   return {
     ...p,
+    ...(sprite ? { sprite } : {}),
     maxHp,
     currentHp,
     computedStats: { hp: computed.hp, atk: computed.atk, def: computed.def, spa: computed.spa, spd: computed.spd, spe: computed.spe },
@@ -1720,6 +1745,26 @@ export async function listPokemonSpriteOptions(
           animated: false,
         });
       }
+    }
+  }
+
+  // IFD CDN custom sprites for regular (non-fusion) Pokemon.
+  // These live at /custom/{ifdNum}.png, /custom/{ifdNum}a.png, etc.
+  const ifdRegularNum = nameToDexNum(speciesName);
+  if (Number.isFinite(ifdRegularNum) && ifdRegularNum && ifdRegularNum > 0) {
+    const ifdNum = natToIfdNum(ifdRegularNum);
+    const alphas = Array.from({ length: 8 }, (_, i) => String.fromCharCode(97 + i));
+    const ifdCandidates = [`${ifdNum}`, ...alphas.map(a => `${ifdNum}${a}`)];
+    for (const suffix of ifdCandidates) {
+      const url = `${IFD_CDN_BASE}/custom/${suffix}.png`;
+      out.push({
+        id: `ifd:${suffix}`,
+        label: `IFD Custom • ${suffix}`,
+        spriteId: String(ifdNum),
+        set: 'gen5',
+        front: url,
+        animated: false,
+      });
     }
   }
 

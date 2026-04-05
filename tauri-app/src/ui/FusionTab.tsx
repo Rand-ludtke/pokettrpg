@@ -997,6 +997,7 @@ function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSpr
   onSelect: () => void;
   onSpriteSelect: (url: string) => void;
 }) {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const candidateUrls = variantCandidates && variantCandidates.length
     ? variantCandidates
     : preview.spriteChain.candidates;
@@ -1042,10 +1043,7 @@ function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSpr
                 className="mini"
                 onClick={e => {
                   e.stopPropagation();
-                  onSpriteSelect(url);
-                  onSelect();
-                  // Auto-cache IFD CDN sprites when user selects them
-                  if (url.startsWith(IFD_CDN_BASE)) cacheIfdSprite(headNum, bodyNum, url);
+                  setPreviewUrl(url);
                 }}
                 style={{
                   width: 40, height: 40, padding: 2, borderRadius: 4,
@@ -1081,6 +1079,36 @@ function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSpr
       </div>
 
       {selected && <div style={{ textAlign: 'center', color: '#6366f1', fontWeight: 600, fontSize: '0.85em' }}>✓ Selected</div>}
+
+      {/* Sprite preview lightbox */}
+      {previewUrl && (
+        <div
+          onClick={(e) => { e.stopPropagation(); setPreviewUrl(null); }}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <div style={{ textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+            <img
+              src={previewUrl}
+              alt="Sprite preview"
+              style={{ width: 288, height: 288, imageRendering: 'pixelated', objectFit: 'contain', background: '#181830', borderRadius: 12, border: '2px solid #6366f1' }}
+            />
+            <div style={{ marginTop: 8, display: 'flex', gap: 8, justifyContent: 'center' }}>
+              <button className="mini" onClick={() => { onSpriteSelect(previewUrl); onSelect(); if (previewUrl.startsWith(IFD_CDN_BASE)) cacheIfdSprite(headNum, bodyNum, previewUrl); setPreviewUrl(null); }}
+                style={{ padding: '6px 16px', fontSize: '0.9em' }}>
+                ✓ Use This Sprite
+              </button>
+              <button className="mini" onClick={() => setPreviewUrl(null)} style={{ padding: '6px 16px', fontSize: '0.9em' }}>
+                ✕ Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

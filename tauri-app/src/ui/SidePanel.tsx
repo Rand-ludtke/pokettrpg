@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
-import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, resyncSpriteCatalog, type PokemonSpriteOption } from '../data/adapter';
+import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, resyncSpriteCatalog, getFusionApiBases, IFD_CDN_BASE, cacheIfdSprite, nameToDexNum, dexNumToName, type PokemonSpriteOption } from '../data/adapter';
 import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
 import { FusionCreator } from './FusionCreator';
 import { SpriteModeToggle, VariantPicker } from './SpriteVariantSelector';
@@ -1200,35 +1200,241 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
         </div>
       )}
 
-      {/* Sprite Variant Chooser for Fusions */}
-      {(selected as any).fusion && onReplaceSelected && (
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: '0.82em' }}>
-          <span className="dim">Sprite:</span>
-          <SpriteModeToggle
-            mode={(selected as any).spriteMode || 'auto'}
-            onModeChange={(mode: string) => {
-              const next = { ...selected, spriteMode: mode } as any;
-              onReplaceSelected(next);
-            }}
-            compact
-          />
-          <VariantPicker
-            variants={(selected as any).fusion?.variants || (
-              (selected as any).fusion?.headId && (selected as any).fusion?.bodyId
-                ? [`${(selected as any).fusion.headId}.${(selected as any).fusion.bodyId}.png`,
-                   `${(selected as any).fusion.headId}.${(selected as any).fusion.bodyId}a.png`,
-                   `${(selected as any).fusion.headId}.${(selected as any).fusion.bodyId}b.png`]
-                : ['default']
+      {/* Sprite Variant Chooser for Fusions — image thumbnails */}
+      {(selected as any).fusion && onReplaceSelected && (() => {
+        const fusion = (selected as any).fusion;
+        const variants: string[] = fusion.variants || [];
+        const apiBases = getFusionApiBases();
+        // Resolve variant filenames to full URLs for <img src>
+        const resolveVariantUrl = (raw: string): string => {
+          if (!raw) return '';
+          if (/^(data:|https?:\/\/)/i.test(raw)) return raw;
+          if (raw.startsWith('/')) return raw;
+          return apiBases.length ? `${apiBases[0]}/fusion/sprites/${raw}` : `/fusion-sprites/${raw}`;
+        };
+        const currentSpriteFile = fusion.spriteFile || '';
+        return (
+          <div style={{ display: 'grid', gap: 6, fontSize: '0.82em' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span className="dim">Fusion Sprites:</span>
+              <SpriteModeToggle
+                mode={(selected as any).spriteMode || 'auto'}
+                onModeChange={(mode: string) => {
+                  const next = { ...selected, spriteMode: mode } as any;
+                  onReplaceSelected(next);
+                }}
+                compact
+              />
+            </div>
+            {variants.length > 0 && (
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', maxHeight: 220, overflowY: 'auto', paddingRight: 2 }}>
+                {variants.map((v: string, i: number) => {
+                  const url = resolveVariantUrl(v);
+                  const active = v === currentSpriteFile || (!currentSpriteFile && i === 0);
+                  return (
+                    <button
+                      key={v + i}
+                      onClick={() => {
+                        const next = { ...selected, fusion: { ...fusion, spriteFile: v } } as any;
+                        // Also set sprite property so battle system uses it
+                        next.sprite = url;
+                        onReplaceSelected(next);
+                        if (url.startsWith(IFD_CDN_BASE)) cacheIfdSprite(fusion.headId, fusion.bodyId, url);
+                      }}
+                      title={v}
+                      style={{
+                        width: 88,
+                        minHeight: 96,
+                        display: 'grid',
+                        gap: 4,
+                        alignContent: 'start',
+                        justifyItems: 'center',
+                        border: active ? '2px solid var(--accent)' : '1px solid #444',
+                        borderRadius: 6,
+                        background: active ? 'rgba(255,255,255,0.08)' : 'var(--panel-bg-dark)',
+                        padding: 4,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <img
+                        src={url}
+                        alt={`Variant ${i + 1}`}
+                        loading="lazy"
+                        style={{ width: 56, height: 56, imageRendering: 'pixelated', objectFit: 'contain' }}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).parentElement!.style.display = 'none';
+                        }}
+                      />
+                      <span className="dim" style={{ fontSize: '0.7em', lineHeight: 1.2, textAlign: 'center' }}>
+                        {/^https?:\/\//i.test(v) ? (v.includes(IFD_CDN_BASE) ? `IFD ${i + 1}` : `Web ${i + 1}`) : v.replace(/\.png$/i, '')}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             )}
-            selectedVariant={(selected as any).fusion?.spriteFile || ''}
-            onSelect={(variant) => {
-              const fusion = { ...(selected as any).fusion, spriteFile: variant };
-              const next = { ...selected, fusion } as any;
-              onReplaceSelected(next);
-            }}
-          />
-        </div>
-      )}
+            {variants.length === 0 && (
+              <span className="dim">No fusion sprite variants found.</span>
+            )}
+
+            {/* Defuse Button */}
+            <button
+              className="mini"
+              onClick={() => {
+                if (!onReplaceSelected || !onAdd || !dex) return;
+                const headMon = toPokemon(fusion.headName, dex.pokedex, selected.level);
+                const bodyMon = toPokemon(fusion.bodyName, dex.pokedex, selected.level);
+                if (headMon) onAdd(prepareBattle(headMon));
+                if (bodyMon) onAdd(prepareBattle(bodyMon));
+                onDeleteSelected?.();
+              }}
+              title="Split this fusion back into its two component Pokémon"
+              style={{ marginTop: 4, padding: '4px 12px', fontSize: '0.85em' }}
+            >
+              🔓 Defuse → {fusion.headName} + {fusion.bodyName}
+            </button>
+
+            {/* Evolve Head / Body */}
+            {dex && (() => {
+              const headId = normalizeName(fusion.headName || '');
+              const bodyId = normalizeName(fusion.bodyName || '');
+              const headEntry = dex.pokedex[headId];
+              const bodyEntry = dex.pokedex[bodyId];
+              const headEvos: string[] = headEntry?.evos || [];
+              const bodyEvos: string[] = bodyEntry?.evos || [];
+              if (headEvos.length === 0 && bodyEvos.length === 0) return null;
+
+              const handleFusionEvolve = async (component: 'head' | 'body', evoSpeciesName: string) => {
+                if (!onReplaceSelected || !dex) return;
+                const evoId = normalizeName(evoSpeciesName);
+                const evoEntry = dex.pokedex[evoId];
+                if (!evoEntry) return;
+
+                const evoNum = nameToDexNum(evoSpeciesName);
+                if (!evoNum) return;
+
+                const newHeadName = component === 'head' ? (evoEntry.name || evoSpeciesName) : fusion.headName;
+                const newBodyName = component === 'body' ? (evoEntry.name || evoSpeciesName) : fusion.bodyName;
+                const newHeadId = component === 'head' ? evoNum : fusion.headId;
+                const newBodyId = component === 'body' ? evoNum : fusion.bodyId;
+
+                // Recalculate fusion name
+                const splitH = Math.ceil(newHeadName.length / 2);
+                const splitB = Math.floor(newBodyName.length / 2);
+                const newFusionName = (newHeadName.slice(0, splitH) + newBodyName.slice(splitB)).charAt(0).toUpperCase()
+                  + (newHeadName.slice(0, splitH) + newBodyName.slice(splitB)).slice(1).toLowerCase();
+
+                // Recalculate fusion types
+                const hEntry = component === 'head' ? evoEntry : headEntry;
+                const bEntry = component === 'body' ? evoEntry : bodyEntry;
+                const hTypes = hEntry?.types || ['Normal'];
+                const bTypes = bEntry?.types || ['Normal'];
+                const t1 = hTypes[0];
+                const t2 = bTypes.length > 1 ? bTypes[1] : bTypes[0];
+                const newTypes = normalizeName(t1) === normalizeName(t2) ? [t1] : [t1, t2];
+
+                // Recalculate fusion stats
+                const hbs = hEntry?.baseStats || { hp:50, atk:50, def:50, spa:50, spd:50, spe:50 };
+                const bbs = bEntry?.baseStats || { hp:50, atk:50, def:50, spa:50, spd:50, spe:50 };
+                const newBaseStats = {
+                  hp:    Math.floor((2 * hbs.hp  + bbs.hp)  / 3),
+                  atk:   Math.floor((2 * bbs.atk + hbs.atk) / 3),
+                  def:   Math.floor((2 * bbs.def + hbs.def) / 3),
+                  spAtk: Math.floor((2 * hbs.spa + bbs.spa) / 3),
+                  spDef: Math.floor((2 * hbs.spd + bbs.spd) / 3),
+                  speed: Math.floor((2 * bbs.spe + hbs.spe) / 3),
+                };
+
+                // Fetch new variants
+                const newVariants = await fetchFusionVariants(newHeadId, newBodyId).catch(() => [`${newHeadId}.${newBodyId}.png`]);
+
+                // Build evolved fusion
+                const next = {
+                  ...selected,
+                  species: newFusionName,
+                  types: newTypes,
+                  baseStats: newBaseStats,
+                  fusion: {
+                    ...fusion,
+                    headId: newHeadId,
+                    bodyId: newBodyId,
+                    headName: newHeadName,
+                    bodyName: newBodyName,
+                    spriteFile: newVariants[0] || undefined,
+                    variants: newVariants,
+                  },
+                } as any;
+
+                // Preserve nickname only if it was custom (not the old fusion species name)
+                if (selected.name === selected.species) {
+                  next.name = newFusionName;
+                }
+
+                // Filter moves to ones legal for either component
+                const headLearnset = dex.learnsets[normalizeName(newHeadName)]?.learnset || {};
+                const bodyLearnset = dex.learnsets[normalizeName(newBodyName)]?.learnset || {};
+                next.moves = selected.moves.filter((m: any) => {
+                  const mid = normalizeName(m.name);
+                  return headLearnset[mid] || bodyLearnset[mid];
+                });
+
+                // Recalculate HP
+                const bp = prepareBattle(next);
+                const hpPct = selected.currentHp / selected.maxHp;
+                bp.currentHp = Math.max(1, Math.round(hpPct * bp.maxHp));
+
+                onReplaceSelected(bp);
+              };
+
+              return (
+                <div style={{ marginTop: 4, padding: 8, background: 'rgba(100, 200, 100, 0.1)', borderRadius: 6, border: '1px solid rgba(100, 200, 100, 0.3)' }}>
+                  <div className="dim" style={{ fontSize: '0.75em', marginBottom: 4 }}>Fusion Evolution</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {headEvos.map(evoName => {
+                      const evoId = normalizeName(evoName);
+                      const evoEntry = dex.pokedex[evoId];
+                      if (!evoEntry) return null;
+                      const evoLevel = evoEntry.evoLevel;
+                      const canEvolve = !evoLevel || selected.level >= evoLevel;
+                      return (
+                        <button
+                          key={`head-${evoId}`}
+                          className="mini"
+                          onClick={() => handleFusionEvolve('head', evoName)}
+                          disabled={!canEvolve}
+                          title={`Evolve head (${fusion.headName}) → ${evoEntry.name}${evoLevel ? ` (Lv ${evoLevel})` : ''}`}
+                          style={{ opacity: canEvolve ? 1 : 0.5 }}
+                        >
+                          🧠 Head → {evoEntry.name}
+                        </button>
+                      );
+                    })}
+                    {bodyEvos.map(evoName => {
+                      const evoId = normalizeName(evoName);
+                      const evoEntry = dex.pokedex[evoId];
+                      if (!evoEntry) return null;
+                      const evoLevel = evoEntry.evoLevel;
+                      const canEvolve = !evoLevel || selected.level >= evoLevel;
+                      return (
+                        <button
+                          key={`body-${evoId}`}
+                          className="mini"
+                          onClick={() => handleFusionEvolve('body', evoName)}
+                          disabled={!canEvolve}
+                          title={`Evolve body (${fusion.bodyName}) → ${evoEntry.name}${evoLevel ? ` (Lv ${evoLevel})` : ''}`}
+                          style={{ opacity: canEvolve ? 1 : 0.5 }}
+                        >
+                          💪 Body → {evoEntry.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        );
+      })()}
 
       {!(selected as any).fusion && (
         <div style={{ display: 'grid', gap: 6, fontSize: '0.82em' }}>
