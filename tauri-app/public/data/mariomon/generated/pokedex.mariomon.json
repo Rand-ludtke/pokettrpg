@@ -68,7 +68,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 18
   },
   "peteypiranha": {
     "num": 10003,
@@ -102,7 +103,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 32
   },
   "blooper": {
     "num": 10004,
@@ -173,7 +175,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 16
   },
   "gooperblooper": {
     "num": 10006,
@@ -207,7 +210,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 34
   },
   "bobomb": {
     "num": 10007,
@@ -279,7 +283,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 14
   },
   "kingbobomb": {
     "num": 10009,
@@ -313,7 +318,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 36
   },
   "goomba": {
     "num": 10010,
@@ -383,7 +389,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 18
   },
   "anttrooper": {
     "num": 10012,
@@ -454,7 +461,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 14
   },
   "cheepcheep": {
     "num": 10014,
@@ -527,7 +535,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 20
   },
   "porcupuffer": {
     "num": 10016,
@@ -562,7 +571,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 30
   },
   "podoboo": {
     "num": 10017,
@@ -631,7 +641,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 34
   },
   "biddybud": {
     "num": 10019,
@@ -702,7 +713,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 18
   },
   "shyguy": {
     "num": 10021,
@@ -773,7 +785,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 26
   },
   "fuzzy": {
     "num": 10023,
@@ -946,7 +959,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 22
   },
   "majorburrows": {
     "num": 10027,
@@ -981,7 +995,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 34
   },
   "thwimp": {
     "num": 10028,
@@ -1050,7 +1065,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 24
   },
   "whomp": {
     "num": 10030,
@@ -1153,7 +1169,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 22
   },
   "kingboo": {
     "num": 10033,
@@ -1186,7 +1203,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 38
   },
   "dinotorch": {
     "num": 10034,
@@ -1255,7 +1273,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 26
   },
   "rex": {
     "num": 10036,
@@ -1394,7 +1413,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 20
   },
   "yoob": {
     "num": 10039,
@@ -1428,7 +1448,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 50
   },
   "redyoshi": {
     "num": 10040,
@@ -1461,7 +1482,9 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoType": "useItem",
+    "evoItem": "Red Shell"
   },
   "blueyoshi": {
     "num": 10041,
@@ -1494,7 +1517,9 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoType": "useItem",
+    "evoItem": "Blue Shell"
   },
   "yellowyoshi": {
     "num": 10042,
@@ -1527,7 +1552,9 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoType": "useItem",
+    "evoItem": "Yellow Shell"
   },
   "birdo": {
     "num": 10043,
@@ -1629,7 +1656,9 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoType": "useItem",
+    "evoItem": "Green Shell"
   },
   "fang": {
     "num": 10046,
@@ -1699,7 +1728,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 22
   },
   "baldcleft": {
     "num": 10048,
@@ -1768,7 +1798,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 24
   },
   "bristle": {
     "num": 10050,
@@ -1870,7 +1901,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 32
   },
   "duplighost": {
     "num": 10053,
@@ -2037,7 +2069,10 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 30,
+    "evoType": "levelExtra",
+    "evoCondition": "Female"
   },
   "buzzybeetle": {
     "num": 10058,
@@ -2106,7 +2141,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 22
   },
   "spiny": {
     "num": 10060,
@@ -2175,7 +2211,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 26
   },
   "spike": {
     "num": 10062,
@@ -2244,7 +2281,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 24
   },
   "pokey": {
     "num": 10064,
@@ -2314,7 +2352,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 36
   },
   "koopatroopa": {
     "num": 10066,
@@ -2383,7 +2422,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 24
   },
   "drybones": {
     "num": 10068,
@@ -2417,7 +2457,10 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 24,
+    "evoType": "levelExtra",
+    "evoCondition": "Shedinja Method"
   },
   "cataquack": {
     "num": 10069,
@@ -2489,7 +2532,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 42
   },
   "chainchomp": {
     "num": 10071,
@@ -2722,7 +2766,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 40
   },
   "gushen": {
     "num": 10075,
@@ -2793,7 +2838,9 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoType": "useItem",
+    "evoItem": "Red Shell"
   },
   "trex": {
     "num": 10077,
@@ -2895,7 +2942,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 34
   },
   "uproot": {
     "num": 10080,
@@ -3134,7 +3182,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 30
   },
   "beanie": {
     "num": 10086,
@@ -3205,7 +3254,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 26
   },
   "wiggler": {
     "num": 10088,
@@ -3413,7 +3463,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 16
   },
   "shrooboid": {
     "num": 10093,
@@ -3447,7 +3498,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 36
   },
   "crystalking": {
     "num": 10094,
@@ -3584,7 +3636,8 @@
     "natDexTier": "Illegal",
     "doublesTier": "Illegal",
     "gen": 9,
-    "isNonstandard": "Custom"
+    "isNonstandard": "Custom",
+    "evoLevel": 36
   },
   "minion": {
     "num": 10098,
@@ -3654,7 +3707,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 30
   },
   "lilsparky": {
     "num": 10100,
@@ -3724,7 +3778,8 @@
     "natDexTier": "Illegal",
     "doublesTier": "Illegal",
     "gen": 9,
-    "isNonstandard": "Custom"
+    "isNonstandard": "Custom",
+    "evoLevel": 30
   },
   "handfake": {
     "num": 10102,
@@ -3827,7 +3882,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 22
   },
   "fishbone": {
     "num": 10105,
@@ -4030,7 +4086,9 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoType": "useItem",
+    "evoItem": "Starbits"
   },
   "starbag": {
     "num": 10111,
@@ -4261,7 +4319,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 20
   },
   "sumobro": {
     "num": 10116,
@@ -4366,7 +4425,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 42
   },
   "pyoro": {
     "num": 10119,
@@ -4473,7 +4533,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 32
   },
   "madpiano": {
     "num": 10122,
@@ -4579,7 +4640,9 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoType": "useItem",
+    "evoItem": "Blue Shell"
   },
   "heaveho": {
     "num": 10125,
@@ -4783,7 +4846,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 18
   },
   "twirlip": {
     "num": 10131,
@@ -4855,7 +4919,9 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoType": "useItem",
+    "evoItem": "Yellow Shell"
   },
   "bandit": {
     "num": 10133,
@@ -4957,7 +5023,8 @@
     "natDexTier": "Illegal",
     "doublesTier": "Illegal",
     "gen": 9,
-    "isNonstandard": "Custom"
+    "isNonstandard": "Custom",
+    "evoLevel": 40
   },
   "jabble": {
     "num": 10136,
@@ -5029,7 +5096,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 18
   },
   "ghostmouse": {
     "num": 10138,
@@ -5099,7 +5167,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 25
   },
   "brolder": {
     "num": 10140,
@@ -5166,7 +5235,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 38
   },
   "phanto": {
     "num": 10142,
@@ -5301,7 +5371,8 @@
     "doublesTier": "Illegal",
     "gen": 9,
     "isNonstandard": "Custom",
-    "natDexTier": "Illegal"
+    "natDexTier": "Illegal",
+    "evoLevel": 44
   },
   "exor": {
     "num": 10146,
