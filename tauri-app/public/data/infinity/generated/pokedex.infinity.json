@@ -1,0 +1,7097 @@
+{
+  "bulbasauregho": {
+    "num": 1,
+    "name": "Bulbasaur-Egho",
+    "types": [
+      "Grass",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 44,
+      "atk": 60,
+      "def": 54,
+      "spa": 50,
+      "spd": 64,
+      "spe": 37
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "1": "Poison Point",
+      "H": "Poison Point"
+    },
+    "heightm": 0.9,
+    "weightkg": 16,
+    "evos": [
+      "Ivysaur"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "ivysauregho": {
+    "num": 2,
+    "name": "Ivysaur-Egho",
+    "types": [
+      "Grass",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 80,
+      "def": 65,
+      "spa": 67,
+      "spd": 78,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "1": "Poison Point",
+      "H": "Poison Point"
+    },
+    "heightm": 1.4,
+    "weightkg": 70,
+    "prevo": "Bulbasaur-Egho",
+    "evos": [
+      "Venusaur"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "venusauregho": {
+    "num": 3,
+    "name": "Venusaur-Egho",
+    "types": [
+      "Grass",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 111,
+      "def": 100,
+      "spa": 90,
+      "spd": 88,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "1": "Solid Rock",
+      "H": "Sand Stream"
+    },
+    "heightm": 2.6,
+    "weightkg": 280,
+    "prevo": "Ivysaur-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "charmanderegho": {
+    "num": 4,
+    "name": "Charmander-Egho",
+    "types": [
+      "Fire",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 39,
+      "atk": 50,
+      "def": 43,
+      "spa": 62,
+      "spd": 50,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Oblivious",
+      "1": "Competitive",
+      "H": "Competitive"
+    },
+    "heightm": 0.8,
+    "weightkg": 8.5,
+    "evos": [
+      "Charmeleon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "charmeleonegho": {
+    "num": 5,
+    "name": "Charmeleon-Egho",
+    "types": [
+      "Fire",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "atk": 64,
+      "def": 58,
+      "spa": 80,
+      "spd": 65,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Oblivious",
+      "1": "Competitive",
+      "H": "Competitive"
+    },
+    "heightm": 1.3,
+    "weightkg": 19,
+    "prevo": "Charmander-Egho",
+    "evos": [
+      "Charizard"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "charizardegho": {
+    "num": 6,
+    "name": "Charizard-Egho",
+    "types": [
+      "Fire",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 76,
+      "atk": 75,
+      "def": 75,
+      "spa": 114,
+      "spd": 80,
+      "spe": 114
+    },
+    "abilities": {
+      "0": "Levitate",
+      "1": "Competitive",
+      "H": "Intimidate"
+    },
+    "heightm": 2.3,
+    "weightkg": 90.5,
+    "prevo": "Charmeleon-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "squirtleegho": {
+    "num": 7,
+    "name": "Squirtle-Egho",
+    "types": [
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 44,
+      "atk": 48,
+      "def": 65,
+      "spa": 50,
+      "spd": 64,
+      "spe": 43
+    },
+    "abilities": {
+      "0": "Serene Grace",
+      "1": "Overcoat",
+      "H": "Overcoat"
+    },
+    "heightm": 0.5,
+    "weightkg": 8.5,
+    "evos": [
+      "Wartortle"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "wartortleegho": {
+    "num": 8,
+    "name": "Wartortle-Egho",
+    "types": [
+      "Water",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 59,
+      "atk": 63,
+      "def": 80,
+      "spa": 65,
+      "spd": 80,
+      "spe": 58
+    },
+    "abilities": {
+      "0": "Serene Grace",
+      "1": "Overcoat",
+      "H": "Overcoat"
+    },
+    "heightm": 1,
+    "weightkg": 20,
+    "prevo": "Squirtle-Egho",
+    "evos": [
+      "Blastoise"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "blastoiseegho": {
+    "num": 9,
+    "name": "Blastoise-Egho",
+    "types": [
+      "Water",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 85,
+      "def": 85,
+      "spa": 95,
+      "spd": 105,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Serene Grace",
+      "1": "Drizzle",
+      "H": "Snow Warning"
+    },
+    "heightm": 1.6,
+    "weightkg": 76,
+    "prevo": "Wartortle-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "lukpup": {
+    "num": 8003,
+    "name": "Lukpup",
+    "types": [
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 75,
+      "def": 50,
+      "spa": 70,
+      "spd": 70,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Fluffy",
+      "H": "Triage"
+    },
+    "heightm": 0.5,
+    "weightkg": 14.9,
+    "evos": [
+      "Lukagon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "lukagon": {
+    "num": 8004,
+    "name": "Lukagon",
+    "types": [
+      "Fairy",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 124,
+      "def": 88,
+      "spa": 102,
+      "spd": 92,
+      "spe": 94
+    },
+    "abilities": {
+      "0": "Fluffy",
+      "H": "Triage"
+    },
+    "heightm": 2.4,
+    "weightkg": 123,
+    "prevo": "Lukpup",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "kokiseed": {
+    "num": 8005,
+    "name": "Kokiseed",
+    "types": [
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 55,
+      "def": 55,
+      "spa": 55,
+      "spd": 60,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Own Tempo",
+      "1": "Scrappy",
+      "H": "Soundproof"
+    },
+    "heightm": 0.4,
+    "weightkg": 6,
+    "evos": [
+      "Kokipound"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "kokipound": {
+    "num": 8006,
+    "name": "Kokipound",
+    "types": [
+      "Grass",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 85,
+      "def": 70,
+      "spa": 53,
+      "spd": 65,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Justified",
+      "1": "Scrappy",
+      "H": "Soundproof"
+    },
+    "heightm": 1.3,
+    "weightkg": 36,
+    "prevo": "Kokiseed",
+    "evos": [
+      "Kokismash"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "kokismash": {
+    "num": 8007,
+    "name": "Kokismash",
+    "types": [
+      "Grass",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 130,
+      "def": 85,
+      "spa": 65,
+      "spd": 80,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Justified",
+      "1": "Iron Fist",
+      "H": "Soundproof"
+    },
+    "heightm": 2.1,
+    "weightkg": 164,
+    "prevo": "Kokipound",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "chargo": {
+    "num": 8008,
+    "name": "Chargo",
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 49,
+      "atk": 45,
+      "def": 50,
+      "spa": 64,
+      "spd": 54,
+      "spe": 58
+    },
+    "abilities": {
+      "0": "Reckless",
+      "1": "Cursed Body",
+      "H": "Flame Body"
+    },
+    "heightm": 0.4,
+    "weightkg": 14.8,
+    "evos": [
+      "Burnaram"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "burnaram": {
+    "num": 8009,
+    "name": "Burnaram",
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "atk": 75,
+      "def": 61,
+      "spa": 83,
+      "spd": 68,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Reckless",
+      "1": "Cursed Body",
+      "H": "Flame Body"
+    },
+    "heightm": 1.3,
+    "weightkg": 53,
+    "prevo": "Chargo",
+    "evos": [
+      "Psysteed"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "psysteed": {
+    "num": 8010,
+    "name": "Psysteed",
+    "types": [
+      "Fire",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 90,
+      "def": 82,
+      "spa": 113,
+      "spd": 85,
+      "spe": 87
+    },
+    "abilities": {
+      "0": "Reckless",
+      "1": "Magic Guard",
+      "H": "Flame Body"
+    },
+    "heightm": 2,
+    "weightkg": 88,
+    "prevo": "Burnaram",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "darpole": {
+    "num": 8011,
+    "name": "Darpole",
+    "types": [
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 56,
+      "atk": 60,
+      "def": 50,
+      "spa": 40,
+      "spd": 60,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Pickpocket",
+      "1": "Swift Swim",
+      "H": "Infiltrator"
+    },
+    "heightm": 0.5,
+    "weightkg": 2.8,
+    "evos": [
+      "Brutoad"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "brutoad": {
+    "num": 8012,
+    "name": "Brutoad",
+    "types": [
+      "Water",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "atk": 80,
+      "def": 71,
+      "spa": 60,
+      "spd": 71,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Pickpocket",
+      "1": "Swift Swim",
+      "H": "Infiltrator"
+    },
+    "heightm": 1,
+    "weightkg": 43,
+    "prevo": "Darpole",
+    "evos": [
+      "Godfrogger"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "godfrogger": {
+    "num": 8013,
+    "name": "Godfrogger",
+    "types": [
+      "Water",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 102,
+      "def": 95,
+      "spa": 90,
+      "spd": 105,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Bulletproof",
+      "1": "Swift Swim",
+      "H": "Infiltrator"
+    },
+    "heightm": 1.6,
+    "weightkg": 187,
+    "prevo": "Brutoad",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "gorochu": {
+    "num": 8014,
+    "name": "Gorochu",
+    "types": [
+      "Electric",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 112,
+      "def": 50,
+      "spa": 88,
+      "spd": 70,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Reckless",
+      "H": "Unburden"
+    },
+    "heightm": 1.1,
+    "weightkg": 38.4,
+    "prevo": "Pikachu",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "nidorook": {
+    "num": 8015,
+    "name": "Nidorook",
+    "types": [
+      "Poison",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "atk": 97,
+      "def": 75,
+      "spa": 85,
+      "spd": 70,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Poison Point",
+      "1": "Merciless",
+      "H": "Sheer Force"
+    },
+    "heightm": 1.4,
+    "weightkg": 76.8,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "quezsparce": {
+    "num": 8016,
+    "name": "Quezsparce",
+    "types": [
+      "Fairy",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 105,
+      "def": 75,
+      "spa": 80,
+      "spd": 70,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Serene Grace",
+      "1": "Shed Skin",
+      "H": "Rattled"
+    },
+    "heightm": 2.4,
+    "weightkg": 79.3,
+    "prevo": "Dunsparce",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "faeralynx": {
+    "num": 8017,
+    "name": "Faeralynx",
+    "types": [
+      "Fairy",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 98,
+      "def": 73,
+      "spa": 88,
+      "spd": 75,
+      "spe": 126
+    },
+    "abilities": {
+      "0": "Infiltrator",
+      "1": "Technician",
+      "H": "Pixilate"
+    },
+    "heightm": 1.5,
+    "weightkg": 51,
+    "prevo": "Persian",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "shellderegho": {
+    "num": 90,
+    "name": "Shellder-Egho",
+    "types": [
+      "Water",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 52,
+      "atk": 40,
+      "def": 70,
+      "spa": 55,
+      "spd": 57,
+      "spe": 31
+    },
+    "abilities": {
+      "0": "Iron Barbs",
+      "H": "Super Luck"
+    },
+    "heightm": 1.2,
+    "weightkg": 41,
+    "prevo": "Shellder",
+    "evos": [
+      "Skulkraken"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "skulkraken": {
+    "num": 8018,
+    "name": "Skulkraken",
+    "types": [
+      "Water",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 83,
+      "def": 123,
+      "spa": 83,
+      "spd": 110,
+      "spe": 46
+    },
+    "abilities": {
+      "0": "Iron Barbs",
+      "H": "Super Luck"
+    },
+    "heightm": 2,
+    "weightkg": 212,
+    "prevo": "Shellder-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "grimeregho": {
+    "num": 88,
+    "name": "Grimer-Egho",
+    "types": [
+      "Poison",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 70,
+      "def": 70,
+      "spa": 60,
+      "spd": 45,
+      "spe": 20
+    },
+    "abilities": {
+      "0": "Stench",
+      "1": "Flare Boost",
+      "H": "Poison Touch"
+    },
+    "heightm": 1,
+    "weightkg": 205,
+    "evos": [
+      "Muk-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "mukegho": {
+    "num": 89,
+    "name": "Muk-Egho",
+    "types": [
+      "Poison",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 100,
+      "def": 105,
+      "spa": 90,
+      "spd": 80,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Stench",
+      "1": "Flare Boost",
+      "H": "Poison Touch"
+    },
+    "heightm": 1.4,
+    "weightkg": 395,
+    "prevo": "Grimer-Egho",
+    "evos": [
+      "Oozma"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "oozma": {
+    "num": 8019,
+    "name": "Oozma",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 134,
+      "def": 100,
+      "spa": 100,
+      "spd": 55,
+      "spe": 96
+    },
+    "abilities": {
+      "0": "Iron Fist",
+      "H": "Intimidate"
+    },
+    "heightm": 2.2,
+    "weightkg": 240,
+    "prevo": "Muk-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "omeon": {
+    "num": 8020,
+    "name": "Omeon",
+    "types": [
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 124,
+      "def": 85,
+      "spa": 65,
+      "spd": 65,
+      "spe": 116
+    },
+    "abilities": {
+      "0": "Super Luck",
+      "H": "Moxie"
+    },
+    "heightm": 1.1,
+    "weightkg": 18,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "champeon": {
+    "num": 8021,
+    "name": "Champeon",
+    "types": [
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 110,
+      "def": 65,
+      "spa": 95,
+      "spd": 60,
+      "spe": 130
+    },
+    "abilities": {
+      "0": "Scrappy",
+      "H": "Competitive"
+    },
+    "heightm": 1,
+    "weightkg": 23,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "lepideon": {
+    "num": 8022,
+    "name": "Lepideon",
+    "types": [
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 65,
+      "def": 72,
+      "spa": 115,
+      "spd": 90,
+      "spe": 103
+    },
+    "abilities": {
+      "0": "Rattled",
+      "H": "Tinted Lens"
+    },
+    "heightm": 1.4,
+    "weightkg": 22,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "guardeon": {
+    "num": 8023,
+    "name": "Guardeon",
+    "types": [
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 60,
+      "def": 130,
+      "spa": 110,
+      "spd": 95,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Bulletproof",
+      "H": "Heatproof"
+    },
+    "heightm": 1.2,
+    "weightkg": 58.5,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "obsideon": {
+    "num": 8024,
+    "name": "Obsideon",
+    "types": [
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 120,
+      "def": 75,
+      "spa": 60,
+      "spd": 115,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Rock Head",
+      "H": "Sand Rush"
+    },
+    "heightm": 1.3,
+    "weightkg": 33,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "scorpeon": {
+    "num": 8025,
+    "name": "Scorpeon",
+    "types": [
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 111,
+      "def": 105,
+      "spa": 84,
+      "spd": 50,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Poison Touch",
+      "H": "Lightning Rod"
+    },
+    "heightm": 1.1,
+    "weightkg": 23,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "sphynxeon": {
+    "num": 8026,
+    "name": "Sphynxeon",
+    "types": [
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 120,
+      "atk": 88,
+      "def": 106,
+      "spa": 70,
+      "spd": 80,
+      "spe": 61
+    },
+    "abilities": {
+      "0": "Synchronize",
+      "H": "Technician"
+    },
+    "heightm": 0.9,
+    "weightkg": 24,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "nimbeon": {
+    "num": 8027,
+    "name": "Nimbeon",
+    "types": [
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 120,
+      "atk": 88,
+      "def": 61,
+      "spa": 70,
+      "spd": 80,
+      "spe": 106
+    },
+    "abilities": {
+      "0": "Aerilate",
+      "H": "Gale Wings"
+    },
+    "heightm": 1.3,
+    "weightkg": 14,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "draconeon": {
+    "num": 8028,
+    "name": "Draconeon",
+    "types": [
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 127,
+      "def": 80,
+      "spa": 70,
+      "spd": 50,
+      "spe": 118
+    },
+    "abilities": {
+      "0": "Tough Claws",
+      "H": "Multiscale"
+    },
+    "heightm": 1.3,
+    "weightkg": 25,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "eeveeon": {
+    "num": 8029,
+    "name": "Eeveeon",
+    "types": [
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 95,
+      "def": 70,
+      "spa": 95,
+      "spd": 70,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Klutz",
+      "H": "Normalize"
+    },
+    "heightm": 1.4,
+    "weightkg": 25,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "vareon": {
+    "num": 8030,
+    "name": "Vareon",
+    "types": [
+      "???"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 110,
+      "def": 100,
+      "spa": 110,
+      "spd": 100,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Protean",
+      "H": "Unaware"
+    },
+    "heightm": 1.6,
+    "weightkg": 28,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "terathwack": {
+    "num": 8031,
+    "name": "Terathwack",
+    "types": [
+      "Normal",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 135,
+      "def": 113,
+      "spa": 60,
+      "spd": 80,
+      "spe": 77
+    },
+    "abilities": {
+      "0": "Rock Head",
+      "1": "Scrappy",
+      "H": "Battle Armor"
+    },
+    "heightm": 2.6,
+    "weightkg": 123,
+    "prevo": "Marowak",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "spearowegho": {
+    "num": 21,
+    "name": "Spearow-Egho",
+    "types": [
+      "Dark",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 70,
+      "def": 25,
+      "spa": 26,
+      "spd": 31,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Defiant",
+      "H": "Adaptability"
+    },
+    "heightm": 0.4,
+    "weightkg": 2.8,
+    "evos": [
+      "Fearow-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "fearowegho": {
+    "num": 22,
+    "name": "Fearow-Egho",
+    "types": [
+      "Dark",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 112,
+      "def": 55,
+      "spa": 50,
+      "spd": 50,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Defiant",
+      "H": "Adaptability"
+    },
+    "heightm": 1.1,
+    "weightkg": 45,
+    "prevo": "Spearow-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "hoothootegho": {
+    "num": 163,
+    "name": "Hoothoot-Egho",
+    "types": [
+      "Dark",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 30,
+      "def": 40,
+      "spa": 56,
+      "spd": 36,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Unnerve",
+      "H": "No Guard"
+    },
+    "heightm": 0.9,
+    "weightkg": 23.5,
+    "evos": [
+      "Noctowl-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "noctowlegho": {
+    "num": 164,
+    "name": "Noctowl-Egho",
+    "types": [
+      "Dark",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 86,
+      "atk": 50,
+      "def": 77,
+      "spa": 99,
+      "spd": 70,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Unnerve",
+      "H": "No Guard"
+    },
+    "heightm": 1.9,
+    "weightkg": 49.8,
+    "prevo": "Hoothoot-Egho",
+    "evos": [
+      "Grimfowl"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "grimfowl": {
+    "num": 8032,
+    "name": "Grimfowl",
+    "types": [
+      "Dark",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 112,
+      "atk": 63,
+      "def": 80,
+      "spa": 130,
+      "spd": 77,
+      "spe": 78
+    },
+    "abilities": {
+      "0": "Unnerve",
+      "H": "No Guard"
+    },
+    "heightm": 2.4,
+    "weightkg": 70,
+    "prevo": "Noctowl-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "azurillegho": {
+    "num": 298,
+    "name": "Azurill-Egho",
+    "types": [
+      "Normal",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 40,
+      "def": 30,
+      "spa": 20,
+      "spd": 25,
+      "spe": 25
+    },
+    "abilities": {
+      "0": "Huge Power",
+      "H": "Dry Skin"
+    },
+    "heightm": 0.3,
+    "weightkg": 4,
+    "evos": [
+      "Marill-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "marillegho": {
+    "num": 183,
+    "name": "Marill-Egho",
+    "types": [
+      "Rock",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 50,
+      "def": 40,
+      "spa": 20,
+      "spd": 30,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Huge Power",
+      "H": "Dry Skin"
+    },
+    "heightm": 0.7,
+    "weightkg": 15,
+    "prevo": "Azurill-Egho",
+    "evos": [
+      "Azumarill-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "azumarillegho": {
+    "num": 184,
+    "name": "Azumarill-Egho",
+    "types": [
+      "Rock",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 80,
+      "def": 65,
+      "spa": 60,
+      "spd": 60,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Huge Power",
+      "H": "Dry Skin"
+    },
+    "heightm": 1,
+    "weightkg": 46,
+    "prevo": "Marill-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "trubbishegho": {
+    "num": 568,
+    "name": "Trubbish-Egho",
+    "types": [
+      "Poison",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 57,
+      "atk": 22,
+      "def": 95,
+      "spa": 60,
+      "spd": 87,
+      "spe": 10
+    },
+    "abilities": {
+      "0": "Filter",
+      "H": "Magnet Pull"
+    },
+    "heightm": 0.6,
+    "weightkg": 43,
+    "evos": [
+      "Garbodor-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "garbodoregho": {
+    "num": 569,
+    "name": "Garbodor-Egho",
+    "types": [
+      "Poison",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 25,
+      "def": 147,
+      "spa": 95,
+      "spd": 107,
+      "spe": 15
+    },
+    "abilities": {
+      "0": "Unaware",
+      "H": "Magnet Pull"
+    },
+    "heightm": 1.8,
+    "weightkg": 177.3,
+    "prevo": "Trubbish-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "swabluegho": {
+    "num": 333,
+    "name": "Swablu-Egho",
+    "types": [
+      "Normal",
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 30,
+      "def": 55,
+      "spa": 60,
+      "spd": 45,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Contrary"
+    },
+    "heightm": 0.4,
+    "weightkg": 4.2,
+    "evos": [
+      "Altaria-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "altariaegho": {
+    "num": 334,
+    "name": "Altaria-Egho",
+    "types": [
+      "Dragon",
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 60,
+      "def": 90,
+      "spa": 95,
+      "spd": 60,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Contrary"
+    },
+    "heightm": 1,
+    "weightkg": 24,
+    "prevo": "Swablu-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "lotadegho": {
+    "num": 270,
+    "name": "Lotad-Egho",
+    "types": [
+      "Fire",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 40,
+      "spa": 50,
+      "spd": 30,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Harvest",
+      "1": "Solar Power",
+      "H": "Dry Skin"
+    },
+    "heightm": 0.6,
+    "weightkg": 8,
+    "evos": [
+      "Lombre-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "lombreegho": {
+    "num": 271,
+    "name": "Lombre-Egho",
+    "types": [
+      "Fire",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 50,
+      "def": 60,
+      "spa": 70,
+      "spd": 50,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Harvest",
+      "1": "Solar Power",
+      "H": "Dry Skin"
+    },
+    "heightm": 1.3,
+    "weightkg": 73.5,
+    "prevo": "Lotad-Egho",
+    "evos": [
+      "Ludicolo-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "ludicoloegho": {
+    "num": 272,
+    "name": "Ludicolo-Egho",
+    "types": [
+      "Fire",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 50,
+      "def": 95,
+      "spa": 100,
+      "spd": 75,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Harvest",
+      "1": "Solar Power",
+      "H": "Dry Skin"
+    },
+    "heightm": 1.7,
+    "weightkg": 130,
+    "prevo": "Lombre-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "otherFormes": [
+      "Ludicolo-Egho-Mega"
+    ],
+    "formeOrder": [
+      "Ludicolo-Egho",
+      "Ludicolo-Egho-Mega"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "ludicoloeghomega": {
+    "num": 8150,
+    "name": "Ludicolo-Egho-Mega",
+    "baseSpecies": "Ludicolo-Egho",
+    "forme": "Mega",
+    "types": [
+      "Fire",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 100,
+      "def": 95,
+      "spa": 100,
+      "spd": 95,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Wok Hei"
+    },
+    "heightm": 2.4,
+    "weightkg": 155.5,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "requiredItem": "Wok",
+    "isNonstandard": "Custom",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "sunflorid": {
+    "num": 8033,
+    "name": "Sunflorid",
+    "types": [
+      "Grass",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 90,
+      "def": 75,
+      "spa": 115,
+      "spd": 80,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Chlorophyll",
+      "1": "Solar Power",
+      "H": "Drought"
+    },
+    "heightm": 1,
+    "weightkg": 34,
+    "prevo": "Sunflora",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "sorcerice": {
+    "num": 8034,
+    "name": "Sorcerice",
+    "types": [
+      "Ice",
+      "Psychic"
+    ],
+    "gender": "F",
+    "baseStats": {
+      "hp": 75,
+      "atk": 60,
+      "def": 40,
+      "spa": 130,
+      "spd": 105,
+      "spe": 125
+    },
+    "abilities": {
+      "0": "Infiltrator",
+      "H": "Dry Skin"
+    },
+    "heightm": 2.1,
+    "weightkg": 71,
+    "prevo": "Jynx",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "kecleodon": {
+    "num": 8035,
+    "name": "Kecleodon",
+    "types": [
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 110,
+      "def": 75,
+      "spa": 80,
+      "spd": 140,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Living Prism",
+      "1": "Protean"
+    },
+    "heightm": 2.6,
+    "weightkg": 142,
+    "prevo": "Kecleon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "magnemiteegho": {
+    "num": 81,
+    "name": "Magnemite-Egho",
+    "types": [
+      "Grass",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 80,
+      "def": 55,
+      "spa": 40,
+      "spd": 65,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Magnet Pull",
+      "1": "Regenerator",
+      "H": "Analytic"
+    },
+    "heightm": 0.4,
+    "weightkg": 20,
+    "evos": [
+      "Magneton-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "magnetonegho": {
+    "num": 82,
+    "name": "Magneton-Egho",
+    "types": [
+      "Grass",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 109,
+      "def": 66,
+      "spa": 65,
+      "spd": 90,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Magnet Pull",
+      "1": "Regenerator",
+      "H": "Analytic"
+    },
+    "heightm": 1.3,
+    "weightkg": 90,
+    "prevo": "Magnemite-Egho",
+    "evos": [
+      "Magnezone-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "magnezoneegho": {
+    "num": 462,
+    "name": "Magnezone-Egho",
+    "types": [
+      "Grass",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 130,
+      "def": 85,
+      "spa": 75,
+      "spd": 105,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Magnet Pull",
+      "1": "Regenerator",
+      "H": "Analytic"
+    },
+    "heightm": 2.2,
+    "weightkg": 285,
+    "prevo": "Magneton-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "tangelaegho": {
+    "num": 114,
+    "name": "Tangela-Egho",
+    "types": [
+      "Electric",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "atk": 70,
+      "def": 90,
+      "spa": 80,
+      "spd": 77,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Volt Absorb",
+      "1": "Lightning Rod",
+      "H": "Static"
+    },
+    "heightm": 1,
+    "weightkg": 35,
+    "evos": [
+      "Tangrowth-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "tangrowthegho": {
+    "num": 465,
+    "name": "Tangrowth-Egho",
+    "types": [
+      "Electric",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 55,
+      "def": 107,
+      "spa": 96,
+      "spd": 77,
+      "spe": 92
+    },
+    "abilities": {
+      "0": "Volt Absorb",
+      "1": "Lightning Rod",
+      "H": "Static"
+    },
+    "heightm": 2,
+    "weightkg": 138.6,
+    "prevo": "Tangela-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "wereyena": {
+    "num": 8036,
+    "name": "Wereyena",
+    "types": [
+      "Dark",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 129,
+      "def": 75,
+      "spa": 84,
+      "spd": 70,
+      "spe": 102
+    },
+    "abilities": {
+      "0": "Intimidate",
+      "1": "Quick Feet",
+      "H": "Moxie"
+    },
+    "heightm": 2.3,
+    "weightkg": 108,
+    "prevo": "Mightyena",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "reaptide": {
+    "num": 8037,
+    "name": "Reaptide",
+    "types": [
+      "Water",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 28,
+      "atk": 130,
+      "def": 72,
+      "spa": 105,
+      "spd": 28,
+      "spe": 122
+    },
+    "abilities": {
+      "0": "Rattled",
+      "1": "Swift Swim",
+      "H": "Wonder Guard"
+    },
+    "heightm": 0.8,
+    "weightkg": 6,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "happinyegho": {
+    "num": 440,
+    "name": "Happiny-Egho",
+    "types": [
+      "Fighting",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 100,
+      "def": 15,
+      "spa": 5,
+      "spd": 5,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "1": "Reckless",
+      "H": "Own Tempo"
+    },
+    "heightm": 0.6,
+    "weightkg": 24.4,
+    "evos": [
+      "Chansey-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "chanseyegho": {
+    "num": 113,
+    "name": "Chansey-Egho",
+    "types": [
+      "Fighting",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "atk": 250,
+      "def": 35,
+      "spa": 5,
+      "spd": 5,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "1": "Reckless",
+      "H": "Own Tempo"
+    },
+    "heightm": 1.1,
+    "weightkg": 34.6,
+    "prevo": "Happiny-Egho",
+    "evos": [
+      "Blissey-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "blisseyegho": {
+    "num": 242,
+    "name": "Blissey-Egho",
+    "types": [
+      "Fighting",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 135,
+      "atk": 255,
+      "def": 55,
+      "spa": 10,
+      "spd": 10,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "1": "Reckless",
+      "H": "Own Tempo"
+    },
+    "heightm": 1.5,
+    "weightkg": 46.8,
+    "prevo": "Chansey-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "kidfoot": {
+    "num": 8038,
+    "name": "Kidfoot",
+    "types": [
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 75,
+      "def": 45,
+      "spa": 45,
+      "spd": 45,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Forewarn",
+      "H": "Adaptability"
+    },
+    "heightm": 1.2,
+    "weightkg": 70,
+    "evos": [
+      "Snosquatch",
+      "Grasquatch"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "snosquatch": {
+    "num": 8039,
+    "name": "Snosquatch",
+    "types": [
+      "Ice",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "atk": 130,
+      "def": 100,
+      "spa": 80,
+      "spd": 60,
+      "spe": 96
+    },
+    "abilities": {
+      "0": "Moxie",
+      "1": "Pure Focus"
+    },
+    "heightm": 3.4,
+    "weightkg": 450,
+    "prevo": "Kidfoot",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "grasquatch": {
+    "num": 8040,
+    "name": "Grasquatch",
+    "types": [
+      "Grass",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "atk": 80,
+      "def": 60,
+      "spa": 130,
+      "spd": 100,
+      "spe": 96
+    },
+    "abilities": {
+      "0": "Chlorophyll",
+      "H": "Pure Power"
+    },
+    "heightm": 3,
+    "weightkg": 370,
+    "prevo": "Kidfoot",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "arctusk": {
+    "num": 8041,
+    "name": "Arctusk",
+    "types": [
+      "Ice",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 65,
+      "def": 100,
+      "spa": 50,
+      "spd": 55,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Sturdy",
+      "H": "Simple"
+    },
+    "heightm": 1.1,
+    "weightkg": 107,
+    "evos": [
+      "Gigantusk"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "gigantusk": {
+    "num": 8042,
+    "name": "Gigantusk",
+    "types": [
+      "Ice",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 100,
+      "def": 133,
+      "spa": 60,
+      "spd": 60,
+      "spe": 57
+    },
+    "abilities": {
+      "0": "Sturdy",
+      "H": "Simple"
+    },
+    "heightm": 2.4,
+    "weightkg": 440,
+    "prevo": "Arctusk",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "iceros": {
+    "num": 8043,
+    "name": "Iceros",
+    "types": [
+      "Ice",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 85,
+      "def": 70,
+      "spa": 40,
+      "spd": 60,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Ice Body",
+      "H": "Sheer Force"
+    },
+    "heightm": 1.4,
+    "weightkg": 73,
+    "evos": [
+      "Glacieros"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "glacieros": {
+    "num": 8044,
+    "name": "Glacieros",
+    "types": [
+      "Ice",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 120,
+      "def": 100,
+      "spa": 40,
+      "spd": 76,
+      "spe": 84
+    },
+    "abilities": {
+      "0": "Ice Body",
+      "H": "Sheer Force"
+    },
+    "heightm": 1.9,
+    "weightkg": 132,
+    "prevo": "Iceros",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "mockroach": {
+    "num": 8045,
+    "name": "Mockroach",
+    "types": [
+      "Bug",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 52,
+      "atk": 100,
+      "def": 70,
+      "spa": 40,
+      "spd": 90,
+      "spe": 138
+    },
+    "abilities": {
+      "0": "Prankster",
+      "1": "Sturdy",
+      "H": "Hustle"
+    },
+    "heightm": 0.6,
+    "weightkg": 10,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "jollibird": {
+    "num": 8046,
+    "name": "Jollibird",
+    "types": [
+      "Ice",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 50,
+      "def": 105,
+      "spa": 120,
+      "spd": 115,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Thick Fat",
+      "H": "Snow Warning"
+    },
+    "heightm": 1.4,
+    "weightkg": 98,
+    "prevo": "Delibird",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "kablowfish": {
+    "num": 8047,
+    "name": "Kablowfish",
+    "types": [
+      "Water",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 100,
+      "def": 125,
+      "spa": 65,
+      "spd": 85,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Poison Point",
+      "1": "Swift Swim",
+      "H": "Intimidate"
+    },
+    "heightm": 1.7,
+    "weightkg": 60,
+    "prevo": "Qwilfish",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "scalarva": {
+    "num": 8048,
+    "name": "Scalarva",
+    "types": [
+      "Bug",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 70,
+      "def": 65,
+      "spa": 40,
+      "spd": 40,
+      "spe": 35
+    },
+    "abilities": {
+      "0": "Compound Eyes",
+      "H": "Intimidate"
+    },
+    "heightm": 0.5,
+    "weightkg": 12.5,
+    "evos": [
+      "Dragalis"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "dragalis": {
+    "num": 8049,
+    "name": "Dragalis",
+    "types": [
+      "Bug",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 80,
+      "def": 100,
+      "spa": 70,
+      "spd": 65,
+      "spe": 25
+    },
+    "abilities": {
+      "0": "Compound Eyes",
+      "H": "Intimidate"
+    },
+    "heightm": 0.5,
+    "weightkg": 12.5,
+    "prevo": "Scalarva",
+    "evos": [
+      "Ceregal"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "ceregal": {
+    "num": 8050,
+    "name": "Ceregal",
+    "types": [
+      "Bug",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 145,
+      "def": 110,
+      "spa": 90,
+      "spd": 75,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Compound Eyes",
+      "H": "Intimidate"
+    },
+    "heightm": 2.2,
+    "weightkg": 70,
+    "prevo": "Dragalis",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "gargon": {
+    "num": 8051,
+    "name": "Gargon",
+    "types": [
+      "Rock",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 65,
+      "def": 65,
+      "spa": 60,
+      "spd": 45,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Intimidate",
+      "1": "Sturdy",
+      "H": "No Guard"
+    },
+    "heightm": 0.9,
+    "weightkg": 70,
+    "evos": [
+      "Wardern"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "wardern": {
+    "num": 8052,
+    "name": "Wardern",
+    "types": [
+      "Rock",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 80,
+      "def": 90,
+      "spa": 70,
+      "spd": 60,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Intimidate",
+      "1": "Sturdy",
+      "H": "No Guard"
+    },
+    "heightm": 2.2,
+    "weightkg": 190,
+    "prevo": "Gargon",
+    "evos": [
+      "Dragoyle"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "dragoyle": {
+    "num": 8053,
+    "name": "Dragoyle",
+    "types": [
+      "Rock",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 113,
+      "def": 122,
+      "spa": 99,
+      "spd": 65,
+      "spe": 81
+    },
+    "abilities": {
+      "0": "Intimidate",
+      "1": "Sturdy",
+      "H": "No Guard"
+    },
+    "heightm": 3.8,
+    "weightkg": 360,
+    "prevo": "Wardern",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "porygonx": {
+    "num": 8054,
+    "name": "Porygon-X",
+    "types": [
+      "Electric",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 70,
+      "def": 72,
+      "spa": 95,
+      "spd": 72,
+      "spe": 141
+    },
+    "abilities": {
+      "0": "Adaptability",
+      "1": "Download",
+      "H": "Levitate"
+    },
+    "gender": "N",
+    "heightm": 0.9,
+    "weightkg": 34,
+    "prevo": "Porygon2",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "oculeus": {
+    "num": 8055,
+    "name": "Oculeus",
+    "types": [
+      "Psychic",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 120,
+      "atk": 120,
+      "def": 120,
+      "spa": 120,
+      "spd": 120,
+      "spe": 120
+    },
+    "abilities": {
+      "0": "Technician"
+    },
+    "heightm": 3.2,
+    "weightkg": 45,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "arkhaos": {
+    "num": 8056,
+    "name": "Arkhaos",
+    "types": [
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 140,
+      "atk": 136,
+      "def": 100,
+      "spa": 136,
+      "spd": 100,
+      "spe": 188
+    },
+    "abilities": {
+      "0": "Shed Skin",
+      "H": "Multiscale"
+    },
+    "heightm": 88,
+    "weightkg": 888,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "botamon": {
+    "num": 8057,
+    "name": "Botamon",
+    "types": [
+      "Normal"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 30,
+      "atk": 20,
+      "def": 20,
+      "spa": 25,
+      "spd": 25,
+      "spe": 25
+    },
+    "abilities": {
+      "0": "Klutz",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.3,
+    "weightkg": 2.6,
+    "evos": [
+      "Pagumon",
+      "Motimon",
+      "Koromon",
+      "Tsunomon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "koromon": {
+    "num": 8058,
+    "name": "Koromon",
+    "types": [
+      "Normal"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 45,
+      "atk": 35,
+      "def": 35,
+      "spa": 30,
+      "spd": 25,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Adaptability",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.4,
+    "weightkg": 5,
+    "prevo": "Botamon",
+    "evos": [
+      "Patamon",
+      "Biyomon",
+      "Agumon",
+      "Betamon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "agumon": {
+    "num": 8059,
+    "name": "Agumon",
+    "types": [
+      "Fire"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 65,
+      "atk": 75,
+      "def": 75,
+      "spa": 80,
+      "spd": 65,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Adaptability",
+      "H": "Friend Guard"
+    },
+    "heightm": 1.4,
+    "weightkg": 80,
+    "prevo": "Koromon",
+    "evos": [
+      "Numemon",
+      "Numemon",
+      "Ogremon",
+      "Monochromon",
+      "Tyrannomon",
+      "Greymon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "greymon": {
+    "num": 8060,
+    "name": "Greymon",
+    "types": [
+      "Fire"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 80,
+      "atk": 115,
+      "def": 100,
+      "spa": 100,
+      "spd": 80,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Adaptability",
+      "H": "Friend Guard"
+    },
+    "heightm": 3.7,
+    "weightkg": 500,
+    "prevo": "Agumon",
+    "evos": [
+      "MetalGreymon",
+      "SkullGreymon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "metalgreymon": {
+    "num": 8061,
+    "name": "MetalGreymon",
+    "types": [
+      "Fire",
+      "Steel"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 85,
+      "atk": 120,
+      "def": 120,
+      "spa": 110,
+      "spd": 80,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Adaptability",
+      "H": "Flash Fire"
+    },
+    "heightm": 14.8,
+    "weightkg": 1220,
+    "prevo": "Greymon",
+    "evos": [
+      "WarGreymon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "wargreymon": {
+    "num": 8062,
+    "name": "WarGreymon",
+    "types": [
+      "Fire",
+      "Steel"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 104,
+      "atk": 135,
+      "def": 150,
+      "spa": 135,
+      "spd": 100,
+      "spe": 86
+    },
+    "abilities": {
+      "0": "Download",
+      "H": "Flash Fire"
+    },
+    "heightm": 3,
+    "weightkg": 1350,
+    "prevo": "MetalGreymon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "tyrannomon": {
+    "num": 8063,
+    "name": "Tyrannomon",
+    "types": [
+      "Fire"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 85,
+      "atk": 115,
+      "def": 100,
+      "spa": 70,
+      "spd": 90,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Adaptability",
+      "H": "Sheer Force"
+    },
+    "heightm": 2.7,
+    "weightkg": 350,
+    "prevo": "Agumon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "skullgreymon": {
+    "num": 8064,
+    "name": "SkullGreymon",
+    "types": [
+      "Fire",
+      "Ghost"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 75,
+      "atk": 140,
+      "def": 70,
+      "spa": 140,
+      "spd": 55,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Intimidate",
+      "H": "Tough Claws"
+    },
+    "heightm": 3.5,
+    "weightkg": 160,
+    "prevo": "Greymon",
+    "evos": [
+      "Machinedramon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "betamon": {
+    "num": 8065,
+    "name": "Betamon",
+    "types": [
+      "Water"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 70,
+      "atk": 79,
+      "def": 77,
+      "spa": 60,
+      "spd": 65,
+      "spe": 54
+    },
+    "abilities": {
+      "0": "Mold Breaker",
+      "H": "Friend Guard"
+    },
+    "heightm": 1,
+    "weightkg": 55,
+    "prevo": "Koromon",
+    "evos": [
+      "Numemon",
+      "Numemon",
+      "Seadramon",
+      "Shellmon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "seadramon": {
+    "num": 8066,
+    "name": "Seadramon",
+    "types": [
+      "Water",
+      "Dragon"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 110,
+      "def": 80,
+      "spa": 95,
+      "spd": 70,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Mold Breaker",
+      "H": "Unaware"
+    },
+    "heightm": 2.8,
+    "weightkg": 195,
+    "prevo": "Betamon",
+    "evos": [
+      "MegaSeadramon",
+      "MetalSeadramon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "numemon": {
+    "num": 8067,
+    "name": "Numemon",
+    "types": [
+      "Poison",
+      "Dark"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 90,
+      "def": 100,
+      "spa": 90,
+      "spd": 100,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Limber",
+      "H": "Storm Drain"
+    },
+    "heightm": 1.5,
+    "weightkg": 110,
+    "evos": [
+      "Monzaemon",
+      "Monzaemon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "oddishegho": {
+    "num": 43,
+    "name": "Oddish-Egho",
+    "types": [
+      "Ghost",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 30,
+      "def": 65,
+      "spa": 75,
+      "spd": 55,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Effect Spore"
+    },
+    "heightm": 0.4,
+    "weightkg": 3.4,
+    "evos": [
+      "Gloom-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "gloomegho": {
+    "num": 44,
+    "name": "Gloom-Egho",
+    "types": [
+      "Ghost",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 45,
+      "def": 90,
+      "spa": 85,
+      "spd": 65,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Effect Spore"
+    },
+    "heightm": 0.7,
+    "weightkg": 6.5,
+    "prevo": "Oddish-Egho",
+    "evos": [
+      "Viledoom",
+      "Mortossum"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "viledoom": {
+    "num": 8068,
+    "name": "Viledoom",
+    "types": [
+      "Ghost",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 52,
+      "def": 113,
+      "spa": 105,
+      "spd": 80,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Effect Spore"
+    },
+    "heightm": 1,
+    "weightkg": 14.2,
+    "prevo": "Gloom-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "mortossum": {
+    "num": 8069,
+    "name": "Mortossum",
+    "types": [
+      "Ghost",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 57,
+      "def": 80,
+      "spa": 100,
+      "spd": 80,
+      "spe": 83
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Healer"
+    },
+    "heightm": 0.4,
+    "weightkg": 5,
+    "prevo": "Gloom-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "mushling": {
+    "num": 8070,
+    "name": "Mushling",
+    "types": [
+      "Grass",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 40,
+      "spa": 60,
+      "spd": 50,
+      "spe": 47
+    },
+    "abilities": {
+      "0": "Magic Guard",
+      "H": "Poison Heal"
+    },
+    "heightm": 0.4,
+    "weightkg": 8,
+    "evos": [
+      "Psycholyte"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "psycholyte": {
+    "num": 8071,
+    "name": "Psycholyte",
+    "types": [
+      "Grass",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 50,
+      "def": 60,
+      "spa": 85,
+      "spd": 70,
+      "spe": 58
+    },
+    "abilities": {
+      "0": "Magic Guard",
+      "H": "Poison Heal"
+    },
+    "heightm": 0.9,
+    "weightkg": 14,
+    "prevo": "Mushling",
+    "evos": [
+      "Shroomage"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "shroomage": {
+    "num": 8072,
+    "name": "Shroomage",
+    "types": [
+      "Grass",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 60,
+      "def": 80,
+      "spa": 130,
+      "spd": 100,
+      "spe": 76
+    },
+    "abilities": {
+      "0": "Magic Guard",
+      "H": "Poison Heal"
+    },
+    "heightm": 1.7,
+    "weightkg": 30,
+    "prevo": "Psycholyte",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "calfpint": {
+    "num": 8073,
+    "name": "Calfpint",
+    "types": [
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "atk": 65,
+      "def": 50,
+      "spa": 27,
+      "spd": 50,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Forewarn",
+      "1": "Rivalry",
+      "H": "No Guard"
+    },
+    "heightm": 0.7,
+    "weightkg": 48,
+    "evos": [
+      "Miltank",
+      "Tauros"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "arbird": {
+    "num": 8074,
+    "name": "Arbird",
+    "types": [
+      "Steel",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 47,
+      "atk": 56,
+      "def": 95,
+      "spa": 18,
+      "spd": 52,
+      "spe": 52
+    },
+    "abilities": {
+      "0": "Keen Eye",
+      "1": "Sturdy",
+      "H": "Weak Armor"
+    },
+    "heightm": 0.5,
+    "weightkg": 15,
+    "evos": [
+      "Skarmory"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "girafaraf": {
+    "num": 8075,
+    "name": "Girafaraf",
+    "types": [
+      "Fairy",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 80,
+      "def": 70,
+      "spa": 120,
+      "spd": 105,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Pixilate",
+      "H": "Sap Sipper"
+    },
+    "heightm": 2.3,
+    "weightkg": 95,
+    "prevo": "Girafarig",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "giragira": {
+    "num": 8076,
+    "name": "Giragira",
+    "types": [
+      "Dark",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 120,
+      "def": 70,
+      "spa": 110,
+      "spd": 70,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Strong Jaw",
+      "H": "Sap Sipper"
+    },
+    "heightm": 2.1,
+    "weightkg": 75,
+    "prevo": "Girafarig",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "whave": {
+    "num": 8077,
+    "name": "Whave",
+    "types": [
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 80,
+      "def": 75,
+      "spa": 55,
+      "spd": 60,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Hydration",
+      "1": "Clear Body",
+      "H": "Prankster"
+    },
+    "heightm": 1.1,
+    "weightkg": 124,
+    "evos": [
+      "Orcabyss"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "orcabyss": {
+    "num": 8078,
+    "name": "Orcabyss",
+    "types": [
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 110,
+      "def": 100,
+      "spa": 90,
+      "spd": 85,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Pressure",
+      "1": "Clear Body",
+      "H": "Prankster"
+    },
+    "heightm": 4,
+    "weightkg": 768.5,
+    "prevo": "Whave",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "zapalope": {
+    "num": 8079,
+    "name": "Zapalope",
+    "types": [
+      "Electric",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 75,
+      "def": 40,
+      "spa": 35,
+      "spd": 30,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Fluffy",
+      "H": "Cheek Pouch"
+    },
+    "heightm": 0.5,
+    "weightkg": 10,
+    "evos": [
+      "Joltalope"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "joltalope": {
+    "num": 8080,
+    "name": "Joltalope",
+    "types": [
+      "Electric",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 102,
+      "def": 80,
+      "spa": 47,
+      "spd": 55,
+      "spe": 131
+    },
+    "abilities": {
+      "0": "Overgrow",
+      "H": "Cheek Pouch"
+    },
+    "heightm": 1.1,
+    "weightkg": 24,
+    "prevo": "Zapalope",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "chikoritaegho": {
+    "num": 152,
+    "name": "Chikorita-Egho",
+    "types": [
+      "Grass",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 10,
+      "def": 49,
+      "spa": 65,
+      "spd": 65,
+      "spe": 44
+    },
+    "abilities": {
+      "0": "Chlorophyll",
+      "H": "Regenerator"
+    },
+    "heightm": 1.1,
+    "weightkg": 6.4,
+    "evos": [
+      "Bayleef-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "bayleefegho": {
+    "num": 153,
+    "name": "Bayleef-Egho",
+    "types": [
+      "Grass",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 108,
+      "atk": 17,
+      "def": 63,
+      "spa": 80,
+      "spd": 80,
+      "spe": 57
+    },
+    "abilities": {
+      "0": "Chlorophyll",
+      "H": "Regenerator"
+    },
+    "heightm": 1.6,
+    "weightkg": 15.8,
+    "prevo": "Chikorita-Egho",
+    "evos": [
+      "Meganium-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "meganiumegho": {
+    "num": 154,
+    "name": "Meganium-Egho",
+    "types": [
+      "Grass",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 143,
+      "atk": 24,
+      "def": 83,
+      "spa": 100,
+      "spd": 100,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Chlorophyll",
+      "H": "Regenerator"
+    },
+    "heightm": 2.3,
+    "weightkg": 100.5,
+    "prevo": "Bayleef-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "cyndaquilegho": {
+    "num": 155,
+    "name": "Cyndaquil-Egho",
+    "types": [
+      "Fire",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 38,
+      "def": 52,
+      "spa": 65,
+      "spd": 44,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Static",
+      "H": "Cloud Nine"
+    },
+    "heightm": 0.5,
+    "weightkg": 6.3,
+    "evos": [
+      "Quilava-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "quilavaegho": {
+    "num": 156,
+    "name": "Quilava-Egho",
+    "types": [
+      "Fire",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 66,
+      "atk": 52,
+      "def": 71,
+      "spa": 83,
+      "spd": 60,
+      "spe": 73
+    },
+    "abilities": {
+      "0": "Static",
+      "H": "Cloud Nine"
+    },
+    "heightm": 0.9,
+    "weightkg": 14,
+    "prevo": "Cyndaquil-Egho",
+    "evos": [
+      "Typhlosion-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "typhlosionegho": {
+    "num": 157,
+    "name": "Typhlosion-Egho",
+    "types": [
+      "Fire",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 84,
+      "atk": 64,
+      "def": 94,
+      "spa": 120,
+      "spd": 78,
+      "spe": 97
+    },
+    "abilities": {
+      "0": "Static",
+      "H": "Cloud Nine"
+    },
+    "heightm": 1.9,
+    "weightkg": 68,
+    "prevo": "Quilava-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "totodileegho": {
+    "num": 158,
+    "name": "Totodile-Egho",
+    "types": [
+      "Water",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 56,
+      "def": 45,
+      "spa": 57,
+      "spd": 42,
+      "spe": 69
+    },
+    "abilities": {
+      "0": "Merciless",
+      "H": "Speed Boost"
+    },
+    "heightm": 0.6,
+    "weightkg": 9.5,
+    "evos": [
+      "Croconaw-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "croconawegho": {
+    "num": 159,
+    "name": "Croconaw-Egho",
+    "types": [
+      "Water",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 70,
+      "def": 59,
+      "spa": 70,
+      "spd": 54,
+      "spe": 87
+    },
+    "abilities": {
+      "0": "Merciless",
+      "H": "Speed Boost"
+    },
+    "heightm": 1.1,
+    "weightkg": 25,
+    "prevo": "Totodile-Egho",
+    "evos": [
+      "Feraligatr-Egho"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "feraligatregho": {
+    "num": 160,
+    "name": "Feraligatr-Egho",
+    "types": [
+      "Water",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 95,
+      "def": 70,
+      "spa": 103,
+      "spd": 66,
+      "spe": 121
+    },
+    "abilities": {
+      "0": "Merciless",
+      "H": "Speed Boost"
+    },
+    "heightm": 2.3,
+    "weightkg": 88.8,
+    "prevo": "Croconaw-Egho",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "mewthree": {
+    "num": 8081,
+    "name": "Mewthree",
+    "types": [
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 150,
+      "atk": 100,
+      "def": 95,
+      "spa": 150,
+      "spd": 95,
+      "spe": 130
+    },
+    "abilities": {
+      "0": "Pressure",
+      "H": "Sturdy"
+    },
+    "heightm": 2.3,
+    "weightkg": 162,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "palmon": {
+    "num": 8082,
+    "name": "Palmon",
+    "types": [
+      "Grass"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 70,
+      "atk": 69,
+      "def": 71,
+      "spa": 75,
+      "spd": 62,
+      "spe": 63
+    },
+    "abilities": {
+      "0": "Super Luck",
+      "H": "Friend Guard"
+    },
+    "heightm": 1.1,
+    "weightkg": 40,
+    "prevo": "Motimon",
+    "evos": [
+      "RedVegiemon",
+      "Vegiemon",
+      "Numemon",
+      "Togemon",
+      "Woodmon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "togemon": {
+    "num": 8083,
+    "name": "Togemon",
+    "types": [
+      "Grass",
+      "Fighting"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 85,
+      "atk": 160,
+      "def": 85,
+      "spa": 80,
+      "spd": 65,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Super Luck",
+      "H": "Iron Fist"
+    },
+    "heightm": 3,
+    "weightkg": 197.5,
+    "prevo": "Palmon",
+    "evos": [
+      "Lillymon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "shellmon": {
+    "num": 8084,
+    "name": "Shellmon",
+    "types": [
+      "Water",
+      "Ground"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 135,
+      "atk": 80,
+      "def": 120,
+      "spa": 75,
+      "spd": 110,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Super Luck",
+      "H": "Liquid Ooze"
+    },
+    "heightm": 2.6,
+    "weightkg": 420,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "tsunomon": {
+    "num": 8085,
+    "name": "Tsunomon",
+    "types": [
+      "Normal"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 30,
+      "spa": 35,
+      "spd": 30,
+      "spe": 35
+    },
+    "abilities": {
+      "0": "Defiant",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.4,
+    "weightkg": 5.5,
+    "prevo": "Botamon",
+    "evos": [
+      "Gomamon",
+      "Gabumon",
+      "Elecmon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "motimon": {
+    "num": 8086,
+    "name": "Motimon",
+    "types": [
+      "Normal"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 45,
+      "atk": 30,
+      "def": 30,
+      "spa": 30,
+      "spd": 35,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Super Luck",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.5,
+    "weightkg": 5,
+    "prevo": "Botamon",
+    "evos": [
+      "Crabmon",
+      "Kunemon",
+      "Palmon",
+      "Tentomon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "gabumon": {
+    "num": 8087,
+    "name": "Gabumon",
+    "types": [
+      "Ice"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 70,
+      "atk": 75,
+      "def": 75,
+      "spa": 75,
+      "spd": 65,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "H": "Fur Coat"
+    },
+    "heightm": 1.4,
+    "weightkg": 50,
+    "prevo": "Tsunomon",
+    "evos": [
+      "Numemon",
+      "Ogremon",
+      "Frigimon",
+      "Monochromon",
+      "Drimogemon",
+      "Garurumon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "elecmon": {
+    "num": 8088,
+    "name": "Elecmon",
+    "types": [
+      "Electric"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 60,
+      "atk": 70,
+      "def": 70,
+      "spa": 75,
+      "spd": 65,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.8,
+    "weightkg": 30,
+    "prevo": "Tsunomon",
+    "evos": [
+      "Unimon",
+      "Leomon",
+      "Drimogemon",
+      "Mojyamon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "gomamon": {
+    "num": 8089,
+    "name": "Gomamon",
+    "types": [
+      "Water"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 69,
+      "atk": 73,
+      "def": 73,
+      "spa": 65,
+      "spd": 70,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.9,
+    "weightkg": 34,
+    "prevo": "Tsunomon",
+    "evos": [
+      "Ikkakumon",
+      "Frigimon",
+      "Mojyamon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "crabmon": {
+    "num": 8090,
+    "name": "Crabmon",
+    "types": [
+      "Water"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 70,
+      "atk": 65,
+      "def": 85,
+      "spa": 75,
+      "spd": 70,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "H": "Stall"
+    },
+    "heightm": 1,
+    "weightkg": 40,
+    "prevo": "Motimon",
+    "evos": [
+      "Coelamon",
+      "Shellmon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "kunemon": {
+    "num": 8091,
+    "name": "Kunemon",
+    "types": [
+      "Electric",
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 57,
+      "atk": 75,
+      "def": 73,
+      "spa": 70,
+      "spd": 45,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Poison Point",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.8,
+    "weightkg": 26,
+    "prevo": "Motimon",
+    "evos": [
+      "Kuwagamon",
+      "Flymon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "tentomon": {
+    "num": 8092,
+    "name": "Tentomon",
+    "types": [
+      "Bug",
+      "Flying"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 65,
+      "atk": 84,
+      "def": 86,
+      "spa": 65,
+      "spd": 62,
+      "spe": 53
+    },
+    "abilities": {
+      "0": "Super Luck",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.8,
+    "weightkg": 30,
+    "prevo": "Motimon",
+    "evos": [
+      "Kuwagamon",
+      "Kabuterimon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "biyomon": {
+    "num": 8093,
+    "name": "Biyomon",
+    "types": [
+      "Fairy",
+      "Flying"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 80,
+      "atk": 66,
+      "def": 64,
+      "spa": 73,
+      "spd": 55,
+      "spe": 72
+    },
+    "abilities": {
+      "0": "Cute Charm",
+      "H": "Serene Grace"
+    },
+    "heightm": 1.1,
+    "weightkg": 30,
+    "prevo": "Koromon",
+    "evos": [
+      "Airdramon",
+      "Birdramon",
+      "Unimon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "patamon": {
+    "num": 8094,
+    "name": "Patamon",
+    "types": [
+      "Flying",
+      "Normal"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 75,
+      "atk": 61,
+      "def": 64,
+      "spa": 65,
+      "spd": 55,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Telepathy",
+      "H": "Friend Guard"
+    },
+    "heightm": 0.7,
+    "weightkg": 19,
+    "prevo": "Koromon",
+    "evos": [
+      "Unimon",
+      "Airdramon",
+      "Angemon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "monochromon": {
+    "num": 8095,
+    "name": "Monochromon",
+    "types": [
+      "Ground",
+      "Fire"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 97,
+      "atk": 105,
+      "def": 125,
+      "spa": 80,
+      "spd": 110,
+      "spe": 33
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "H": "Sturdy"
+    },
+    "heightm": 2.5,
+    "weightkg": 419,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "birdramon": {
+    "num": 8096,
+    "name": "Birdramon",
+    "types": [
+      "Fairy",
+      "Fire"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 115,
+      "atk": 110,
+      "def": 65,
+      "spa": 104,
+      "spd": 60,
+      "spe": 101
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Telepathy"
+    },
+    "heightm": 4.4,
+    "weightkg": 305,
+    "prevo": "Biyomon",
+    "evos": [
+      "Garudamon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "drimogemon": {
+    "num": 8097,
+    "name": "Drimogemon",
+    "types": [
+      "Ground"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 125,
+      "def": 105,
+      "spa": 70,
+      "spd": 70,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Sand Rush",
+      "H": "Simple"
+    },
+    "heightm": 3.6,
+    "weightkg": 477,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "garurumon": {
+    "num": 8098,
+    "name": "Garurumon",
+    "types": [
+      "Ice"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 80,
+      "atk": 115,
+      "def": 75,
+      "spa": 110,
+      "spd": 70,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Technician",
+      "H": "Fur Coat"
+    },
+    "heightm": 2.8,
+    "weightkg": 255,
+    "prevo": "Gabumon",
+    "evos": [
+      "WereGarurumon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "unimon": {
+    "num": 8099,
+    "name": "Unimon",
+    "types": [
+      "Steel",
+      "Fairy"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 105,
+      "atk": 106,
+      "def": 75,
+      "spa": 80,
+      "spd": 75,
+      "spe": 109
+    },
+    "abilities": {
+      "0": "Natural Cure",
+      "H": "Speed Boost"
+    },
+    "heightm": 1.9,
+    "weightkg": 175,
+    "evos": [
+      "Piximon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "leomon": {
+    "num": 8100,
+    "name": "Leomon",
+    "types": [
+      "Normal",
+      "Fighting"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 85,
+      "atk": 123,
+      "def": 89,
+      "spa": 75,
+      "spd": 66,
+      "spe": 102
+    },
+    "abilities": {
+      "0": "Steadfast",
+      "H": "Justified"
+    },
+    "heightm": 2.8,
+    "weightkg": 246,
+    "evos": [
+      "SaberLeomon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "ogremon": {
+    "num": 8101,
+    "name": "Ogremon",
+    "types": [
+      "Dark"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 75,
+      "atk": 130,
+      "def": 85,
+      "spa": 70,
+      "spd": 80,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "H": "Moxie"
+    },
+    "heightm": 3,
+    "weightkg": 221,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "ikkakumon": {
+    "num": 8102,
+    "name": "Ikkakumon",
+    "types": [
+      "Ice",
+      "Water"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 95,
+      "atk": 120,
+      "def": 90,
+      "spa": 85,
+      "spd": 80,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "H": "Intimidate"
+    },
+    "heightm": 3.7,
+    "weightkg": 460,
+    "prevo": "Gomamon",
+    "evos": [
+      "Zudomon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "mojyamon": {
+    "num": 8103,
+    "name": "Mojyamon",
+    "types": [
+      "Normal"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 115,
+      "def": 100,
+      "spa": 75,
+      "spd": 100,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Early Bird",
+      "H": "Snow Warning"
+    },
+    "heightm": 2.6,
+    "weightkg": 254,
+    "evos": [
+      "Piximon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "frigimon": {
+    "num": 8104,
+    "name": "Frigimon",
+    "types": [
+      "Ice"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 75,
+      "atk": 125,
+      "def": 90,
+      "spa": 80,
+      "spd": 80,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Iron Fist",
+      "H": "Slush Rush"
+    },
+    "heightm": 2.8,
+    "weightkg": 237,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "kuwagamon": {
+    "num": 8105,
+    "name": "Kuwagamon",
+    "types": [
+      "Bug",
+      "Fighting"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 65,
+      "atk": 135,
+      "def": 95,
+      "spa": 85,
+      "spd": 70,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Hyper Cutter",
+      "H": "Compound Eyes"
+    },
+    "heightm": 4.1,
+    "weightkg": 372.5,
+    "evos": [
+      "Okuwamon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "kabuterimon": {
+    "num": 8106,
+    "name": "Kabuterimon",
+    "types": [
+      "Bug",
+      "Electric"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 80,
+      "atk": 110,
+      "def": 125,
+      "spa": 70,
+      "spd": 85,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Speed Boost"
+    },
+    "heightm": 4.2,
+    "weightkg": 400,
+    "prevo": "Tentomon",
+    "evos": [
+      "MegaKabuterimon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "flymon": {
+    "num": 8107,
+    "name": "Flymon",
+    "types": [
+      "Electric",
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 70,
+      "atk": 122,
+      "def": 80,
+      "spa": 82,
+      "spd": 55,
+      "spe": 136
+    },
+    "abilities": {
+      "0": "Static",
+      "H": "Levitate"
+    },
+    "heightm": 1.9,
+    "weightkg": 55,
+    "prevo": "Kunemon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "vegiemon": {
+    "num": 8108,
+    "name": "Vegiemon",
+    "types": [
+      "Grass",
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 80,
+      "atk": 104,
+      "def": 85,
+      "spa": 106,
+      "spd": 90,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Prankster",
+      "H": "Aftermath"
+    },
+    "heightm": 1.6,
+    "weightkg": 93,
+    "prevo": "Palmon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "redvegiemon": {
+    "num": 8109,
+    "name": "RedVegiemon",
+    "types": [
+      "Grass",
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 85,
+      "atk": 120,
+      "def": 80,
+      "spa": 100,
+      "spd": 80,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Poison Touch",
+      "H": "No Guard"
+    },
+    "heightm": 1.7,
+    "weightkg": 94,
+    "prevo": "Palmon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "coelamon": {
+    "num": 8110,
+    "name": "Coelamon",
+    "types": [
+      "Water",
+      "Steel"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 95,
+      "def": 100,
+      "spa": 110,
+      "spd": 95,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "H": "Stall"
+    },
+    "heightm": 1.9,
+    "weightkg": 321.5,
+    "prevo": "Crabmon",
+    "evos": [
+      "Whamon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "airdramon": {
+    "num": 8111,
+    "name": "Airdramon",
+    "types": [
+      "Dragon",
+      "Flying"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 130,
+      "def": 70,
+      "spa": 80,
+      "spd": 70,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Rock Head",
+      "H": "Serene Grace"
+    },
+    "heightm": 3,
+    "weightkg": 242,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "angemon": {
+    "num": 8112,
+    "name": "Angemon",
+    "types": [
+      "Fairy",
+      "Flying"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 105,
+      "atk": 115,
+      "def": 70,
+      "spa": 90,
+      "spd": 70,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Long Reach",
+      "H": "Serene Grace"
+    },
+    "heightm": 2.1,
+    "weightkg": 133.5,
+    "prevo": "Patamon",
+    "evos": [
+      "MagnaAngemon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "weregarurumon": {
+    "num": 8113,
+    "name": "WereGarurumon",
+    "types": [
+      "Ice",
+      "Fighting"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 85,
+      "atk": 130,
+      "def": 80,
+      "spa": 115,
+      "spd": 85,
+      "spe": 115
+    },
+    "abilities": {
+      "0": "Technician",
+      "H": "Guts"
+    },
+    "heightm": 2.8,
+    "weightkg": 257.5,
+    "prevo": "Garurumon",
+    "evos": [
+      "MetalGarurumon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "megakabuterimon": {
+    "num": 8114,
+    "name": "MegaKabuterimon",
+    "types": [
+      "Bug",
+      "Electric"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 105,
+      "atk": 120,
+      "def": 150,
+      "spa": 80,
+      "spd": 95,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Speed Boost"
+    },
+    "heightm": 14.7,
+    "weightkg": 986,
+    "prevo": "Kabuterimon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "garudamon": {
+    "num": 8115,
+    "name": "Garudamon",
+    "types": [
+      "Fire",
+      "Flying"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 138,
+      "def": 80,
+      "spa": 104,
+      "spd": 75,
+      "spe": 123
+    },
+    "abilities": {
+      "0": "Guts",
+      "H": "Telepathy"
+    },
+    "heightm": 11.2,
+    "weightkg": 645,
+    "prevo": "Birdramon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "zudomon": {
+    "num": 8116,
+    "name": "Zudomon",
+    "types": [
+      "Ice",
+      "Rock"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 140,
+      "def": 120,
+      "spa": 92,
+      "spd": 90,
+      "spe": 78
+    },
+    "abilities": {
+      "0": "Anger Point",
+      "H": "Intimidate"
+    },
+    "heightm": 15,
+    "weightkg": 1547,
+    "prevo": "Ikkakumon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "megaseadramon": {
+    "num": 8117,
+    "name": "MegaSeadramon",
+    "types": [
+      "Water",
+      "Dragon"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 120,
+      "def": 100,
+      "spa": 114,
+      "spd": 74,
+      "spe": 117
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "H": "Unaware"
+    },
+    "heightm": 5.7,
+    "weightkg": 485,
+    "prevo": "Seadramon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "okuwamon": {
+    "num": 8118,
+    "name": "Okuwamon",
+    "types": [
+      "Bug",
+      "Fighting"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 65,
+      "atk": 150,
+      "def": 100,
+      "spa": 117,
+      "spd": 73,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Hyper Cutter",
+      "H": "Compound Eyes"
+    },
+    "heightm": 12.5,
+    "weightkg": 821,
+    "prevo": "Kuwagamon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "piximon": {
+    "num": 8119,
+    "name": "Piximon",
+    "types": [
+      "Fairy",
+      "Fighting"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 85,
+      "atk": 120,
+      "def": 85,
+      "spa": 100,
+      "spd": 90,
+      "spe": 130
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Magician"
+    },
+    "heightm": 1.5,
+    "weightkg": 49,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "lillymon": {
+    "num": 8120,
+    "name": "Lillymon",
+    "types": [
+      "Grass",
+      "Fairy"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 100,
+      "atk": 90,
+      "def": 80,
+      "spa": 138,
+      "spd": 85,
+      "spe": 117
+    },
+    "abilities": {
+      "0": "Opportunist",
+      "H": "Solar Power"
+    },
+    "heightm": 1.8,
+    "weightkg": 74.5,
+    "prevo": "Togemon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "whamon": {
+    "num": 8121,
+    "name": "Whamon",
+    "types": [
+      "Water",
+      "Normal"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 100,
+      "atk": 125,
+      "def": 110,
+      "spa": 110,
+      "spd": 105,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "H": "Sheer Force"
+    },
+    "heightm": 11.5,
+    "weightkg": 1284,
+    "prevo": "Coelamon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "monzaemon": {
+    "num": 8122,
+    "name": "Monzaemon",
+    "types": [
+      "Normal",
+      "Fairy"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 120,
+      "atk": 120,
+      "def": 100,
+      "spa": 100,
+      "spd": 95,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Pixilate",
+      "H": "Telepathy"
+    },
+    "heightm": 3.8,
+    "weightkg": 470,
+    "prevo": "Numemon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "magnaangemon": {
+    "num": 8123,
+    "name": "MagnaAngemon",
+    "types": [
+      "Fairy",
+      "Flying"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 95,
+      "atk": 120,
+      "def": 85,
+      "spa": 120,
+      "spd": 85,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Magic Guard",
+      "H": "Serene Grace"
+    },
+    "heightm": 2.6,
+    "weightkg": 238,
+    "prevo": "Angemon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "saberleomon": {
+    "num": 8124,
+    "name": "SaberLeomon",
+    "types": [
+      "Electric",
+      "Fighting"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 100,
+      "atk": 135,
+      "def": 120,
+      "spa": 105,
+      "spd": 90,
+      "spe": 140
+    },
+    "abilities": {
+      "0": "Iron Barbs",
+      "H": "Justified"
+    },
+    "heightm": 3.6,
+    "weightkg": 525,
+    "prevo": "Leomon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "metalgarurumon": {
+    "num": 8125,
+    "name": "MetalGarurumon",
+    "types": [
+      "Ice",
+      "Steel"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 100,
+      "atk": 134,
+      "def": 120,
+      "spa": 126,
+      "spd": 105,
+      "spe": 125
+    },
+    "abilities": {
+      "0": "Technician",
+      "H": "Download"
+    },
+    "heightm": 2.2,
+    "weightkg": 616,
+    "prevo": "WereGarurumon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "machinedramon": {
+    "num": 8126,
+    "name": "Machinedramon",
+    "types": [
+      "Steel",
+      "Ghost"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 76,
+      "atk": 145,
+      "def": 135,
+      "spa": 155,
+      "spd": 125,
+      "spe": 79
+    },
+    "abilities": {
+      "0": "Mega Launcher",
+      "H": "Magnet Pull"
+    },
+    "heightm": 14.4,
+    "weightkg": 1490,
+    "prevo": "SkullGreymon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "omnimon": {
+    "num": 8127,
+    "name": "Omnimon",
+    "types": [
+      "Fire",
+      "Ice"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 115,
+      "atk": 145,
+      "def": 120,
+      "spa": 145,
+      "spd": 120,
+      "spe": 130
+    },
+    "abilities": {
+      "0": "Magic Guard",
+      "H": "Download"
+    },
+    "heightm": 3.5,
+    "weightkg": 470,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "pagumon": {
+    "num": 8128,
+    "name": "Pagumon",
+    "types": [
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 35,
+      "atk": 30,
+      "def": 30,
+      "spa": 40,
+      "spd": 35,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Prankster",
+      "H": "Contrary"
+    },
+    "heightm": 0.5,
+    "weightkg": 13,
+    "prevo": "Botamon",
+    "evos": [
+      "Keramon",
+      "Keramon",
+      "Gazimon",
+      "Demidevimon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "gazimon": {
+    "num": 8129,
+    "name": "Gazimon",
+    "types": [
+      "Poison",
+      "Dark"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 70,
+      "atk": 70,
+      "def": 60,
+      "spa": 80,
+      "spd": 70,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Prankster",
+      "H": "Contrary"
+    },
+    "heightm": 1.1,
+    "weightkg": 49,
+    "prevo": "Pagumon",
+    "evos": [
+      "Etemon",
+      "Leomon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "etemon": {
+    "num": 8130,
+    "name": "Etemon",
+    "types": [
+      "Fighting",
+      "Ground"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 80,
+      "atk": 130,
+      "def": 90,
+      "spa": 95,
+      "spd": 92,
+      "spe": 118
+    },
+    "abilities": {
+      "0": "Prankster",
+      "H": "Contrary"
+    },
+    "heightm": 1.9,
+    "weightkg": 117.5,
+    "prevo": "Gazimon",
+    "evos": [
+      "MetalEtemon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "metaletemon": {
+    "num": 8131,
+    "name": "MetalEtemon",
+    "types": [
+      "Fighting",
+      "Steel"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 100,
+      "atk": 140,
+      "def": 120,
+      "spa": 109,
+      "spd": 130,
+      "spe": 106
+    },
+    "abilities": {
+      "0": "Filter",
+      "H": "Contrary"
+    },
+    "heightm": 2,
+    "weightkg": 278.5,
+    "prevo": "Etemon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "demidevimon": {
+    "num": 8132,
+    "name": "Demidevimon",
+    "types": [
+      "Flying",
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 70,
+      "atk": 69,
+      "def": 66,
+      "spa": 70,
+      "spd": 70,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Prankster",
+      "H": "Contrary"
+    },
+    "heightm": 0.9,
+    "weightkg": 30,
+    "prevo": "Pagumon",
+    "evos": [
+      "Wizardmon",
+      "Devimon",
+      "Bakemon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "devimon": {
+    "num": 8133,
+    "name": "Devimon",
+    "types": [
+      "Flying",
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 85,
+      "atk": 125,
+      "def": 70,
+      "spa": 90,
+      "spd": 80,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Long Reach",
+      "H": "Dark Aura"
+    },
+    "heightm": 2.2,
+    "weightkg": 112,
+    "prevo": "Demidevimon",
+    "evos": [
+      "Myotismon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "bakemon": {
+    "num": 8134,
+    "name": "Bakemon",
+    "types": [
+      "Poison",
+      "Ghost"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 75,
+      "atk": 70,
+      "def": 90,
+      "spa": 114,
+      "spd": 120,
+      "spe": 81
+    },
+    "abilities": {
+      "0": "Cursed Body",
+      "H": "Levitate"
+    },
+    "heightm": 1.3,
+    "weightkg": 26,
+    "prevo": "Demidevimon",
+    "evos": [
+      "Phantomon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "keramon": {
+    "num": 8135,
+    "name": "Keramon",
+    "types": [
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 75,
+      "atk": 70,
+      "def": 70,
+      "spa": 70,
+      "spd": 70,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Prankster",
+      "H": "Contrary"
+    },
+    "heightm": 1.2,
+    "weightkg": 83,
+    "prevo": "Pagumon",
+    "evos": [
+      "Infermon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom"
+  },
+  "infermon": {
+    "num": 8136,
+    "name": "Infermon",
+    "types": [
+      "Bug",
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 90,
+      "atk": 90,
+      "def": 110,
+      "spa": 120,
+      "spd": 110,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Prankster",
+      "H": "Download"
+    },
+    "heightm": 2.1,
+    "weightkg": 450,
+    "prevo": "Keramon",
+    "evos": [
+      "Diaboromon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "diaboromon": {
+    "num": 8137,
+    "name": "Diaboromon",
+    "types": [
+      "Poison",
+      "Dark"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 105,
+      "atk": 130,
+      "def": 120,
+      "spa": 151,
+      "spd": 120,
+      "spe": 129
+    },
+    "abilities": {
+      "0": "Dark Aura",
+      "H": "Download"
+    },
+    "heightm": 3.8,
+    "weightkg": 587,
+    "prevo": "Infermon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "wizardmon": {
+    "num": 8138,
+    "name": "Wizardmon",
+    "types": [
+      "Psychic",
+      "Ghost"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 80,
+      "atk": 100,
+      "def": 70,
+      "spa": 130,
+      "spd": 75,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Magic Bounce",
+      "H": "Magic Bounce"
+    },
+    "heightm": 1.6,
+    "weightkg": 75,
+    "prevo": "Demidevimon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "woodmon": {
+    "num": 8139,
+    "name": "Woodmon",
+    "types": [
+      "Grass"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 105,
+      "atk": 95,
+      "def": 130,
+      "spa": 70,
+      "spd": 65,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Super Luck",
+      "H": "Natural Cure"
+    },
+    "heightm": 4.8,
+    "weightkg": 519,
+    "prevo": "Palmon",
+    "evos": [
+      "Cherrymon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "cherrymon": {
+    "num": 8140,
+    "name": "Cherrymon",
+    "types": [
+      "Grass",
+      "Poison"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 105,
+      "atk": 130,
+      "def": 130,
+      "spa": 95,
+      "spd": 65,
+      "spe": 64
+    },
+    "abilities": {
+      "0": "Sniper",
+      "H": "Illusion"
+    },
+    "heightm": 6,
+    "weightkg": 1251,
+    "prevo": "Woodmon",
+    "evos": [
+      "Puppetmon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "puppetmon": {
+    "num": 8141,
+    "name": "Puppetmon",
+    "types": [
+      "Grass",
+      "Dark"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 120,
+      "atk": 141,
+      "def": 110,
+      "spa": 120,
+      "spd": 90,
+      "spe": 119
+    },
+    "abilities": {
+      "0": "Sniper",
+      "H": "Flare Boost"
+    },
+    "heightm": 1.5,
+    "weightkg": 158,
+    "prevo": "Cherrymon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "metalseadramon": {
+    "num": 8142,
+    "name": "MetalSeadramon",
+    "types": [
+      "Steel",
+      "Dragon"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 104,
+      "atk": 100,
+      "def": 130,
+      "spa": 145,
+      "spd": 105,
+      "spe": 121
+    },
+    "abilities": {
+      "0": "Drizzle",
+      "H": "Storm Drain"
+    },
+    "heightm": 12,
+    "weightkg": 1485,
+    "prevo": "Seadramon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "myotismon": {
+    "num": 8143,
+    "name": "Myotismon",
+    "types": [
+      "Poison",
+      "Psychic"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 100,
+      "atk": 119,
+      "def": 94,
+      "spa": 126,
+      "spd": 80,
+      "spe": 106
+    },
+    "abilities": {
+      "0": "Tough Claws",
+      "H": "Nightmare Heart"
+    },
+    "heightm": 2.6,
+    "weightkg": 238,
+    "prevo": "Devimon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "phantomon": {
+    "num": 8144,
+    "name": "Phantomon",
+    "types": [
+      "Poison",
+      "Ghost"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 94,
+      "atk": 128,
+      "def": 90,
+      "spa": 100,
+      "spd": 95,
+      "spe": 103
+    },
+    "abilities": {
+      "0": "Cursed Body",
+      "H": "Levitate"
+    },
+    "heightm": 2.1,
+    "weightkg": 127.5,
+    "prevo": "Bakemon",
+    "evos": [
+      "Piedmon"
+    ],
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "piedmon": {
+    "num": 8145,
+    "name": "Piedmon",
+    "types": [
+      "Ghost",
+      "Dark"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 104,
+      "atk": 160,
+      "def": 105,
+      "spa": 108,
+      "spd": 110,
+      "spe": 118
+    },
+    "abilities": {
+      "0": "Cursed Body",
+      "H": "Pickpocket"
+    },
+    "heightm": 2.5,
+    "weightkg": 163.5,
+    "prevo": "Phantomon",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity",
+      "Digimon"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "venus": {
+    "num": 8146,
+    "name": "Venus",
+    "types": [
+      "Grass",
+      "Ground"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 115,
+      "atk": 120,
+      "def": 130,
+      "spa": 75,
+      "spd": 110,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Magic Guard",
+      "H": "Magic Guard"
+    },
+    "heightm": 1.3,
+    "weightkg": 90,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "mars": {
+    "num": 8147,
+    "name": "Mars",
+    "types": [
+      "Fire",
+      "Dragon"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 80,
+      "atk": 130,
+      "def": 110,
+      "spa": 120,
+      "spd": 75,
+      "spe": 115
+    },
+    "abilities": {
+      "0": "No Guard",
+      "H": "No Guard"
+    },
+    "heightm": 1,
+    "weightkg": 60,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "mercury": {
+    "num": 8148,
+    "name": "Mercury",
+    "types": [
+      "Water",
+      "Ice"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 130,
+      "atk": 75,
+      "def": 80,
+      "spa": 120,
+      "spd": 115,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Filter",
+      "H": "Filter"
+    },
+    "heightm": 1.3,
+    "weightkg": 90,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "jupiter": {
+    "num": 8149,
+    "name": "Jupiter",
+    "types": [
+      "Flying",
+      "Electric"
+    ],
+    "gender": "N",
+    "baseStats": {
+      "hp": 75,
+      "atk": 115,
+      "def": 110,
+      "spa": 80,
+      "spd": 120,
+      "spe": 130
+    },
+    "abilities": {
+      "0": "Friend Guard",
+      "H": "Friend Guard"
+    },
+    "heightm": 1.2,
+    "weightkg": 70,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "onixbrock": {
+    "num": 8151,
+    "name": "Onix-Brock",
+    "types": [
+      "Rock",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 135,
+      "def": 135,
+      "spa": 20,
+      "spd": 70,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Sheer Force"
+    },
+    "heightm": 9.4,
+    "weightkg": 235,
+    "color": "Gray",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "onixcrystal": {
+    "num": 8152,
+    "name": "Onix-Crystal",
+    "types": [
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 125,
+      "def": 140,
+      "spa": 30,
+      "spd": 90,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Crystalline"
+    },
+    "heightm": 9.4,
+    "weightkg": 235,
+    "color": "Blue",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "psyduckmisty": {
+    "num": 54,
+    "name": "Psyduck-Misty",
+    "types": [
+      "Water",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 66,
+      "atk": 85,
+      "def": 53,
+      "spa": 142,
+      "spd": 120,
+      "spe": 74
+    },
+    "abilities": {
+      "0": "Migraine"
+    },
+    "heightm": 0.8,
+    "weightkg": 19.6,
+    "color": "Yellow",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "pikachuash": {
+    "num": 25,
+    "name": "Pikachu-Ash",
+    "types": [
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 101,
+      "atk": 80,
+      "def": 51,
+      "spa": 72,
+      "spd": 61,
+      "spe": 115
+    },
+    "abilities": {
+      "0": "Supercharged"
+    },
+    "heightm": 0.4,
+    "weightkg": 6,
+    "color": "Yellow",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "baseSpecies": "Pikachu",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "raticateblue": {
+    "num": 20,
+    "name": "Raticate-Blue",
+    "types": [
+      "Ghost",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 138,
+      "def": 60,
+      "spa": 97,
+      "spd": 94,
+      "spe": 111
+    },
+    "abilities": {
+      "0": "Restless Spirit"
+    },
+    "heightm": 0.8,
+    "weightkg": 5.1,
+    "color": "Brown",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "zoroarkn": {
+    "num": 571,
+    "name": "Zoroark-N",
+    "types": [
+      "Dark",
+      "Normal"
+    ],
+    "genderRatio": {
+      "M": 0.875,
+      "F": 0.125
+    },
+    "baseStats": {
+      "hp": 103,
+      "atk": 129,
+      "def": 70,
+      "spa": 87,
+      "spd": 62,
+      "spe": 119
+    },
+    "abilities": {
+      "0": "Illusionist"
+    },
+    "heightm": 1.9,
+    "weightkg": 81.1,
+    "color": "Gray",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "missingnomega": {
+    "num": 0,
+    "name": "MissingNo.-Mega",
+    "baseSpecies": "MissingNo.",
+    "forme": "Mega",
+    "types": [
+      "???"
+    ],
+    "baseStats": {
+      "hp": 111,
+      "atk": 110,
+      "def": 110,
+      "spa": 101,
+      "spd": 101,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Glitch Out"
+    },
+    "heightm": 3,
+    "weightkg": 1590.8,
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "requiredItem": "Corrupted Data",
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "arbokjessie": {
+    "num": 24,
+    "name": "Arbok-Jessie",
+    "types": [
+      "Poison",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 66,
+      "atk": 113,
+      "def": 80,
+      "spa": 85,
+      "spd": 90,
+      "spe": 101
+    },
+    "abilities": {
+      "0": "Grand Entrance"
+    },
+    "heightm": 3.5,
+    "weightkg": 65,
+    "color": "Purple",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  },
+  "weezingjames": {
+    "num": 110,
+    "name": "Weezing-James",
+    "types": [
+      "Poison",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 66,
+      "def": 113,
+      "spa": 101,
+      "spd": 85,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Simply Evil"
+    },
+    "heightm": 1.2,
+    "weightkg": 9.5,
+    "color": "Purple",
+    "tags": [
+      "Infinity"
+    ],
+    "eggGroups": [
+      "Infinity"
+    ],
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal",
+    "isNonstandard": "Custom",
+    "tier": "Illegal"
+  }
+}

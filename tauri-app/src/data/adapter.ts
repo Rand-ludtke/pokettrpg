@@ -50,6 +50,10 @@ export type AliasesIndex = Record<string, string>;
 let gBundledSprites: Record<string, Partial<Record<string, string>>> = {};
 let gPreferBackendSpriteIds = new Set<string>();
 
+// Maps normalized species ID → fangame key for Pokeathlon-hosted sprite resolution.
+// Populated during loadShowdownDex(). Keys: species id; Values: 'uranium' | 'infinity' | 'mariomon'
+let gFangameSpriteSource: Map<string, string> = new Map();
+
 function isSagePlaceholderText(value: unknown): boolean {
   const text = String(value || '').trim().toLowerCase();
   return text === 'pokemon sage custom move.'
@@ -720,6 +724,27 @@ export async function loadShowdownDex(options?: { base?: string }) {
     fetchOptionalJson(withPublicBase('data/more-pokemon/generated/wylin-customs.generated.json')),
   ]);
 
+  const [uraniumDex, uraniumLearnsets, uraniumMoves, uraniumAbilities] = await Promise.all([
+    fetchOptionalJson(withPublicBase('data/uranium/generated/pokedex.uranium.json')),
+    fetchOptionalJson(withPublicBase('data/uranium/generated/learnsets.uranium.json')),
+    fetchOptionalJson(withPublicBase('data/uranium/generated/moves.custom.uranium.json')),
+    fetchOptionalJson(withPublicBase('data/uranium/generated/abilities.custom.uranium.json')),
+  ]);
+
+  const [infinityDex, infinityLearnsets, infinityMoves, infinityAbilities] = await Promise.all([
+    fetchOptionalJson(withPublicBase('data/infinity/generated/pokedex.infinity.json')),
+    fetchOptionalJson(withPublicBase('data/infinity/generated/learnsets.infinity.json')),
+    fetchOptionalJson(withPublicBase('data/infinity/generated/moves.custom.infinity.json')),
+    fetchOptionalJson(withPublicBase('data/infinity/generated/abilities.custom.infinity.json')),
+  ]);
+
+  const [mariomonDex, mariomonLearnsets, mariomonMoves, mariomonAbilities] = await Promise.all([
+    fetchOptionalJson(withPublicBase('data/mariomon/generated/pokedex.mariomon.json')),
+    fetchOptionalJson(withPublicBase('data/mariomon/generated/learnsets.mariomon.json')),
+    fetchOptionalJson(withPublicBase('data/mariomon/generated/moves.custom.mariomon.json')),
+    fetchOptionalJson(withPublicBase('data/mariomon/generated/abilities.custom.mariomon.json')),
+  ]);
+
   const wylinDex = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).dex : null) || {};
   const wylinLearnsets = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).learnsets : null) || {};
   const wylinMoves = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).moves : null) || {};
@@ -754,23 +779,35 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((sagePokedex || {}) as DexIndex),
     ...((insPokedex || {}) as DexIndex),
     ...((wylinDex || {}) as DexIndex),
+    ...((uraniumDex || {}) as DexIndex),
+    ...((infinityDex || {}) as DexIndex),
+    ...((mariomonDex || {}) as DexIndex),
   } as DexIndex;
   const mergedBaseLearnsets = {
     ...(learnsets as LearnsetsIndex),
     ...((sageLearnsets || {}) as LearnsetsIndex),
     ...((insLearnsets || {}) as LearnsetsIndex),
     ...((wylinLearnsets || {}) as LearnsetsIndex),
+    ...((uraniumLearnsets || {}) as LearnsetsIndex),
+    ...((infinityLearnsets || {}) as LearnsetsIndex),
+    ...((mariomonLearnsets || {}) as LearnsetsIndex),
   } as LearnsetsIndex;
   const mergedBaseMoves = {
     ...(moves as MoveIndex),
     ...((sageMoves || {}) as MoveIndex),
     ...((wylinMoves || {}) as MoveIndex),
+    ...((uraniumMoves || {}) as MoveIndex),
+    ...((infinityMoves || {}) as MoveIndex),
+    ...((mariomonMoves || {}) as MoveIndex),
   } as MoveIndex;
   const mergedBaseAbilities = {
     ...(abilities as AbilityIndex),
     ...((sageAbilities || {}) as AbilityIndex),
     ...((insAbilities || {}) as AbilityIndex),
     ...((wylinAbilities || {}) as AbilityIndex),
+    ...((uraniumAbilities || {}) as AbilityIndex),
+    ...((infinityAbilities || {}) as AbilityIndex),
+    ...((mariomonAbilities || {}) as AbilityIndex),
   } as AbilityIndex;
   const mergedBaseItems = {
     ...(items as ItemIndex),
@@ -791,6 +828,20 @@ export async function loadShowdownDex(options?: { base?: string }) {
   addSourceTags((sagePokedex || {}) as Record<string, any>, 'sage');
   addSourceTags((insPokedex || {}) as Record<string, any>, 'insurgence');
   addSourceTags((wylinDex || {}) as Record<string, any>, 'wylin');
+  addSourceTags((uraniumDex || {}) as Record<string, any>, 'uranium');
+  addSourceTags((infinityDex || {}) as Record<string, any>, 'infinity');
+  addSourceTags((mariomonDex || {}) as Record<string, any>, 'mariomon');
+
+  // Build Pokeathlon fangame sprite source map for sprite resolution
+  const fangameSpriteMap = new Map<string, string>();
+  for (const [tag, dexObj] of [['uranium', uraniumDex], ['infinity', infinityDex], ['mariomon', mariomonDex]] as const) {
+    if (dexObj) {
+      for (const id of Object.keys(dexObj)) {
+        fangameSpriteMap.set(normalizeName(id), tag);
+      }
+    }
+  }
+  gFangameSpriteSource = fangameSpriteMap;
 
   // Merge custom overlays from local storage (local-only additions)
   const customDex = getCustomDex();
@@ -1228,6 +1279,15 @@ export function spriteUrl(speciesId: string, shiny = false, options?: { base?: s
       const local = getCustomSprite(id, slot);
       if (local) return local;
     }
+  }
+  // For Pokeathlon fangame Pokemon, return their hosted sprite directly
+  const fgTag = gFangameSpriteSource.get(normalizeName(speciesId));
+  if (fgTag) {
+    const fgExt = fgTag === 'uranium' ? 'gif' : 'png';
+    const fgDir = !!options?.back
+      ? (shiny ? 'back-shiny' : 'back')
+      : (shiny ? 'front-shiny' : 'front');
+    return `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/${fgDir}/${ids[0]}.${fgExt}`;
   }
   // Fall back to the first candidate file path
   return `${base}/${folder}/${ids[0]}.${ext}`;
@@ -1785,6 +1845,12 @@ export function speciesFormesInfo(name: string, dex: DexIndex) {
 }
 
 export function iconUrl(speciesId: string, options?: { base?: string }) {
+  // For Pokeathlon fangame Pokemon, use their hosted icon sprites
+  const fgTag = gFangameSpriteSource.get(normalizeName(speciesId));
+  if (fgTag) {
+    const fgIconExt = (fgTag === 'uranium' || fgTag === 'mariomon') ? 'gif' : 'png';
+    return `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/iconsprites/${normalizeName(speciesId)}.${fgIconExt}`;
+  }
   const base = normalizeBaseUrl(options?.base) || getPreferredSpriteBase();
   return `${base}/gen5icons/${normalizeName(speciesId)}.png`;
 }
@@ -1793,6 +1859,12 @@ export function iconUrlWithFallback(speciesId: string, onError: (nextUrl: string
   const id = normalizeName(speciesId);
   const bases = getSpriteBaseCandidates(options?.base);
   const candidates: string[] = [];
+  // For Pokeathlon fangame Pokemon, prioritize their hosted icon sprites
+  const fgTag = gFangameSpriteSource.get(id);
+  if (fgTag) {
+    const fgIconExt = (fgTag === 'uranium' || fgTag === 'mariomon') ? 'gif' : 'png';
+    candidates.push(`https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/iconsprites/${id}.${fgIconExt}`);
+  }
   // Try gen5icons across all bases
   for (const b of bases) candidates.push(`${b}/gen5icons/${id}.png`);
   // Then try gen5 full sprites across all bases as small icon fallback
@@ -1863,6 +1935,21 @@ export function spriteUrlWithFallback(
     for (const slot of slotPriority) {
       const custom = getCustomSprite(id, slot);
       if (custom) candidates.push(custom);
+    }
+  }
+  // Pokeathlon fangame sprite candidates (uranium, infinity, mariomon).
+  // These sprites are hosted externally on Pokeathlon and should be tried before
+  // local bases (which won't have them) to avoid wasted 404s.
+  const fangameTag = gFangameSpriteSource.get(normalizeName(speciesId));
+  if (fangameTag) {
+    const pokeathlonBase = 'https://play.pokeathlon.com/sprites/fangame-sprites';
+    // Uranium/Pokeathlon use .gif; Infinity/Mariomon use .png
+    const fgExt = fangameTag === 'uranium' ? 'gif' : 'png';
+    for (const id of idList) {
+      const frontDir = shiny ? 'front-shiny' : 'front';
+      const backDir = shiny ? 'back-shiny' : 'back';
+      const dir = back ? backDir : frontDir;
+      candidates.push(`${pokeathlonBase}/${fangameTag}/${dir}/${id}.${fgExt}`);
     }
   }
   // Try each ID across ALL bases before moving to the next ID.

@@ -1,0 +1,147 @@
+{
+  "petrify": {
+    "flags": {},
+    "name": "Petrify",
+    "desc": "On switch-in, this Pokemon lowers the Speed of opposing Pokemon by 1 stage. Pokemon behind a substitute are immune.",
+    "shortDesc": "On switch-in, this Pokemon lowers the Speed of opponents by 1 stage.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "lazy": {
+    "flags": {},
+    "name": "Lazy",
+    "shortDesc": "This Pokemon falls asleep on Switch-in.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "infuriate": {
+    "flags": {},
+    "name": "Infuriate",
+    "shortDesc": "If this Pokemon is hit by a physical attack, its attack is raised by 1 stage.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "quickcharge": {
+    "flags": {},
+    "name": "Quick Charge",
+    "shortDesc": "On this Pokemon's first turn, its moves have +4 priority.",
+    "rating": 4.5,
+    "isNonstandard": "Custom"
+  },
+  "bloodlust": {
+    "flags": {},
+    "name": "Blood Lust",
+    "shortDesc": "After an attack, holder gains 1/6 of the damage in HP dealt to other Pokemon.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "sharpcoral": {
+    "onModifyAtkPriority": 5,
+    "onModifySpAPriority": 5,
+    "onModifyDefPriority": 5,
+    "onModifySpDPriority": 5,
+    "flags": {},
+    "name": "Sharp Coral",
+    "shortDesc": "Doubles the user's offensive stats and halves its defensive stats.",
+    "rating": 4,
+    "isNonstandard": "Custom"
+  },
+  "soundboost": {
+    "onBasePowerPriority": 7,
+    "flags": {},
+    "name": "Sound Boost",
+    "shortDesc": "Sound-based moves are boosted by 1.3x.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "acceleration": {
+    "onBasePowerPriority": 7,
+    "flags": {},
+    "name": "Acceleration",
+    "shortDesc": "Priority moves are boosted by 1.5x.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "energizate": {
+    "onModifyTypePriority": -1,
+    "onBasePowerPriority": 23,
+    "flags": {},
+    "name": "Energizate",
+    "desc": "This Pokemon's Normal-type moves become Electric-type moves and have their power multiplied by 1.2. This effect comes after other effects that change a move's type.",
+    "shortDesc": "This Pokemon's Normal-type moves become Electric type and have 1.2x power.",
+    "rating": 4,
+    "isNonstandard": "Custom"
+  },
+  "atomizate": {
+    "onModifyTypePriority": -1,
+    "onBasePowerPriority": 23,
+    "flags": {},
+    "name": "Atomizate",
+    "desc": "This Pokemon's Normal-type moves become Nuclear-type moves and have their power multiplied by 1.2. This effect comes after other effects that change a move's type.",
+    "shortDesc": "This Pokemon's Normal-type moves become Nuclear type and have 1.2x power.",
+    "rating": 4,
+    "isNonstandard": "Custom"
+  },
+  "geigersense": {
+    "flags": {},
+    "name": "Geiger Sense",
+    "shortDesc": "Raises this Pokemon's Atk and Sp. Atk if a Nuclear-type Pokemon is on the field.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "rebuild": {
+    "onResidualOrder": 5,
+    "onResidualSubOrder": 3,
+    "flags": {},
+    "name": "Rebuild",
+    "shortDesc": "If this Pokemon is not hit by an attack during a turn, it heals 1/8th HP.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "nightterror": {
+    "flags": {},
+    "name": "Night Terror",
+    "shortDesc": "Causes paralysis on awakening foes.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "deepfreeze": {
+    "flags": {},
+    "name": "Deep Freeze",
+    "shortDesc": "30% chance a Pokemon making contact with this Pokemon will be frozen.",
+    "rating": 2,
+    "isNonstandard": "Custom"
+  },
+  "leadskin": {
+    "flags": {
+      "breakable": 1
+    },
+    "name": "Lead Skin",
+    "shortDesc": "This Pokemon is immune to Nuclear-type moves.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "stormbringer": {
+    "flags": {},
+    "name": "Stormbringer",
+    "shortDesc": "On switch-in, this Pokemon summons Thunderstorm.",
+    "rating": 4,
+    "isNonstandard": "Custom"
+  },
+  "disenchant": {
+    "flags": {
+      "breakable": 1
+    },
+    "name": "Disenchant",
+    "shortDesc": "This Pokemon is immune to Fairy-type moves.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "elementalist": {
+    "flags": {},
+    "name": "Elementalist",
+    "shortDesc": "User's Fire, Water, and Electric moves become STAB.",
+    "rating": 2,
+    "isNonstandard": "Custom"
+  }
+}

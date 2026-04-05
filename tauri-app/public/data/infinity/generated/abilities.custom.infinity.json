@@ -1,0 +1,114 @@
+{
+  "wokhei": {
+    "flags": {},
+    "name": "Wok Hei",
+    "shortDesc": "+2 Atk. when burning a foe.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "livingprism": {
+    "flags": {},
+    "name": "Living Prism",
+    "shortDesc": "Color Change + Protean",
+    "rating": 0,
+    "isNonstandard": "Custom"
+  },
+  "purefocus": {
+    "onModifySpAPriority": 5,
+    "flags": {},
+    "name": "Pure Focus",
+    "shortDesc": "Doubles the user's Special Attack stat.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "nightmareheart": {
+    "onSourceBasePowerPriority": 17,
+    "flags": {
+      "breakable": 1
+    },
+    "name": "Nightmare Heart",
+    "shortDesc": "This Pokemon is healed 1/4 by Dark, 1/8 by Snow; is hurt 1.25x by Fairy, 1/8 by Sun.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "crystalline": {
+    "onSourceModifyAtkPriority": 6,
+    "onSourceModifySpAPriority": 5,
+    "flags": {
+      "breakable": 1
+    },
+    "name": "Crystalline",
+    "shortDesc": "Ground-/Water-type moves against this Pokemon deal damage with a halved offensive stat.",
+    "rating": 3.5,
+    "isNonstandard": "Custom"
+  },
+  "migraine": {
+    "flags": {},
+    "name": "Migraine",
+    "shortDesc": "-7 prio on attacks; 100% crit chance.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "supercharged": {
+    "onModifyMovePriority": -5,
+    "onDamagingHitOrder": 1,
+    "flags": {
+      "breakable": 1
+    },
+    "name": "Supercharged",
+    "shortDesc": "Electric-type moves hit Ground for resisted; Charges when hit by special move.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "restlessspirit": {
+    "onResidualOrder": 9,
+    "flags": {
+      "failroleplay": 1,
+      "noreceiver": 1,
+      "noentrain": 1,
+      "notrace": 1,
+      "failskillswap": 1,
+      "cantsuppress": 1
+    },
+    "name": "Restless Spirit",
+    "shortDesc": "Immune to status bar sleep; if asleep at end of turn, faints.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "illusionist": {
+    "onModifyAccuracyPriority": -1,
+    "flags": {
+      "failroleplay": 1,
+      "noreceiver": 1,
+      "noentrain": 1,
+      "notrace": 1,
+      "failskillswap": 1
+    },
+    "name": "Illusionist",
+    "shortDesc": "Illusion. While illusion, x1.25 evasion. Loses illusion when attacking.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "glitchout": {
+    "flags": {},
+    "name": "Glitch Out",
+    "shortDesc": "If user misses a move, will select random move from list.",
+    "desc": "After the user misses a move, a move will be randomly selected from: Swords Dance, Mind Reader, Vanish, Iron Defense, Nasty Plot, Amnesia, Agility, Whirlwind, Stealth Rock, Spikes, Toxic Spikes, Sticky Web, Reflect, Lightscreen, and used.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "grandentrance": {
+    "flags": {},
+    "name": "Grand Entrance",
+    "shortDesc": "+1 to highest stat on switch-in.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  },
+  "simplyevil": {
+    "flags": {},
+    "name": "Simply Evil",
+    "shortDesc": "x2 to stat changes for all Poison-type pokemon.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  }
+}

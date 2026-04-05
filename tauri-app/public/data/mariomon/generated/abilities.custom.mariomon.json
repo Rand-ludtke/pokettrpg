@@ -1,0 +1,28 @@
+{
+  "transmutate": {
+    "onModifyTypePriority": -1,
+    "onBasePowerPriority": 23,
+    "flags": {},
+    "name": "Transmutate",
+    "desc": "This Pokemon's Normal-type moves become Psychic-type moves and have their power multiplied by 1.2. This effect comes after other effects that change a move's type.",
+    "shortDesc": "This Pokemon's Normal-type moves become Psychic type and have 1.2x power.",
+    "rating": 4,
+    "isNonstandard": "Custom"
+  },
+  "chaosemeralds": {
+    "onDamagePriority": -40,
+    "onResidualOrder": 1,
+    "flags": {
+      "failroleplay": 1,
+      "noreceiver": 1,
+      "noentrain": 1,
+      "notrace": 1,
+      "failskillswap": 1,
+      "cantsuppress": 1
+    },
+    "name": "Chaos Emeralds",
+    "shortDesc": "When Sonic reaches 1 HP, fully heal and transform into Super Sonic.",
+    "rating": 5,
+    "isNonstandard": "Custom"
+  }
+}

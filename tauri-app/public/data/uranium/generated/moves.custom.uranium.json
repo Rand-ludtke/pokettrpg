@@ -1,0 +1,5092 @@
+{
+  "bloomsday": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 150,
+    "basePowerCallback": true,
+    "category": "Special",
+    "name": "Bloom's Day",
+    "desc": "Power is equal to (user's current HP * 150 / user's maximum HP), rounded down, but not less than 1.",
+    "shortDesc": "Less power as user's HP decreases. Hits foe(s).",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "allAdjacentFoes",
+    "type": "Grass",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "spudmortar": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 120,
+    "category": "Special",
+    "name": "Spud Mortar",
+    "desc": "Deals damage two turns after this move is used. If the user is holding a berry, this move will consume the berry and boost the move's basepower by 50%. At the end of that turn, the damage is calculated at that time and dealt to the Pokemon at the position the target had when the move was used. If the user is no longer active at the time, damage is calculated based on the user's natural Special Attack stat, types, and level, with no boosts from its held item or Ability. Fails if another future move is already in effect for the target's position.",
+    "shortDesc": "Hits two turns after being used. If holding berry, x1.5 BP, consumes berry.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "metronome": 1,
+      "futuremove": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Grass",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "delightandflight": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 60,
+    "category": "Physical",
+    "name": "Delight and Flight",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "selfSwitch": true,
+    "secondary": null,
+    "desc": "If this move is successful and the user has not fainted, the user switches out even if it is trapped and is replaced immediately by a selected party member. The user does not switch out if there are no unfainted party members, or if the target switched out using an Eject Button or through the effect of the Emergency Exit or Wimp Out Abilities.",
+    "shortDesc": "User switches out after damaging the target.",
+    "target": "normal",
+    "type": "Grass",
+    "isNonstandard": "Custom"
+  },
+  "thornwhip": {
+    "accuracy": 95,
+    "basePower": 50,
+    "category": "Physical",
+    "name": "Thorn Whip",
+    "desc": "The target is struck with thick, spiked vines. High critical hit ratio.",
+    "shortDesc": "High critical hit ratio.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "critRatio": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Grass",
+    "isNonstandard": "Custom"
+  },
+  "dryneedles": {
+    "accuracy": 95,
+    "basePower": 18,
+    "category": "Physical",
+    "name": "Dry Needles",
+    "desc": "The target is struck with a series of 2 to 5 needles from a cactus plant.",
+    "shortDesc": "Hits 2-5 times in one turn.",
+    "pp": 20,
+    "priority": 0,
+    "multihit": [
+      2,
+      5
+    ],
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Grass",
+    "isNonstandard": "Custom"
+  },
+  "nanorepair": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Nanorepair",
+    "desc": "The user restores 1/2 of its maximum HP, rounded half up. Defense is boosted by +1.",
+    "shortDesc": "User heals 50% of its max HP; gets +1 Def.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "snatch": 1,
+      "heal": 1,
+      "metronome": 1
+    },
+    "heal": [
+      1,
+      2
+    ],
+    "boosts": {
+      "def": 1
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Steel",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "runtimeexception": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Runtime Exception",
+    "desc": "The user randomly uses Flare Blitz, Iron Head, Psychic, or Wild Charge.",
+    "shortDesc": "Randomly executes one of 4 powerful moves.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "failencore": 1,
+      "nosleeptalk": 1,
+      "noassist": 1,
+      "failcopycat": 1,
+      "failmimic": 1,
+      "failinstruct": 1
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Steel",
+    "contestType": "Cute",
+    "isNonstandard": "Custom"
+  },
+  "heavycleave": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Heavy Cleave",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "contact": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "slicing": 1
+    },
+    "secondary": {
+      "chance": 20,
+      "boosts": {
+        "def": -1
+      }
+    },
+    "target": "allAdjacentFoes",
+    "type": "Steel",
+    "shortDesc": "20% chance to lower foe(s) Defense by 1 stage.",
+    "isNonstandard": "Custom"
+  },
+  "throwingknives": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 25,
+    "category": "Physical",
+    "name": "Throwing Knives",
+    "pp": 30,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "slicing": 1
+    },
+    "multihit": [
+      2,
+      5
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Steel",
+    "shortDesc": "Hits 2-5 times.",
+    "isNonstandard": "Custom"
+  },
+  "simmertoss": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Simmer Toss",
+    "pp": 10,
+    "priority": -6,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "noassist": 1,
+      "failcopycat": 1
+    },
+    "forceSwitch": true,
+    "target": "normal",
+    "type": "Steel",
+    "contestType": "Cool",
+    "shortDesc": "Forces the target to switch to a random ally.",
+    "isNonstandard": "Custom"
+  },
+  "metalwhip": {
+    "accuracy": 90,
+    "basePower": 50,
+    "category": "Physical",
+    "name": "Metal Whip",
+    "desc": "Prevents the target from switching for four or five turns (seven turns if the user is holding Grip Claw). Causes damage to the target equal to 1/8 of its maximum HP (1/6 if the user is holding Binding Band), rounded down, at the end of each turn during effect. The target can still switch out if it is holding Shed Shell or uses Baton Pass, Flip Turn, Parting Shot, Shed Tail, Teleport, U-turn, or Volt Switch. The effect ends if either the user or the target leaves the field, or if the target uses Mortal Spin, Rapid Spin, or Substitute successfully. This effect is not stackable or reset by using this or another binding move.",
+    "shortDesc": "Traps and damages the target for 4-5 turns.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "volatileStatus": "partiallytrapped",
+    "secondary": null,
+    "target": "normal",
+    "type": "Steel",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "mugencannon": {
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Special",
+    "name": "Mugen Cannon",
+    "desc": "The user blasts devastating energy waves from its cannons. It may lower the target's accuracy.",
+    "shortDesc": "30% chance to lower the target's accuracy by 1.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "pulse": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "boosts": {
+        "accuracy": -1
+      }
+    },
+    "target": "normal",
+    "type": "Steel",
+    "isNonstandard": "Custom"
+  },
+  "lionsword": {
+    "accuracy": true,
+    "basePower": 75,
+    "category": "Physical",
+    "name": "Lion Sword",
+    "desc": "The user slashes at the target with a magical sword. This attack never misses.",
+    "shortDesc": "This move does not check accuracy.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "slicing": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Steel",
+    "isNonstandard": "Custom"
+  },
+  "trumpsword": {
+    "accuracy": 100,
+    "basePower": 25,
+    "category": "Physical",
+    "name": "Trump Sword",
+    "desc": "In a flash the user summons sharp swords at the target. It strikes one to four times in a row.",
+    "shortDesc": "Hits 1-4 times in one turn.",
+    "pp": 10,
+    "priority": 1,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "multihit": [
+      1,
+      4
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Steel",
+    "isNonstandard": "Custom"
+  },
+  "morph": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "desc": "Functions the same as Transform; however, if a Delta species of the target exists, the user will turn into that instead. If the target has multiple Delta Species, it will select one of them at random.",
+    "shortDesc": "Transforms into the opponent, prioritizes Delta Form.",
+    "name": "Morph",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "allyanim": 1,
+      "failencore": 1,
+      "noassist": 1,
+      "failcopycat": 1,
+      "failmimic": 1,
+      "failinstruct": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Normal",
+    "zMove": {
+      "effect": "heal"
+    },
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "retrograde": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Retrograde",
+    "shortDesc": "Reverts Mega Evolved Pokémon back to their base form.",
+    "pp": 30,
+    "priority": 0,
+    "flags": {},
+    "secondary": null,
+    "target": "any",
+    "type": "Normal",
+    "zMove": {
+      "boost": {
+        "def": 3,
+        "spd": 3
+      }
+    },
+    "isNonstandard": "Custom"
+  },
+  "heal": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Heal",
+    "shortDesc": "Heals the target by 20HP.",
+    "pp": 1,
+    "noPPBoosts": true,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "reflectable": 1,
+      "distance": 1,
+      "heal": 1,
+      "allyanim": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "adjacentAllyOrSelf",
+    "type": "Normal",
+    "zMove": {
+      "boost": {
+        "atk": 1,
+        "def": 1,
+        "spa": 1,
+        "spd": 1,
+        "spe": 1
+      }
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "hyperheal": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Hyper Heal",
+    "shortDesc": "Heals the target by 200HP.",
+    "pp": 1,
+    "noPPBoosts": true,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "reflectable": 1,
+      "distance": 1,
+      "heal": 1,
+      "allyanim": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "adjacentAllyOrSelf",
+    "type": "Normal",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "fullheal": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Full Heal",
+    "shortDesc": "Heals the target to full HP.",
+    "pp": 1,
+    "noPPBoosts": true,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "reflectable": 1,
+      "distance": 1,
+      "heal": 1,
+      "allyanim": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "adjacentAllyOrSelf",
+    "type": "Normal",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "groomguard": {
+    "accuracy": 0,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Groom Guard",
+    "desc": "The user protects itself by grooming its thick fur, drastically raising its Sp. Def stat.",
+    "shortDesc": "Raises the user's Sp. Def by 3.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "snatch": 1
+    },
+    "boosts": {
+      "spd": 3
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Normal",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "isNonstandard": "Custom"
+  },
+  "eevoboost": {
+    "accuracy": 0,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Eevoboost",
+    "desc": "The user slowly gathers its inner potential, uncovering a power that raises all stats.",
+    "shortDesc": "Raises all stats by 1 (not acc/eva).",
+    "pp": 3,
+    "noPPBoosts": true,
+    "priority": -2,
+    "flags": {
+      "snatch": 1
+    },
+    "boosts": {
+      "atk": 1,
+      "def": 1,
+      "spa": 1,
+      "spd": 1,
+      "spe": 1
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Normal",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "isNonstandard": "Custom"
+  },
+  "charmingtweety": {
+    "accuracy": 85,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Charming Tweety",
+    "desc": "An earsplitting screech harshly reduces the target's Defense stat.",
+    "shortDesc": "Lowers the target's Defense by 2.",
+    "pp": 40,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "sound": 1
+    },
+    "boosts": {
+      "def": -2
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Normal",
+    "zMove": {
+      "boost": {
+        "atk": 1
+      }
+    },
+    "isNonstandard": "Custom"
+  },
+  "cactussmash": {
+    "accuracy": 100,
+    "basePower": 115,
+    "category": "Physical",
+    "name": "Cactus Smash",
+    "desc": "The user slams its spiky cactus into the target to attack. The user also sustains serious damage.",
+    "shortDesc": "Has 33% recoil. 35% chance to poison.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "recoil": [
+      33,
+      100
+    ],
+    "secondary": {
+      "chance": 35,
+      "status": "psn"
+    },
+    "target": "normal",
+    "type": "Grass",
+    "isNonstandard": "Custom"
+  },
+  "foulstrike": {
+    "num": 0,
+    "accuracy": 95,
+    "basePower": 100,
+    "category": "Physical",
+    "name": "Foul Strike",
+    "shortDesc": "Ignores screens and substitutes.",
+    "pp": 10,
+    "priority": 0,
+    "infiltrates": true,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "punch": 1,
+      "contact": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Steel",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "rocketgrab": {
+    "num": 0,
+    "accuracy": 95,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Rocket Grab",
+    "desc": "If an opposing Pokemon switches out this turn, this move hits that Pokemon before it leaves the field, even if it was not the original target. If the user moves after an opponent using Flip Turn, Parting Shot, Teleport, U-turn, or Volt Switch, but not Baton Pass, it will hit that opponent before it leaves the field. Switch is cancelled if the user hits an opponent switching out, and the user's turn is over; if an opponent faints from this, the replacement Pokemon does not become active until the end of the turn. Can't be used twice in a row.",
+    "shortDesc": "If a foe is switching out, cancels it. Cannot be used twice in a row.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "cantusetwice": 1
+    },
+    "condition": {
+      "duration": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Steel",
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "metalcruncher": {
+    "accuracy": 85,
+    "basePower": 120,
+    "category": "Physical",
+    "name": "Metal Cruncher",
+    "desc": "Has an 85% chance to lower the target's Defense by 1 stage.",
+    "shortDesc": "70% chance to lower the target's Defense by 1.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "bite": 1
+    },
+    "secondary": {
+      "chance": 70,
+      "boosts": {
+        "def": -1
+      }
+    },
+    "target": "normal",
+    "type": "Steel",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "nailcrusher": {
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Nail Crusher",
+    "desc": "The user crushes the target with its ginormous claws. It may lower the target's Defense.",
+    "shortDesc": "50% chance to lower the target's defense by 1.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 50,
+      "boosts": {
+        "def": -1
+      }
+    },
+    "target": "normal",
+    "type": "Steel",
+    "isNonstandard": "Custom"
+  },
+  "duoscissorclaw": {
+    "accuracy": 90,
+    "basePower": 105,
+    "category": "Physical",
+    "name": "Duo Scissor Claw",
+    "desc": "A scissor-armed attack that can tear through diamond. It may lower the target's Defense.",
+    "shortDesc": "50% chance to lower the target's defense by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 50,
+      "boosts": {
+        "def": -1
+      }
+    },
+    "target": "normal",
+    "type": "Steel",
+    "isNonstandard": "Custom"
+  },
+  "nuclearpunch": {
+    "accuracy": 90,
+    "basePower": 105,
+    "category": "Physical",
+    "name": "Nuclear Punch",
+    "desc": "The target is hit with a Chrome Digizoid hardened fist. It may raise the user's Attack.",
+    "shortDesc": "20% chance to raise the user's Attack by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "punch": 1
+    },
+    "secondary": {
+      "chance": 20,
+      "self": {
+        "boosts": {
+          "atk": 1
+        }
+      }
+    },
+    "target": "normal",
+    "type": "Steel",
+    "isNonstandard": "Custom"
+  },
+  "kablow": {
+    "accuracy": 100,
+    "basePower": 170,
+    "category": "Physical",
+    "name": "Kablow!",
+    "desc": "The user detonates to inflict damage on those around it. Rusty shrapnel is launched at the opponent.",
+    "shortDesc": "The user faints. Sets Spikes and Toxic Spikes layer.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "noparentalbond": 1
+    },
+    "selfdestruct": "always",
+    "secondary": null,
+    "target": "allAdjacent",
+    "type": "Steel",
+    "isNonstandard": "Custom"
+  },
+  "bullethammer": {
+    "accuracy": 100,
+    "basePower": 150,
+    "category": "Physical",
+    "name": "Bullet Hammer",
+    "desc": "The user bats the opponent with a super-charged hammer. The recoil forces the user to rest.",
+    "shortDesc": "Forces the target to switch to a random ally. User cannot move next turn.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "recharge": 1
+    },
+    "secondary": null,
+    "forceSwitch": true,
+    "self": {
+      "volatileStatus": "mustrecharge"
+    },
+    "target": "normal",
+    "type": "Steel",
+    "isNonstandard": "Custom"
+  },
+  "hotcoals": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Hot Coals",
+    "desc": "Sets up a hazard on the opposing side of the field, damaging each opposing Pokemon that switches in. Fails if the effect is already active on the opposing side. Foes lose 1/32, 1/16, 1/8, 1/4, or 1/2 of their maximum HP, rounded down, based on their weakness to the Fire type; 0.25x, 0.5x, neutral, 2x, or 4x, respectively. Can be removed from the opposing side if any Pokemon uses Tidy Up, or if any opposing Pokemon uses Mortal Spin, Rapid Spin, or Defog successfully, or is hit by Defog.",
+    "shortDesc": "Hurts foes on switch-in. Factors Fire weakness.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "reflectable": 1,
+      "mustpressure": 1,
+      "nosketch": 1
+    },
+    "sideCondition": "hotcoals",
+    "condition": {},
+    "secondary": null,
+    "target": "foeSide",
+    "type": "Fire",
+    "zMove": {
+      "boost": {
+        "def": 1
+      }
+    },
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "wildfire": {
+    "num": 0,
+    "accuracy": 75,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Wildfire",
+    "desc": "Burns the foe. If it is a Grass-type Pokemon, burns all Pokemon in their party weak to fire.",
+    "shortDesc": "Burns the target & possibly target's team.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "reflectable": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "status": "brn",
+    "secondary": null,
+    "target": "allAdjacentFoes",
+    "type": "Fire",
+    "zMove": {
+      "boost": {
+        "atk": 1
+      }
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "fierymaelstrom": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Fiery Maelstrom",
+    "shortDesc": "Summons Sun. Heat Rock: x1.2 damage.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "weather": "sunnyday",
+    "target": "normal",
+    "type": "Fire",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "moltenglaze": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Molten Glaze",
+    "desc": "Hits both foes. Until the target switches out, the effectiveness of Fire-type moves is doubled against it.",
+    "shortDesc": "Hits both foes. Makes foes weaker to fire.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "defrost": 1
+    },
+    "volatileStatus": "moltenglaze",
+    "condition": {
+      "onEffectivenessPriority": -2
+    },
+    "secondary": null,
+    "target": "allAdjacentFoes",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "flameaxe": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Flame Axe",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "contact": 1,
+      "slicing": 1
+    },
+    "volatileStatus": "flameaxe",
+    "condition": {
+      "duration": 2,
+      "onTryMovePriority": -2,
+      "onModifyTypePriority": -1
+    },
+    "target": "normal",
+    "type": "Fire",
+    "desc": "Changes foe's Rock-type moves to Fire-type moves for 2 turns.",
+    "shortDesc": "Changes foe's Rock-type moves to Fire-type for 2 turns.",
+    "isNonstandard": "Custom"
+  },
+  "meltdown": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 180,
+    "category": "Special",
+    "name": "Meltdown",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "noparentalbond": 1
+    },
+    "selfdestruct": "always",
+    "secondary": null,
+    "target": "allAdjacent",
+    "type": "Fire",
+    "contestType": "Beautiful",
+    "shortDesc": "User faints. 1.5x power during Fallout.",
+    "isNonstandard": "Custom"
+  },
+  "brutalcalamity": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 75,
+    "category": "Special",
+    "name": "Brutal Calamity",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fire",
+    "contestType": "Beautiful",
+    "shortDesc": "2x BP in Trick Room, Wonder Room and Magic Room. Clears Rooms.",
+    "isNonstandard": "Custom"
+  },
+  "smolderdash": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Smolder Dash",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "reflectable": 1,
+      "mirror": 1,
+      "bypasssub": 1,
+      "metronome": 1
+    },
+    "secondary": {},
+    "target": "normal",
+    "type": "Fire",
+    "contestType": "Cool",
+    "shortDesc": "Clears grounded hazards, burns if succesful.",
+    "isNonstandard": "Custom"
+  },
+  "flameimpact": {
+    "accuracy": 100,
+    "basePower": 65,
+    "category": "Physical",
+    "name": "Flame Impact",
+    "desc": "No additional effect.",
+    "shortDesc": "Nearly always goes first.",
+    "pp": 15,
+    "priority": 2,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fire",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "nostrilflare": {
+    "accuracy": 90,
+    "basePower": 55,
+    "category": "Special",
+    "name": "Nostril Flare",
+    "desc": "Before the opponent attacks, the user unleashes a quick flame from its nostrils.",
+    "shortDesc": "Usually goes first.",
+    "pp": 20,
+    "priority": 1,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "pepperbreath": {
+    "accuracy": 100,
+    "basePower": 65,
+    "category": "Special",
+    "name": "Pepper Breath",
+    "desc": "A small blast of fire that may leave the foe with a burn.",
+    "shortDesc": "30% chance to burn the target.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "brn"
+    },
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "cinderbreath": {
+    "accuracy": 100,
+    "basePower": 55,
+    "category": "Special",
+    "name": "Cinder Breath",
+    "desc": "The foe is blasted with a cloud of hot ash to inflict damage and lower accuracy.",
+    "shortDesc": "100% chance to lower the target's accuracy by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "boosts": {
+        "accuracy": -1
+      }
+    },
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "novablast": {
+    "accuracy": 100,
+    "basePower": 75,
+    "category": "Special",
+    "name": "Nova Blast",
+    "desc": "The user unleashes a massive pulse of fire to damage the opponent.",
+    "shortDesc": "15% chance to burn the target.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "pulse": 1
+    },
+    "secondary": {
+      "chance": 15,
+      "status": "brn"
+    },
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "gigadestroyer": {
+    "accuracy": 90,
+    "basePower": 55,
+    "category": "Special",
+    "name": "Giga Destroyer",
+    "desc": "The user unleashes two organic missiles to destroy the foe.",
+    "shortDesc": "Hits 2 times in one turn.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "multihit": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "terraforce": {
+    "accuracy": 100,
+    "basePower": 115,
+    "category": "Special",
+    "name": "Terra Force",
+    "desc": "The user hurls a scorching ball of energy that strikes every Pokémon around it.",
+    "shortDesc": "Hits adjacent Pokemon. Double damage on Dig.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "allAdjacent",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "sizzleslam": {
+    "accuracy": 100,
+    "basePower": 75,
+    "category": "Physical",
+    "name": "Sizzle Slam",
+    "desc": "The user headbutts the opponent with an open flame stove atop its head. Leaves the foe burning.",
+    "shortDesc": "100% chance to burn the target. Destroys foe's Berry/Gem.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "status": "brn"
+    },
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "fireball": {
+    "accuracy": 85,
+    "basePower": 25,
+    "category": "Special",
+    "name": "Fire Ball",
+    "shortDesc": "Hits 3 times. 15% chance to burn.",
+    "multihit": 3,
+    "secondary": {
+      "chance": 15,
+      "status": "brn"
+    },
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "nosketch": 1
+    },
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "quakingthrust": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 75,
+    "basePowerCallback": true,
+    "category": "Physical",
+    "name": "Quaking Thrust",
+    "desc": "x1.5 power if the user moves before the target.",
+    "shortDesc": "x1.5 power if user moves before the target.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "slicing": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ground",
+    "isNonstandard": "Custom"
+  },
+  "superheatedcrash": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Physical",
+    "name": "Superheated Crash",
+    "desc": "If the user is hit by a contact move this turn before it can execute this move, the attacker is burned.",
+    "shortDesc": "Burns on contact with the user before it moves.",
+    "condition": {
+      "duration": 1
+    },
+    "pp": 10,
+    "priority": -3,
+    "flags": {
+      "protect": 1,
+      "failmefirst": 1,
+      "nosleeptalk": 1,
+      "noassist": 1,
+      "failcopycat": 1,
+      "failinstruct": 1,
+      "contact": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "pyropounce": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Physical",
+    "name": "Pyro Pounce",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "charge": 1,
+      "protect": 1,
+      "mirror": 1,
+      "gravity": 1,
+      "distance": 1,
+      "metronome": 1,
+      "nosleeptalk": 1,
+      "noassist": 1,
+      "failinstruct": 1
+    },
+    "condition": {
+      "duration": 2
+    },
+    "secondary": {
+      "chance": 100,
+      "status": "brn"
+    },
+    "target": "any",
+    "type": "Fire",
+    "contestType": "Cute",
+    "shortDesc": "Bounces turn 1. Hits turn 2. 100% Chance to Burn.",
+    "isNonstandard": "Custom"
+  },
+  "infernalblade": {
+    "accuracy": 95,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Infernal Blade",
+    "desc": "This move's type effectiveness against a Pokemon with the Fairy type is changed to be super effective no matter what this move's type is. Has a 10% chance to burn.",
+    "shortDesc": "10% chance to burn. Always super effective on Fairy.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "slicing": 1
+    },
+    "secondary": {
+      "chance": 10,
+      "status": "brn"
+    },
+    "target": "normal",
+    "type": "Fire",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "searingslash": {
+    "accuracy": 95,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Searing Slash",
+    "desc": "The user rips through the foe with a hot blade. It may hit critically, and leave a burn.",
+    "shortDesc": "High critical hit ratio. 10% burn chance.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "slicing": 1
+    },
+    "critRatio": 2,
+    "secondary": {
+      "chance": 10,
+      "status": "brn"
+    },
+    "target": "normal",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "core": {
+    "accuracy": 70,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Core",
+    "desc": "Bro heats up and burns everything. This also lowers the afflicted targets' Defense stat.",
+    "shortDesc": "Lowers the target(s) Defense by 1",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "boosts": {
+        "def": -1
+      }
+    },
+    "target": "allAdjacent",
+    "type": "Fire",
+    "isNonstandard": "Custom"
+  },
+  "mudslide": {
+    "num": 0,
+    "accuracy": 95,
+    "basePower": 95,
+    "category": "Physical",
+    "name": "Mudslide",
+    "desc": "Has a 50% chance to lower the target's Speed by 1 stage.",
+    "shortDesc": "50% chance to lower the target's Speed by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 50,
+      "boosts": {
+        "spe": -1
+      }
+    },
+    "target": "allAdjacentFoes",
+    "type": "Ground",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "currencyflow": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Physical",
+    "name": "Currency Flow",
+    "shortDesc": "1.5x damage if coins are scattered.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ground",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "bitethedust": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 95,
+    "category": "Physical",
+    "name": "Bite the Dust",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "bite": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "self": {},
+    "target": "normal",
+    "shortDesc": "Heals for 1/8th max HP on hit.",
+    "type": "Ground",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "subduction": {
+    "accuracy": 90,
+    "basePower": 140,
+    "category": "Physical",
+    "name": "Subduction",
+    "desc": "Confuses the user. 100% chance to lower the foes's speed by 2 stages.",
+    "shortDesc": "Confuses user. 100% to lower foe's speed by 2 stages.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "sound": 1,
+      "bypasssub": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "boosts": {
+        "spe": -2
+      }
+    },
+    "target": "normal",
+    "type": "Ground",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "bonesweep": {
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Bone Sweep",
+    "desc": "A large club is swung at the foe in a sweeping motion. This move hits the entire enemy team.",
+    "shortDesc": "No additional effect. Hits adjacent foes.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "allAdjacentFoes",
+    "type": "Ground",
+    "isNonstandard": "Custom"
+  },
+  "anvilsmash": {
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Physical",
+    "name": "Anvil Smash",
+    "desc": "The user slams a hammer into the ground, creating a shockwave that hits every Pokémon.",
+    "shortDesc": "Hits adjacent Pokemon. Double damage on Dig.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "allAdjacent",
+    "type": "Ground",
+    "isNonstandard": "Custom"
+  },
+  "pumpup": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Pump Up",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "snatch": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Water",
+    "shortDesc": "Raises highest stat by 2 stages.",
+    "zMove": {
+      "effect": "crit2"
+    },
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "pressureburst": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Pressure Burst",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Water",
+    "contestType": "Cool",
+    "shortDesc": "Sets Aqua Ring for every Pokemon on user's side.",
+    "isNonstandard": "Custom"
+  },
+  "clayhaymaker": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Clay Haymaker",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "punch": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 10,
+      "boosts": {
+        "spe": -1
+      }
+    },
+    "target": "normal",
+    "type": "Water",
+    "contestType": "Cool",
+    "shortDesc": "10% chance to lower the target's Speed by 1.",
+    "isNonstandard": "Custom"
+  },
+  "coralbreak": {
+    "accuracy": 95,
+    "basePower": 80,
+    "category": "Special",
+    "overrideDefensiveStat": "def",
+    "name": "Coral Break",
+    "desc": "Deals damage to the target based on its Defense instead of Special Defense.",
+    "shortDesc": "Damages target based on Defense, not Sp. Def.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Water",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "nimbusfist": {
+    "accuracy": 100,
+    "basePower": 35,
+    "category": "Physical",
+    "name": "Nimbus Fist",
+    "desc": "A strike of condensed mist strikes the foe, lowering its accuracy.",
+    "shortDesc": "100% chance to lower the target's accuracy by 1.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "punch": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "boosts": {
+        "accuracy": -1
+      }
+    },
+    "target": "normal",
+    "type": "Water",
+    "isNonstandard": "Custom"
+  },
+  "foggystrike": {
+    "accuracy": true,
+    "basePower": 55,
+    "category": "Physical",
+    "name": "Foggy Strike",
+    "desc": "A quick, concealed strike in a shroud of mist, which cannot be dodged.",
+    "shortDesc": "This move does not check accuracy.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Water",
+    "isNonstandard": "Custom"
+  },
+  "flashflood": {
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Special",
+    "name": "Flash Flood",
+    "desc": "The user causes a quick surge of flowing water to drown out the foe. This move always goes first.",
+    "shortDesc": "Usually goes first.",
+    "pp": 15,
+    "priority": 1,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Water",
+    "isNonstandard": "Custom"
+  },
+  "fincutter": {
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Fin Cutter",
+    "desc": "The user cuts the foe with a sharpened fin. This move is more likely to crit.",
+    "shortDesc": "High critical hit ratio.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "slicing": 1
+    },
+    "critRatio": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Water",
+    "isNonstandard": "Custom"
+  },
+  "tonic": {
+    "accuracy": 100,
+    "basePower": 0,
+    "damage": "level",
+    "category": "Special",
+    "name": "Tonic",
+    "desc": "The user drains life-force and shares it among your active mons. The power scales with the user's level.",
+    "shortDesc": "Does damage equal to the user's level. User recovers 50% of the damage dealt, split among alies.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Water",
+    "isNonstandard": "Custom"
+  },
+  "livewire": {
+    "num": 390,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Livewire",
+    "desc": "Sets up a hazard on the opposing side of the field, with a chance to paralyze each opposing Pokemon that switches in, unless it is a Flying-type Pokemon or has the Levitate Ability. Can be used up to five times before failing. Chance of paralysis is X/5 where X is the number of layers, chance is doubled in rain. Can be removed from the opposing side if any opposing Pokemon uses Mortal Spin, Rapid Spin, or Defog successfully, is hit by Defog, or a grounded Electric or Ground type Pokemon switches in. Safeguard prevents the opposing party from being paralyzed on switch-in, but a substitute does not.",
+    "shortDesc": "Can paralyze grounded foes on switch-in. Max 5 layers.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "reflectable": 1,
+      "nonsky": 1,
+      "metronome": 1,
+      "mustpressure": 1
+    },
+    "sideCondition": "livewire",
+    "condition": {},
+    "secondary": null,
+    "target": "foeSide",
+    "type": "Electric",
+    "zMove": {
+      "boost": {
+        "def": 1
+      }
+    },
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "riftjump": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "slotCondition": "riftjump",
+    "condition": {
+      "duration": 2
+    },
+    "category": "Status",
+    "name": "Rift Jump",
+    "desc": "User switches out. The Pokémon switching in will gain +1 priority to any move on their first turn out.",
+    "shortDesc": "Switch out. Switch-in gains +1 prio for 1 turn.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "metronome": 1
+    },
+    "selfSwitch": true,
+    "secondary": null,
+    "target": "self",
+    "type": "Electric",
+    "zMove": {
+      "effect": "healreplacement"
+    },
+    "isNonstandard": "Custom"
+  },
+  "shockbombs": {
+    "num": 0,
+    "accuracy": 95,
+    "basePower": 25,
+    "category": "Physical",
+    "name": "Shock Bombs",
+    "desc": "Hits two to five times. Has a 35% chance to hit two or three times and a 15% chance to hit four or five times. If one of the hits breaks the target's substitute, it will take damage for the remaining hits. If the user has the Skill Link Ability, this move will always hit five times.",
+    "shortDesc": "Hits 2-5 times in one turn.",
+    "pp": 30,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "bullet": 1
+    },
+    "multihit": [
+      2,
+      5
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Electric",
+    "zMove": {
+      "basePower": 140
+    },
+    "maxMove": {
+      "basePower": 130
+    },
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "rebootandretry": {
+    "num": 0,
+    "accuracy": 80,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Reboot and Retry",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "basePowerCallback": true,
+    "secondary": null,
+    "target": "normal",
+    "type": "Electric",
+    "contestType": "Beautiful",
+    "shortDesc": "Power doubles if the user's last move failed.",
+    "isNonstandard": "Custom"
+  },
+  "severedsidearm": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 55,
+    "category": "Special",
+    "name": "Severed Sidearm",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "target": "normal",
+    "type": "Electric",
+    "secondary": null,
+    "contestType": "Cool",
+    "shortDesc": "User's HP is 50% or less: +1 priority.",
+    "isNonstandard": "Custom"
+  },
+  "thunderstorm": {
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Thunderstorm",
+    "desc": "For 5 turns, the weather becomes Thunderstorm. The damage of Electric-type attacks is multiplied by 1.5 during the effect. All non-Electric and Ground type Pokemon are damaged depending on their weakness to the Electric-type every other turn. Fails if the current weather is Thunderstorm.",
+    "shortDesc": "For 5 turns, a storm powers Electric moves.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "metronome": 1
+    },
+    "weather": "thunderstorm",
+    "secondary": null,
+    "target": "all",
+    "type": "Electric",
+    "zMove": {
+      "boost": {
+        "spe": 1
+      }
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "thunderslash": {
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Thunder Slash",
+    "desc": "The foe is slashed with an electrified blade. Critical hits land easier.",
+    "shortDesc": "High critical hit ratio.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "slicing": 1
+    },
+    "critRatio": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Electric",
+    "isNonstandard": "Custom"
+  },
+  "infinityarrow": {
+    "accuracy": 100,
+    "basePower": 65,
+    "category": "Physical",
+    "name": "Infinity Arrow",
+    "desc": "Lightning, in the shape of arrows, shoots from the user's fur, leaving the foe paralyzed.",
+    "shortDesc": "100% chance to paralyze the target.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "status": "par"
+    },
+    "target": "normal",
+    "type": "Electric",
+    "isNonstandard": "Custom"
+  },
+  "sirensong": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 95,
+    "category": "Special",
+    "name": "Siren Song",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "sound": 1,
+      "bypasssub": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 100
+    },
+    "shortDesc": "Drowsies if target boosted stats. Heals if target is ally.",
+    "target": "any",
+    "type": "Water",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "oceanswrath": {
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Special",
+    "name": "Ocean's Wrath",
+    "desc": "Prevents the target from switching for four or five turns (seven turns if the user is holding Grip Claw). Causes damage to the target equal to 1/8 of its maximum HP (1/6 if the user is holding Binding Band), rounded down, at the end of each turn during effect. The target can still switch out if it is holding Shed Shell or uses Baton Pass, Flip Turn, Parting Shot, Shed Tail, Teleport, U-turn, or Volt Switch. The effect ends if either the user or the target leaves the field, or if the target uses Mortal Spin, Rapid Spin, or Substitute successfully. This effect is not stackable or reset by using this or another binding move.",
+    "shortDesc": "Traps and damages the target for 4-5 turns.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "volatileStatus": "partiallytrapped",
+    "secondary": null,
+    "target": "normal",
+    "type": "Water",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "omniblast": {
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Special",
+    "name": "Omni Blast",
+    "desc": "The user unleashes a bolt of digital energy. Struck foes may get paralyzed, burned, or frozen.",
+    "shortDesc": "50% chance to burn, freeze, or paralyze target.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "pulse": 1
+    },
+    "secondary": {
+      "chance": 20
+    },
+    "target": "normal",
+    "type": "Electric",
+    "isNonstandard": "Custom"
+  },
+  "achillesheel": {
+    "num": 34,
+    "accuracy": 100,
+    "basePower": 45,
+    "category": "Physical",
+    "name": "Achilles' Heel",
+    "shortDesc": "Always super effective.",
+    "desc": "Always deals super effective damage, except against types that would normally be immune to it.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "nonsky": 1,
+      "metronome": 1
+    },
+    "target": "normal",
+    "type": "Normal",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "laserpulse": {
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Laser Pulse",
+    "shortDesc": "Type is random pick of Fire, Ice, and Electric",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "pulse": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Normal",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "nailflick": {
+    "accuracy": 90,
+    "basePower": 50,
+    "category": "Physical",
+    "name": "Nail Flick",
+    "desc": "The user charges up a powerful flick of a sharp claw or nail. Critical hits land more easily.",
+    "shortDesc": "High critical hit ratio.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "critRatio": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Normal",
+    "isNonstandard": "Custom"
+  },
+  "boombubble": {
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Physical",
+    "name": "Boom Bubble",
+    "desc": "The user unleashes a powerful burst that may make the foe flinch.",
+    "shortDesc": "30% chance to make the target flinch.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "volatileStatus": "flinch"
+    },
+    "target": "normal",
+    "type": "Normal",
+    "isNonstandard": "Custom"
+  },
+  "omnihowl": {
+    "accuracy": 100,
+    "basePower": 140,
+    "category": "Special",
+    "name": "Omni Howl",
+    "desc": "The user hits everything around it with the destructive power of a prideful, explosive howl.",
+    "shortDesc": "No additional effect. Hits adjacent Pokemon.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "sound": 1
+    },
+    "secondary": null,
+    "target": "allAdjacent",
+    "type": "Normal",
+    "isNonstandard": "Custom"
+  },
+  "hammerthrow": {
+    "accuracy": 85,
+    "basePower": 25,
+    "category": "Physical",
+    "name": "Hammer Throw",
+    "shortDesc": "Hits 2-5 times. Changes based on the weather.",
+    "multihit": [
+      2,
+      5
+    ],
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Normal",
+    "isNonstandard": "Custom"
+  },
+  "twingust": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 30,
+    "category": "Special",
+    "name": "Twin Gust",
+    "desc": "Hits twice. If the first hit breaks the target's substitute, it will take damage for the second hit. In Double Battles, this move attempts to hit the targeted Pokemon and its ally once each. If hitting one of these Pokemon would be prevented by immunity, protection, semi-invulnerability, an Ability, or accuracy, it attempts to hit the other Pokemon twice instead. If this move is redirected, it hits that target twice.",
+    "shortDesc": "Hits twice. Doubles: Tries to hit each foe once.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "noparentalbond": 1,
+      "wind": 1
+    },
+    "multihit": 2,
+    "smartTarget": true,
+    "secondary": null,
+    "target": "normal",
+    "type": "Flying",
+    "isNonstandard": "Custom"
+  },
+  "severingwind": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Special",
+    "name": "Severing Wind",
+    "desc": "Has a higher chance for a critical hit. 20% chance to lower the target's Sp. Def by 1.",
+    "shortDesc": "High critical hit ratio. 20% chance to lower the target's Sp. Def by 1. Hits adjacent foes.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "wind": 1,
+      "slicing": 1
+    },
+    "critRatio": 2,
+    "secondary": {
+      "chance": 20,
+      "boosts": {
+        "spd": -1
+      }
+    },
+    "target": "allAdjacentFoes",
+    "type": "Flying",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "skypierce": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Sky Pierce",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "slicing": 1
+    },
+    "critRatio": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Flying",
+    "contestType": "Cool",
+    "shortDesc": "High critical hit ratio.",
+    "isNonstandard": "Custom"
+  },
+  "skyfall": {
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Special",
+    "name": "Sky Fall",
+    "desc": "Has a 30% chance to paralyse the target.",
+    "shortDesc": "30% chance to paralyse the target.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "par"
+    },
+    "target": "normal",
+    "type": "Flying",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "typhoon": {
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Typhoon",
+    "desc": "The target is whipped around by a strong typhoon. It may also lower the target's accuracy.",
+    "shortDesc": "30% chance to lower the target's accuracy by 1.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "boosts": {
+        "accuracy": -1
+      }
+    },
+    "target": "normal",
+    "type": "Flying",
+    "isNonstandard": "Custom"
+  },
+  "boomerang": {
+    "accuracy": 90,
+    "basePower": 45,
+    "category": "Physical",
+    "name": "Boomerang",
+    "shortDesc": "Hits 2 times. 15% chance to flinch.",
+    "multihit": 2,
+    "secondary": {
+      "chance": 15,
+      "volatileStatus": "flinch"
+    },
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "nosketch": 1
+    },
+    "target": "normal",
+    "type": "Flying",
+    "isNonstandard": "Custom"
+  },
+  "gale": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 60,
+    "category": "Physical",
+    "name": "Gale",
+    "desc": "The user creates a shockwave eliminating traps and hazards. Raises the user's Speed stat.",
+    "shortDesc": "Free user from hazards/bind/Leech Seed; +1 Spe.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "self": {
+        "boosts": {
+          "spe": 1
+        }
+      }
+    },
+    "target": "normal",
+    "type": "Flying",
+    "isNonstandard": "Custom"
+  },
+  "scarabssting": {
+    "num": 0,
+    "accuracy": 85,
+    "basePower": 50,
+    "category": "Physical",
+    "name": "Scarab’s Sting",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "contact": 1
+    },
+    "multihit": 2,
+    "secondary": {
+      "chance": 20,
+      "status": "par"
+    },
+    "target": "normal",
+    "type": "Bug",
+    "maxMove": {
+      "basePower": 100
+    },
+    "contestType": "Cool",
+    "desc": "Hits twice, with each hit having a 20% chance to paralyze the target. If the first hit breaks the target's substitute, it will take damage for the second hit.",
+    "shortDesc": "Hits 2 times. Each hit has 20% chance to paralyze.",
+    "isNonstandard": "Custom"
+  },
+  "chitinsnare": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Chitin Snare",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "allyanim": 1,
+      "metronome": 1,
+      "contact": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Bug",
+    "contestType": "Clever",
+    "shortDesc": "If succesful, hits again 2 turns later.",
+    "isNonstandard": "Custom"
+  },
+  "decapattack": {
+    "accuracy": 100,
+    "basePower": 120,
+    "category": "Physical",
+    "name": "Decap Attack",
+    "desc": "The user removes its head and launches it at the foe. This also damages the user.",
+    "shortDesc": "Has 33% recoil.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "bullet": 1
+    },
+    "recoil": [
+      33,
+      100
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Bug",
+    "isNonstandard": "Custom"
+  },
+  "hornbuster": {
+    "accuracy": 90,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Horn Buster",
+    "desc": "Using its thruster, the user charges into the target. Raises the user's Speed stat.",
+    "shortDesc": "100% chance to raise the user's Speed by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "self": {
+        "boosts": {
+          "spe": 1
+        }
+      }
+    },
+    "target": "normal",
+    "type": "Bug",
+    "isNonstandard": "Custom"
+  },
+  "spiritaway": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Physical",
+    "isNonstandard": "Custom",
+    "name": "Spirit Away",
+    "desc": "This attack takes the target into the air with the user on the first turn and executes on the second. The user and the target cannot make a move between turns, but the target can select a move to use. Fails on the first turn if the target is an ally, if the target has a substitute, or if the target is using Bounce, Dig, Dive, Fly, Phantom Force, Shadow Force, or Sky Drop.",
+    "shortDesc": "User and foe fly up turn 1. Damages on turn 2.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "charge": 1,
+      "protect": 1,
+      "mirror": 1,
+      "gravity": 1,
+      "distance": 1,
+      "metronome": 1,
+      "nosleeptalk": 1,
+      "noassist": 1,
+      "failinstruct": 1
+    },
+    "condition": {
+      "duration": 2,
+      "onFoeTrapPokemonPriority": -15,
+      "onFoeBeforeMovePriority": 12,
+      "onRedirectTargetPriority": 99
+    },
+    "secondary": null,
+    "target": "any",
+    "type": "Fairy",
+    "contestType": "Tough"
+  },
+  "pixietrick": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Pixie Trick",
+    "shortDesc": "0.5x damage if foe isn't holding an item. Swaps items.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "failmefirst": 1,
+      "noassist": 1,
+      "failcopycat": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fairy",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "faequills": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 25,
+    "category": "Physical",
+    "name": "Fae Quills",
+    "desc": "Hits two to five times. Has a 35% chance to hit two or three times and a 15% chance to hit four or five times. If one of the hits breaks the target's substitute, it will take damage for the remaining hits. If the user has the Skill Link Ability, this move will always hit five times.",
+    "shortDesc": "Hits 2-5 times in one turn.",
+    "pp": 30,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "multihit": [
+      2,
+      5
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Fairy",
+    "zMove": {
+      "basePower": 140
+    },
+    "maxMove": {
+      "basePower": 130
+    },
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "meltingaroma": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Melting Aroma",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "heal": 1,
+      "bypasssub": 1,
+      "allyanim": 1
+    },
+    "secondary": null,
+    "desc": "Each Pokemon on the user's side restores 1/4 of its maximum HP, rounded half up, and has its status condition cured.",
+    "shortDesc": "User and allies: healed 1/4 max HP, status cured.",
+    "target": "allies",
+    "type": "Fairy",
+    "isNonstandard": "Custom"
+  },
+  "sugarglaive": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Sugar Glaive",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "heal": 1,
+      "metronome": 1,
+      "slicing": 1
+    },
+    "drain": [
+      1,
+      2
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Fairy",
+    "contestType": "Clever",
+    "desc": "The user recovers 1/2 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down.",
+    "shortDesc": "User recovers 50% of the damage dealt.",
+    "isNonstandard": "Custom"
+  },
+  "starlightcalling": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Starlight Calling",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "snatch": 1,
+      "heal": 1,
+      "metronome": 1
+    },
+    "secondary": {},
+    "heal": [
+      1,
+      3
+    ],
+    "target": "self",
+    "type": "Fairy",
+    "contestType": "Clever",
+    "shortDesc": "Heals 33%, transform into Tenkibo-Magical-Hero. If Tenkibo-Magical-Hero, 100BP Special move.",
+    "isNonstandard": "Custom"
+  },
+  "faengrush": {
+    "accuracy": 95,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Faeng Rush",
+    "desc": "The user slams the target with a whimsical strike of the fangs. It may make the target flinch.",
+    "shortDesc": "30% chance to make the target flinch.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "bite": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "volatileStatus": "flinch"
+    },
+    "target": "normal",
+    "type": "Fairy",
+    "isNonstandard": "Custom"
+  },
+  "excalibur": {
+    "accuracy": true,
+    "basePower": 105,
+    "category": "Physical",
+    "name": "Excalibur",
+    "desc": "The user slashes the enemy using the holy sword, Excalibur. This attack never misses.",
+    "shortDesc": "This move does not check accuracy.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "slicing": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fairy",
+    "isNonstandard": "Custom"
+  },
+  "beamshield": {
+    "accuracy": 0,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Beam Shield",
+    "desc": "The user protects itself. This move also damages attackers who make direct contact.",
+    "shortDesc": "Protects from moves. Contact: loses 1/8 max HP.",
+    "pp": 10,
+    "priority": 4,
+    "flags": {
+      "snatch": 1,
+      "noassist": 1,
+      "failcopycat": 1
+    },
+    "stallingMove": true,
+    "volatileStatus": "beamshield",
+    "condition": {
+      "duration": 1,
+      "onTryHitPriority": 3
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Fairy",
+    "zMove": {
+      "boost": {
+        "def": 1
+      }
+    },
+    "isNonstandard": "Custom"
+  },
+  "heavensknuckle": {
+    "accuracy": 85,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Heaven's Knuckle",
+    "desc": "The user blasts a beam of holy energy from their fist. It does not make contact.",
+    "shortDesc": "No additional effect.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "punch": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fairy",
+    "isNonstandard": "Custom"
+  },
+  "ancientroar": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Ancient Roar",
+    "desc": "No additional effect.",
+    "shortDesc": "No additional effect. Hits adjacent Pokemon.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "sound": 1,
+      "bypasssub": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "allAdjacentFoes",
+    "type": "Rock",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "medusaray": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Medusa Ray",
+    "desc": "Causes the target to become a Rock type. Fails if the target is an Arceus, or if the target is already purely Rock type.",
+    "shortDesc": "Changes the target's type to Rock.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "reflectable": 1,
+      "mirror": 1,
+      "allyanim": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Rock",
+    "zMove": {
+      "boost": {
+        "spa": 1
+      }
+    },
+    "isNonstandard": "Custom"
+  },
+  "deserttempest": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Desert Tempest",
+    "shortDesc": "Summons Sandstorm. Smooth Rock: x1.2 damage.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "weather": "sandstorm",
+    "target": "normal",
+    "type": "Rock",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "gorgonfang": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 65,
+    "category": "Physical",
+    "name": "Gorgon Fang",
+    "desc": "Has a 100% chance to lower the target's Speed by 1 stage.",
+    "shortDesc": "100% chance to lower the foe(s) Speed by 1.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "bite": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "boosts": {
+        "spe": -1
+      }
+    },
+    "target": "normal",
+    "type": "Rock",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "jaggedshot": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Jagged Shot",
+    "desc": "This move becomes a physical attack if the user's Attack is greater than its Special Attack, including stat stage changes. Always results in a critical hit.",
+    "shortDesc": "Physical if user's Atk > Sp. Atk. Always crits.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "bullet": 1
+    },
+    "secondary": null,
+    "willCrit": true,
+    "target": "normal",
+    "type": "Rock",
+    "isNonstandard": "Custom"
+  },
+  "boulderbash": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Physical",
+    "name": "Boulder Bash",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "multihit": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Rock",
+    "zMove": {
+      "basePower": 140
+    },
+    "maxMove": {
+      "basePower": 120
+    },
+    "contestType": "Cool",
+    "shortDesc": "Hits twice.",
+    "isNonstandard": "Custom"
+  },
+  "rampartsmight": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Physical",
+    "name": "Rampart's Might",
+    "pp": 10,
+    "priority": -5,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "failmefirst": 1
+    },
+    "condition": {
+      "duration": 1,
+      "onFoeRedirectTargetPriority": 1
+    },
+    "secondary": null,
+    "target": "scripted",
+    "type": "Rock",
+    "contestType": "Cool",
+    "shortDesc": "The foes' moves target the user. Returns last damage taken at 1.5x power.",
+    "isNonstandard": "Custom"
+  },
+  "retroblast": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Retro Blast",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 33,
+      "boosts": {
+        "spd": -1,
+        "spa": -1
+      }
+    },
+    "target": "allAdjacentFoes",
+    "type": "Rock",
+    "contestType": "Cool",
+    "shortDesc": "33% Chance to lower targets Sp. Atk and Sp. Def by 1 stage",
+    "isNonstandard": "Custom"
+  },
+  "lunarianforce": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Lunarian Force",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Rock",
+    "contestType": "Beautiful",
+    "shortDesc": "If Misty Terrain; nullifies the target's Ability.",
+    "isNonstandard": "Custom"
+  },
+  "gemstoneglimmer": {
+    "accuracy": 95,
+    "basePower": 75,
+    "category": "Special",
+    "name": "Gemstone Glimmer",
+    "desc": "Has a 25% chance to lower the target's Accuracy by 1 stage.",
+    "shortDesc": "25% chance to lower the target's Accuracy by 1.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 25,
+      "boosts": {
+        "accuracy": -1
+      }
+    },
+    "target": "normal",
+    "type": "Rock",
+    "isNonstandard": "Custom"
+  },
+  "tartantrum": {
+    "accuracy": 95,
+    "basePower": 115,
+    "category": "Physical",
+    "name": "Tar-Tantrum",
+    "desc": "The user throws powerful tar-fists at his foe. It may also lower the foes' Speed stat.",
+    "shortDesc": "30% chance to lower the target's speed by 1.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "defrost": 1,
+      "punch": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "boosts": {
+        "spe": -1
+      }
+    },
+    "target": "normal",
+    "type": "Rock",
+    "isNonstandard": "Custom"
+  },
+  "pressurize": {
+    "accuracy": 0,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Pressurize",
+    "desc": "The user pressurizes its crystalline body parts, sharply raising its Sp. Def stat.",
+    "shortDesc": "Raises the user's Sp. Def by 2.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "snatch": 1
+    },
+    "boosts": {
+      "spd": 2
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Rock",
+    "zMove": {
+      "effect": "crit2"
+    },
+    "isNonstandard": "Custom"
+  },
+  "vulcanshammer": {
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Physical",
+    "name": "Vulcan's Hammer",
+    "desc": "The foe is struck with a spark generating Hammer. It may leave the target with a burn.",
+    "shortDesc": "30% chance to burn the target.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "brn"
+    },
+    "target": "normal",
+    "type": "Rock",
+    "isNonstandard": "Custom"
+  },
+  "granite": {
+    "accuracy": 0,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Granite",
+    "desc": "The user sets up a protective reinforcement for their side of the field. Lasts for 3 turns.",
+    "shortDesc": "Sets Reflect and Light Screen on user's side for 3 turns.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "snatch": 1
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Rock",
+    "isNonstandard": "Custom"
+  },
+  "greatbind": {
+    "accuracy": 80,
+    "basePower": 120,
+    "category": "Physical",
+    "name": "Great Bind",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "volatileStatus": "partiallytrapped",
+    "secondary": null,
+    "target": "normal",
+    "type": "Rock",
+    "contestType": "Tough",
+    "shortDesc": "Traps and damages the target for 4-5 turns.",
+    "isNonstandard": "Custom"
+  },
+  "nihillight": {
+    "num": 920,
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Special",
+    "isNonstandard": "Future",
+    "name": "Nihil Light",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "ignoreEvasion": true,
+    "ignoreDefensive": true,
+    "ignoreImmunity": {
+      "Fairy": true
+    },
+    "secondary": null,
+    "target": "allAdjacentFoes",
+    "type": "Dragon"
+  },
+  "dragonify": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Dragonify",
+    "desc": "Causes the target to become a Dragon type. Fails if the target is an Arceus, or if the target is already purely Dragon type.",
+    "shortDesc": "Changes the target's type to Dragon.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "reflectable": 1,
+      "mirror": 1,
+      "allyanim": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Dragon",
+    "zMove": {
+      "boost": {
+        "spa": 1
+      }
+    },
+    "isNonstandard": "Custom"
+  },
+  "dracojet": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Physical",
+    "name": "Draco Jet",
+    "desc": "No additional effect.",
+    "shortDesc": "Usually goes first.",
+    "pp": 30,
+    "priority": 1,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Dragon",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "drakonvoice": {
+    "num": 0,
+    "accuracy": 85,
+    "basePower": 105,
+    "category": "Special",
+    "name": "Drakon Voice",
+    "desc": "No additional effect.",
+    "shortDesc": "No additional effect. Hits adjacent foes.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "sound": 1,
+      "bypasssub": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "allAdjacentFoes",
+    "type": "Dragon",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "jetstream": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Jet Stream",
+    "desc": "For 2 turns, the user and its party members have their Priority increased by 1. Fails if this move is already in effect for the user's side.",
+    "shortDesc": "For 2 turns, allies' get +1 Priority.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "snatch": 1,
+      "metronome": 1,
+      "wind": 1
+    },
+    "sideCondition": "jetstream",
+    "condition": {
+      "duration": 2,
+      "onSideResidualOrder": 26,
+      "onSideResidualSubOrder": 5
+    },
+    "secondary": null,
+    "target": "allySide",
+    "type": "Dragon",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "venomousroar": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Special",
+    "name": "Venomous Roar",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "sound": 1,
+      "bypasssub": 1
+    },
+    "secondary": {
+      "chance": 20,
+      "status": "psn"
+    },
+    "target": "normal",
+    "type": "Dragon",
+    "contestType": "Tough",
+    "desc": "Has a 30% chance to poison the target.",
+    "shortDesc": "30% chance to poison the target.",
+    "isNonstandard": "Custom"
+  },
+  "mistbarrage": {
+    "num": 0,
+    "accuracy": 95,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Mist Barrage",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "contact": 1
+    },
+    "secondary": {
+      "chance": 10,
+      "volatileStatus": "confusion"
+    },
+    "target": "allAdjacentFoes",
+    "shortDesc": "During Misty Terrain: 1.5x damage instead of half. 10% chance to confuse.",
+    "type": "Dragon",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "splintercannon": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Special",
+    "name": "Splinter Cannon",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "self": {
+      "boosts": {
+        "spd": -1
+      }
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Dragon",
+    "contestType": "Beautiful",
+    "shortDesc": "Lowers the user's Sp. Def by 1.",
+    "isNonstandard": "Custom"
+  },
+  "causticbreath": {
+    "accuracy": 100,
+    "basePower": 60,
+    "category": "Special",
+    "name": "Caustic Breath",
+    "desc": "Has a 100% chance to lower the target's Defense and Special Defense by 1 stage.",
+    "shortDesc": "Lowers the target's Def and Sp. Def by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "boosts": {
+        "def": -1,
+        "spd": -1
+      }
+    },
+    "target": "allAdjacentFoes",
+    "type": "Dragon",
+    "isNonstandard": "Custom"
+  },
+  "corrode": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Corrode",
+    "desc": "This move's type effectiveness against Steel is changed to be super effective no matter what this move's type is.",
+    "shortDesc": "Super effective on Steel.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "ignoreImmunity": {
+      "Poison": true
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Poison",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "voidtentacle": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Void Tentacle",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "boosts": {
+        "def": -1
+      }
+    },
+    "target": "normal",
+    "type": "Poison",
+    "desc": "Has a 100% chance to lower the target's Defense by 1 stage. Power is multiplied by 1.5 during Gravity's effect.",
+    "shortDesc": "Target: 100% -1 Def. During Gravity: 1.5x power.",
+    "isNonstandard": "Custom"
+  },
+  "mourningkiss": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 75,
+    "category": "Special",
+    "name": "Mourning Kiss",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "heal": 1,
+      "metronome": 1
+    },
+    "drain": [
+      1,
+      2
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Poison",
+    "contestType": "Cute",
+    "shortDesc": "User recovers 50% of the damage dealt.",
+    "isNonstandard": "Custom"
+  },
+  "stickyterrain": {
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Sticky Terrain",
+    "desc": "For 5 turns, the terrain becomes Sticky Terrain. During the effect, grounded Pokemon cannot be hit by moves with priority greater than 0, unless the target is an ally. Camouflage transforms the user into a Normal type. Fails if the current terrain is Sticky Terrain.",
+    "shortDesc": "5 turns. Grounded: immune to priority.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "nonsky": 1,
+      "metronome": 1
+    },
+    "terrain": "stickyterrain",
+    "condition": {
+      "effectType": "Terrain",
+      "duration": 5,
+      "onTryHitPriority": 4,
+      "onFieldResidualOrder": 27,
+      "onFieldResidualSubOrder": 7
+    },
+    "secondary": null,
+    "target": "all",
+    "type": "Poison",
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "barbedtackle": {
+    "accuracy": 100,
+    "basePower": 45,
+    "category": "Physical",
+    "name": "Barbed Tackle",
+    "desc": "The user rams into an opponent with the poisoned points on its body. This may also poison the target.",
+    "shortDesc": "30% chance to poison the target.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "psn"
+    },
+    "target": "normal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "venomswipe": {
+    "accuracy": 90,
+    "basePower": 100,
+    "category": "Physical",
+    "name": "Venom Swipe",
+    "desc": "The user swipes around its venomous tail aimlessly. This may poison struck targets.",
+    "shortDesc": "30% chance to poison the target.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "psn"
+    },
+    "target": "allAdjacent",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "bugblaster": {
+    "accuracy": 90,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Bug Blaster",
+    "desc": "The user spews out a destructive bullet of glowing data. It may lower the target's Attack stat.",
+    "shortDesc": "10% chance to lower the target's attack by 1.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "pulse": 1
+    },
+    "secondary": {
+      "chance": 10,
+      "boosts": {
+        "atk": -1
+      }
+    },
+    "target": "normal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "poisonbubbles": {
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Physical",
+    "name": "Poison Bubbles",
+    "desc": "The user spews bubbles that are covered in a poisonous substance that may poison the foe.",
+    "shortDesc": "30% chance to poison the target.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "psn"
+    },
+    "target": "normal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "virusskater": {
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Virus Skater",
+    "desc": "The user skates through digital data, hitting the foe with a nasty blow. Raises the user's Speed.",
+    "shortDesc": "100% chance to raise the user's Speed by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "self": {
+        "boosts": {
+          "spe": 1
+        }
+      }
+    },
+    "target": "normal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "pagefault": {
+    "accuracy": 100,
+    "basePower": 120,
+    "category": "Physical",
+    "name": "Page Fault",
+    "desc": "The user somersaults, striking with its blades for several turns. The user ends up confused.",
+    "shortDesc": "Lasts 2-3 turns. Confuses the user afterwards.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "failinstruct": 1
+    },
+    "self": {
+      "volatileStatus": "lockedmove"
+    },
+    "target": "randomNormal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "cablecrusher": {
+    "accuracy": true,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Cable Crusher",
+    "desc": "The foe is strangled by the user and held in place 4 to 5 turns. There is no escape.",
+    "shortDesc": "Traps and damages the target for 4-5 turns.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "volatileStatus": "partiallytrapped",
+    "secondary": null,
+    "target": "normal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "hyperstinkshot": {
+    "accuracy": 90,
+    "basePower": 95,
+    "category": "Special",
+    "name": "Hyper-Stink-Shot",
+    "desc": "The user shoots a bullet, made out of compressed gas. This move is unblockable.",
+    "shortDesc": "Breaks the target's protection for this turn.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "mirror": 1,
+      "bypasssub": 1
+    },
+    "breaksProtect": true,
+    "secondary": null,
+    "target": "normal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "compostbomber": {
+    "accuracy": 100,
+    "basePower": 95,
+    "category": "Special",
+    "name": "Compost Bomber",
+    "desc": "Poisonous clumps are scattered aimlessly. It's likely to poison those hit.",
+    "shortDesc": "50% chance to poison the target.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 50,
+      "status": "psn"
+    },
+    "target": "allAdjacent",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "darknetwork": {
+    "accuracy": 90,
+    "basePower": 130,
+    "category": "Special",
+    "name": "Dark Network",
+    "desc": "A frenzy of virus-infested cables ravage the foe. The user's Sp. Atk harshly drops.",
+    "shortDesc": "Lowers the user's Sp. Atk by 2.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "self": {
+      "boosts": {
+        "spa": -2
+      }
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "cherryblast": {
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Special",
+    "name": "Cherry Blast",
+    "desc": "Forbidden fruit is shot at the opponent. Likely puts a curse on those hit.",
+    "shortDesc": "25% chance to Curse target.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "pulse": 1
+    },
+    "secondary": {
+      "chance": 25,
+      "volatileStatus": "curse"
+    },
+    "target": "normal",
+    "type": "Poison",
+    "isNonstandard": "Custom"
+  },
+  "fibregraft": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Fibre Graft",
+    "desc": "The user faints, and the Pokemon brought out receives the Fighting type, a +1 atk boost, and the effect of Focus Energy. The replacement is sent out at the end of the turn, and the healing happens before hazards take effect.",
+    "shortDesc": "User faints. Switch-in gains +1 Atk, +2 Crit ratio, + Fighting type.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "snatch": 1,
+      "metronome": 1
+    },
+    "selfdestruct": "ifHit",
+    "slotCondition": "fibregraft",
+    "condition": {},
+    "secondary": null,
+    "target": "self",
+    "type": "Fighting",
+    "zMove": {
+      "effect": "healreplacement"
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "lycanpounce": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Physical",
+    "name": "Lycan Pounce",
+    "shortDesc": "High crit ratio. Disguises as the first damaging move in the user's moveset.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "critRatio": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Fighting",
+    "isNonstandard": "Custom"
+  },
+  "groundingstomp": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Physical",
+    "name": "Grounding Stomp",
+    "desc": "This move's type effectiveness against Poison is changed to be super effective no matter what this move's type is. This move can hit a target using Bounce, Fly, or Sky Drop, or is under the effect of Sky Drop. If this move hits a target under the effect of Bounce, Fly, Magnet Rise, or Telekinesis, the effect ends. If the target is a Flying type that has not used Roost this turn or a Pokemon with the Levitate Ability, it loses its immunity to Ground-type attacks and the Arena Trap Ability as long as it remains active. During the effect, Magnet Rise fails for the target and Telekinesis fails against the target.",
+    "shortDesc": "Super effective on Poison. Removes the target's Ground immunity.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "nonsky": 1,
+      "metronome": 1,
+      "contact": 1
+    },
+    "volatileStatus": "groundingstomp",
+    "condition": {
+      "noCopy": true
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fighting",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "goldenfist": {
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Golden Fist",
+    "shortDesc": "Scatters coins.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "punch": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fighting",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "dinokick": {
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Dino Kick",
+    "desc": "The user kicks the opponent, destroying their item. Does less damage if opponent has no item.",
+    "shortDesc": "1.5x damage if foe holds an item. Removes item.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Fighting",
+    "isNonstandard": "Custom"
+  },
+  "airslam": {
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Physical",
+    "name": "Air Slam",
+    "desc": "The user spins towards the foe swinging its Holy Rod. It may leave the target with paralysis.",
+    "shortDesc": "30% chance to paralyze the target.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "par"
+    },
+    "target": "normal",
+    "type": "Flying",
+    "isNonstandard": "Custom"
+  },
+  "evilwing": {
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Physical",
+    "name": "Evil Wing",
+    "desc": "The user slashes the opponent with its wings at incredible speed. May leave the target paralyzed.",
+    "shortDesc": "30% chance to paralyze the target.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "par"
+    },
+    "target": "normal",
+    "type": "Flying",
+    "isNonstandard": "Custom"
+  },
+  "pheroblast": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 130,
+    "category": "Special",
+    "name": "Pheroblast",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "self": {
+      "boosts": {
+        "spa": -2
+      }
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Bug",
+    "contestType": "Beautiful",
+    "shortDesc": "Lowers user's Sp.Atk by 2 stages after use.",
+    "isNonstandard": "Custom"
+  },
+  "wormhole": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Special",
+    "name": "Wormhole",
+    "desc": "No additional effect.",
+    "shortDesc": "Usually goes first.",
+    "pp": 10,
+    "priority": 1,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Psychic",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "bulwark": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Bulwark",
+    "shortDesc": "Sets the effects of Light Screen and Reflect.",
+    "pp": 5,
+    "priority": -1,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Psychic",
+    "zMove": {
+      "boost": {
+        "def": 1,
+        "spd": 1
+      }
+    },
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "mindwipe": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Mindwipe",
+    "desc": "Resets all of the target's stat stages to 0.",
+    "shortDesc": "Resets all of the target's stat stages to 0.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Psychic",
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "mindtrap": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 40,
+    "basePowerCallback": true,
+    "category": "Physical",
+    "name": "Mindtrap",
+    "desc": "If an opposing Pokemon switches out this turn, this move hits that Pokemon before it leaves the field, even if it was not the original target. If the user moves after an opponent using Flip Turn, Parting Shot, Teleport, U-turn, or Volt Switch, but not Baton Pass, it will hit that opponent before it leaves the field. Power doubles and no accuracy check is done if the user hits an opponent switching out, and the user's turn is over; if an opponent faints from this, the replacement Pokemon does not become active until the end of the turn.",
+    "shortDesc": "If a foe is switching out, hits it at 2x power.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "condition": {
+      "duration": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Psychic",
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "solarflare": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Special",
+    "name": "Solar Flare",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "multihit": 2,
+    "target": "normal",
+    "type": "Psychic",
+    "secondary": {
+      "chance": 20,
+      "status": "brn"
+    },
+    "zMove": {
+      "basePower": 140
+    },
+    "maxMove": {
+      "basePower": 120
+    },
+    "contestType": "Cool",
+    "shortDesc": "Hits twice, 20% chance to burn per hit.",
+    "isNonstandard": "Custom"
+  },
+  "getlucky": {
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Get Lucky",
+    "desc": "Has a 100% chance to raise the user's critical hit ratio by 2 stages.",
+    "shortDesc": "100% chance to raise the user's crit ratio by 2.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "self": {
+      "volatileStatus": "focusenergy"
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Psychic",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "instantcrush": {
+    "accuracy": 100,
+    "basePower": 60,
+    "category": "Special",
+    "name": "Instant Crush",
+    "desc": "No additional effect.",
+    "shortDesc": "Usually goes first.",
+    "pp": 10,
+    "priority": 1,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Psychic",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "dejavu": {
+    "accuracy": true,
+    "basePower": 105,
+    "category": "Special",
+    "name": "Deja-vu",
+    "desc": "The user disrupts space-time to discombobulate the foe. This move can't miss.",
+    "shortDesc": "This move does not check accuracy.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Psychic",
+    "isNonstandard": "Custom"
+  },
+  "brainfreeze": {
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Special",
+    "name": "Brain Freeze",
+    "desc": "The user employs cryokinesis against the foe, potentially freezing it.",
+    "shortDesc": "10% chance to freeze the target.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 10,
+      "status": "frz"
+    },
+    "target": "normal",
+    "type": "Psychic",
+    "isNonstandard": "Custom"
+  },
+  "brainstorm": {
+    "accuracy": 90,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Brain Storm",
+    "desc": "The user attacks using psychic force whilst brainstorming. This may raise the user's Sp. Atk stat.",
+    "shortDesc": "70% chance to raise the user's Sp. Atk by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 70,
+      "self": {
+        "boosts": {
+          "spa": 1
+        }
+      }
+    },
+    "target": "normal",
+    "type": "Psychic",
+    "isNonstandard": "Custom"
+  },
+  "necromagic": {
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Special",
+    "name": "Necro Magic",
+    "desc": "The user saps HP from the foe with a cursed grasp, restoring HP equal to half the damage dealt.",
+    "shortDesc": "User recovers 50% of the damage dealt.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "drain": [
+      1,
+      2
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Psychic",
+    "isNonstandard": "Custom"
+  },
+  "newmoon": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "New Moon",
+    "desc": "For 5 turns, the weather becomes New Moon. The damage of Ghost/Dark-type attacks is multiplied by 1.35 and the damage of Fairy-type attacks is multiplied by 0.75 during the effect. Lasts for 8 turns if the user is holding Dark Rock. Fails if the current weather is New Moon.",
+    "shortDesc": "For 5 turns, darkness powers Ghost/Dark moves.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "metronome": 1
+    },
+    "weather": "newmoon",
+    "secondary": null,
+    "target": "all",
+    "type": "Dark",
+    "zMove": {
+      "boost": {
+        "spe": 1
+      }
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "megatonslice": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 110,
+    "category": "Physical",
+    "name": "Megaton Slice",
+    "shortDesc": "Cannot be selected the turn after it's used.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "cantusetwice": 1,
+      "slicing": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Dark",
+    "isNonstandard": "Custom"
+  },
+  "lucky7s": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Lucky 7s",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "shortDesc": "+5 BP for each 7 in the user's stats.",
+    "type": "Dark",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "salchowjump": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 85,
+    "category": "Physical",
+    "name": "Salchow Jump",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "contact": 1,
+      "dance": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "self": {
+        "boosts": {
+          "accuracy": 1
+        }
+      }
+    },
+    "target": "normal",
+    "type": "Dark",
+    "contestType": "Clever",
+    "shortDesc": "100% to raise accuracy. Never misses.",
+    "isNonstandard": "Custom"
+  },
+  "foolsgambit": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 120,
+    "category": "Physical",
+    "name": "Fool's Gambit",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "contact": 1,
+      "bite": 1
+    },
+    "self": {
+      "boosts": {
+        "def": -2
+      }
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Dark",
+    "contestType": "Beautiful",
+    "shortDesc": "Lowers the user's Def by 2.",
+    "isNonstandard": "Custom"
+  },
+  "drainlife": {
+    "accuracy": 100,
+    "basePower": 75,
+    "category": "Physical",
+    "name": "Drain Life",
+    "desc": "The user recovers 1/2 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down.",
+    "shortDesc": "User recovers 50% of the damage dealt.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "heal": 1,
+      "metronome": 1
+    },
+    "drain": [
+      1,
+      2
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Dark",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "suddenstrike": {
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Physical",
+    "name": "Sudden Strike",
+    "desc": "No additional effect.",
+    "shortDesc": "Usually goes first.",
+    "pp": 30,
+    "priority": 1,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Dark",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "ambush": {
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Physical",
+    "name": "Ambush",
+    "desc": "An attack that hits first and makes the target flinch. It only works the first turn the user is in battle.",
+    "shortDesc": "Hits first. First turn out only. 100% flinch chance.",
+    "pp": 10,
+    "priority": 3,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "volatileStatus": "flinch"
+    },
+    "target": "normal",
+    "type": "Dark",
+    "isNonstandard": "Custom"
+  },
+  "yuckytongue": {
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Yucky Tongue",
+    "desc": "The target is licked with a long tongue. It may paralyze the foe.",
+    "shortDesc": "45% chance to paralyze the target.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 45,
+      "status": "par"
+    },
+    "target": "normal",
+    "type": "Dark",
+    "isNonstandard": "Custom"
+  },
+  "devilsdeed": {
+    "accuracy": 0,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Devil's Deed",
+    "desc": "The user performs a dark ritual that boosts its Attack and Speed stats.",
+    "shortDesc": "Raises the user's Attack and Speed by 1.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "snatch": 1
+    },
+    "boosts": {
+      "atk": 1,
+      "spe": 1
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Dark",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "isNonstandard": "Custom"
+  },
+  "concertcrush": {
+    "accuracy": 100,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Concert Crush",
+    "desc": "The user attempts to sing. Those hearing it feel heartbroken and their fighting spirit vanishes.",
+    "shortDesc": "Lowers adjacent pokemon's Attack and Sp. Atk by 1.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "sound": 1
+    },
+    "boosts": {
+      "atk": -1,
+      "spa": -1
+    },
+    "secondary": null,
+    "target": "allAdjacent",
+    "type": "Dark",
+    "zMove": {
+      "boost": {
+        "def": 1
+      }
+    },
+    "isNonstandard": "Custom"
+  },
+  "cometstrike": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 130,
+    "category": "Special",
+    "name": "Comet Strike",
+    "desc": "Lowers the user's Special Attack by 2 stages. This move's power is x1.3 in gravity",
+    "shortDesc": "Lowers the user's Sp. Atk by 2. x1.3 power in gravity.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "self": {
+      "boosts": {
+        "spa": -2
+      }
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Rock",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "dracoblitz": {
+    "accuracy": 100,
+    "basePower": 120,
+    "category": "Physical",
+    "name": "Draco Blitz",
+    "desc": "The user crashes into the foe at a scorching speed. The user also takes damage and may burn the target.",
+    "shortDesc": "Has 33% recoil. 10% chance to burn. Thaws user.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "defrost": 1
+    },
+    "recoil": [
+      33,
+      100
+    ],
+    "secondary": {
+      "chance": 10,
+      "status": "brn"
+    },
+    "target": "normal",
+    "type": "Dragon",
+    "isNonstandard": "Custom"
+  },
+  "permafrost": {
+    "num": 390,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Permafrost",
+    "desc": "Sets up a hazard on the opposing side of the field, with a chance to freeze each opposing Pokemon that switches in, unless it is a Flying-type Pokemon or has the Levitate Ability. Can be used up to five times before failing. Chance of freeze is X/10 where X is the number of layers, chance is doubled in hail/snow. Can be removed from the opposing side if any opposing Pokemon uses Mortal Spin, Rapid Spin, or Defog successfully, is hit by Defog, or a grounded Ice or Fire type Pokemon switches in. Safeguard prevents the opposing party from being frozen on switch-in, but a substitute does not.",
+    "shortDesc": "Can freeze grounded foes on switch-in. Max 5 layers.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "reflectable": 1,
+      "nonsky": 1,
+      "metronome": 1,
+      "mustpressure": 1
+    },
+    "sideCondition": "permafrost",
+    "condition": {},
+    "secondary": null,
+    "target": "foeSide",
+    "type": "Ice",
+    "zMove": {
+      "boost": {
+        "def": 1
+      }
+    },
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "subzerostorm": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Subzero Storm",
+    "shortDesc": "Summons Snow. Icy Rock: x1.2 damage.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "weather": "snowscape",
+    "target": "normal",
+    "type": "Ice",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "packin": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Pack In",
+    "desc": "The user restores 1/2 of its maximum HP, rounded half up. Defense is boosted by +1 if Hail or Snow is active.",
+    "shortDesc": "User heals 50% of its max HP. +1 Def in Hail/Snow.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "snatch": 1,
+      "heal": 1,
+      "metronome": 1
+    },
+    "heal": [
+      1,
+      2
+    ],
+    "secondary": null,
+    "target": "self",
+    "type": "Ice",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "iceslash": {
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Ice Slash",
+    "desc": "The target is slashed with a frozen claw or blade. Critical hits land more easily.",
+    "shortDesc": "High critical hit ratio.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "slicing": 1
+    },
+    "critRatio": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Ice",
+    "isNonstandard": "Custom"
+  },
+  "iceblast": {
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Special",
+    "name": "Ice Blast",
+    "desc": "The target is hit with a sudden blast of freezing energy. This move is strong against Water types.",
+    "shortDesc": "10% chance to freeze. Super effective on Water.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 10,
+      "status": "frz"
+    },
+    "target": "normal",
+    "type": "Ice",
+    "isNonstandard": "Custom"
+  },
+  "blueblaster": {
+    "accuracy": 100,
+    "basePower": 50,
+    "category": "Special",
+    "name": "Blue Blaster",
+    "desc": "Releases a stream of blue ice-like flames from its mouth, reducing the targets' Speed stat.",
+    "shortDesc": "100% chance to lower the target's speed by 1.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "boosts": {
+        "spe": -1
+      }
+    },
+    "target": "allAdjacentFoes",
+    "type": "Ice",
+    "isNonstandard": "Custom"
+  },
+  "icewolfclaw": {
+    "accuracy": 100,
+    "basePower": 30,
+    "category": "Special",
+    "name": "Ice Wolf Claw",
+    "desc": "The user launches ice-missiles in all directions. It hits two to five times in a row.",
+    "shortDesc": "Hits 2-5 times in one turn.",
+    "pp": 5,
+    "priority": 0,
+    "multihit": [
+      2,
+      5
+    ],
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "allAdjacent",
+    "type": "Ice",
+    "isNonstandard": "Custom"
+  },
+  "garurukick": {
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Garuru-Kick",
+    "desc": "After kicking with an ice-covered paw, the user backflips to switch places with a party Pokémon.",
+    "shortDesc": "User switches out after damaging the target.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "selfSwitch": true,
+    "secondary": null,
+    "target": "normal",
+    "type": "Ice",
+    "isNonstandard": "Custom"
+  },
+  "supremecannon": {
+    "accuracy": 100,
+    "basePower": 95,
+    "category": "Special",
+    "name": "Supreme Cannon",
+    "desc": "A powerful energy blast from the Garuru Cannon that hits all foes with a chance of freezing.",
+    "shortDesc": "25% chance to freeze. Hits adjacent foes.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "pulse": 1
+    },
+    "secondary": {
+      "chance": 25,
+      "status": "frz"
+    },
+    "target": "allAdjacentFoes",
+    "type": "Ice",
+    "isNonstandard": "Custom"
+  },
+  "icetoss": {
+    "accuracy": 85,
+    "basePower": 25,
+    "category": "Special",
+    "name": "Ice Toss",
+    "shortDesc": "Hits 3 times. 15% chance to frostbite.",
+    "multihit": 3,
+    "secondary": {
+      "chance": 15,
+      "status": "frz"
+    },
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "nosketch": 1
+    },
+    "target": "normal",
+    "type": "Ice",
+    "isNonstandard": "Custom"
+  },
+  "psychobarrage": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 120,
+    "category": "Physical",
+    "name": "Psycho Barrage",
+    "desc": "The user spends two or three turns locked into this move and becomes confused immediately after its move on the last turn of the effect if it is not already. This move targets an opposing Pokemon at random on each turn. If the user is prevented from moving, is asleep at the beginning of a turn, or the attack is not successful against the target on the first turn of the effect or the second turn of a three-turn effect, the effect ends without causing confusion. If this move is called by Sleep Talk and the user is asleep, the move is used for one turn and does not confuse the user.",
+    "shortDesc": "Lasts 2-3 turns. Confuses the user afterwards.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "failinstruct": 1
+    },
+    "self": {
+      "volatileStatus": "lockedmove"
+    },
+    "secondary": null,
+    "target": "randomNormal",
+    "type": "Psychic",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "focusedram": {
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Physical",
+    "name": "Focused Ram",
+    "desc": "The user centers their mind for a psy-charged headbutt. User takes recoil damage.",
+    "shortDesc": "Has 25% recoil.",
+    "pp": 10,
+    "priority": 0,
+    "recoil": [
+      25,
+      100
+    ],
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Psychic",
+    "isNonstandard": "Custom"
+  },
+  "starlightblast": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 100,
+    "category": "Special",
+    "name": "Starlight Blast",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "failcopycat": 1,
+      "failmimic": 1
+    },
+    "secondary": {},
+    "target": "normal",
+    "type": "Fairy",
+    "contestType": "Clever",
+    "shortDesc": "Heals 33%, transform into Tenkibo-Magical-Hero. If Tenkibo-Magical-Hero, 100BP Special move.",
+    "isNonstandard": "Custom"
+  },
+  "shroudedblows": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 85,
+    "category": "Special",
+    "name": "Shrouded Blows",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "punch": 1
+    },
+    "secondary": {
+      "chance": 100,
+      "volatileStatus": "taunt"
+    },
+    "target": "normal",
+    "type": "Fighting",
+    "desc": "Taunts foe for 2 turns.",
+    "shortDesc": "Taunts foe for 2 turns.",
+    "isNonstandard": "Custom"
+  },
+  "atomicpunch": {
+    "accuracy": 95,
+    "basePower": 80,
+    "category": "Physical",
+    "name": "Atomic Punch",
+    "desc": "Has a 15% chance to paralyze the target.",
+    "shortDesc": "15% chance to paralyze the target.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "punch": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 15,
+      "status": "par"
+    },
+    "target": "normal",
+    "type": "Nuclear",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "expunge": {
+    "accuracy": 70,
+    "basePower": 110,
+    "category": "Special",
+    "name": "Expunge",
+    "desc": "Super effective on Nuclear. If the weather is Fallout, this move's accuracy is 100%.",
+    "shortDesc": "Super effective on Nuclear. 100% acc in Fallout.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "any",
+    "type": "Nuclear",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "fallout": {
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Fallout",
+    "desc": "For 5 turns, the weather becomes Fallout. All non-Nuclear and Steel type Pokemon are damaged depending on their weakness to the Nuclear-type every other turn. Fails if the current weather is Fallout.",
+    "shortDesc": "For 5 turns, Fallout damages Pokemon.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "metronome": 1
+    },
+    "weather": "fallout",
+    "secondary": null,
+    "target": "all",
+    "type": "Nuclear",
+    "zMove": {
+      "boost": {
+        "spe": 1
+      }
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "gammaray": {
+    "accuracy": 100,
+    "basePower": 40,
+    "category": "Special",
+    "name": "Gamma Ray",
+    "shortDesc": "No additional effect.",
+    "pp": 30,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Nuclear",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "halflife": {
+    "accuracy": 90,
+    "basePower": 0,
+    "category": "Special",
+    "name": "Half-Life",
+    "desc": "Deals damage to the target equal to half of its current HP, rounded down, but not less than 1 HP.",
+    "shortDesc": "Does damage equal to 1/2 target's current HP.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Nuclear",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "nuclearslash": {
+    "accuracy": 90,
+    "basePower": 55,
+    "category": "Physical",
+    "name": "Nuclear Slash",
+    "desc": "Has a higher chance for a critical hit.",
+    "shortDesc": "High critical hit ratio.",
+    "pp": 20,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "slicing": 1
+    },
+    "critRatio": 2,
+    "secondary": null,
+    "target": "normal",
+    "type": "Nuclear",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "nuclearwaste": {
+    "accuracy": 85,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Nuclear Waste",
+    "shortDesc": "Badly poisons the target.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "reflectable": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "status": "tox",
+    "secondary": null,
+    "target": "normal",
+    "type": "Nuclear",
+    "zMove": {
+      "boost": {
+        "def": 2
+      }
+    },
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "nuclearwind": {
+    "accuracy": 95,
+    "basePower": 65,
+    "category": "Special",
+    "name": "Nuclear Wind",
+    "shortDesc": "5% chance to summon Fallout.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Nuclear",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "protonbeam": {
+    "accuracy": 90,
+    "basePower": 100,
+    "category": "Special",
+    "name": "Proton Beam",
+    "desc": "Lowers the user's Special Attack by 2 stages.",
+    "shortDesc": "Lowers the user's Sp. Atk by 2.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "self": {
+      "boosts": {
+        "spa": -2
+      }
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Nuclear",
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "radioacid": {
+    "accuracy": 100,
+    "basePower": 60,
+    "category": "Special",
+    "name": "Radioacid",
+    "desc": "Has a 30% chance to burn the target.",
+    "shortDesc": "30% chance to burn the target.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": {
+      "chance": 30,
+      "status": "brn"
+    },
+    "target": "normal",
+    "type": "Nuclear",
+    "contestType": "Tough",
+    "isNonstandard": "Custom"
+  },
+  "darkmatter": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 150,
+    "category": "Special",
+    "name": "Dark Matter",
+    "desc": "If this move is successful, the user must recharge on the following turn and cannot select a move.",
+    "shortDesc": "User cannot move next turn.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "recharge": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "self": {
+      "volatileStatus": "mustrecharge"
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Dark",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "lunarcannon": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 105,
+    "category": "Special",
+    "name": "Lunar Cannon",
+    "desc": "This attack charges on the first turn and executes on the second. If the user is holding a Power Herb or the weather is New Moon, the move completes in one turn.",
+    "shortDesc": "Charges turn 1. Hits turn 2. No charge in new moon.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "charge": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "nosleeptalk": 1,
+      "failinstruct": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Dark",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "webwrecker": {
+    "accuracy": 100,
+    "basePower": 115,
+    "category": "Special",
+    "name": "Web Wrecker",
+    "desc": "The user recklessly fires a powerful shot of destructive energy. Hits the entire field.",
+    "shortDesc": "Hits adjacent Pokemon. Double damage on Dig.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "allAdjacent",
+    "type": "Dark",
+    "isNonstandard": "Custom"
+  },
+  "boxin": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 70,
+    "category": "Physical",
+    "name": "Box In",
+    "desc": "Prevents the user and the target from switching out. The user and the target can still switch out if either of them is holding Shed Shell or uses Baton Pass, Flip Turn, Parting Shot, Teleport, U-turn, or Volt Switch. The effect ends if either the user or the target leaves the field.",
+    "shortDesc": "Prevents both user and target from switching out.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "bite": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "isNonstandard": "Custom"
+  },
+  "jumpship": {
+    "num": 0,
+    "accuracy": true,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Jump Ship",
+    "desc": "The user restores 1/2 of its maximum HP and heals its status condition, rounded half up. If Manacra, it swaps between plated and radial form.",
+    "shortDesc": "User is healed 1/2 max HP, status cured. If Manacra, swaps form.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "snatch": 1,
+      "heal": 1,
+      "metronome": 1
+    },
+    "heal": [
+      1,
+      2
+    ],
+    "target": "self",
+    "type": "Ghost",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "contestType": "Beautiful",
+    "isNonstandard": "Custom"
+  },
+  "spiritsiphon": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 65,
+    "category": "Special",
+    "name": "Spirit Siphon",
+    "desc": "The user recovers 1/2 the HP lost by the target, rounded half up. If Big Root is held by the user, the HP recovered is 1.3x normal, rounded half down.",
+    "shortDesc": "User recovers 50% of the damage dealt.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "heal": 1,
+      "metronome": 1
+    },
+    "drain": [
+      1,
+      2
+    ],
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "contestType": "Clever",
+    "isNonstandard": "Custom"
+  },
+  "shadowbound": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 95,
+    "category": "Special",
+    "name": "Shadowbound",
+    "desc": "Damage is calculated using the target's Special Attack stat, including stat stage changes. The user's Ability, item, and burn are used as normal.",
+    "shortDesc": "Uses target's Sp.Attack stat in damage calculation.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "overrideOffensivePokemon": "target",
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "isNonstandard": "Custom"
+  },
+  "vengefulpulse": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 70,
+    "basePowerCallback": true,
+    "self": {},
+    "category": "Special",
+    "name": "Vengeful Pulse",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "bullet": 1,
+      "pulse": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "zMove": {
+      "basePower": 160
+    },
+    "contestType": "Clever",
+    "shortDesc": "1.5x power if user is burn/poison/paralyzed. Transfers status.",
+    "isNonstandard": "Custom"
+  },
+  "phantasmalgust": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Special",
+    "name": "Phantasmal Gust",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "wind": 1
+    },
+    "secondary": {
+      "chance": 10,
+      "boosts": {
+        "spa": -1
+      }
+    },
+    "target": "allAdjacentFoes",
+    "type": "Ghost",
+    "contestType": "Beautiful",
+    "shortDesc": "10% Chance to lower target(s) Sp. Atk by 1 stage",
+    "isNonstandard": "Custom"
+  },
+  "deadsilence": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Dead Silence",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "failmefirst": 1,
+      "nosleeptalk": 1,
+      "noassist": 1,
+      "failcopycat": 1,
+      "failinstruct": 1
+    },
+    "condition": {
+      "duration": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "contestType": "Tough",
+    "shortDesc": "Perish song if user is not hit before moving.",
+    "isNonstandard": "Custom"
+  },
+  "vanish": {
+    "accuracy": 0,
+    "basePower": 0,
+    "category": "Status",
+    "name": "Vanish",
+    "desc": "The user becomes nigh invisible using its ghostly body. This sharply raises its evasiveness.",
+    "shortDesc": "Raises the user's evasiveness by 2.",
+    "pp": 5,
+    "priority": 0,
+    "flags": {
+      "snatch": 1
+    },
+    "boosts": {
+      "evasion": 2
+    },
+    "secondary": null,
+    "target": "self",
+    "type": "Ghost",
+    "zMove": {
+      "effect": "clearnegativeboost"
+    },
+    "isNonstandard": "Custom"
+  },
+  "darkshot": {
+    "accuracy": true,
+    "basePower": 80,
+    "category": "Special",
+    "name": "Dark Shot",
+    "desc": "The user launches a dark organic missile from its spine that always hits the foe.",
+    "shortDesc": "This move does not check accuracy.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "pulse": 1,
+      "bullet": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "isNonstandard": "Custom"
+  },
+  "soulchopper": {
+    "accuracy": 100,
+    "basePower": 60,
+    "category": "Physical",
+    "name": "Soul Chopper",
+    "desc": "The user annihilates the foe's soul with mighty cleaves. Always lands a critical hit.",
+    "shortDesc": "Always results in a critical hit.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "willCrit": true,
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "isNonstandard": "Custom"
+  },
+  "zombiestrike": {
+    "num": 0,
+    "accuracy": 90,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Zombie Strike",
+    "shortDesc": "No additional effect.",
+    "pp": 15,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "contestType": "Cool",
+    "isNonstandard": "Custom"
+  },
+  "misersmaul": {
+    "num": 0,
+    "accuracy": 100,
+    "basePower": 90,
+    "category": "Physical",
+    "name": "Miser's Maul",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "contact": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "contestType": "Clever",
+    "shortDesc": "Scatters coins if this KOes the target.",
+    "isNonstandard": "Custom"
+  },
+  "deathnail": {
+    "accuracy": 95,
+    "basePower": 85,
+    "category": "Physical",
+    "name": "Death Nail",
+    "desc": "The user slashes at its foe with dark matter. This move obliterates any barrier such as Light Screen and Reflect.",
+    "shortDesc": "Destroys screens, unless the target is immune.",
+    "pp": 10,
+    "priority": 0,
+    "flags": {
+      "contact": 1,
+      "protect": 1,
+      "mirror": 1
+    },
+    "secondary": null,
+    "target": "normal",
+    "type": "Ghost",
+    "isNonstandard": "Custom"
+  }
+}
