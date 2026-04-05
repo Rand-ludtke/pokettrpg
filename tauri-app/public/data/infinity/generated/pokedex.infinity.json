@@ -22,7 +22,7 @@
     "heightm": 0.9,
     "weightkg": 16,
     "evos": [
-      "Ivysaur"
+      "Ivysaur-Egho"
     ],
     "tags": [
       "Infinity"
@@ -59,7 +59,7 @@
     "weightkg": 70,
     "prevo": "Bulbasaur-Egho",
     "evos": [
-      "Venusaur"
+      "Venusaur-Egho"
     ],
     "tags": [
       "Infinity"
@@ -129,7 +129,7 @@
     "heightm": 0.8,
     "weightkg": 8.5,
     "evos": [
-      "Charmeleon"
+      "Charmeleon-Egho"
     ],
     "tags": [
       "Infinity"
@@ -166,7 +166,7 @@
     "weightkg": 19,
     "prevo": "Charmander-Egho",
     "evos": [
-      "Charizard"
+      "Charizard-Egho"
     ],
     "tags": [
       "Infinity"
@@ -235,7 +235,7 @@
     "heightm": 0.5,
     "weightkg": 8.5,
     "evos": [
-      "Wartortle"
+      "Wartortle-Egho"
     ],
     "tags": [
       "Infinity"
@@ -272,7 +272,7 @@
     "weightkg": 20,
     "prevo": "Squirtle-Egho",
     "evos": [
-      "Blastoise"
+      "Blastoise-Egho"
     ],
     "tags": [
       "Infinity"

@@ -124,6 +124,8 @@ const TYPE_STYLE: Record<string, React.CSSProperties> = {
   dark: { background: 'linear-gradient(#705848,#513F34)', borderColor: '#362A23' },
   steel: { background: 'linear-gradient(#B8B8D0,#9797BA)', borderColor: '#7A7AA7' },
   fairy: { background: 'linear-gradient(#F830D0,#F008C1)', borderColor: '#C1079B' },
+  nuclear: { background: 'linear-gradient(#92D050,#6DBB2D)', borderColor: '#559922' },
+  cosmic: { background: 'linear-gradient(#6B2FA0,#4E1F78)', borderColor: '#3A1759' },
 };
 
 const STAT_NAMES: Record<string, string> = {

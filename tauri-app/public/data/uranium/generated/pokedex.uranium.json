@@ -2087,7 +2087,8 @@
     "tier": "Illegal",
     "natDexTier": "Illegal",
     "doublesTier": "Illegal",
-    "isNonstandard": "Custom"
+    "isNonstandard": "Custom",
+    "evoLevel": 20
   },
   "dunseraph": {
     "num": 5022,
@@ -9472,7 +9473,7 @@
     "heightm": 1.3,
     "weightkg": 55.8,
     "color": "Blue",
-    "prevo": "Pufluff-Chritmas",
+    "prevo": "Pufluff-Christmas",
     "evoCondition": "with an Atk stat > its Spe stat",
     "eggGroups": [
       "Uranium",

@@ -25,6 +25,8 @@ const TYPE_COLORS: Record<string, string> = {
   dark: '#705848',
   steel: '#B8B8D0',
   fairy: '#EE99AC',
+  nuclear: '#92D050',
+  cosmic: '#6B2FA0',
 };
 
 const NATURES: Array<{ name: string; plus: string | null; minus: string | null }> = [

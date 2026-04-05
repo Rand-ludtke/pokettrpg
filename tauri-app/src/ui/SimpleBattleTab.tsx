@@ -45,6 +45,8 @@ const TYPE_COLORS: Record<string, string> = {
   fairy: '#d685ad',
   stellar: '#44698f',
   shadow: '#5a4975',
+  nuclear: '#92D050',
+  cosmic: '#6B2FA0',
 };
 
 const FX_ASSET_BASE = '/fx';
