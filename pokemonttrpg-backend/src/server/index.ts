@@ -471,6 +471,53 @@ const FUSION_SPRITES_DIR = process.env.FUSION_SPRITES_DIR
   ? path.resolve(process.env.FUSION_SPRITES_DIR)
   : firstExistingPath(DEFAULT_FUSION_SPRITES_CANDIDATES);
 const FUSION_SPRITES_EXTRA_DIRS = parsePathList(process.env.FUSION_SPRITES_EXTRA_DIRS);
+const DEFAULT_FUSION_SUBDIRS = [
+  "CustomBattlers",
+  "generated",
+  "Other",
+  "sprites",
+];
+// Recursively discover directories that contain head-XXXX-XXXX bucket dirs.
+// This finds sprites in nested structures like generated/sage-sdxl/<date>/head-XXXX-XXXX/
+// as well as top-level head-XXXX buckets.
+function discoverSpriteRoots(dir: string, maxDepth = 4, depth = 0): string[] {
+  const roots: string[] = [];
+  if (depth > maxDepth || !dir || !fs.existsSync(dir)) return roots;
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    let hasHeadBucket = false;
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      if (/^head-/.test(entry.name)) {
+        hasHeadBucket = true;
+      }
+    }
+    // If this dir contains head-* buckets, it's a sprite root
+    if (hasHeadBucket) roots.push(dir);
+    // Recurse into non-head subdirs to find nested sprite roots
+    for (const entry of entries) {
+      if (!entry.isDirectory() || /^head-/.test(entry.name)) continue;
+      if (entry.name === 'node_modules' || entry.name === '.git') continue;
+      roots.push(...discoverSpriteRoots(path.join(dir, entry.name), maxDepth, depth + 1));
+    }
+  } catch {}
+  return roots;
+}
+
+function buildFusionExtraDirs(root: string, configured: string[]): string[] {
+  const discovered: string[] = [];
+  if (root && fs.existsSync(root)) {
+    // Add well-known subdirectories
+    for (const rel of DEFAULT_FUSION_SUBDIRS) {
+      const abs = path.resolve(root, rel);
+      if (fs.existsSync(abs)) discovered.push(abs);
+    }
+    // Recursively discover all directories that contain head-* buckets
+    discovered.push(...discoverSpriteRoots(root));
+  }
+  return Array.from(new Set([...configured, ...discovered]));
+}
+const EFFECTIVE_FUSION_SPRITES_EXTRA_DIRS = buildFusionExtraDirs(FUSION_SPRITES_DIR, FUSION_SPRITES_EXTRA_DIRS);
 const VENDOR_SPRITES_DIR = firstExistingPath(DEFAULT_VENDOR_SPRITES_CANDIDATES);
 const FULL_PACK_BASE_SPRITES_DIR = firstExistingPath(DEFAULT_FULL_PACK_BASE_SPRITES_CANDIDATES);
 const FUSION_OTHER_BASE_SPRITES_DIR = firstExistingPath([
@@ -607,6 +654,8 @@ function buildMergedSpriteIndex(): { folders: Record<string, string[]> } {
     addSpritesFromDirRecursive(merged["gen5"], path.join(FUSION_SPRITES_DIR, "sprites", "Other"), 4);
     addSpritesFromDirRecursive(merged["gen5"], path.join(FUSION_SPRITES_DIR, "sprites", "gen5"), 2);
     addSpritesFromDirRecursive(merged["gen5"], path.join(FUSION_SPRITES_DIR, "gen5"), 2);
+    // CustomBattlers: user-uploaded and curated fusion sprites → available in battles
+    addSpritesFromDir(merged["gen5"], path.join(FUSION_SPRITES_DIR, "CustomBattlers"));
   }
 
   // Add delta name aliases (e.g. "deltavenusaur") so the index advertises them.
@@ -663,6 +712,8 @@ function tryCacheSpriteToUnified(folder: string, filename: string): string {
     }
     if (folder === "gen5") {
       if (FUSION_SPRITES_DIR) {
+        // Check CustomBattlers first (user-uploaded / curated fusion sprites)
+        sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "CustomBattlers", filename));
         sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "sprites", "gen5", filename));
         sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "gen5", filename));
         sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "Other", filename));
@@ -692,6 +743,9 @@ function tryCacheSpriteToUnified(folder: string, filename: string): string {
     sourceCandidates.push(path.join(UNIFIED_SPRITES_ROOT, siblingFolder, filename));
     if (VENDOR_SPRITES_DIR) {
       sourceCandidates.push(path.join(VENDOR_SPRITES_DIR, siblingFolder, filename));
+    }
+    if (FUSION_SPRITES_DIR) {
+      sourceCandidates.push(path.join(FUSION_SPRITES_DIR, "CustomBattlers", filename));
     }
     if (FUSION_OTHER_BASE_SPRITES_DIR) {
       sourceCandidates.push(path.join(FUSION_OTHER_BASE_SPRITES_DIR, filename));
@@ -741,6 +795,23 @@ app.get("/sprites/index.json", (_req: Request, res: Response) => {
   }
 });
 
+app.post("/sprites/reindex", (_req: Request, res: Response) => {
+  const unifiedIndex = path.join(UNIFIED_SPRITES_ROOT, "index.json");
+  try {
+    if (fs.existsSync(unifiedIndex)) {
+      try { fs.unlinkSync(unifiedIndex); } catch {}
+    }
+    const payload = buildMergedSpriteIndex();
+    const hasAny = Object.values(payload.folders).some((list) => list.length > 0);
+    if (!hasAny) payload.folders = { gen5: [] };
+    ensureParentDir(unifiedIndex);
+    fs.writeFileSync(unifiedIndex, JSON.stringify(payload));
+    return res.json({ ok: true, folders: Object.keys(payload.folders).length });
+  } catch (err: any) {
+    return res.status(500).json({ ok: false, error: err?.message || "failed to rebuild sprite index" });
+  }
+});
+
 app.get("/sprites/:folder/:filename", (req: Request, res: Response) => {
   const folder = path.basename(String(req.params.folder || ""));
   const filename = path.basename(String(req.params.filename || ""));
@@ -783,13 +854,13 @@ if (FUSION_SPRITES_DIR && fs.existsSync(FUSION_SPRITES_DIR)) {
   if (!remoteMode) {
     registerFusionRoutes(app, {
       spritesDir: FUSION_SPRITES_DIR,
-      spritesDirs: FUSION_SPRITES_EXTRA_DIRS,
+      spritesDirs: EFFECTIVE_FUSION_SPRITES_EXTRA_DIRS,
       packZipPath: FUSION_PACK_ZIP || undefined,
       reportsDir: FUSION_REPORTS_DIR,
     });
     console.log(`[Fusion] Sprites directory enabled: ${FUSION_SPRITES_DIR}`);
-    if (FUSION_SPRITES_EXTRA_DIRS.length) {
-      console.log(`[Fusion] Extra sprite roots: ${FUSION_SPRITES_EXTRA_DIRS.join(", ")}`);
+    if (EFFECTIVE_FUSION_SPRITES_EXTRA_DIRS.length) {
+      console.log(`[Fusion] Extra sprite roots: ${EFFECTIVE_FUSION_SPRITES_EXTRA_DIRS.join(", ")}`);
     }
   } else {
     console.log(`[Fusion] Remote worker mode; proxying fusion sprite/variant endpoints to ${FUSION_GEN_REMOTE_BASE}`);
@@ -1086,6 +1157,36 @@ app.post("/api/customdex/upload", (req: Request, res: Response) => {
       if (!existing) {
         serverSprites[id] = { ...(serverSprites[id] || {}), [slot]: dataUrl } as any;
         addedSprites++;
+        // Write PNG to sprite folders so battles can serve them
+        try {
+          const pngMatch = String(dataUrl).match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/);
+          if (pngMatch) {
+            const buf = Buffer.from(pngMatch[1], "base64");
+            const safeName = id.replace(/[^a-z0-9_-]/gi, "").toLowerCase();
+            if (safeName) {
+              const pngFilename = `${safeName}.png`;
+              // Write to gen5 sprites folder (for battle serving)
+              if (UNIFIED_SPRITES_ROOT) {
+                const gen5Dir = path.join(UNIFIED_SPRITES_ROOT, "gen5");
+                ensureParentDir(path.join(gen5Dir, pngFilename));
+                fs.writeFileSync(path.join(gen5Dir, pngFilename), buf);
+              }
+              // Write to CustomBattlers (for fusion sprite lookup and BaseSprites)
+              if (FUSION_SPRITES_DIR) {
+                const cbDir = path.join(FUSION_SPRITES_DIR, "CustomBattlers");
+                ensureParentDir(path.join(cbDir, pngFilename));
+                fs.writeFileSync(path.join(cbDir, pngFilename), buf);
+              }
+              // Write to Other/BaseSprites too
+              if (FUSION_OTHER_BASE_SPRITES_DIR) {
+                ensureParentDir(path.join(FUSION_OTHER_BASE_SPRITES_DIR, pngFilename));
+                fs.writeFileSync(path.join(FUSION_OTHER_BASE_SPRITES_DIR, pngFilename), buf);
+              }
+            }
+          }
+        } catch (spriteWriteErr: any) {
+          console.warn(`[customdex-upload] Failed to write sprite file for ${id}/${slot}:`, spriteWriteErr?.message);
+        }
       }
     }
   }
@@ -1662,11 +1763,12 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
   // Use Pokemon Showdown engine or custom engine based on configuration
   if (USE_PS_ENGINE) {
     console.log(`[Server] Using Pokemon Showdown battle engine with rules:`, JSON.stringify(rules));
-    // For "true boss" mode, force singles format so boss only has 1 active Pokemon
-    let engineRules = rules;
+    // True Boss mode: keep doubles so each challenger gets an active slot.
+    // The boss side naturally sends out as many Pokemon as it has (1 if team size is 1,
+    // or 2 in doubles). The key is that ALL challengers must have an active slot.
+    const engineRules = rules;
     if (rules?.trueBoss && rules?.playerFormat?.match(/^\d+v1$/)) {
-      engineRules = { ...rules, playerFormat: '1v1', format: 'singles' };
-      console.log(`[Server] True Boss mode: overriding format to singles (1v1)`);
+      console.log(`[Server] True Boss mode: keeping ${rules.playerFormat} doubles format (each challenger gets 1 active slot)`);
     }
     // Determine PS format from rules.format (singles/doubles/triples/ffa) or boss playerFormat
     let psFormat: string | undefined;
@@ -1971,12 +2073,13 @@ function emitMovePrompts(room: Room, state: BattleState): number {
         const filteredSide = psRequest.side ? {
           ...psRequest.side,
           playerId: realPlayerId,
-          pokemon: (psRequest.side.pokemon || []).filter((p: any) => {
-            // allowAllySwap: show all allied Pokemon; otherwise only owned
-            if (room.bossMode!.allowAllySwap) return true;
-            const owners = room.bossMode!.detailsOwnerMap?.get(p.details) || [];
-            return owners.includes(realPlayerId);
-          }),
+          // Filter by stable merged-team index ownership (details text can collide).
+          pokemon: filterSplitSidePokemonByOwnership(
+            psRequest.side.pokemon,
+            room.bossMode!.pokemonOwnershipByIndex,
+            realPlayerId,
+            !!room.bossMode!.allowAllySwap,
+          ),
         } : undefined;
 
         const promptType: "move" | "wait" = alreadyActed ? "wait" : "move";
@@ -2045,10 +2148,12 @@ function emitMovePrompts(room: Room, state: BattleState): number {
           const filteredSide = psRequest.side ? {
             ...psRequest.side,
             playerId: realPlayerId,
-            pokemon: (psRequest.side.pokemon || []).filter((p: any) => {
-              const owners = sideConfig.detailsOwnerMap?.get(p.details) || [];
-              return owners.includes(realPlayerId);
-            }),
+            pokemon: filterSplitSidePokemonByOwnership(
+              psRequest.side.pokemon,
+              sideConfig.pokemonOwnershipByIndex,
+              realPlayerId,
+              false,
+            ),
           } : undefined;
 
           const promptType: "move" | "wait" = alreadyActed ? "wait" : "move";
@@ -2251,6 +2356,73 @@ function emitForceSwitchPrompts(room: Room, state: BattleState, needsSwitch: str
     }
     
     const player = state.players.find(p => p.id === playerId);
+
+    const bossSlotInfo = room.bossMode?.playerSlots.find((s) => s.playerId === playerId);
+    if (bossSlotInfo && room.bossMode && room.engine instanceof SyncPSEngine) {
+      const mergedId = room.bossMode.mergedPlayerId;
+      const psRequest = room.engine.getRequest(mergedId);
+      if (!psRequest?.side) {
+        console.log(`[Server] emitForceSwitchPrompts: No merged PS request for boss ally ${playerId}`);
+        continue;
+      }
+      const mergedStatePlayer = state.players.find((p) => p.id === mergedId);
+      const sideIndex = mergedStatePlayer ? state.players.indexOf(mergedStatePlayer) : 1;
+      const sideId = `p${Math.max(1, sideIndex + 1)}`;
+      const filteredSide = {
+        ...psRequest.side,
+        playerId,
+        pokemon: filterSplitSidePokemonByOwnership(
+          psRequest.side.pokemon,
+          room.bossMode!.pokemonOwnershipByIndex,
+          playerId,
+          !!room.bossMode!.allowAllySwap,
+        ),
+      };
+      const prompt = {
+        ...psRequest,
+        requestType: "switch" as const,
+        playerId,
+        rqid: psRequest.rqid || Date.now(),
+        side: filteredSide,
+        forceSwitch: [true],
+        bossSlot: bossSlotInfo.slot,
+      };
+      sock.emit("promptAction", { roomId: room.id, playerId, prompt, state, ourSide: sideId });
+      continue;
+    }
+
+    const teamSideConfig = room.teamBattleMode?.sides.find((s) => s.playerSlots.some((sl) => sl.playerId === playerId));
+    const teamSlotInfo = teamSideConfig?.playerSlots.find((sl) => sl.playerId === playerId);
+    if (teamSideConfig && teamSlotInfo && room.engine instanceof SyncPSEngine) {
+      const mergedId = teamSideConfig.mergedPlayerId;
+      const psRequest = room.engine.getRequest(mergedId);
+      if (!psRequest?.side) {
+        console.log(`[Server] emitForceSwitchPrompts: No merged PS request for team ally ${playerId}`);
+        continue;
+      }
+      const filteredSide = {
+        ...psRequest.side,
+        playerId,
+        pokemon: filterSplitSidePokemonByOwnership(
+          psRequest.side.pokemon,
+          teamSideConfig.pokemonOwnershipByIndex,
+          playerId,
+          false,
+        ),
+      };
+      const prompt = {
+        ...psRequest,
+        requestType: "switch" as const,
+        playerId,
+        rqid: psRequest.rqid || Date.now(),
+        side: filteredSide,
+        forceSwitch: [true],
+        bossSlot: teamSlotInfo.slot,
+      };
+      sock.emit("promptAction", { roomId: room.id, playerId, prompt, state, ourSide: teamSideConfig.sideId });
+      continue;
+    }
+
     if (!player) {
       console.log(`[Server] emitForceSwitchPrompts: Player not found in state for ${playerId}`);
       continue;
@@ -2593,22 +2765,60 @@ const FORCE_SWITCH_TIMEOUT_MS = Number(process.env.FORCE_SWITCH_TIMEOUT_MS || 45
 export function computeNeedsSwitch(state: import("../types").BattleState, engine?: SyncPSEngine): string[] {
   const out: string[] = [];
   for (const pl of state.players) {
+    // In doubles/triples, forceSwitch can be needed for a non-primary slot even when
+    // activeIndex still points at a healthy Pokemon. Trust engine request first.
+    if (engine && engine.needsForceSwitch(pl.id)) {
+      out.push(pl.id);
+      continue;
+    }
     const active = pl.team[pl.activeIndex];
     // If the active Pokemon has HP > 0, no switch is needed.
     // The engine's activeRequest can retain a stale forceSwitch after commitDecisions
     // auto-resolved the faint switch, so trust state over engine request here.
     if (active && active.currentHP > 0) continue;
-    // Active is fainted - check engine first, then state fallback
-    if (engine && engine.needsForceSwitch(pl.id)) {
-      out.push(pl.id);
-      continue;
-    }
-    // Fallback: check our state mirror
+    // Fallback: check our state mirror (primarily singles/custom mirror paths)
     if (active && active.currentHP <= 0 && pl.team.some((m, idx) => idx !== pl.activeIndex && m.currentHP > 0)) {
       out.push(pl.id);
     }
   }
   return out;
+}
+
+function expandForceSwitchPlayers(room: Room, needsSwitch: string[]): string[] {
+  const expanded = new Set<string>();
+  for (const pid of needsSwitch) {
+    let expandedForPid = false;
+
+    if (room.bossMode && pid === room.bossMode.mergedPlayerId && room.engine instanceof SyncPSEngine) {
+      const req = room.engine.getRequest(pid);
+      const flags: boolean[] = Array.isArray(req?.forceSwitch) ? req.forceSwitch : [];
+      for (const slotInfo of room.bossMode.playerSlots) {
+        if (flags[slotInfo.slot]) {
+          expanded.add(slotInfo.playerId);
+          expandedForPid = true;
+        }
+      }
+    }
+
+    if (room.teamBattleMode && room.engine instanceof SyncPSEngine) {
+      const sideConfig = room.teamBattleMode.sides.find((s) => s.mergedPlayerId === pid);
+      if (sideConfig) {
+        const req = room.engine.getRequest(pid);
+        const flags: boolean[] = Array.isArray(req?.forceSwitch) ? req.forceSwitch : [];
+        for (const slotInfo of sideConfig.playerSlots) {
+          if (flags[slotInfo.slot]) {
+            expanded.add(slotInfo.playerId);
+            expandedForPid = true;
+          }
+        }
+      }
+    }
+
+    if (!expandedForPid) {
+      expanded.add(pid);
+    }
+  }
+  return Array.from(expanded);
 }
 
 function startForceSwitchTimer(room: Room) {
@@ -2675,6 +2885,59 @@ function clearForceSwitchTimer(room: Room) {
     room.forceSwitchTimer = undefined;
   }
   room.forceSwitchDeadline = undefined;
+}
+
+function getOwnedMergedTeamIndices(room: Room, playerId: string, mergedPlayerId: string): number[] | null {
+  if (room.bossMode && room.bossMode.mergedPlayerId === mergedPlayerId) {
+    if (room.bossMode.allowAllySwap) return null;
+    const ownership = room.bossMode.pokemonOwnershipByIndex || [];
+    const owned: number[] = [];
+    for (let i = 0; i < ownership.length; i++) {
+      if (ownership[i] === playerId) owned.push(i);
+    }
+    return owned;
+  }
+
+  if (room.teamBattleMode) {
+    const side = room.teamBattleMode.sides.find((s) => s.mergedPlayerId === mergedPlayerId);
+    if (!side) return null;
+    const ownership = side.pokemonOwnershipByIndex || [];
+    const owned: number[] = [];
+    for (let i = 0; i < ownership.length; i++) {
+      if (ownership[i] === playerId) owned.push(i);
+    }
+    return owned;
+  }
+
+  return null;
+}
+
+function remapSplitTeamIndex(
+  room: Room,
+  playerId: string,
+  mergedPlayerId: string | undefined,
+  localIndex: unknown,
+): number {
+  const idx = Number(localIndex);
+  if (!Number.isInteger(idx) || idx < 0) return -1;
+  if (!mergedPlayerId) return idx;
+
+  const owned = getOwnedMergedTeamIndices(room, playerId, mergedPlayerId);
+  if (!owned) return idx;
+  if (idx >= owned.length) return -1;
+  return owned[idx];
+}
+
+function filterSplitSidePokemonByOwnership(
+  sidePokemon: any[] | undefined,
+  ownershipByIndex: string[] | undefined,
+  playerId: string,
+  allowAll: boolean = false,
+): any[] {
+  const pokemon = Array.isArray(sidePokemon) ? sidePokemon : [];
+  if (allowAll) return pokemon;
+  const owners = Array.isArray(ownershipByIndex) ? ownershipByIndex : [];
+  return pokemon.filter((_, idx) => owners[idx] === playerId);
 }
 
 // Turn timeout - disabled auto-fill, just log a warning
@@ -2773,7 +3036,8 @@ function processTurnWithBuffer(room: Room) {
   }
 
   room.replay.push({ turn: result.state.turn, events: result.events, anim: result.anim });
-  const needsSwitch: string[] = computeNeedsSwitch(result.state, room.engine instanceof SyncPSEngine ? room.engine : undefined);
+  const engineNeedsSwitch: string[] = computeNeedsSwitch(result.state, room.engine instanceof SyncPSEngine ? room.engine : undefined);
+  const needsSwitch: string[] = expandForceSwitchPlayers(room, engineNeedsSwitch);
   console.log(`[Server] Turn ${result.state.turn} results: events=${result.events.length} needsSwitch=${needsSwitch.length} (${needsSwitch.join(', ')})`);
   if (needsSwitch.length > 0) {
     room.phase = "force-switch";
@@ -3106,6 +3370,92 @@ io.on("connection", (socket: Socket) => {
       if (data.action.type !== "switch") {
         return socket.emit("error", { error: "must switch due to faint" });
       }
+
+      const bossSlotInfo = room.bossMode?.playerSlots.find((s) => s.playerId === data.playerId);
+      const teamSideConfig = room.teamBattleMode?.sides.find((s) => s.playerSlots.some((sl) => sl.playerId === data.playerId));
+      const teamSlotInfo = teamSideConfig?.playerSlots.find((sl) => sl.playerId === data.playerId);
+      const splitMergedPlayerId = bossSlotInfo ? room.bossMode!.mergedPlayerId : (teamSideConfig ? teamSideConfig.mergedPlayerId : undefined);
+      const splitSlot = bossSlotInfo ? bossSlotInfo.slot : (teamSlotInfo ? teamSlotInfo.slot : undefined);
+
+      if (splitMergedPlayerId !== undefined && splitSlot !== undefined) {
+        const localToIndex = (data.action as any).toIndex;
+        const toIndex = remapSplitTeamIndex(room, data.playerId, splitMergedPlayerId, localToIndex);
+        if (toIndex < 0) {
+          return socket.emit("error", { error: "invalid switch target" });
+        }
+        const mergedState = room.engine.getState().players.find((p) => p.id === splitMergedPlayerId);
+        if (!mergedState) {
+          return socket.emit("error", { error: "merged side not found" });
+        }
+        const targetMon = mergedState.team[toIndex];
+        if (!targetMon || targetMon.currentHP <= 0) {
+          return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
+        }
+
+        room.turnBuffer[data.playerId] = {
+          type: "switch",
+          pokemonId: "",
+          toIndex,
+          slotIndex: splitSlot,
+        } as any;
+
+        const allPending = Array.from(room.forceSwitchNeeded);
+        const requiredForMerged = allPending.filter((pid) => {
+          const boss = room.bossMode?.playerSlots.find((s) => s.playerId === pid);
+          if (boss && room.bossMode) return room.bossMode.mergedPlayerId === splitMergedPlayerId;
+          const team = room.teamBattleMode?.sides.find((s) => s.playerSlots.some((sl) => sl.playerId === pid));
+          return !!team && team.mergedPlayerId === splitMergedPlayerId;
+        });
+        const ready = requiredForMerged.length > 0 && requiredForMerged.every((pid) => !!room.turnBuffer[pid]);
+        if (!ready) {
+          return;
+        }
+
+        const usedBench = new Set<number>();
+        const choices = requiredForMerged
+          .map((pid) => {
+            const a: any = room.turnBuffer[pid];
+            const boss = room.bossMode?.playerSlots.find((s) => s.playerId === pid);
+            const team = room.teamBattleMode?.sides.find((s) => s.playerSlots.some((sl) => sl.playerId === pid));
+            const teamSlot = team?.playerSlots.find((sl) => sl.playerId === pid);
+            const slotIndex = boss ? boss.slot : teamSlot?.slot;
+            return { type: "switch", slotIndex, toIndex: a.toIndex } as any;
+          })
+          .filter((c) => typeof c.slotIndex === "number");
+
+        for (const c of choices) {
+          if (usedBench.has(c.toIndex)) {
+            return socket.emit("error", { error: "cannot switch two slots to the same Pokemon" });
+          }
+          usedBench.add(c.toIndex);
+        }
+
+        let res = room.engine.forceSwitch(splitMergedPlayerId, choices[0]?.toIndex, choices);
+        if (Array.isArray(res.events)) {
+          res = { ...res, events: deduplicateSwitchLines(res.events) };
+        }
+        room.replay.push({ turn: res.state.turn, events: res.events, anim: res.anim, phase: "force-switch" });
+
+        for (const pid of requiredForMerged) {
+          room.forceSwitchNeeded.delete(pid);
+          delete room.turnBuffer[pid];
+        }
+
+        {
+          const s = room.engine.getState();
+          io.to(room.id).emit("battleUpdate", { result: res, needsSwitch: Array.from(room.forceSwitchNeeded), deadline: room.forceSwitchDeadline ?? null, rooms: { trick: s.field.room, magic: s.field.magicRoom, wonder: s.field.wonderRoom } });
+        }
+        if (room.forceSwitchNeeded.size === 0) {
+          room.phase = "normal";
+          io.to(room.id).emit("phase", { phase: room.phase });
+          clearForceSwitchTimer(room);
+          room.lastPromptByPlayer = {};
+          const freshState = room.engine.getState();
+          emitMovePrompts(room, freshState);
+        }
+        return;
+      }
+
       // Validate switch target(s) - multi-slot sends choices array, single-slot sends toIndex
       const forceSwitchState = room.engine.getState();
       const forceSwitchPlayer = forceSwitchState.players.find(p => p.id === data.playerId);
@@ -3200,16 +3550,35 @@ io.on("connection", (socket: Socket) => {
       }
       return;
     }
+    const normalBossSlotInfo = room.bossMode?.playerSlots.find((s) => s.playerId === data.playerId);
+    const normalTeamSideConfig = room.teamBattleMode?.sides.find((s) => s.playerSlots.some((sl) => sl.playerId === data.playerId));
+    const normalTeamSlotInfo = normalTeamSideConfig?.playerSlots.find((sl) => sl.playerId === data.playerId);
+    const normalSplitMergedPlayerId = normalBossSlotInfo ? room.bossMode!.mergedPlayerId : (normalTeamSideConfig ? normalTeamSideConfig.mergedPlayerId : undefined);
+    const normalSplitSlot = normalBossSlotInfo ? normalBossSlotInfo.slot : (normalTeamSlotInfo ? normalTeamSlotInfo.slot : undefined);
+
     // Validate switch actions before buffering
     if (data.action.type === "switch") {
       const normalState = room.engine.getState();
-      const normalPlayer = normalState.players.find(p => p.id === data.playerId);
+      const normalLookupPlayerId = normalSplitMergedPlayerId || data.playerId;
+      const remappedToIndex = remapSplitTeamIndex(
+        room,
+        data.playerId,
+        normalSplitMergedPlayerId,
+        (data.action as any).toIndex ?? (data.action as any).switchTo,
+      );
+      if (remappedToIndex < 0) {
+        return socket.emit("error", { error: "invalid switch target" });
+      }
+      const normalPlayer = normalState.players.find(p => p.id === normalLookupPlayerId);
       if (normalPlayer) {
-        const targetMon = normalPlayer.team[(data.action as any).toIndex];
+        const targetMon = normalPlayer.team[remappedToIndex];
         if (!targetMon || targetMon.currentHP <= 0) {
           return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
         }
-        if ((data.action as any).toIndex === normalPlayer.activeIndex) {
+        const activeIdx = typeof normalSplitSlot === "number"
+          ? (normalPlayer.activeIndices?.[normalSplitSlot] ?? normalPlayer.activeIndex)
+          : normalPlayer.activeIndex;
+        if (remappedToIndex === activeIdx) {
           return socket.emit("error", { error: "cannot switch to the same Pokemon" });
         }
       }
@@ -3220,23 +3589,44 @@ io.on("connection", (socket: Socket) => {
     let processedAction = data.action;
     if (data.action.type === "move") {
       const moveState = room.engine.getState();
-      const movePlayer = moveState.players.find(p => p.id === data.playerId);
+      const lookupPlayerId = normalSplitMergedPlayerId || data.playerId;
+      const movePlayer = moveState.players.find(p => p.id === lookupPlayerId);
       if (movePlayer) {
-        const activePokemon = movePlayer.team[movePlayer.activeIndex];
-        const opponent = moveState.players.find(p => p.id !== data.playerId);
+        const splitSlotIndex = typeof normalSplitSlot === "number" ? normalSplitSlot : undefined;
+        const activePokemonIndex = typeof splitSlotIndex === "number"
+          ? (movePlayer.activeIndices?.[splitSlotIndex] ?? movePlayer.activeIndex)
+          : movePlayer.activeIndex;
+        const activePokemon = movePlayer.team[activePokemonIndex];
+        const opponent = moveState.players.find(p => p.id !== lookupPlayerId);
         const opponentActive = opponent?.team[opponent.activeIndex];
 
         const providedMoveId = (data.action as any).moveId as string | undefined;
         const moveIndex = (data.action as any).moveIndex as number | undefined;
-        const moveFromIndex = typeof moveIndex === "number" ? activePokemon?.moves?.[moveIndex] : undefined;
-        const resolvedMoveId = providedMoveId || (moveFromIndex ? (typeof moveFromIndex === 'string' ? moveFromIndex : (moveFromIndex.id || moveFromIndex.name)) : undefined);
+        let resolvedMoveId = providedMoveId;
+        if (!resolvedMoveId && typeof moveIndex === "number") {
+          const req = room.engine instanceof SyncPSEngine ? room.engine.getRequest(lookupPlayerId) : null;
+          const reqActive = Array.isArray(req?.active) ? req.active : [];
+          const activeSlot = typeof splitSlotIndex === "number" ? splitSlotIndex : 0;
+          const reqMoves = reqActive[activeSlot]?.moves;
+          const moveFromReq = Array.isArray(reqMoves) ? reqMoves[moveIndex] : undefined;
+          const moveFromReqId = moveFromReq ? ((moveFromReq as any).id || (moveFromReq as any).move || (moveFromReq as any).name) : undefined;
+          if (moveFromReqId) {
+            resolvedMoveId = String(moveFromReqId);
+          }
+        }
+        if (!resolvedMoveId) {
+          const moveFromIndex = typeof moveIndex === "number" ? activePokemon?.moves?.[moveIndex] : undefined;
+          resolvedMoveId = moveFromIndex ? (typeof moveFromIndex === 'string' ? moveFromIndex : ((moveFromIndex as any).id || (moveFromIndex as any).name)) : undefined;
+        }
 
         if (resolvedMoveId) {
           processedAction = {
             type: "move",
             actorPlayerId: data.playerId,
-            pokemonId: activePokemon.id,
+            pokemonId: activePokemon?.id || "",
             moveId: resolvedMoveId,
+            moveIndex,
+            slotIndex: splitSlotIndex,
             targetLoc: (data.action as any).targetLoc,
             targetPlayerId: opponent?.id || "",
             targetPokemonId: opponentActive?.id || "",
@@ -3244,9 +3634,9 @@ io.on("connection", (socket: Socket) => {
             zmove: !!(data.action as any).zmove,
             dynamax: !!(data.action as any).dynamax,
             terastallize: !!(data.action as any).terastallize,
-          } as MoveAction;
+          } as any;
           if (typeof moveIndex === "number") {
-            console.log(`[Server] Converted moveIndex ${moveIndex} to moveId ${resolvedMoveId}`);
+            console.log(`[Server] Converted moveIndex ${moveIndex} to moveId ${resolvedMoveId} (slot=${splitSlotIndex ?? 0})`);
           } else {
             console.log(`[Server] Using provided moveId ${resolvedMoveId}`);
           }
@@ -3257,17 +3647,30 @@ io.on("connection", (socket: Socket) => {
     // Handle switch action - client may send switchTo or toIndex
     if (data.action.type === "switch") {
       const switchState = room.engine.getState();
-      const switchPlayer = switchState.players.find(p => p.id === data.playerId);
+      const switchLookupPlayerId = normalSplitMergedPlayerId || data.playerId;
+      const switchPlayer = switchState.players.find(p => p.id === switchLookupPlayerId);
       if (switchPlayer) {
-        const activePokemon = switchPlayer.team[switchPlayer.activeIndex];
+        const activeIdx = typeof normalSplitSlot === "number"
+          ? (switchPlayer.activeIndices?.[normalSplitSlot] ?? switchPlayer.activeIndex)
+          : switchPlayer.activeIndex;
+        const activePokemon = switchPlayer.team[activeIdx];
         // Support both switchTo (legacy) and toIndex
-        const targetIndex = (data.action as any).toIndex ?? (data.action as any).switchTo;
+        const targetIndex = remapSplitTeamIndex(
+          room,
+          data.playerId,
+          normalSplitMergedPlayerId,
+          (data.action as any).toIndex ?? (data.action as any).switchTo,
+        );
+        if (targetIndex < 0) {
+          return socket.emit("error", { error: "invalid switch target" });
+        }
         
         processedAction = {
           type: "switch",
           actorPlayerId: data.playerId,
           pokemonId: activePokemon?.id || "",
           toIndex: targetIndex,
+          slotIndex: normalSplitSlot,
         } as SwitchAction;
         console.log(`[Server] Processed switch action to index ${targetIndex}`);
       }
@@ -3329,9 +3732,9 @@ io.on("connection", (socket: Socket) => {
           const action = room.turnBuffer[slotInfo.playerId];
           if (action) {
             if (action.type === "move") {
-              mergedChoices.push({ type: "move", moveId: (action as any).moveId, moveIndex: (action as any).moveIndex, targetLoc: (action as any).targetLoc, mega: !!(action as any).mega, zmove: !!(action as any).zmove, dynamax: !!(action as any).dynamax, terastallize: !!(action as any).terastallize });
+              mergedChoices.push({ type: "move", slotIndex: slotInfo.slot, moveId: (action as any).moveId, moveIndex: (action as any).moveIndex, targetLoc: (action as any).targetLoc, mega: !!(action as any).mega, zmove: !!(action as any).zmove, dynamax: !!(action as any).dynamax, terastallize: !!(action as any).terastallize });
             } else if (action.type === "switch") {
-              mergedChoices.push({ type: "switch", toIndex: (action as any).toIndex });
+              mergedChoices.push({ type: "switch", slotIndex: slotInfo.slot, toIndex: (action as any).toIndex });
             } else {
               mergedChoices.push(action);
             }
@@ -3354,9 +3757,9 @@ io.on("connection", (socket: Socket) => {
             const action = room.turnBuffer[slotInfo.playerId];
             if (action) {
               if (action.type === "move") {
-                mergedChoices.push({ type: "move", moveId: (action as any).moveId, moveIndex: (action as any).moveIndex, targetLoc: (action as any).targetLoc, mega: !!(action as any).mega, zmove: !!(action as any).zmove, dynamax: !!(action as any).dynamax, terastallize: !!(action as any).terastallize });
+                mergedChoices.push({ type: "move", slotIndex: slotInfo.slot, moveId: (action as any).moveId, moveIndex: (action as any).moveIndex, targetLoc: (action as any).targetLoc, mega: !!(action as any).mega, zmove: !!(action as any).zmove, dynamax: !!(action as any).dynamax, terastallize: !!(action as any).terastallize });
               } else if (action.type === "switch") {
-                mergedChoices.push({ type: "switch", toIndex: (action as any).toIndex });
+                mergedChoices.push({ type: "switch", slotIndex: slotInfo.slot, toIndex: (action as any).toIndex });
               } else {
                 mergedChoices.push(action);
               }
