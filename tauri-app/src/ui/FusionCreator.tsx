@@ -525,6 +525,7 @@ function FusionSpriteImg({ fb, size, alt }: {
       width={size}
       height={size}
       style={{ imageRendering: 'pixelated' }}
+      onLoad={() => { fb.handleLoad?.(src); }}
       onError={() => {
         idxRef.current++;
         setSrc(fb.candidates[idxRef.current] || fb.placeholder);

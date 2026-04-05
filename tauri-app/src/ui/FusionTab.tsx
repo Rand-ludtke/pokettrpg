@@ -4,6 +4,7 @@ import {
   nameToDexNum, dexNumToName, fusionSpriteUrlWithFallback, buildDexNumMaps,
   speciesAbilityOptions, isMoveLegalForSpecies, placeholderSpriteDataURL,
   spriteUrlWithFallback, ensureFusionSpriteOnDemand, saveCustomFusionSprite, fetchFusionVariants, getFusionApiBases,
+  IFD_CDN_BASE, cacheIfdSprite,
 } from '../data/adapter';
 import { SpritePainter } from './SpritePainter';
 import type { BattlePokemon, Pokemon, Move } from '../types';
@@ -1039,7 +1040,13 @@ function FusionComboCard({ label, preview, headNum, bodyNum, selected, chosenSpr
               <button
                 key={i}
                 className="mini"
-                onClick={e => { e.stopPropagation(); onSpriteSelect(url); onSelect(); }}
+                onClick={e => {
+                  e.stopPropagation();
+                  onSpriteSelect(url);
+                  onSelect();
+                  // Auto-cache IFD CDN sprites when user selects them
+                  if (url.startsWith(IFD_CDN_BASE)) cacheIfdSprite(headNum, bodyNum, url);
+                }}
                 style={{
                   width: 40, height: 40, padding: 2, borderRadius: 4,
                   border: chosenSprite === url ? '2px solid #22c55e' : '1px solid #444',
@@ -1198,6 +1205,7 @@ function FusionSpriteImg({ chain, size, alt, overrideSrc, headNum, bodyNum }: {
       width={size}
       height={size}
       style={{ imageRendering: 'pixelated' }}
+      onLoad={() => { chain.handleLoad?.(src); }}
       onError={() => {
         idxRef.current++;
         const next = chain.candidates[idxRef.current];

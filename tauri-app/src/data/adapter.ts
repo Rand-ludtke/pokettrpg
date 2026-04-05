@@ -493,6 +493,47 @@ function normalizeBaseUrl(base: string | null | undefined): string {
 /** Default backend URL for sprite index / BaseSprites (mirrored from fusion API). */
 const DEFAULT_BACKEND_SPRITE_BASE = 'https://pokettrpg.duckdns.org/sprites';
 
+// ── Infinite Fusion Dex CDN (community sprite source) ──
+export const IFD_CDN_BASE = 'https://ifd-spaces.sfo2.cdn.digitaloceanspaces.com';
+/** National dex → IFD dex mapping for divergent IDs (252+). Loaded lazily. */
+let gNatToIfd: Record<number, number> = {};
+let gNatToIfdLoaded = false;
+
+/** Convert a national dex number to the corresponding IFD dex number. */
+function natToIfdNum(natNum: number): number {
+  return gNatToIfd[natNum] ?? natNum;
+}
+
+/** Load the national→IFD mapping file (call once at startup). */
+async function loadIfdMapping(): Promise<void> {
+  if (gNatToIfdLoaded) return;
+  try {
+    const url = withPublicBase('data/national-to-ifdex.json');
+    const resp = await fetch(url);
+    if (!resp.ok) { gNatToIfdLoaded = true; return; }
+    const data = await resp.json();
+    if (data && typeof data === 'object') {
+      for (const [natStr, ifdNum] of Object.entries(data as Record<string, number>)) {
+        const nat = Number(natStr);
+        if (Number.isFinite(nat) && Number.isFinite(ifdNum)) gNatToIfd[nat] = ifdNum;
+      }
+    }
+  } catch {}
+  gNatToIfdLoaded = true;
+}
+
+/** Build IFD CDN URLs for a given fusion pair (national dex IDs). */
+export function ifdCdnFusionCandidates(headNum: number, bodyNum: number): string[] {
+  const ifdHead = natToIfdNum(headNum);
+  const ifdBody = natToIfdNum(bodyNum);
+  const stem = `${ifdHead}.${ifdBody}`;
+  const alphas = Array.from({ length: 8 }, (_, i) => String.fromCharCode(97 + i));
+  return [
+    `${IFD_CDN_BASE}/custom/${stem}.png`,
+    ...alphas.map(a => `${IFD_CDN_BASE}/custom/${stem}${a}.png`),
+  ];
+}
+
 /** Detect Tauri desktop environment — always allow HTTP backends from desktop apps. */
 function isTauriApp(): boolean {
   return typeof window !== 'undefined' && !!(window as any).__TAURI__;
@@ -854,6 +895,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
   };
   // Make dex number lookups available globally for sprite fallback IDs.
   buildDexNumMaps(mergedDex);
+  // Load IFD dex mapping in the background (non-blocking).
+  loadIfdMapping();
   return result;
   })();
 
@@ -2396,18 +2439,82 @@ export function fusionSpriteUrlWithFallback(
     candidates.push(`${base}/fusion-sprites/${filename}`);
   }
 
+  // IFD CDN fallback — community sprites from infinitefusiondex.com
+  // Uses IFD dex numbering (diverges from national dex after #251)
+  const ifdUrls = ifdCdnFusionCandidates(headNum, bodyNum);
+  candidates.push(...ifdUrls);
+
   const headName = gNumToName[headNum] || String(headNum);
   const bodyName = gNumToName[bodyNum] || String(bodyNum);
   const phLabel = `${headName.slice(0, 4)}/${bodyName.slice(0, 4)}`.toUpperCase();
   const placeholder = placeholderSpriteDataURL(phLabel);
 
+  // Track which URL successfully loaded so we can cache IFD sprites
   let idx = 0;
+  const firstIfdIdx = candidates.indexOf(ifdUrls[0]);
   return {
     src: candidates[0] || placeholder,
-    handleError: () => { idx++; onError(candidates[idx] || placeholder); },
+    handleError: () => {
+      idx++;
+      const next = candidates[idx] || placeholder;
+      onError(next);
+    },
+    /** Call when <img> loads successfully to cache IFD CDN sprites locally. */
+    handleLoad: (loadedSrc: string) => {
+      if (firstIfdIdx >= 0 && idx >= firstIfdIdx && loadedSrc?.startsWith(IFD_CDN_BASE)) {
+        cacheIfdSprite(headNum, bodyNum, loadedSrc);
+      }
+    },
     candidates,
     placeholder,
   };
+}
+
+/**
+ * Download an IFD CDN sprite, save it locally, and upload to backend.
+ * Runs in the background — never blocks rendering.
+ */
+export function cacheIfdSprite(headNum: number, bodyNum: number, url: string): void {
+  const cacheKey = `ifd-cache:${headNum}.${bodyNum}`;
+  // Deduplicate — don't re-cache the same sprite
+  if (gFusionEnsurePromises.has(cacheKey)) return;
+  const work = (async () => {
+    try {
+      const resp = await fetchWithTimeout(url, {}, 10_000);
+      if (!resp.ok) return null;
+      const blob = await resp.blob();
+      // Convert to data URL for localStorage
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      if (!dataUrl?.startsWith('data:image/')) return null;
+      // Save to localStorage so future loads are instant
+      saveCustomFusionSprite(headNum, bodyNum, dataUrl);
+      // Upload to backend so other players can use it too
+      uploadIfdSpriteToBackend(headNum, bodyNum, dataUrl);
+      return dataUrl;
+    } catch {
+      return null;
+    }
+  })();
+  gFusionEnsurePromises.set(cacheKey, work);
+}
+
+/** Fire-and-forget upload of a cached IFD sprite to the backend. */
+function uploadIfdSpriteToBackend(headNum: number, bodyNum: number, dataUrl: string): void {
+  const apiBases = getFusionApiBases();
+  if (!apiBases.length) return;
+  const payload = JSON.stringify({ headNum, bodyNum, dataUrl });
+  for (const base of apiBases.slice(0, 1)) {
+    fetchWithTimeout(`${base}/api/fusion/upload-sprite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+    }, 15_000).catch(() => {});
+  }
 }
 
 const DEFAULT_FUSION_API_BASE = 'https://pokettrpg.duckdns.org';
@@ -2692,15 +2799,20 @@ export async function fetchFusionVariants(headNum: number, bodyNum: number): Pro
         .map(normalizeVariant)
         .filter((v): v is string => !!v);
       if (variants.length) {
-        return Array.from(new Set(variants)).sort((a, b) => {
+        const sorted = Array.from(new Set(variants)).sort((a, b) => {
           const rankDiff = variantRank(a) - variantRank(b);
           if (rankDiff !== 0) return rankDiff;
           return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
         });
+        // Merge IFD CDN URLs so community sprites appear as selectable options
+        const ifdUrls = ifdCdnFusionCandidates(headNum, bodyNum);
+        return [...sorted, ...ifdUrls];
       }
     } catch {}
   }
-  return fallback;
+  // No backend variants — return default filenames + IFD CDN URLs
+  const ifdFallback = ifdCdnFusionCandidates(headNum, bodyNum);
+  return [...fallback, ...ifdFallback];
 }
 
 /** Save a custom fusion sprite (data URL) to localStorage */
@@ -2737,4 +2849,7 @@ export const adapter = {
   cacheSpriteSelectionLocally,
   ensureFusionSpriteOnDemand,
   listPokemonSpriteOptions,
+  ifdCdnFusionCandidates,
+  IFD_CDN_BASE,
+  cacheIfdSprite,
 };
