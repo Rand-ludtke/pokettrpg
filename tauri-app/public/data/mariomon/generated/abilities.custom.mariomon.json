@@ -21,6 +21,7 @@
       "cantsuppress": 1
     },
     "name": "Chaos Emeralds",
+    "desc": "When this Pokemon would be brought to 0 HP, it instead survives at 1 HP, fully restores its HP, and transforms into its Super form. This effect can only activate once per battle.",
     "shortDesc": "When Sonic reaches 1 HP, fully heal and transform into Super Sonic.",
     "rating": 5,
     "isNonstandard": "Custom"

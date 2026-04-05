@@ -4,6 +4,7 @@
     "basePower": 25,
     "category": "Physical",
     "name": "Hammer Throw",
+    "desc": "Hits 2-5 times. The number of hits and type may change based on the current weather condition.",
     "shortDesc": "Hits 2-5 times. Changes based on the weather.",
     "multihit": [
       2,
@@ -82,6 +83,7 @@
     "basePower": 80,
     "category": "Special",
     "name": "Fiery Maelstrom",
+    "desc": "Causes the weather to become Sunny Day for 5 turns. If the user is holding a Heat Rock, this move's damage is multiplied by 1.2.",
     "shortDesc": "Summons Sun. Heat Rock: x1.2 damage.",
     "pp": 15,
     "priority": 0,
