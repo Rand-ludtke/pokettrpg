@@ -867,6 +867,25 @@ export async function loadShowdownDex(options?: { base?: string }) {
       mergedDex[chatotKey] = entry;
     }
   } catch {}
+
+  // Patch cross-dex evolutions: when a fangame species has a `prevo` pointing
+  // to a standard (or other-dex) species, ensure the base species' `evos` array
+  // includes this species so the dex tab shows all possible evolutions.
+  for (const [key, entry] of Object.entries(mergedDex)) {
+    if (!entry.prevo) continue;
+    const prevoId = normalizeName(entry.prevo);
+    const prevoEntry = mergedDex[prevoId];
+    if (!prevoEntry) continue;
+    const evoName = entry.name || key;
+    const existingEvos: string[] = prevoEntry.evos || [];
+    const alreadyListed = existingEvos.some(
+      (e: string) => normalizeName(e) === normalizeName(evoName),
+    );
+    if (!alreadyListed) {
+      prevoEntry.evos = [...existingEvos, evoName];
+    }
+  }
+
   const mergedLs = { ...mergedBaseLearnsets, ...customLearnsets } as LearnsetsIndex;
   const mergedItems = { ...mergedBaseItems, ...customItems } as ItemIndex;
   const mergedMoves = { ...mergedBaseMoves, ...customMoves } as MoveIndex;
