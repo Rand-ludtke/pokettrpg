@@ -774,6 +774,19 @@ export async function loadShowdownDex(options?: { base?: string }) {
     }
   }
 
+  // Sage and Insurgence sprites live on the backend API (not bundled or CDN-hosted).
+  // Register them so bestSpriteBaseForId() returns the backend URL.
+  for (const fgDex of [sagePokedex, insPokedex]) {
+    if (fgDex) {
+      for (const [key, entry] of Object.entries(fgDex as Record<string, any>)) {
+        const normalizedKey = normalizeName(key);
+        if (normalizedKey) gPreferBackendSpriteIds.add(normalizedKey);
+        const entryName = normalizeName(String(entry?.name || ''));
+        if (entryName) gPreferBackendSpriteIds.add(entryName);
+      }
+    }
+  }
+
   const mergedBaseDex = {
     ...(pokedex as DexIndex),
     ...((sagePokedex || {}) as DexIndex),
@@ -1330,14 +1343,17 @@ export function spriteUrl(speciesId: string, shiny = false, options?: { base?: s
       if (local) return local;
     }
   }
-  // For Pokeathlon fangame Pokemon, return their hosted sprite directly
+  // For Pokeathlon fangame Pokemon, return their hosted sprite directly.
+  // CDN filenames are fully normalized (no hyphens), so use normalizeName
+  // instead of ids[0] which may contain dashes (e.g. "blissey-egho" → "blisseyegho").
   const fgTag = gFangameSpriteSource.get(normalizeName(speciesId));
   if (fgTag) {
     const fgExt = fgTag === 'uranium' ? 'gif' : 'png';
     const fgDir = !!options?.back
       ? (shiny ? 'back-shiny' : 'back')
       : (shiny ? 'front-shiny' : 'front');
-    return `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/${fgDir}/${ids[0]}.${fgExt}`;
+    const fgFileName = normalizeName(speciesId);
+    return `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/${fgDir}/${fgFileName}.${fgExt}`;
   }
   // Fall back to the first candidate file path
   return `${base}/${folder}/${ids[0]}.${ext}`;
@@ -1883,8 +1899,8 @@ export async function listPokemonSpriteOptions(
   const fgTag = gFangameSpriteSource.get(normalizeName(speciesName));
   if (fgTag) {
     const fgExt = fgTag === 'uranium' ? 'gif' : 'png';
-    const fgIds = spriteIdCandidates(speciesName);
-    const fgId = fgIds[0] || normalizeName(speciesName);
+    // CDN filenames are fully normalized (no hyphens)
+    const fgId = normalizeName(speciesName);
     const fgFront = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/front/${fgId}.${fgExt}`;
     const fgBack = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/back/${fgId}.${fgExt}`;
     out.unshift({

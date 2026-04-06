@@ -1345,31 +1345,28 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 // flag it so PS flips it horizontally
                 if (!isFront && !spriteLookupIds.some((id) => hasRealBackSprite(id))) result.isCustomFront = true;
               } else {
-                // 3) No custom/bundled sprite — use spriteUrl() which knows about
-                //    Pokeathlon CDN (uranium/infinity/mariomon) and custom sprite dirs.
-                const dexEntry = (window as any).BattlePokedex?.[speciesId];
-                const hasCanonicalNum = typeof dexEntry?.num === 'number' && dexEntry.num > 0;
-                if (!hasCanonicalNum) {
-                  const resolved = spriteUrl(speciesName, false, { back: !isFront, forceStatic: true });
-                  if (resolved) {
-                    result.url = resolved;
-                    result.w = 96;
-                    result.h = 96;
-                    result.pixelated = true;
-                    if (!isFront) result.isCustomFront = true;
-                  }
+                // 3) No custom/bundled sprite — try spriteUrl() which knows about
+                //    Pokeathlon CDN (uranium/infinity/mariomon), backend API (sage/insurgence),
+                //    and custom sprite dirs.  Only override the original result when
+                //    spriteUrl() returns an absolute URL (CDN/backend/data-URI), not a
+                //    relative vendor path that would be the same broken local fallback.
+                const resolved = spriteUrl(speciesName, false, { back: !isFront, forceStatic: true });
+                if (resolved && (resolved.startsWith('data:') || resolved.startsWith('http'))) {
+                  result.url = resolved;
+                  result.w = 96;
+                  result.h = 96;
+                  result.pixelated = true;
+                  if (!isFront) result.isCustomFront = true;
                 }
               }
 
               if (typeof result?.url === 'string') {
-                // Some custom/non-canonical species do not have ani/home assets.
-                // Fall back to spriteUrl() for reliable resolution (CDN, custom dirs, etc.)
-                const dexEntry = (window as any).BattlePokedex?.[speciesId];
-                const hasCanonicalNum = typeof dexEntry?.num === 'number' && dexEntry.num > 0;
+                // Some fangame / non-standard species don't have ani/home assets.
+                // Replace animated/home URLs with spriteUrl() when it provides an absolute URL.
                 const hasMissingAnimatedOrHome = result.url.includes('/sprites/ani/') || result.url.includes('/sprites/home/');
-                if (!hasCanonicalNum && hasMissingAnimatedOrHome) {
+                if (hasMissingAnimatedOrHome) {
                   const resolved = spriteUrl(speciesName, false, { back: !isFront, forceStatic: true });
-                  if (resolved) {
+                  if (resolved && (resolved.startsWith('data:') || resolved.startsWith('http'))) {
                     result.url = resolved;
                     result.w = 96;
                     result.h = 96;
