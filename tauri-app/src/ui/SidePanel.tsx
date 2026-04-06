@@ -68,6 +68,15 @@ function moveTooltip(move: any): string {
   return (move.shortDesc || move.desc || `${name}${category}`) as string;
 }
 
+function itemOptionLabel(itemName: string, dex: any): string {
+  if (!dex?.items) return itemName;
+  const normalized = normalizeName(itemName);
+  const item = dex.items[normalized]
+    || Object.values(dex.items).find((i: any) => normalizeName((i as any)?.name || '') === normalized);
+  const desc = (item as any)?.shortDesc || (item as any)?.desc || '';
+  return desc ? `${itemName} - ${desc}` : itemName;
+}
+
 export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected, onHeal }: {
   selected: BattlePokemon | null;
   boxes?: Array<Array<BattlePokemon | null>>;
@@ -134,6 +143,8 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     const desc = (ability as any)?.shortDesc || (ability as any)?.desc || '';
     return desc ? `${abilityName} - ${desc}` : abilityName;
   }, [dex]);
+
+  const getItemOptionLabel = useCallback((name: string) => itemOptionLabel(name, dex), [dex]);
 
   const pcSpeciesPool = useMemo(() => {
     const seen = new Set<string>();
@@ -933,13 +944,16 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       const fusion = (selected as any).fusion;
       if (fusion && fusion.headId && fusion.bodyId) {
         saveCustomFusionSprite(fusion.headId, fusion.bodyId, dataUrl);
+        // Set the sprite directly on the Pokemon so it persists through prepareBattle()
+        const next: any = { ...selected, sprite: dataUrl, spriteChoiceId: 'custom-upload', spriteChoiceLabel: 'Custom Upload' };
+        if (next.fusion) next.fusion = { ...next.fusion, spriteFile: dataUrl };
+        onReplaceSelected && onReplaceSelected(next);
       } else {
         const next: any = { ...selected, sprite: dataUrl, spriteChoiceId: 'custom-upload', spriteChoiceLabel: 'Custom Upload' };
         if (!next.backSprite) next.backSprite = undefined;
         onReplaceSelected && onReplaceSelected(next);
       }
       setSpriteChangeKey(k => k + 1);
-      if (fusion && onReplaceSelected) onReplaceSelected({ ...selected });
     };
     reader.readAsDataURL(file);
     // Reset file input so the same file can be re-selected
@@ -1885,7 +1899,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   <div style={{display:'flex', gap:4, alignItems:'center'}} onClick={(e)=>e.stopPropagation()}>
                     <input list="showdown-items" value={showdownFieldValue} onChange={e=>setShowdownFieldValue(e.target.value)} style={{width:'100%'}} />
                     <datalist id="showdown-items">
-                      {dex && Object.values(dex.items).map((it:any) => <option key={it.name} value={it.name} />)}
+                      {dex && Object.values(dex.items).map((it:any) => <option key={it.name} value={it.name} label={getItemOptionLabel(it.name)} />)}
                     </datalist>
                     <button className="mini" onClick={(e)=>{ e.stopPropagation(); commitShowdownEdit(); }}>✓</button>
                     <button className="mini" onClick={(e)=>{ e.stopPropagation(); cancelShowdownEdit(); }}>✕</button>
@@ -2421,7 +2435,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   <div className="label"><strong>Item</strong></div>
                   <input list="items" value={itemSel} onChange={e=>setItemSel(e.target.value)} placeholder="Optional" />
                   <datalist id="items">
-                    {dex && Object.values(dex.items).map((it:any) => <option key={it.name} value={it.name} />)}
+                    {dex && Object.values(dex.items).map((it:any) => <option key={it.name} value={it.name} label={getItemOptionLabel(it.name)} />)}
                   </datalist>
                 </label>
               </div>
@@ -2433,7 +2447,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
               <h4>Moves {sortedMoves && <span style={{fontSize:'0.75em',opacity:0.7}}>({sortedMoves.legal.length} legal)</span>}</h4>
               {[0,1,2,3].map((i) => {
                 const mv = movesInput[i] ?? '';
-                const legal = !dex || !mv ? true : isMoveLegalForSpecies(speciesInput || resolveSpeciesName(), mv, dex.learnsets);
+                const legal = !dex || !mv ? true : (sortedMoves?.legalMoveIds ? sortedMoves.legalMoveIds.has(normalizeName(mv)) : isMoveLegalForSpecies(speciesInput || resolveSpeciesName(), mv, dex.learnsets));
                 return (
                   <div key={i} style={{marginBottom:6}}>
                     <input list={`moves-${i}`} value={mv} onChange={e=>{
@@ -2733,7 +2747,7 @@ function AddNewPanel({ onAdd }: { onAdd?: (p: BattlePokemon) => void }) {
             <div className="label"><strong>Item</strong></div>
             <input list="add-items" value={item} onChange={e=>setItem(e.target.value)} placeholder="Optional" />
             <datalist id="add-items">
-              {dex && Object.values(dex.items).map((it:any) => <option key={it.name} value={it.name} />)}
+              {dex && Object.values(dex.items).map((it:any) => <option key={it.name} value={it.name} label={itemOptionLabel(it.name, dex)} />)}
             </datalist>
           </label>
         </div>
