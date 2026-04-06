@@ -79,6 +79,7 @@ const TYPE_COLORS: Record<string, string> = {
   rock: '#B8A038', ghost: '#705898', dragon: '#7038F8', dark: '#705848',
   steel: '#B8B8D0', fairy: '#EE99AC',
   nuclear: '#92D050', cosmic: '#6B2FA0',
+  crystal: '#A8D8EA', '???': '#68A090', stellar: '#44698f', shadow: '#5a4975',
 };
 
 interface FusionCreatorProps {

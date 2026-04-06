@@ -1314,6 +1314,16 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                           return result;
                         }
                       }
+                      // Fusion parent sprite fallback — use head species sprite when no fusion sprite exists
+                      const parentSprite = (mon as any)._fusionParentSprite;
+                      if (parentSprite) {
+                        result.url = parentSprite;
+                        result.w = 96;
+                        result.h = 96;
+                        result.pixelated = true;
+                        if (!isFront) result.isCustomFront = true;
+                        return result;
+                      }
                       break;
                     }
                   }

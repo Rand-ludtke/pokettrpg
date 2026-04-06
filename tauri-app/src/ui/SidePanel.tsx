@@ -27,6 +27,10 @@ const TYPE_COLORS: Record<string, string> = {
   fairy: '#EE99AC',
   nuclear: '#92D050',
   cosmic: '#6B2FA0',
+  crystal: '#A8D8EA',
+  '???': '#68A090',
+  stellar: '#44698f',
+  shadow: '#5a4975',
 };
 
 const NATURES: Array<{ name: string; plus: string | null; minus: string | null }> = [
@@ -227,31 +231,52 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     const species = speciesInput || resolveSpeciesName();
     const speciesId = normalizeName(species);
     
-    // Get learnset for this species
-    const learnset = dex.learnsets[speciesId];
     const legalMoveIds = new Set<string>();
-    
-    if (learnset?.learnset) {
-      for (const moveId of Object.keys(learnset.learnset)) {
-        legalMoveIds.add(moveId);
-      }
-    }
-    
-    // Also check prevo chain for egg moves
-    const pokedexEntry = dex.pokedex[speciesId];
-    if (pokedexEntry?.prevo) {
-      let prevo = pokedexEntry.prevo;
-      while (prevo) {
-        const prevoId = normalizeName(prevo);
-        const prevoLearnset = dex.learnsets[prevoId];
-        if (prevoLearnset?.learnset) {
-          for (const moveId of Object.keys(prevoLearnset.learnset)) {
-            legalMoveIds.add(moveId);
-          }
+
+    // Helper: collect all move IDs from a species + its prevo chain.
+    // Falls back to baseSpecies/battleOnly for formes without their own learnset
+    // (e.g. nuclear formes, megas, regional variants, battle-only forms).
+    const collectLearnset = (sid: string, visited?: Set<string>) => {
+      const seen = visited || new Set<string>();
+      if (seen.has(sid)) return;
+      seen.add(sid);
+      const ls = dex.learnsets[sid];
+      if (ls?.learnset) {
+        for (const moveId of Object.keys(ls.learnset)) {
+          legalMoveIds.add(moveId);
         }
-        const prevoEntry = dex.pokedex[prevoId];
-        prevo = prevoEntry?.prevo;
       }
+      const entry = dex.pokedex[sid];
+      // If no learnset found, fall back to baseSpecies or battleOnly
+      if (!ls?.learnset && entry) {
+        const base = entry.baseSpecies || entry.battleOnly;
+        if (base) {
+          collectLearnset(normalizeName(String(base)), seen);
+        }
+      }
+      if (entry?.prevo) {
+        let prevo = entry.prevo;
+        while (prevo) {
+          const prevoId = normalizeName(prevo);
+          const prevoLs = dex.learnsets[prevoId];
+          if (prevoLs?.learnset) {
+            for (const moveId of Object.keys(prevoLs.learnset)) {
+              legalMoveIds.add(moveId);
+            }
+          }
+          prevo = dex.pokedex[prevoId]?.prevo;
+        }
+      }
+    };
+
+    // For fusions, combine learnsets from both (or all three) parent species
+    const fusion = selected.fusion;
+    if (fusion?.headName && fusion?.bodyName) {
+      collectLearnset(normalizeName(fusion.headName));
+      collectLearnset(normalizeName(fusion.bodyName));
+      if (fusion.thirdName) collectLearnset(normalizeName(fusion.thirdName));
+    } else {
+      collectLearnset(speciesId);
     }
     
     const allMoves = Object.values(dex.moves) as any[];
@@ -275,7 +300,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     
     // Legal moves first, then illegal
     return { legal, illegal, legalMoveIds };
-  }, [dex, speciesInput, selected.species, selected.name]);
+  }, [dex, speciesInput, selected.species, selected.name, selected.fusion]);
 
   // Build detailed legal move list with learn methods for the move browser
   const detailedLegalMoves = useMemo(() => {
@@ -295,14 +320,37 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
         }
       }
     };
-    collectSources(speciesId);
-    const pokedexEntry = dex.pokedex[speciesId];
-    if (pokedexEntry?.prevo) {
-      let prevo = pokedexEntry.prevo;
-      while (prevo) {
-        collectSources(normalizeName(prevo));
-        prevo = dex.pokedex[normalizeName(prevo)]?.prevo;
+    const collectWithPrevo = (sid: string, visited?: Set<string>) => {
+      const seen = visited || new Set<string>();
+      if (seen.has(sid)) return;
+      seen.add(sid);
+      collectSources(sid);
+      const entry = dex.pokedex[sid];
+      // Forme fallback: if this species has no learnset, try baseSpecies/battleOnly
+      if (!dex.learnsets[sid]?.learnset && entry) {
+        const base = entry.baseSpecies || entry.battleOnly;
+        if (base) {
+          collectWithPrevo(normalizeName(String(base)), seen);
+          return;
+        }
       }
+      if (entry?.prevo) {
+        let prevo = entry.prevo;
+        while (prevo) {
+          collectSources(normalizeName(prevo));
+          prevo = dex.pokedex[normalizeName(prevo)]?.prevo;
+        }
+      }
+    };
+
+    // For fusions, collect from all parent species
+    const fusion = selected.fusion;
+    if (fusion?.headName && fusion?.bodyName) {
+      collectWithPrevo(normalizeName(fusion.headName));
+      collectWithPrevo(normalizeName(fusion.bodyName));
+      if (fusion.thirdName) collectWithPrevo(normalizeName(fusion.thirdName));
+    } else {
+      collectWithPrevo(speciesId);
     }
 
     const parseLearnMethod = (sources: string[]): string => {
@@ -346,7 +394,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       if (b.lowestLevel !== Infinity) return 1;
       return a.name.localeCompare(b.name);
     });
-  }, [dex, sortedMoves, speciesInput, selected.species, selected.name]);
+  }, [dex, sortedMoves, speciesInput, selected.species, selected.name, selected.fusion]);
 
   // Check for available evolutions
   interface EvoOption {
@@ -2847,6 +2895,8 @@ const TYPE_CHART: Record<string, Record<string, number>> = {
   fairy: { fighting: 2, dragon: 2, dark: 2, fire: 0.5, poison: 0.5, steel: 0.5 },
   nuclear: { normal: 2, fire: 2, water: 2, electric: 2, grass: 2, ice: 2, fighting: 2, poison: 2, ground: 2, flying: 2, psychic: 2, bug: 2, rock: 2, ghost: 2, dragon: 2, dark: 2, fairy: 2, cosmic: 2, nuclear: 0.5, steel: 0.5 },
   cosmic: { fairy: 2, normal: 2, nuclear: 2, psychic: 0.5 },
+  crystal: {},
+  '???': {},
 };
 
 function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]; weak: string[]; neutral: string[]; resist: string[]; quadResist: string[]; immune: string[] } {

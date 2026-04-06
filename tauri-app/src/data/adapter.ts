@@ -1077,6 +1077,25 @@ export function prepareBattle(p: Pokemon): BattlePokemon {
         sprite = bases.length ? `${bases[0]}/fusion/sprites/${stem}v1.png` : `/fusion-sprites/${stem}.png`;
       }
     }
+    // If the resolved sprite looks like a likely-404 API path, also prepare parent fallback
+    // so the battle sprite monkey-patch can try the parent species sprite.
+    if (sprite && !sprite.startsWith('data:')) {
+      const headName = p.fusion.headName || gNumToName[p.fusion.headId] || '';
+      if (headName) {
+        (p as any)._fusionParentSprite = spriteUrl(headName);
+      }
+    }
+  }
+  // For any Pokemon (fusion or not), if we still have no sprite, check localStorage
+  // for a custom uploaded sprite. This ensures custom sprites are included in the
+  // battle state and visible to both players (not just the uploader).
+  if (!sprite) {
+    const speciesId = normalizeName(p.species || p.name);
+    const ids = getSpriteIdCandidates(speciesId);
+    for (const id of [speciesId, ...ids]) {
+      const custom = getCustomSprite(id, 'front');
+      if (custom) { sprite = custom; break; }
+    }
   }
   return {
     ...p,
@@ -2576,8 +2595,14 @@ export function fusionSpriteUrlWithFallback(
   const ifdUrls = ifdCdnFusionCandidates(headNum, bodyNum);
   candidates.push(...ifdUrls);
 
+  // Parent species sprites as fallback — use head sprite first, then body
   const headName = gNumToName[headNum] || String(headNum);
   const bodyName = gNumToName[bodyNum] || String(bodyNum);
+  const headSpriteUrl = spriteUrl(headName);
+  const bodySpriteUrl = spriteUrl(bodyName);
+  if (headSpriteUrl) candidates.push(headSpriteUrl);
+  if (bodySpriteUrl && bodySpriteUrl !== headSpriteUrl) candidates.push(bodySpriteUrl);
+
   const phLabel = `${headName.slice(0, 4)}/${bodyName.slice(0, 4)}`.toUpperCase();
   const placeholder = placeholderSpriteDataURL(phLabel);
 
