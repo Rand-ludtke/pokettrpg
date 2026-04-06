@@ -11,7 +11,7 @@ import { withPublicBase } from '../utils/publicBase';
 import { loadPokemonShowdown, createPSBattle, getDex, toID } from './ps-loader';
 import { ProtocolConverter, requestToPS } from './protocol-adapter';
 import type { PoketTRPGClient } from '../net/pokettrpgClient';
-import { getCustomSprite, getSpriteIdCandidates, hasRealBackSprite, normalizeName } from '../data/adapter';
+import { getCustomSprite, getSpriteIdCandidates, hasRealBackSprite, normalizeName, spriteUrl } from '../data/adapter';
 import './ps-battle.css';
 
 /** Set to true to enable verbose console logging during battles. */
@@ -1344,30 +1344,37 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                 // If we used a front sprite as the back sprite fallback (no real back exists),
                 // flag it so PS flips it horizontally
                 if (!isFront && !spriteLookupIds.some((id) => hasRealBackSprite(id))) result.isCustomFront = true;
-              } else if (!isFront && typeof result?.url === 'string') {
-                // For non-canonical species with no back sprite, use front sprite + flip.
+              } else {
+                // 3) No custom/bundled sprite — use spriteUrl() which knows about
+                //    Pokeathlon CDN (uranium/infinity/mariomon) and custom sprite dirs.
                 const dexEntry = (window as any).BattlePokedex?.[speciesId];
                 const hasCanonicalNum = typeof dexEntry?.num === 'number' && dexEntry.num > 0;
-                if (!hasCanonicalNum && result.url.includes('/gen5-back/')) {
-                  result.url = result.url.replace('/gen5-back/', '/gen5/');
-                  result.w = 96;
-                  result.h = 96;
-                  result.pixelated = true;
-                  result.isCustomFront = true;
+                if (!hasCanonicalNum) {
+                  const resolved = spriteUrl(speciesName, false, { back: !isFront, forceStatic: true });
+                  if (resolved) {
+                    result.url = resolved;
+                    result.w = 96;
+                    result.h = 96;
+                    result.pixelated = true;
+                    if (!isFront) result.isCustomFront = true;
+                  }
                 }
               }
 
               if (typeof result?.url === 'string') {
                 // Some custom/non-canonical species do not have ani/home assets.
-                // Fall back to static gen5 sprite so they still render reliably.
+                // Fall back to spriteUrl() for reliable resolution (CDN, custom dirs, etc.)
                 const dexEntry = (window as any).BattlePokedex?.[speciesId];
                 const hasCanonicalNum = typeof dexEntry?.num === 'number' && dexEntry.num > 0;
                 const hasMissingAnimatedOrHome = result.url.includes('/sprites/ani/') || result.url.includes('/sprites/home/');
                 if (!hasCanonicalNum && hasMissingAnimatedOrHome) {
-                  result.url = withPublicBase(`vendor/showdown/sprites/gen5/${speciesId}.png`);
-                  result.w = 96;
-                  result.h = 96;
-                  result.pixelated = true;
+                  const resolved = spriteUrl(speciesName, false, { back: !isFront, forceStatic: true });
+                  if (resolved) {
+                    result.url = resolved;
+                    result.w = 96;
+                    result.h = 96;
+                    result.pixelated = true;
+                  }
                 }
               }
             } catch { /* ignore lookup errors */ }

@@ -1116,6 +1116,18 @@ export function prepareBattle(p: Pokemon): BattlePokemon {
       if (custom) { sprite = custom; break; }
     }
   }
+  // For fangame / non-standard Pokemon that still have no sprite, resolve via
+  // spriteUrl() which knows about the Pokeathlon CDN and custom sprite dirs.
+  // This ensures battle state carries the correct sprite URL for species like
+  // Blissey-Egho, Orangutao, Koopa Troopa, etc.
+  if (!sprite) {
+    const speciesId = normalizeName(p.species || p.name);
+    const resolved = spriteUrl(speciesId, false, { forceStatic: true });
+    // Only use if it looks like a real URL (not just vendor/showdown default for unknowns)
+    if (resolved && (resolved.startsWith('data:') || resolved.startsWith('http') || gFangameSpriteSource.has(speciesId))) {
+      sprite = resolved;
+    }
+  }
   return {
     ...p,
     ...(sprite ? { sprite } : {}),
@@ -1864,6 +1876,26 @@ export async function listPokemonSpriteOptions(
         animated: false,
       });
     }
+  }
+
+  // Pokeathlon CDN sprites for fangame Pokemon (uranium/infinity/mariomon).
+  // Insert as the first option so the correct sprite is always selectable.
+  const fgTag = gFangameSpriteSource.get(normalizeName(speciesName));
+  if (fgTag) {
+    const fgExt = fgTag === 'uranium' ? 'gif' : 'png';
+    const fgIds = spriteIdCandidates(speciesName);
+    const fgId = fgIds[0] || normalizeName(speciesName);
+    const fgFront = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/front/${fgId}.${fgExt}`;
+    const fgBack = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/back/${fgId}.${fgExt}`;
+    out.unshift({
+      id: `fangame:${fgTag}:${fgId}`,
+      label: `${fgTag.charAt(0).toUpperCase() + fgTag.slice(1)} • Base`,
+      spriteId: fgId,
+      set: 'gen5',
+      front: fgFront,
+      back: fgBack,
+      animated: fgExt === 'gif',
+    });
   }
 
   // De-duplicate by front URL while preserving order.
