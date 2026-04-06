@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
-import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, resyncSpriteCatalog, getFusionApiBases, IFD_CDN_BASE, cacheIfdSprite, nameToDexNum, dexNumToName, type PokemonSpriteOption } from '../data/adapter';
+import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, saveCustomSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, resyncSpriteCatalog, getFusionApiBases, IFD_CDN_BASE, cacheIfdSprite, nameToDexNum, dexNumToName, type PokemonSpriteOption } from '../data/adapter';
 import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
 import { FusionCreator } from './FusionCreator';
 import { SpriteModeToggle, VariantPicker } from './SpriteVariantSelector';
@@ -949,6 +949,9 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
         if (next.fusion) next.fusion = { ...next.fusion, spriteFile: dataUrl };
         onReplaceSelected && onReplaceSelected(next);
       } else {
+        // Persist to localStorage (and auto-upload to backend) so it survives refreshes
+        const speciesId = normalizeName(selected.species || selected.name || '');
+        if (speciesId) saveCustomSprite(speciesId, 'front', dataUrl);
         const next: any = { ...selected, sprite: dataUrl, spriteChoiceId: 'custom-upload', spriteChoiceLabel: 'Custom Upload' };
         if (!next.backSprite) next.backSprite = undefined;
         onReplaceSelected && onReplaceSelected(next);

@@ -2167,6 +2167,33 @@ export function saveCustomSprite(id: string, slot: SpriteSlot, dataUrl: string) 
   const all = getCustomSprites();
   all[id] = { ...(all[id] || {}), [slot]: dataUrl };
   try { localStorage.setItem(LS_CUSTOM_SPRITES, JSON.stringify(all)); } catch {}
+  // Fire-and-forget upload to backend so custom sprites are served in battles
+  uploadSpriteToBackend(id, slot, dataUrl);
+}
+
+/** Upload a single custom sprite to the backend (fire-and-forget).
+ *  Uses the /api/customdex/upload endpoint which writes PNG to disk. */
+function uploadSpriteToBackend(id: string, slot: SpriteSlot, dataUrl: string) {
+  // Only upload actual data-URL images (skip non-data-url strings)
+  if (!dataUrl || !dataUrl.startsWith('data:image/')) return;
+  const bases = [
+    (() => { try { return localStorage.getItem('ttrpg.apiBase'); } catch { return null; } })(),
+    'https://pokettrpg.duckdns.org',
+  ].filter(Boolean) as string[];
+  // Try each base; stop on first success
+  (async () => {
+    for (const base of bases) {
+      try {
+        const url = `${base.replace(/\/+$/, '')}/api/customdex/upload`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ species: {}, moves: {}, abilities: {}, sprites: { [id]: { [slot]: dataUrl } } }),
+        });
+        if (res.ok) return;
+      } catch { /* try next base */ }
+    }
+  })();
 }
 /** Remove all custom sprites for a given Pokemon ID, or all custom sprites if id is omitted. */
 export function clearCustomSprites(id?: string) {
