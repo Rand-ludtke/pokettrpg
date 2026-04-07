@@ -1687,6 +1687,52 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             </div>
           </div>
 
+          {/* Field Stats (TTRPG skill checks) */}
+          {viewMode === 'ttrpg' && (() => {
+            const bs = selected.baseStats;
+            const types = (selected.types || []).map((t: string) => t.toLowerCase());
+            const TYPE_BONUS: Record<string, string> = {
+              normal:'charm', fire:'charm', water:'fortitude', electric:'athletics',
+              grass:'charm', ice:'athletics', fighting:'strength', poison:'intelligence',
+              ground:'strength', flying:'athletics', psychic:'intelligence', bug:'athletics',
+              rock:'fortitude', ghost:'intelligence', dragon:'strength', dark:'intelligence',
+              steel:'fortitude', fairy:'charm',
+              // fangame types
+              nuclear:'intelligence', cosmic:'intelligence', shadow:'intelligence',
+              sound:'charm',
+            };
+            const tbonus = (stat: string) => {
+              let b = 0;
+              for (const t of types) { if (TYPE_BONUS[t] === stat) b++; }
+              return Math.min(b, 2);
+            };
+            const ceil10 = (x: number) => Math.ceil(x / 10);
+            const ceil20 = (x: number) => Math.ceil(x / 20);
+            const clamp = (x: number) => Math.min(20, Math.max(3, x));
+            const fieldStats = [
+              { label: 'Strength',     value: clamp(ceil10(bs.atk) + tbonus('strength')),     color: '#ffb347' },
+              { label: 'Athletics',    value: clamp(ceil10(bs.speed) + tbonus('athletics')),   color: '#8fff8f' },
+              { label: 'Intelligence', value: clamp(ceil20(bs.spAtk + bs.spDef) + tbonus('intelligence')), color: '#a0a6ff' },
+              { label: 'Fortitude',    value: clamp(ceil20(bs.hp + bs.def) + tbonus('fortitude')),         color: '#ffd56e' },
+              { label: 'Charm',        value: clamp(ceil20(bs.hp + bs.spDef) + tbonus('charm')),           color: '#ff9aa2' },
+            ];
+            return (
+              <div style={{border:'1px solid #444', padding:'4px 6px', borderRadius:6, marginTop:6, flexShrink:0}}>
+                <div className="dim" style={{fontSize:'0.9em', marginBottom:4}}>Field Stats</div>
+                {fieldStats.map(fs => (
+                  <div key={fs.label} style={{display:'grid', gridTemplateColumns:'90px 1fr 36px 46px', gap:4, alignItems:'center'}}>
+                    <div className="label">{fs.label}</div>
+                    <div className="bar" aria-valuenow={fs.value}>
+                      <span style={{ width: `${Math.min(100, (fs.value / 20) * 100)}%`, background: fs.color }} />
+                    </div>
+                    <div className="val" style={{textAlign:'right'}}>{fs.value}</div>
+                    <div className="dim" style={{textAlign:'right', fontSize:'0.85em'}}>+{Math.ceil(fs.value / 2)}</div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
           <div className="ability-item" style={{ cursor:'pointer', marginTop:6, flexShrink:0 }} onClick={()=> jumpToSection('ability')} title="Click to edit ability/item">
             <div>
               <div className="label"><strong>Ability</strong></div>

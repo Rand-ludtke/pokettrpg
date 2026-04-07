@@ -2,6 +2,7 @@
 
 ## Quick contents
 - Stats (Strength, Athletics, Intelligence, Speech, Fortitude, Luck)
+- Pokemon Field Stats & Skill Checks
 - Type Enthusiast
 - Catching (Raw Catching, Wild Bond)
 - Leveling up (Trainer Leveling, Pokemon Leveling)
@@ -25,6 +26,12 @@ How ability checks work is D12 + stat/2 (Round up). Stats grant a bonus to rolls
   
 
 Each player starts with a trait (see Trainer Traits).
+
+## Pokemon field stats
+
+If a Pokemon needs to make a direct out-of-battle action check, environmental stunt check, or showcase-style performance check, use [Pokemon Field Stats & Skill Checks.md](Pokemon%20Field%20Stats%20%26%20Skill%20Checks.md).
+
+That system keeps normal battle math unchanged and gives Pokemon their own quick derived stat line for scene actions.
 
 ## Strength
 
