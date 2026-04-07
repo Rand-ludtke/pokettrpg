@@ -40,9 +40,9 @@ export function RulesTab() {
     : RULE_DOCS;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 12, height: 'calc(100vh - 140px)', marginTop: 12 }}>
+    <div className="rules-grid" style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 12, height: 'calc(100vh - 140px)', marginTop: 12 }}>
       {/* Sidebar */}
-      <section className="panel" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <section className="panel rules-sidebar" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <h3 style={{ margin: '0 0 8px' }}>📖 Rule Documents</h3>
         <input
           type="text"

@@ -571,6 +571,15 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
   .ability-item{grid-template-columns:1fr;gap:6px}
   .side .buttons{flex-wrap:wrap}
   .side .buttons button{flex:1 1 auto;min-width:0;font-size:12px;padding:5px 8px}
+
+  /* Dex: stack sidebar above detail on narrow screens */
+  .pokedex-tab .dex-content{flex-direction:column !important}
+  .pokedex-tab .dex-sidebar{width:100% !important;height:180px !important;max-height:180px !important;border-right:none !important;border-bottom:1px solid #ddd}
+  .pokedex-tab .dex-detail{min-height:0;flex:1}
+
+  /* Rules: single-column on narrow screens */
+  .rules-grid{grid-template-columns:1fr !important}
+  .rules-grid .rules-sidebar{max-height:170px;overflow-y:auto}
 }
 .battle-ps .ps-field-condition--terrain{background:linear-gradient(135deg,rgba(230,255,230,.9),rgba(200,240,200,.85));border:1px solid rgba(100,180,100,.4)}
 .battle-ps .ps-field-condition--electricterrain,.battle-ps .ps-field-condition--electric{background:linear-gradient(135deg,rgba(255,250,180,.95),rgba(255,235,100,.85));border-color:rgba(200,180,50,.5);color:#7a6a00}

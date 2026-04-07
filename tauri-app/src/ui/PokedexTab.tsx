@@ -2377,9 +2377,9 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
       </div>
 
       {/* Content area */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="dex-content" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Results list */}
-        <div style={{
+        <div className="dex-sidebar" style={{
           width: 300,
           borderRight: '1px solid #ddd',
           overflowY: 'auto',
@@ -2403,7 +2403,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
         </div>
 
         {/* Detail panel */}
-        <div style={{ flex: 1, overflowY: 'auto', background: '#fff' }}>
+        <div className="dex-detail" style={{ flex: 1, overflowY: 'auto', background: '#fff' }}>
           {selectedDetail || (
             <div style={{ padding: 32, textAlign: 'center', color: '#666' }}>
               Select an item from the list to view details
