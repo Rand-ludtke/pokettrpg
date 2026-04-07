@@ -51,7 +51,7 @@ let gBundledSprites: Record<string, Partial<Record<string, string>>> = {};
 let gPreferBackendSpriteIds = new Set<string>();
 
 // Maps normalized species ID → fangame key for Pokeathlon-hosted sprite resolution.
-// Populated during loadShowdownDex(). Keys: species id; Values: 'uranium' | 'infinity' | 'mariomon'
+// Populated during loadShowdownDex(). Keys: species id; Values: 'uranium' | 'infinity' | 'mariomon' | 'insurgence'
 let gFangameSpriteSource: Map<string, string> = new Map();
 
 function isSagePlaceholderText(value: unknown): boolean {
@@ -774,9 +774,10 @@ export async function loadShowdownDex(options?: { base?: string }) {
     }
   }
 
-  // Sage and Insurgence sprites live on the backend API (not bundled or CDN-hosted).
+  // Sage sprites live on the backend API (not bundled or CDN-hosted).
   // Register them so bestSpriteBaseForId() returns the backend URL.
-  for (const fgDex of [sagePokedex, insPokedex]) {
+  // (Insurgence sprites are now served via the Pokeathlon CDN.)
+  for (const fgDex of [sagePokedex]) {
     if (fgDex) {
       for (const [key, entry] of Object.entries(fgDex as Record<string, any>)) {
         const normalizedKey = normalizeName(key);
@@ -847,7 +848,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
 
   // Build Pokeathlon fangame sprite source map for sprite resolution
   const fangameSpriteMap = new Map<string, string>();
-  for (const [tag, dexObj] of [['uranium', uraniumDex], ['infinity', infinityDex], ['mariomon', mariomonDex]] as const) {
+  for (const [tag, dexObj] of [['uranium', uraniumDex], ['infinity', infinityDex], ['mariomon', mariomonDex], ['insurgence', insPokedex]] as const) {
     if (dexObj) {
       for (const id of Object.keys(dexObj)) {
         fangameSpriteMap.set(normalizeName(id), tag);
@@ -1894,7 +1895,7 @@ export async function listPokemonSpriteOptions(
     }
   }
 
-  // Pokeathlon CDN sprites for fangame Pokemon (uranium/infinity/mariomon).
+  // Pokeathlon CDN sprites for fangame Pokemon (uranium/infinity/mariomon/insurgence).
   // Insert as the first option so the correct sprite is always selectable.
   const fgTag = gFangameSpriteSource.get(normalizeName(speciesName));
   if (fgTag) {

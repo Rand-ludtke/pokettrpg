@@ -526,3 +526,32 @@ body {
   color: #555;
   font-style: italic;
 }
+
+/* =========================================================
+ * Mobile / Responsive
+ * ========================================================= */
+
+@media (max-width: 768px) {
+  .ps-battle-panel {
+    min-height: auto;
+  }
+
+  .ps-battle-panel .ps-room {
+    min-height: auto;
+  }
+
+  .ps-battle-panel .battle-controls {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+  }
+
+  .ps-battle-panel .movebutton {
+    width: calc(50% - 6px);
+  }
+
+  .ps-battle-panel .switchmenu .switchbutton {
+    width: calc(33.3% - 6px);
+  }
+}

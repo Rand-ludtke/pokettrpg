@@ -555,6 +555,23 @@ body{margin:0;background:linear-gradient(180deg, var(--bg-mint), var(--bg-blue))
 .battle-ps .ps-field-condition--deltastream{background:linear-gradient(135deg,rgba(200,220,200,.95),rgba(150,180,150,.85));border-color:rgba(100,140,100,.5);color:#3a5a3a}
 
 /* Terrain conditions */
+
+/* =========================================================
+ * Mobile / Responsive
+ * ========================================================= */
+
+@media (max-width: 768px) {
+  .app{padding:8px;gap:8px}
+  .topbar{flex-wrap:wrap;gap:8px;padding:8px}
+  .tabs{display:flex;flex-wrap:wrap;gap:4px}
+  .tabs button{padding:5px 8px;font-size:12px}
+  .pc-layout{grid-template-columns:1fr}
+  .battle .battle-layout{grid-template-columns:1fr}
+  .side .side-sprite-wrap{height:110px}
+  .ability-item{grid-template-columns:1fr;gap:6px}
+  .side .buttons{flex-wrap:wrap}
+  .side .buttons button{flex:1 1 auto;min-width:0;font-size:12px;padding:5px 8px}
+}
 .battle-ps .ps-field-condition--terrain{background:linear-gradient(135deg,rgba(230,255,230,.9),rgba(200,240,200,.85));border:1px solid rgba(100,180,100,.4)}
 .battle-ps .ps-field-condition--electricterrain,.battle-ps .ps-field-condition--electric{background:linear-gradient(135deg,rgba(255,250,180,.95),rgba(255,235,100,.85));border-color:rgba(200,180,50,.5);color:#7a6a00}
 .battle-ps .ps-field-condition--grassyterrain,.battle-ps .ps-field-condition--grassy{background:linear-gradient(135deg,rgba(200,255,200,.95),rgba(150,230,150,.85));border-color:rgba(100,180,100,.5);color:#2a6a2a}
