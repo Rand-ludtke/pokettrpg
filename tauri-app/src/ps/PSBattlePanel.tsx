@@ -3868,9 +3868,29 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           .map((c: any) => (Number.isFinite(c?.slotIndex) ? c.slotIndex : -1))
           .filter((si: number) => si >= 0)
       );
-      const forceSwitchDone = isForceSwitchScenario
+      let forceSwitchDone = isForceSwitchScenario
         ? requiredForceSwitchSlots.every((si: number) => selectedForceSlots.has(si))
         : false;
+      // If not all required slots are filled but no more bench pokemon are available,
+      // treat as done — the engine will auto-pass the remaining slots.
+      if (isForceSwitchScenario && !forceSwitchDone && selectedForceSlots.size > 0) {
+        const sidePokemon = currentRequest?.side?.pokemon || [];
+        const usedToIndices = new Set(
+          pendingSlotChoicesRef.current
+            .filter((c: any) => c?.type === 'switch' && Number.isFinite(c?.toIndex))
+            .map((c: any) => c.toIndex)
+        );
+        const remainingBench = sidePokemon.filter((p: any, idx: number) => {
+          if (!p || p.active) return false;
+          const cond = p.condition || '';
+          if (p.fainted || cond.includes('fnt') || /^0\b/.test(cond)) return false;
+          return !usedToIndices.has(idx);
+        });
+        if (remainingBench.length === 0) {
+          PS_DEBUG && console.log('[PSBattlePanel] ForceSwitch: no bench remaining, auto-completing');
+          forceSwitchDone = true;
+        }
+      }
       const allDone = isForceSwitchScenario ? forceSwitchDone : (choices?.isDone?.() || false);
       if (allDone) {
         const orderedChoices = [...pendingSlotChoicesRef.current].sort((a: any, b: any) => {

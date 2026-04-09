@@ -2464,8 +2464,18 @@ function emitForceSwitchPrompts(room: Room, state: BattleState, needsSwitch: str
     }
     
     // Fallback: Build request manually if PS request not available
+    // Determine how many active slots need switching (doubles/triples have >1)
+    const fallbackForceSwitch: boolean[] = [];
+    const isDoubles = room.bossMode || room.teamBattleMode;
+    const activeSlotCount = isDoubles ? 2 : 1;
+    for (let s = 0; s < activeSlotCount; s++) {
+      const poke = player.team[s];
+      fallbackForceSwitch.push(!poke || poke.currentHP <= 0);
+    }
+    // At least one must be true (we got here because a switch is needed)
+    if (!fallbackForceSwitch.some(Boolean)) fallbackForceSwitch[0] = true;
     const switchRequest = {
-      forceSwitch: [true], // Single slot
+      forceSwitch: fallbackForceSwitch,
       side: {
         id: sideId,
         name: player.name,
@@ -2772,11 +2782,11 @@ export function computeNeedsSwitch(state: import("../types").BattleState, engine
       continue;
     }
     const active = pl.team[pl.activeIndex];
-    // If the active Pokemon has HP > 0, no switch is needed.
+    // If the active Pokemon has HP > 0, no switch is needed (primary singles fallback).
     // The engine's activeRequest can retain a stale forceSwitch after commitDecisions
     // auto-resolved the faint switch, so trust state over engine request here.
     if (active && active.currentHP > 0) continue;
-    // Fallback: check our state mirror (primarily singles/custom mirror paths)
+    // Fallback: check our state mirror — if active fainted and bench exists, switch needed
     if (active && active.currentHP <= 0 && pl.team.some((m, idx) => idx !== pl.activeIndex && m.currentHP > 0)) {
       out.push(pl.id);
     }
@@ -3461,7 +3471,31 @@ io.on("connection", (socket: Socket) => {
       const forceSwitchPlayer = forceSwitchState.players.find(p => p.id === data.playerId);
       const switchChoices = (data.action as any).choices;
       const isMultiSlot = Array.isArray(switchChoices) && switchChoices.length >= 1;
-      if (forceSwitchPlayer) {
+      const isAutoPass = Array.isArray(switchChoices) && switchChoices.length === 0;
+      if (isAutoPass) {
+        // Auto-pass: no bench pokemon available, tell engine to pass all force-switch slots
+        console.log(`[ForceSwitch] Auto-pass for ${data.playerId} (empty choices array)`);
+        let res = room.engine.forceSwitch(data.playerId, 0, []);
+        if (Array.isArray(res.events)) {
+          res = { ...res, events: deduplicateSwitchLines(res.events) };
+        }
+        room.replay.push({ turn: res.state.turn, events: res.events, anim: res.anim, phase: "force-switch" });
+        room.forceSwitchNeeded.delete(data.playerId);
+        // Broadcast and check completion (same as normal path below)
+        {
+          const s = room.engine.getState();
+          io.to(room.id).emit("battleUpdate", { result: res, needsSwitch: Array.from(room.forceSwitchNeeded), deadline: room.forceSwitchDeadline ?? null, rooms: { trick: s.field.room, magic: s.field.magicRoom, wonder: s.field.wonderRoom } });
+        }
+        if (room.forceSwitchNeeded.size === 0) {
+          room.phase = "normal";
+          io.to(room.id).emit("phase", { phase: room.phase });
+          clearForceSwitchTimer(room);
+          room.lastPromptByPlayer = {};
+          const freshState = room.engine.getState();
+          emitMovePrompts(room, freshState);
+        }
+        return;
+      } else if (forceSwitchPlayer) {
         if (isMultiSlot) {
           // Validate each choice in multi-slot forceSwitch
           const usedIndices = new Set<number>();
