@@ -77,6 +77,98 @@ function itemOptionLabel(itemName: string, dex: any): string {
   return desc ? `${itemName} - ${desc}` : itemName;
 }
 
+/** Reusable ability picker with legal/illegal grouping and search */
+function AbilityPicker({ value, onChange, onCommit, onCancel, legalAbilities, dex, getLabel, style, hideButtons }: {
+  value: string;
+  onChange: (v: string) => void;
+  onCommit: () => void;
+  onCancel: () => void;
+  legalAbilities: string[];
+  dex: any;
+  getLabel: (name: string) => string;
+  style?: React.CSSProperties;
+  hideButtons?: boolean;
+}) {
+  const [open, setOpen] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const filter = value.toLowerCase();
+
+  const legalFiltered = legalAbilities.filter(a => a.toLowerCase().includes(filter));
+  const allAbilities = useMemo(() => {
+    if (!dex?.abilities) return [];
+    return Object.values(dex.abilities).map((a: any) => a.name as string).sort();
+  }, [dex]);
+  const illegalFiltered = useMemo(() => {
+    const legalSet = new Set(legalAbilities.map(a => a.toLowerCase()));
+    return allAbilities.filter(a => !legalSet.has(a.toLowerCase()) && a.toLowerCase().includes(filter));
+  }, [allAbilities, legalAbilities, filter]);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const pick = (name: string) => { onChange(name); setOpen(false); setTimeout(onCommit, 0); };
+  const maxItems = 80;
+
+  return (
+    <div ref={containerRef} style={{position:'relative', flex:1, ...(style || {})}} onClick={e=>e.stopPropagation()}>
+      <div style={{display:'flex', gap:4, alignItems:'center'}}>
+        <input ref={inputRef} value={value} onChange={e=>{onChange(e.target.value); setOpen(true);}}
+          onFocus={()=>setOpen(true)}
+          onKeyDown={e=>{ if(e.key==='Enter') onCommit(); if(e.key==='Escape') onCancel(); }}
+          style={{width:'100%'}} placeholder="Type any ability..." />
+        {!hideButtons && <button className="mini" onClick={onCommit}>✓</button>}
+        {!hideButtons && <button className="mini" onClick={onCancel}>✕</button>}
+      </div>
+      {open && (legalFiltered.length > 0 || illegalFiltered.length > 0) && (
+        <div style={{position:'absolute', top:'100%', left:0, right:0, zIndex:999, maxHeight:260, overflowY:'auto',
+          background:'#1e1e1e', border:'1px solid #555', borderRadius:4, boxShadow:'0 4px 12px rgba(0,0,0,.5)', marginTop:2}}>
+          {legalFiltered.length > 0 && (
+            <>
+              <div style={{padding:'4px 8px', fontSize:'0.7em', fontWeight:'bold', color:'#4caf50', background:'rgba(76,175,80,.1)', borderBottom:'1px solid #333',
+                position:'sticky', top:0, zIndex:1}}>
+                ✓ Legal Abilities
+              </div>
+              {legalFiltered.map(a => (
+                <div key={a} onClick={()=>pick(a)} title={getLabel(a)}
+                  style={{padding:'4px 8px', cursor:'pointer', fontSize:'0.85em', borderBottom:'1px solid #2a2a2a'}}
+                  onMouseEnter={e=>(e.currentTarget.style.background='#333')} onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
+                  <span style={{color:'#e0e0e0'}}>{a}</span>
+                </div>
+              ))}
+            </>
+          )}
+          {illegalFiltered.length > 0 && (
+            <>
+              <div style={{padding:'4px 8px', fontSize:'0.7em', fontWeight:'bold', color:'#888', background:'rgba(255,255,255,.03)',
+                borderTop: legalFiltered.length > 0 ? '2px solid #555' : 'none', borderBottom:'1px solid #333',
+                position:'sticky', top: legalFiltered.length > 0 ? undefined : 0, zIndex:1}}>
+                Other Abilities
+              </div>
+              {illegalFiltered.slice(0, maxItems).map(a => (
+                <div key={a} onClick={()=>pick(a)} title={getLabel(a)}
+                  style={{padding:'4px 8px', cursor:'pointer', fontSize:'0.85em', borderBottom:'1px solid #2a2a2a', opacity:0.7}}
+                  onMouseEnter={e=>(e.currentTarget.style.background='#333')} onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
+                  <span style={{color:'#aaa'}}>{a}</span>
+                </div>
+              ))}
+              {illegalFiltered.length > maxItems && (
+                <div style={{padding:'4px 8px', fontSize:'0.75em', color:'#666'}}>…{illegalFiltered.length - maxItems} more (type to filter)</div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected, onHeal }: {
   selected: BattlePokemon | null;
   boxes?: Array<Array<BattlePokemon | null>>;
@@ -1960,22 +2052,15 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
               <div style={{cursor:'pointer'}} onClick={()=> startShowdownEdit('ability', selected.ability || '')} title="Click to edit">
                 <div className="dim" style={{fontSize:'0.75em'}}>Ability</div>
                 {showdownEditField === 'ability' ? (
-                  <div style={{display:'flex', gap:4, alignItems:'center'}} onClick={(e)=>e.stopPropagation()}>
-                    {abilityOpts.length ? (
-                      <input list="showdown-abilities" value={showdownFieldValue} onChange={e=>setShowdownFieldValue(e.target.value)} style={{width:'100%'}} placeholder="Type any ability..." />
-                    ) : (
-                      <input value={showdownFieldValue} onChange={e=>setShowdownFieldValue(e.target.value)} style={{width:'100%'}} placeholder="Type any ability..." />
-                    )}
-                    <datalist id="showdown-abilities">
-                      {abilityOpts.map(a => <option key={a} value={a} label={getAbilityOptionLabel(a)} />)}
-                      {dex && (() => {
-                        const illegal = Object.values(dex.abilities).map((a:any) => a.name).sort().filter((a:string) => !abilityOpts.includes(a));
-                        return illegal.map((a:string) => <option key={`il-${a}`} value={a} label={getAbilityOptionLabel(a)} />);
-                      })()}
-                    </datalist>
-                    <button className="mini" onClick={(e)=>{ e.stopPropagation(); commitShowdownEdit(); }}>✓</button>
-                    <button className="mini" onClick={(e)=>{ e.stopPropagation(); cancelShowdownEdit(); }}>✕</button>
-                  </div>
+                  <AbilityPicker
+                    value={showdownFieldValue}
+                    onChange={setShowdownFieldValue}
+                    onCommit={commitShowdownEdit}
+                    onCancel={cancelShowdownEdit}
+                    legalAbilities={abilityOpts}
+                    dex={dex}
+                    getLabel={getAbilityOptionLabel}
+                  />
                 ) : (
                   <div style={{fontWeight:'bold', fontSize:'0.9em'}}>{selected.ability || '—'}</div>
                 )}
@@ -2471,14 +2556,16 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
               <div style={{display:'grid', gap:8}}>
                 <label>
                   <div className="label"><strong>Ability</strong> <span style={{fontSize:'0.75em',opacity:0.6}}>(type any name)</span></div>
-                  <input list="abilities-list" value={abilitySel} onChange={e=>setAbilitySel(e.target.value)} disabled={!speciesInput.trim()} placeholder="Type or select ability..." />
-                  <datalist id="abilities-list">
-                    {abilityOpts.map(a => <option key={a} value={a} label={getAbilityOptionLabel(a)} />)}
-                    {dex && (() => {
-                      const illegal = Object.values(dex.abilities).map((a:any) => a.name).sort().filter((a:string) => !abilityOpts.includes(a));
-                      return illegal.map((a:string) => <option key={`il-${a}`} value={a} label={getAbilityOptionLabel(a)} />);
-                    })()}
-                  </datalist>
+                  <AbilityPicker
+                    value={abilitySel}
+                    onChange={setAbilitySel}
+                    onCommit={()=>{}}
+                    onCancel={()=>{}}
+                    legalAbilities={abilityOpts}
+                    dex={dex}
+                    getLabel={getAbilityOptionLabel}
+                    hideButtons
+                  />
                 </label>
                 <label>
                   <div className="label"><strong>Item</strong></div>

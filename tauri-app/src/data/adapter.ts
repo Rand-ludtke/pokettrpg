@@ -979,8 +979,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
   };
   // Make dex number lookups available globally for sprite fallback IDs.
   buildDexNumMaps(mergedDex);
-  // Load IFD dex mapping in the background (non-blocking).
-  loadIfdMapping();
+  // Load IFD dex mapping so natToIfdNum() is ready for sprite lookups.
+  await loadIfdMapping();
   return result;
   })();
 
@@ -1419,8 +1419,13 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
   // Delta's own high dex number (40001+) should be tried before base species fallback
   const dexNum = gNameToNum?.[normalizeName(speciesName)];
   if (Number.isFinite(dexNum) && dexNum !== 0) {
-    const numericId = String(Math.trunc(dexNum));
+    // Backend BaseSprites use IFDex numbering, so convert nat→ifd for the numeric ID.
+    const ifdNum = natToIfdNum(Math.trunc(dexNum));
+    const numericId = String(ifdNum);
     pushId(numericId);
+    // Also push the national dex number if different (for Showdown/PS sprite packs that use national)
+    const natId = String(Math.trunc(dexNum));
+    if (natId !== numericId) pushId(natId);
   }
   // Delta forms: try base species sprite as last resort if a dedicated file is missing.
   const deltaBaseName = String(speciesName || '')
@@ -1433,7 +1438,10 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
     pushId(normalizeName(toAscii(deltaBaseName)));
     const deltaDexNum = gNameToNum?.[normalizeName(deltaBaseName)];
     if (Number.isFinite(deltaDexNum) && deltaDexNum !== 0) {
-      pushId(String(Math.trunc(deltaDexNum)));
+      const deltaIfdNum = natToIfdNum(Math.trunc(deltaDexNum));
+      pushId(String(deltaIfdNum));
+      const deltaNatId = String(Math.trunc(deltaDexNum));
+      if (deltaNatId !== String(deltaIfdNum)) pushId(deltaNatId);
     }
   }
   // Wylin regional formes: "Wylin Gardevoir" → sprite file is "gardevoir-wylin.png"
