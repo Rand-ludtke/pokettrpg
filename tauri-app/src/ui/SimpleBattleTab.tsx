@@ -3316,6 +3316,51 @@ export function SimpleBattleTab({ roomId, title }: { roomId: string; title?: str
             {pkm?.item && <div><strong>Item:</strong> {pkm.item}</div>}
           </div>
         )}
+        {/* TTRPG Field Stats */}
+        {isMyPokemon && (() => {
+          const cs = computedStats as Record<string, number>;
+          const hp = cs.hp || cs.HP || 0;
+          const atk = cs.atk || cs.Attack || 0;
+          const def_ = cs.def || cs.Defense || 0;
+          const spa = cs.spa || cs.spAtk || cs['Sp. Atk'] || 0;
+          const spd = cs.spd || cs.spDef || cs['Sp. Def'] || 0;
+          const spe = cs.spe || cs.speed || cs.Speed || 0;
+          if (!atk && !spe) return null;
+          const types: string[] = Array.isArray(pkm?.types) ? pkm.types : [];
+          const TYPE_BONUS: Record<string, string> = {
+            Normal:'Charm', Fire:'Charm', Water:'Fortitude', Electric:'Athletics',
+            Grass:'Charm', Ice:'Athletics', Fighting:'Strength', Poison:'Intelligence',
+            Ground:'Strength', Flying:'Athletics', Psychic:'Intelligence', Bug:'Athletics',
+            Rock:'Fortitude', Ghost:'Intelligence', Dragon:'Strength', Dark:'Intelligence',
+            Steel:'Fortitude', Fairy:'Charm',
+          };
+          const tbonus = (stat: string) => {
+            let b = 0;
+            for (const t of types) { if (TYPE_BONUS[t] === stat) b++; }
+            return Math.min(b, 2);
+          };
+          const c10 = (x: number) => Math.ceil(x / 10);
+          const c20 = (x: number) => Math.ceil(x / 20);
+          const cl = (x: number) => Math.max(3, x);
+          const fStats = [
+            { name: 'STR', val: cl(c10(atk) + tbonus('Strength')) },
+            { name: 'ATH', val: cl(c10(spe) + tbonus('Athletics')) },
+            { name: 'INT', val: cl(c20(spa + spd) + tbonus('Intelligence')) },
+            { name: 'FTD', val: cl(c20(hp + def_) + tbonus('Fortitude')) },
+            { name: 'CHA', val: cl(c20(hp + spd) + tbonus('Charm')) },
+          ];
+          return (
+            <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid rgba(255,255,255,0.15)', fontSize: '0.75rem', color: '#aaa' }}>
+              <div style={{ fontWeight: 600, marginBottom: 2, color: '#ccc' }}>Field Stats</div>
+              {fStats.map(s => (
+                <div key={s.name} className="ps-stat-tooltip__row">
+                  <span className="ps-stat-tooltip__label">{s.name}:</span>
+                  <span className="ps-stat-tooltip__value">{s.val} <span style={{ color: '#888' }}>(+{Math.ceil(s.val / 2)})</span></span>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
         {/* Summary line */}
         {!isMyPokemon && (
           <div className="ps-stat-tooltip__summary">Range based on 0–31 IVs, 0–252 EVs</div>

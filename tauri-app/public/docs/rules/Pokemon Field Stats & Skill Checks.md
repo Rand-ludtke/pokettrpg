@@ -46,7 +46,7 @@ Define these helper functions for the app:
 ```text
 ceil10(x) = ceil(x / 10)
 ceil20(x) = ceil(x / 20)
-clampStat(x) = min(20, max(3, x))
+clampStat(x) = max(3, x)
 typeBonus(stat, types) = number of the Pokemon's types that match that stat, max 2
 fieldBonus(stat) = ceil(stat / 2)
 ```

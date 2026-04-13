@@ -1800,7 +1800,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             };
             const ceil10 = (x: number) => Math.ceil(x / 10);
             const ceil20 = (x: number) => Math.ceil(x / 20);
-            const clamp = (x: number) => Math.min(20, Math.max(3, x));
+            const clamp = (x: number) => Math.max(3, x);
             const fieldStats = [
               { label: 'Strength',     value: clamp(ceil10(cs.atk) + tbonus('strength')),     color: '#ffb347' },
               { label: 'Athletics',    value: clamp(ceil10(cs.spe) + tbonus('athletics')),   color: '#8fff8f' },
@@ -1815,7 +1815,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   <div key={fs.label} style={{display:'grid', gridTemplateColumns:'90px 1fr 36px 46px', gap:4, alignItems:'center'}}>
                     <div className="label">{fs.label}</div>
                     <div className="bar" aria-valuenow={fs.value}>
-                      <span style={{ width: `${Math.min(100, (fs.value / 20) * 100)}%`, background: fs.color }} />
+                      <span style={{ width: `${Math.min(100, (fs.value / 40) * 100)}%`, background: fs.color }} />
                     </div>
                     <div className="val" style={{textAlign:'right'}}>{fs.value}</div>
                     <div className="dim" style={{textAlign:'right', fontSize:'0.85em'}}>+{Math.ceil(fs.value / 2)}</div>

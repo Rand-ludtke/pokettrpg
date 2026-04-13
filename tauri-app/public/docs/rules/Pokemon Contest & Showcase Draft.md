@@ -232,7 +232,7 @@ Use the same type-bonus map as [Pokemon Field Stats & Skill Checks.md](Pokemon%2
 ```text
 ceil10(x) = ceil(x / 10)
 ceil20(x) = ceil(x / 20)
-clampStat(x) = min(20, max(3, x))
+clampStat(x) = max(3, x)
 typeBonus(stat, types) = number of the Pokemon's types that match that stat, max 2
 contestBonus(stat) = ceil(stat / 2)
 ```

@@ -42,7 +42,7 @@ const TYPE_BONUS_MAP: Record<string, string> = {
 /* ── Stat Helpers ──────────────────────────────────────────────────── */
 
 function ceilDiv(v: number, d: number) { return Math.ceil(v / d); }
-function clampStat(v: number) { return Math.max(3, Math.min(20, v)); }
+function clampStat(v: number) { return Math.max(3, v); }
 
 function getTypeBonus(statName: string, types: string[]): number {
   return Math.min(2, types.filter(t => TYPE_BONUS_MAP[t] === statName).length);
@@ -363,7 +363,7 @@ export function ContestTab({ boxes }: ContestTabProps) {
                     <div key={name} style={{ display: 'grid', gridTemplateColumns: '85px 1fr 30px 30px', gap: 4, alignItems: 'center', marginBottom: 4 }}>
                       <span style={{ fontSize: '0.8em' }}>{name}</span>
                       <div style={{ background: '#333', borderRadius: 4, height: 12 }}>
-                        <div style={{ width: `${(val / 20) * 100}%`, background: 'var(--accent)', borderRadius: 4, height: '100%' }} />
+                        <div style={{ width: `${Math.min(100, (val / 40) * 100)}%`, background: 'var(--accent)', borderRadius: 4, height: '100%' }} />
                       </div>
                       <span style={{ fontWeight: 600, fontSize: '0.85em', textAlign: 'right' }}>{val}</span>
                       <span className="dim" style={{ fontSize: '0.75em' }}>+{contestBonus(val)}</span>
