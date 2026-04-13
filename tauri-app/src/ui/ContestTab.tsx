@@ -26,6 +26,9 @@ interface ContestState {
   lockedMove: string | null;
   lockedApproach: string | null;
   moveHistory: string[];
+  routineMoves: number[];
+  supportChecks: Array<{ stat: string; roll: number | null }>;
+  supportBonus: number;
 }
 
 const TYPE_BONUS_MAP: Record<string, string> = {
@@ -45,16 +48,16 @@ function getTypeBonus(statName: string, types: string[]): number {
   return Math.min(2, types.filter(t => TYPE_BONUS_MAP[t] === statName).length);
 }
 
-/** Field stats: use BASE stats */
+/** Field stats: use CALCULATED (level-adjusted) stats */
 function calcFieldStats(mon: BattlePokemon) {
-  const b = mon.baseStats;
+  const c = mon.computedStats || computeRealStats(mon);
   const types = mon.types || [];
   return {
-    Strength: clampStat(ceilDiv(b.atk, 10) + getTypeBonus('Strength', types)),
-    Athletics: clampStat(ceilDiv(b.speed, 10) + getTypeBonus('Athletics', types)),
-    Intelligence: clampStat(ceilDiv(b.spAtk + b.spDef, 20) + getTypeBonus('Intelligence', types)),
-    Fortitude: clampStat(ceilDiv(b.hp + b.def, 20) + getTypeBonus('Fortitude', types)),
-    Charm: clampStat(ceilDiv(b.hp + b.spDef, 20) + getTypeBonus('Charm', types)),
+    Strength: clampStat(ceilDiv(c.atk, 10) + getTypeBonus('Strength', types)),
+    Athletics: clampStat(ceilDiv(c.spe, 10) + getTypeBonus('Athletics', types)),
+    Intelligence: clampStat(ceilDiv(c.spa + c.spd, 20) + getTypeBonus('Intelligence', types)),
+    Fortitude: clampStat(ceilDiv(c.hp + c.def, 20) + getTypeBonus('Fortitude', types)),
+    Charm: clampStat(ceilDiv(c.hp + c.spd, 20) + getTypeBonus('Charm', types)),
   };
 }
 
@@ -124,6 +127,9 @@ function defaultState(): ContestState {
     lockedMove: null,
     lockedApproach: null,
     moveHistory: [],
+    routineMoves: [],
+    supportChecks: [],
+    supportBonus: 0,
   };
 }
 
@@ -282,7 +288,7 @@ export function ContestTab({ boxes }: ContestTabProps) {
         <div style={{ display: 'flex', gap: 12 }}>
           <button
             disabled={contestPokemon.length === 0}
-            onClick={() => update({ round: 'round1', round1Scores: { entrance: 0, cute: 0, beauty: 0, cool: 0, tough: 0, smart: 0 } })}
+            onClick={() => update({ round: 'round1', round1Scores: { entrance: 0, cute: 0, beauty: 0, cool: 0, tough: 0, smart: 0 }, routineMoves: [], supportChecks: [], supportBonus: 0 })}
             style={{ padding: '10px 24px', fontSize: '1em' }}
           >
             Start Round 1 — Appeal Stage
@@ -317,7 +323,7 @@ export function ContestTab({ boxes }: ContestTabProps) {
   /* ── Round 1: Appeal Stage ──────────────────────────────────────── */
   if (state.round === 'round1') {
     const scores = state.round1Scores;
-    const total = scores.entrance + scores.cute + scores.beauty + scores.cool + scores.tough + scores.smart;
+    const total = scores.entrance + scores.cute + scores.beauty + scores.cool + scores.tough + scores.smart + state.supportBonus;
     const mon = contestPokemon[0];
 
     return (
@@ -350,7 +356,7 @@ export function ContestTab({ boxes }: ContestTabProps) {
                   <div style={{ fontWeight: 600 }}>{mon.name}</div>
                   <div className="dim" style={{ fontSize: '0.8em' }}>Lv.{mon.level} • {mon.types.join('/')}</div>
                 </div>
-                <h4 style={{ margin: '12px 0 6px' }}>Field Stats (Base)</h4>
+                <h4 style={{ margin: '12px 0 6px' }}>Field Stats</h4>
                 {(() => {
                   const stats = calcFieldStats(mon);
                   return Object.entries(stats).map(([name, val]) => (
@@ -379,7 +385,131 @@ export function ContestTab({ boxes }: ContestTabProps) {
 
           {/* Right: Scoring lanes */}
           <section className="panel" style={{ padding: 12 }}>
-            <h3 style={{ margin: '0 0 12px' }}>Appeal Scoring — {total}/30</h3>
+            <h3 style={{ margin: '0 0 12px' }}>Appeal Scoring — {total}/30{state.supportBonus !== 0 ? ` (${state.supportBonus > 0 ? '+' : ''}${state.supportBonus} support)` : ''}</h3>
+
+            {/* Routine Move Selection */}
+            <div style={{ marginBottom: 16 }}>
+              <h4 style={{ margin: '0 0 8px' }}>Routine Moves</h4>
+              {mon && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                  {mon.moves.map((m, i) => {
+                    const sel = state.routineMoves.includes(i);
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          const next = sel
+                            ? state.routineMoves.filter(x => x !== i)
+                            : state.routineMoves.length < 4
+                              ? [...state.routineMoves, i]
+                              : state.routineMoves;
+                          update({ routineMoves: next, supportChecks: [] });
+                        }}
+                        style={{
+                          padding: '6px 12px', borderRadius: 8,
+                          border: sel ? '2px solid var(--accent)' : '1px solid #555',
+                          background: sel ? 'rgba(233,69,96,0.2)' : 'transparent',
+                          fontSize: '0.85em', cursor: 'pointer',
+                        }}
+                      >
+                        {m.name}
+                        <span className="dim" style={{ marginLeft: 6, fontSize: '0.8em' }}>
+                          {m.type}{m.power > 0 ? ` (${m.power})` : ''}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              <div className="dim" style={{ fontSize: '0.8em' }}>
+                Select up to 4 moves for the routine. {state.routineMoves.length <= 2 ? '1 support roll' : '2 support rolls'} available.
+              </div>
+            </div>
+
+            {/* Support Check (Optional) */}
+            {state.routineMoves.length > 0 && (
+              <div style={{ marginBottom: 16, padding: 12, border: '1px dashed #666', borderRadius: 8, background: 'rgba(255,255,255,0.02)' }}>
+                <h4 style={{ margin: '0 0 8px' }}>🎲 Support Check <span className="dim" style={{ fontWeight: 400, fontSize: '0.8em' }}>(optional)</span></h4>
+                <div className="dim" style={{ fontSize: '0.8em', marginBottom: 8 }}>
+                  Pokémon rolls based on routine moves. Strong: +2 Appeal. Fail: −1 if visible.
+                </div>
+                {(() => {
+                  const rollCount = state.routineMoves.length <= 2 ? 1 : 2;
+                  const fStats = mon ? calcFieldStats(mon) : null;
+                  return Array.from({ length: rollCount }, (_, i) => {
+                    const check = state.supportChecks[i] || { stat: 'Intelligence', roll: null };
+                    const statVal = fStats ? (fStats as Record<string, number>)[check.stat] || 0 : 0;
+                    const bonus = Math.ceil(statVal / 2);
+                    return (
+                      <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.85em', fontWeight: 600, minWidth: 50 }}>Roll {i + 1}:</span>
+                        <select
+                          value={check.stat}
+                          onChange={e => {
+                            const next = [...state.supportChecks];
+                            next[i] = { ...check, stat: e.target.value, roll: null };
+                            update({ supportChecks: next });
+                          }}
+                          style={{ padding: '4px 8px', borderRadius: 6, background: 'var(--panel-bg)', color: 'inherit', border: '1px solid #555', fontSize: '0.85em' }}
+                        >
+                          <option value="Intelligence">Intelligence (planning)</option>
+                          <option value="Charm">Handling (Charm)</option>
+                          <option value="Fortitude">Style Kit (Fortitude)</option>
+                          <option value="Strength">Strength</option>
+                          <option value="Athletics">Athletics</option>
+                        </select>
+                        <span className="dim" style={{ fontSize: '0.8em' }}>+{bonus}</span>
+                        <button
+                          className="mini"
+                          onClick={() => {
+                            const roll = Math.floor(Math.random() * 12) + 1;
+                            const next = [...state.supportChecks];
+                            next[i] = { ...check, roll };
+                            update({ supportChecks: next });
+                          }}
+                          style={{ padding: '4px 10px' }}
+                        >
+                          🎲 Roll d12
+                        </button>
+                        {check.roll !== null && (
+                          <span style={{ fontWeight: 700, fontSize: '0.9em', color: (check.roll + bonus) >= 10 ? '#4fc3f7' : '#e94560' }}>
+                            {check.roll} + {bonus} = {check.roll + bonus}
+                            {check.roll === 12 && <span style={{ marginLeft: 4, color: '#ffa726' }}>NAT 12! (use +{statVal})</span>}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  });
+                })()}
+                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                  <button
+                    className="mini"
+                    onClick={() => update({ supportBonus: state.supportBonus + 2 })}
+                    style={{ padding: '4px 12px', borderRadius: 6 }}
+                  >
+                    ✓ Strong (+2)
+                  </button>
+                  <button
+                    className="mini secondary"
+                    onClick={() => update({ supportBonus: state.supportBonus - 1 })}
+                    style={{ padding: '4px 12px', borderRadius: 6 }}
+                  >
+                    ✗ Fail (−1)
+                  </button>
+                  {state.supportBonus !== 0 && (
+                    <span style={{ fontSize: '0.85em', fontWeight: 600, color: state.supportBonus > 0 ? '#4fc3f7' : '#e94560', alignSelf: 'center' }}>
+                      Bonus: {state.supportBonus > 0 ? '+' : ''}{state.supportBonus}
+                    </span>
+                  )}
+                  {state.supportBonus !== 0 && (
+                    <button className="mini secondary" onClick={() => update({ supportBonus: 0 })} style={{ padding: '4px 8px' }}>
+                      Reset
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div style={{ display: 'grid', gap: 12 }}>
               {([
                 ['entrance', 'Entrance', 'Throw-out, arrival, first pose, visual impression.'],

@@ -34,10 +34,10 @@ If a rule would call for `Speech` but the Pokemon is the one acting directly, us
 
 ## Quick formulas
 
-Use the Pokemon's **base stats**, not level-scaled battle stats.
+Use the Pokemon's **calculated (level-adjusted) stats**, not raw base stats.
 
-That is intentional for field scenes.
-It keeps environmental stunts, travel actions, and direct Pokemon character moments simple and stable across the campaign.
+This means field stats scale with level, nature, EVs, and IVs just like battle stats do.
+A higher-level Pokemon will have stronger field-stat checks.
 
 If you are resolving **Contest Round 2** instead, keep this note's stat names and type-bonus map, but use the contest document's calculated-stat formulas instead.
 
@@ -51,7 +51,7 @@ typeBonus(stat, types) = number of the Pokemon's types that match that stat, max
 fieldBonus(stat) = ceil(stat / 2)
 ```
 
-Then calculate:
+Then calculate using the Pokemon's **calculated** Attack, Speed, Sp. Atk, Sp. Def, HP, and Defense:
 
 ```text
 Strength = clampStat(ceil10(Attack) + typeBonus(Strength, types))
@@ -74,11 +74,11 @@ That keeps Pokemon on the same scale as the rest of your campaign and makes the 
 
 These same five stats now have two uses:
 
-- **Field stats** in this note use **base stats** for out-of-battle scenes
+- **Field stats** in this note use **calculated (level-adjusted) stats** for out-of-battle scenes
 - **Contest battle stats** in [Pokemon Contest & Showcase Draft.md](Pokemon%20Contest%20%26%20Showcase%20Draft.md) use **calculated battle stats** for Round 2 exchanges
 
-Keep the shared type-bonus map between both systems.
-That way the Pokemon still "feels" like the same species, even though the scaling changes between field scenes and contest combat.
+Both systems now scale with level. Keep the shared type-bonus map between both systems.
+That way the Pokemon still "feels" like the same species across field scenes and contest combat.
 
 ## Type bonus map
 

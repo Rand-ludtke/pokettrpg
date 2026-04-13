@@ -97,10 +97,13 @@ Use one of these if the routine clearly leans another way:
 - `Intelligence` for tightly engineered choreography, prop timing, or move sequencing
 - `Athletics` for physically active routines with catching, dancing, or precise prop work
 
-If the table wants a second check, allow one support check:
+If the table wants a second check, allow one or two support checks (optional) based on the routine:
 - `Intelligence` for planning
 - `Pokemon handling` for control
 - `Style Kit or Grooming Kit` use for appearance-first routines
+
+The Pokemon rolls based on the moves it plans to use — one roll for a simple routine (1–2 moves), two rolls for a complex one (3–4 moves).
+The judge evaluates based on these rolls.
 
 On a strong support check, add `+2` total Appeal points.
 On a failed support check, subtract `1` total Appeal point if the mistake was visible.

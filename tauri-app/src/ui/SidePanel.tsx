@@ -1781,7 +1781,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
 
           {/* Field Stats (TTRPG skill checks) */}
           {viewMode === 'ttrpg' && (() => {
-            const bs = selected.baseStats;
+            const cs = realStats;
             const types = (selected.types || []).map((t: string) => t.toLowerCase());
             const TYPE_BONUS: Record<string, string> = {
               normal:'charm', fire:'charm', water:'fortitude', electric:'athletics',
@@ -1802,11 +1802,11 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
             const ceil20 = (x: number) => Math.ceil(x / 20);
             const clamp = (x: number) => Math.min(20, Math.max(3, x));
             const fieldStats = [
-              { label: 'Strength',     value: clamp(ceil10(bs.atk) + tbonus('strength')),     color: '#ffb347' },
-              { label: 'Athletics',    value: clamp(ceil10(bs.speed) + tbonus('athletics')),   color: '#8fff8f' },
-              { label: 'Intelligence', value: clamp(ceil20(bs.spAtk + bs.spDef) + tbonus('intelligence')), color: '#a0a6ff' },
-              { label: 'Fortitude',    value: clamp(ceil20(bs.hp + bs.def) + tbonus('fortitude')),         color: '#ffd56e' },
-              { label: 'Charm',        value: clamp(ceil20(bs.hp + bs.spDef) + tbonus('charm')),           color: '#ff9aa2' },
+              { label: 'Strength',     value: clamp(ceil10(cs.atk) + tbonus('strength')),     color: '#ffb347' },
+              { label: 'Athletics',    value: clamp(ceil10(cs.spe) + tbonus('athletics')),   color: '#8fff8f' },
+              { label: 'Intelligence', value: clamp(ceil20(cs.spa + cs.spd) + tbonus('intelligence')), color: '#a0a6ff' },
+              { label: 'Fortitude',    value: clamp(ceil20(cs.hp + cs.def) + tbonus('fortitude')),         color: '#ffd56e' },
+              { label: 'Charm',        value: clamp(ceil20(cs.hp + cs.spd) + tbonus('charm')),           color: '#ff9aa2' },
             ];
             return (
               <div style={{border:'1px solid #444', padding:'4px 6px', borderRadius:6, marginTop:6, flexShrink:0}}>
