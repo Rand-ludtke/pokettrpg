@@ -774,10 +774,11 @@ export async function loadShowdownDex(options?: { base?: string }) {
     }
   }
 
-  // Sage sprites live on the backend API (not bundled or CDN-hosted).
+  // Sage and Insurgence sprites live on the backend API (not bundled or CDN-hosted).
   // Register them so bestSpriteBaseForId() returns the backend URL.
-  // (Insurgence sprites are now served via the Pokeathlon CDN.)
-  for (const fgDex of [sagePokedex]) {
+  // Insurgence delta forms are NOT available on the Pokeathlon CDN, so route
+  // all insurgence sprites through the backend API alongside sage sprites.
+  for (const fgDex of [sagePokedex, insPokedex]) {
     if (fgDex) {
       for (const [key, entry] of Object.entries(fgDex as Record<string, any>)) {
         const normalizedKey = normalizeName(key);
@@ -848,7 +849,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
 
   // Build Pokeathlon fangame sprite source map for sprite resolution
   const fangameSpriteMap = new Map<string, string>();
-  for (const [tag, dexObj] of [['uranium', uraniumDex], ['infinity', infinityDex], ['mariomon', mariomonDex], ['insurgence', insPokedex]] as const) {
+  for (const [tag, dexObj] of [['uranium', uraniumDex], ['infinity', infinityDex], ['mariomon', mariomonDex]] as const) {
     if (dexObj) {
       for (const id of Object.keys(dexObj)) {
         fangameSpriteMap.set(normalizeName(id), tag);

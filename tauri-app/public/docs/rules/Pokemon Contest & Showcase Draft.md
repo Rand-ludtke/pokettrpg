@@ -204,17 +204,14 @@ Ignore HP for win condition.
 Track **Appeal Points** instead.
 
 ### Contest Battle setup
-- both contestants start at `100 Appeal Points`
+- both contestants start at `60 Appeal Points`
 - the battle lasts `5 turns`
-- if one side hits `0`, they lose immediately
+- if one side hits `0`, faints, or is unable to continue, they lose immediately
 - if both are still standing after turn 5, the higher Appeal Point total wins
-- speed decides who acts first on turn 1
-- after turn 1, the lead alternates each turn
-- the Pokemon that won the initial speed lead acts first on turns `1, 3, and 5`
-- the other Pokemon acts first on turns `2 and 4`
+- the faster Pokemon gets the **tempo advantage** on turns `1, 3, and 5`
+- on a tempo-advantage turn, that Pokemon may change its **approach** after declarations are heard, but not the declared move unless it spends a reaction
 
-This keeps speed relevant without letting one side keep every opening.
-The faster Pokemon gets `3` first actions instead of `2`.
+This keeps speed relevant without forcing the faster side to blindly act first every time.
 
 ### Same-Pokemon expectation
 Formal contests usually expect the same Pokemon from Round 1 to continue into Round 2.
@@ -224,148 +221,211 @@ That matters because:
 - it makes the Pokemon feel like the actual star of the event
 - it matches the anime contest feel better
 
+## Contest battle stats
+Round 2 uses the same five Pokemon-facing scene stats as your field-stat rules, but they are based on the Pokemon's **calculated battle stats**, not base stats.
+
+Use the same type-bonus map as [Pokemon Field Stats & Skill Checks.md](Pokemon%20Field%20Stats%20%26%20Skill%20Checks.md).
+
+```text
+ceil10(x) = ceil(x / 10)
+ceil20(x) = ceil(x / 20)
+clampStat(x) = min(20, max(3, x))
+typeBonus(stat, types) = number of the Pokemon's types that match that stat, max 2
+contestBonus(stat) = ceil(stat / 2)
+```
+
+Then calculate:
+
+```text
+Strength = clampStat(ceil10(calculated Attack) + typeBonus(Strength, types))
+Athletics = clampStat(ceil10(calculated Speed) + typeBonus(Athletics, types))
+Intelligence = clampStat(ceil20(calculated Sp. Atk + calculated Sp. Def) + typeBonus(Intelligence, types))
+Fortitude = clampStat(ceil20(calculated HP + calculated Defense) + typeBonus(Fortitude, types))
+Charm = clampStat(ceil20(calculated HP + calculated Sp. Def) + typeBonus(Charm, types))
+```
+
+Round 2 contested rolls use:
+
+```text
+contest roll = d12 + contestBonus(relevant stat) + movePowerBonus
+```
+
 ## Round 2 turn structure
 Each Pokemon gets:
-- `1` move on its normal action each turn
+
+- `1` declared move each turn
+- free stage reposition up to **half its calculated Speed in feet**
 - up to `2` total reactions for the entire battle
 - never more than `1` reaction in the same turn
 
-That means a Pokemon can spend reactions aggressively, but it cannot spam them every exchange.
+The contest should feel like the judges and crowd can read what is coming, even when they do not know the full payoff yet.
 
-The player acting second on a turn will often use their normal move as a counterplay beat.
-That is expected.
-The reaction system is there for the bigger momentum swings, not for every single exchange.
+### Partial declaration
+At the start of each turn, both sides declare:
 
-## Reaction types
+- the move they are preparing
+- the broad approach they are taking with it
 
-### 1) Counter reaction
-Use this when the defending Pokemon turns the incoming move against the attacker in a stylish way.
+Approach examples:
+
+- attack
+- block
+- dodge
+- setup
+- reposition
+- combo
+
+The DM should then say what is visibly readable on stage.
 
 Examples:
-- reflecting water into a glittering screen
-- slipping through a beam and answering with a clean strike
-- using a defensive move to make the attacker look reckless
 
-If the counter reaction wins the speed contest, the attacker usually suffers a **solid** or **major** Appeal Point loss.
+- "They seem to be building a defensive wall with Ancient Power."
+- "They look like they are preparing to crash in on a large Surf wave."
+- "That stance looks like a dodge-and-counter line, not a straight hit."
 
-### 2) Double attack reaction
-This is the high-risk, high-reward option.
+On turns `1, 3, and 5`, the faster Pokemon may change its **approach** after declarations are heard, but it may not change the declared move for free.
 
-The Pokemon combines `2` moves into one sequence as a reaction.
-This is not free damage. It is a big commitment and should be judged that way.
+## Reaction uses
+A reaction in Round 2 can only be spent in one of these two ways:
 
-Use it when:
-- the Pokemon has a rehearsed combo
-- the trainer wants a dramatic reversal
-- the stage picture clearly supports a chained effect
+### 1) Change move reaction
+Spend `1` reaction after declarations to switch the declared move.
 
-If it works, it can jump one severity step and become a **major** loss or **major reversal** on the opponent.
-If it fails, it often hands the other side a **major reversal** window immediately.
+This lets a slower Pokemon adapt even when it did not win the speed read.
 
-This should feel dangerous.
+If both sides spend a reaction to change move on the same turn:
 
-### 3) Dodge reaction
-Use this when the Pokemon avoids the incoming move and tries to answer cleanly.
+- the slower side commits first
+- the faster side commits second
 
-This is the "dodge and hit back" lane.
-It should look fast, sharp, and deliberate.
+### 2) Combo attack reaction
+Spend `1` reaction to turn the turn into a two-move sequence.
 
-If it succeeds, reduce or cancel the incoming loss and let the defender answer with a stylish return that usually causes **minor** or **solid** loss.
-If the dodge was especially clean, upgrade that to **major**.
+When declaring a combo:
 
-## Reaction speed contest
-When a reaction would directly interrupt or answer an incoming move, run a speed contest.
+- reveal only the **first** move and the broad approach
+- keep the second move hidden until resolution
 
-### Base rule
-- attacker rolls the contest with advantage
-- compare the two Pokemon using your normal speed stat or speed-rule reference from the TTRPG
-- the naturally faster Pokemon gets a bonus based on how much faster it is
+If the combo succeeds cleanly, increase the Appeal loss by one band.
+If it fails, the acting Pokemon usually suffers the next worse loss band itself.
 
-Suggested speed-gap bonus:
-- `+1` if faster by a little
-- `+2` if clearly faster
-- `+3` if much faster
-- `+4` if overwhelmingly faster
-- `+5` max bonus
-
-If you want a cleaner table rule, use this scale:
-- speed gap `10 to 19`: `+1`
-- speed gap `20 to 29`: `+2`
-- speed gap `30 to 39`: `+3`
-- speed gap `40 to 49`: `+4`
-- speed gap `50+`: `+5`
-
-### Why attacker has advantage
-The attacker is already in motion and choosing the line.
-That makes interrupting them harder.
-
-So the defender only gets the reaction payoff if they actually beat a favorable attacker setup.
-
-## Round 2 flow in practice
+## Resolving the exchange
 Use this order each turn:
 
-1. Determine who leads this turn.
-2. Lead Pokemon uses its normal move.
-3. The other side chooses whether to spend a reaction.
-4. Resolve any speed contest if the reaction would interrupt, dodge, or chain into the attack.
-5. Apply Appeal Point loss.
-6. The second Pokemon then takes its normal move if it still has the window to do so.
+1. Both sides declare move plus approach.
+2. The DM states the obvious stage read.
+3. On turns `1, 3, and 5`, the faster side may change its approach.
+4. Either side may spend a reaction to change move or declare a combo.
+5. Both Pokemon reposition up to half Speed.
+6. Roll the opposed contest check.
+7. Apply Appeal loss, status fallout, or knockout consequences.
 
-This makes the second actor on a turn feel dangerous without erasing the lead advantage.
+## Picking the relevant stat
+Use the stat that best matches **how** the move is being used, not only the move's normal category.
+
+Quick picks:
+
+- **Strength**: overpowering, charging, slamming through, direct physical collision
+- **Athletics**: dodging, weaving, skimming, rapid reposition, evasive timing
+- **Intelligence**: beam control, barriers, shaping, precision, baiting angles, setup work
+- **Fortitude**: bracing, shielding, weathering force, holding a line, enduring a crash
+- **Charm**: feints, posture, crowd-selling, confidence beats, pressure that wins the room
+
+Common matchups:
+
+- attack into block: `Strength` vs `Fortitude`
+- wave, beam, or ranged pressure into a sidestep: `Intelligence` or `Strength` vs `Athletics`
+- setup move trying to outfox a rush: `Intelligence` vs `Athletics`
+- defensive screen or Ancient Power wall into a breaking strike: `Fortitude` or `Intelligence` vs `Strength`
+
+## Move power bonus
+Use the move's adjusted power after normal modifiers.
+
+- adjusted power `0-29`: `+0`
+- adjusted power `30-49`: `+1`
+- adjusted power `50-69`: `+2`
+- adjusted power `70-89`: `+3`
+- adjusted power `90-109`: `+4`
+- adjusted power `110-129`: `+5`
+- adjusted power `130+`: `+6`
+
+This is what keeps weak moves from bullying strong moves without a very good reason.
+
+## Head-on move clashes
+If both sides are directly trying to beat the other move head-on, use the normal opposed contest roll, but treat it as a true clash.
+
+If one move would be **super effective** against the opposing Pokemon, multiply that move's **move power bonus** by `1.5`, rounded down, for the clash.
+
+This only changes the clash roll, not the rest of your damage rules elsewhere.
 
 ## How Appeal Points are lost
-Do not calculate damage to subtract from Appeal Points.
-Instead, judge the exchange and roll based on how impressive or ugly it was.
+Do not calculate HP damage into Appeal Point loss.
+Judge the exchange by how strong, clean, risky, and impressive it looked.
 
 Use this loss scale:
-- **Minor loss:** `1d6`
-- **Solid loss:** `1d10`
-- **Major loss:** `1d20`
-- **Major reversal or spectacular counter:** `1d20 + 1d10`
 
-### When to assign Appeal Point loss
-Cause the opponent to lose Appeal Points when:
-- you land a clean stylish hit
-- you block or redirect their move in a way that makes them look bad
-- your setup pays off and steals the crowd
-- they miss badly
-- their move works mechanically but looks clumsy or panicked
-- they repeat a move with no new twist and the crowd gets bored
-- they spend a reaction badly and get blown up for it
+- **Minor loss:** `1d4`
+- **Solid loss:** `2d6`
+- **Major loss:** `3d6`
+- **Reversal or spectacular counter:** `4d6`
 
-Cause the acting Pokemon to lose Appeal Points when:
-- they miss cleanly and it is obvious
-- they overcommit and get stuffed by a counter
-- their move fails to connect with the stage picture they wanted
-- their Pokemon loses rhythm or disobeys visibly
+### When to assign Appeal loss
+Cause the opponent to lose Appeal when:
+
+- you win the exchange cleanly and it reads well on stage
+- you block or counter in a way that makes them look flat
+- your setup pays off and steals the room
+- they overextend, stumble, or reveal the wrong line badly
+- your combo lands and the hidden second move reframes the whole turn
+
+Cause the acting Pokemon to lose Appeal when:
+
+- it misses cleanly and everyone sees it
+- it spends a reaction badly and gets blown up for it
+- it tries to force a combo that never comes together
+- it repeats a stale look with no escalation
 
 ## Round 2 result guide
 
-### Minor loss `1d6`
+### Minor loss `1d4`
 Use when:
-- the stumble is small
-- the attack lands but is visually plain
-- the dodge worked but did not turn the moment around
 
-### Solid loss `1d10`
+- the move worked but looked only fine
+- the dodge avoided trouble without turning the moment
+- the stumble was small
+
+### Solid loss `2d6`
 Use when:
-- a clean hit or strong flourish clearly swings the audience
-- the opponent whiffs in a visible way
-- a defense makes the attacker look flat
 
-### Major loss `1d20`
+- a clear hit or clean defense wins the beat
+- the opponent reveals the wrong line and gets outplayed
+- the crowd clearly shifts but momentum does not fully break
+
+### Major loss `3d6`
 Use when:
-- a move is stuffed hard by a stylish counter
-- a combo pays off perfectly
-- the crowd reacts like the momentum just changed hands
-- the opponent's idea collapses in public
 
-### Major reversal `1d20 + 1d10`
+- a direct clash is won decisively
+- a counter completely stuffs the opponent's idea
+- a strong setup payoff lands exactly as planned
+- the loser looks rattled, messy, or outclassed in public
+
+### Reversal `4d6`
 Use sparingly.
 This is for moments like:
-- using the opponent's attack as part of your own finish
-- turning a dangerous hit into a beautiful shield or reflector scene
-- baiting an obvious miss and making it look intentional on your side
+
+- the second move of a combo completely flips the exchange
+- a dodge or block turns into a full public humiliation
+- one Pokemon uses the opponent's momentum as the centerpiece of its own finish
+
+## Fainting and incapacitation
+If a Pokemon faints in Round 2, it loses immediately.
+
+If a Pokemon is asleep, frozen solid, or otherwise unable to act when its move would resolve:
+
+- it immediately suffers `3d6` Appeal loss
+- if it is still unable to act at the start of the next turn, the judges usually stop the match there
+
+That gives status and knockout moments real weight instead of making them feel cosmetic.
 
 ## Round 2 style calls
 Use these calls to keep the battle moving.
@@ -403,6 +463,7 @@ Borrow the contest logic that combinations matter.
 If one move clearly sets up the next move in a readable way, the payoff move gains one step of severity:
 - minor to solid
 - solid to major
+- major to reversal if it came from a declared combo reaction and the table agrees it was match-defining
 
 Examples:
 - mist into light beam
@@ -410,11 +471,11 @@ Examples:
 - defense curl into elegant rollout finish
 - protect into sparkling close-range counter
 
-If the combo was only possible because of a spent **double attack reaction**, it should hit harder on success but punish harder on failure.
+If the combo was only possible because of a spent reaction, it should hit harder on success but punish harder on failure.
 
 ## Repetition penalty
 If a contestant uses the same move on back-to-back turns with no real change in presentation:
-- they lose `1d6` Appeal Points
+- they lose `1d4` Appeal Points
 - the crowd stops buying the trick
 
 Ignore this penalty if:
@@ -425,10 +486,10 @@ Ignore this penalty if:
 Protective or setup moves should still matter.
 
 Use them like this:
-- `Protect`, `Detect`, or equivalent can reduce incoming Appeal loss or set up a stylish counter window
+- `Protect`, `Detect`, or equivalent can justify `Fortitude` contests, reduce incoming Appeal loss, or set up a stylish counter window
 - dance, stance, or charge moves can grant `+1 severity step` to the next clean payoff
-- illusion, mist, screen, terrain, weather, or displacement moves can make the next enemy miss count as a more severe stumble
-- mobility moves can justify a dodge reaction that would otherwise be too generous
+- illusion, mist, screen, terrain, weather, or displacement moves can shift the relevant contest stat toward `Intelligence` or `Charm`
+- mobility moves can justify a stronger `Athletics` contest and make the next enemy miss count as a more severe stumble
 
 This keeps support Pokemon relevant instead of forcing pure attack spam.
 

@@ -3,6 +3,7 @@ import { withPublicBase } from '../utils/publicBase';
 
 const RULE_DOCS = [
   { file: 'Main rules.md', label: 'Main Rules' },
+  { file: 'Battle Quick Reference.md', label: 'Battle Quick Reference' },
   { file: 'Route Day Procedure.md', label: 'Route Day Procedure' },
   { file: 'Fusion & Defusion (draft).md', label: 'Fusion & Defusion' },
   { file: 'Pokemon Field Stats & Skill Checks.md', label: 'Field Stats & Skill Checks' },

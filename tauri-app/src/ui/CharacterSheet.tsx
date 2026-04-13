@@ -605,6 +605,8 @@ export function CharacterSheet() {
 						)}
 								<div style={{ maxHeight:560, minHeight:360, overflowY:'auto', marginTop:10, display:'grid', gap:8 }}>
 							{(() => {
+								const isTmTab = activeInvTab === 'tms';
+								const TM_UNLIMITED = 9999;
 								const list = (activeInvTab==='items') ? (() => {
 									const acc: Record<string, number> = {};
 									for (const s of ch.inventory) {
@@ -613,19 +615,46 @@ export function CharacterSheet() {
 									}
 									return Object.keys(acc).map(n => ({ name:n, count: acc[n] }));
 								})() : (invParsed[activeInvTab] || []);
-								return list.map((it, i) => (
-									<div key={i} onClick={()=> activeInvTab==='items' ? null : setSelectedInvItem({ key: activeInvTab, index: i })} style={{ cursor: activeInvTab==='items' ? 'default' : 'pointer', display:'grid', gridTemplateColumns: activeInvTab==='items' ? 'auto 1fr auto' : 'auto 1fr auto auto', gap:8, alignItems:'center', border: selectedInvItem?.key===activeInvTab && selectedInvItem.index===i? '2px solid var(--accent)':'1px solid var(--accent)', borderRadius:6, padding:'6px 8px', background: selectedInvItem?.key===activeInvTab && selectedInvItem.index===i? 'var(--panel-bg-dark)':'#fff' }}>
+								return list.map((it, i) => {
+									const isUnlimited = isTmTab && it.count >= TM_UNLIMITED;
+									return (
+									<div key={i} onClick={()=> activeInvTab==='items' ? null : setSelectedInvItem({ key: activeInvTab, index: i })} style={{ cursor: activeInvTab==='items' ? 'default' : 'pointer', display:'grid', gridTemplateColumns: activeInvTab==='items' ? 'auto 1fr auto' : isTmTab ? 'auto 1fr auto auto auto' : 'auto 1fr auto auto', gap:8, alignItems:'center', border: selectedInvItem?.key===activeInvTab && selectedInvItem.index===i? '2px solid var(--accent)':'1px solid var(--accent)', borderRadius:6, padding:'6px 8px', background: selectedInvItem?.key===activeInvTab && selectedInvItem.index===i? 'var(--panel-bg-dark)':'#fff' }}>
 										{renderItemIcon(getItemEntry(it.name),24)}
 										<div className="dim" style={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{it.name}</div>
-										<div className="chip">x{it.count}</div>
-										{activeInvTab!=='items' && (
+										{isTmTab ? (
+											<div className="chip" style={{ minWidth: 50, textAlign: 'center', background: isUnlimited ? 'rgba(0,200,100,0.15)' : it.count <= 1 ? 'rgba(233,69,96,0.15)' : undefined }}>
+												{isUnlimited ? '∞' : `${it.count} use${it.count !== 1 ? 's' : ''}`}
+											</div>
+										) : (
+											<div className="chip">x{it.count}</div>
+										)}
+										{isTmTab && (
+											<div style={{ display:'flex', gap:4 }} onClick={e => e.stopPropagation()}>
+												{!isUnlimited && (
+													<button className="mini secondary" title="Use TM (consume 1 use)" onClick={() => setItemCount(activeInvTab, i, it.count - 1)}
+														style={{ background: 'rgba(233,69,96,0.15)', borderColor: '#e94560', color: '#e94560', fontWeight: 600 }}>
+														Use
+													</button>
+												)}
+												<button className="mini" title={isUnlimited ? 'Set limited uses' : 'Set unlimited'} onClick={() => {
+													if (isUnlimited) {
+														const uses = prompt('Set number of uses:', '3');
+														if (uses != null) setItemCount(activeInvTab, i, Math.max(1, parseInt(uses, 10) || 1));
+													} else {
+														setItemCount(activeInvTab, i, TM_UNLIMITED);
+													}
+												}}>{isUnlimited ? '∞→#' : '∞'}</button>
+											</div>
+										)}
+										{activeInvTab!=='items' && !isTmTab && (
 											<div style={{ display:'flex', gap:4 }} onClick={e=> e.stopPropagation()}>
 												<button className="mini" onClick={()=> setItemCount(activeInvTab, i, it.count-1)}>-1</button>
 												<button className="mini" onClick={()=> setItemCount(activeInvTab, i, it.count+1)}>+1</button>
 											</div>
 										)}
 									</div>
-								));
+									);
+								});
 							})()}
 											{(activeInvTab!=='items' ? (invParsed[activeInvTab] || []) : (()=>{ const acc:Record<string,number>={}; for(const s of ch.inventory){ for(const it of (invParsed[s.key]||[])) acc[it.name]=(acc[it.name]||0)+it.count; } return Object.keys(acc);} )()).length===0 && (
 											<div style={{textAlign:'center', padding:'8px 0'}} />

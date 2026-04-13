@@ -1,23 +1,82 @@
 # Main Rules
 
 ## Quick contents
-- Stats (Strength, Athletics, Intelligence, Speech, Fortitude, Luck)
-- Pokemon Field Stats & Skill Checks
-- Type Enthusiast
-- Catching (Raw Catching, Wild Bond)
-- Leveling up (Trainer Leveling, Pokemon Leveling)
-- Battling
-- Shops and Money
-- Crafting
-- Gathering
-- Resting
-- Confluence Drift & Biome Fractures (Travel Rule)
-- Trainer Traits
-- Battle Bond
+- [[#Stats]]
+- [Battle Quick Reference](Battle%20Quick%20Reference.md)
+- [Pokemon Field Stats & Skill Checks](Pokemon%20Field%20Stats%20%26%20Skill%20Checks.md)
+- [[#Battle Bond (Trait draft)]]
+- [[#Insight Checks]]
+- [[#Type Enthusiast]]
+- [[#Catching]]
+	- [[#Wild Bond]]
+	- [[#Level-scaled Wild Bond DCs(baseline for common pokemon)]]
+	- [[#Wild Bond results]]
+	- [[#Battle and Raw Catch notes]]
+	- [[#Common Poke Ball modifiers]]
+- [[#Pokemon Leveling]]
+- [[#Battling]]
+	- [[#Pokemon HP]]
+	- [[#Pokemon Attacking and Defending]]
+	- [[#Calculated combat bonus bands]]
+	- [[#Held Items]]
+	- [[#Multi Hit Attacks]]
+	- [[#Speed, Turn Order and Reactionary Actions]]
+	- [[#Battle round structure]]
+	- [[#Trainer attacks, blocks, and grapples]]
+	- [[#Open Battlemap Combat]]
+	- [[#Battlemap Movement]]
+	- [[#Battlemap Turn Order]]
+	- [[#Battlemap Attacks, Effects and general Moves.]]
+	- [[#Trainer Support Actions in TTRPG boss battles]]
+- [[#Shops and Money]]
+- [[#Crafting]]
+	- [[#Known recipe rule]]
+	- [[#Research rank unlock ladder]]
+	- [[#Craft pacing]]
+- [[#Gathering]]
+	- [[#Basic gathering flow]]
+	- [[#Common gather checks]]
+- [[#Resting]]
+	- [[#Long rest]]
+	- [[#Short rest]]
+	- [[#Pokemon Center recovery]]
+	- [[#Medicine-first healing]]
+	- [[#Field Treatment (No Medicine)]]
+- [[#Confluence Drift & Biome Fractures (Travel Rule)]]
+	- [[#Step 0: Base travel drain]]
+	- [[#Step 1: Seam pressure check (d20)]]
+	- [[#Step 2: Biome shift chance]]
+	- [[#Step 3: Variation chart]]
+	- [[#Step 4: Apply travel strain]]
+	- [[#Step 5: Running out of stamina]]
+	- [[#Mounted travel]]
+	- [[#Travel party swaps]]
+	- [[#What biome fractures do mechanically]]
+	- [[#Optional travel pressure upgrades]]
+	- [[#Travel bond scenes and level growth]]
+	- [[#Common Rolls & Examples]]
+	- [[#Raids, Boss Actions, and Defusing (player-facing)]]
+- [[#Trainer Traits]]
+
+### Quick tables and reference sections
+- [Battle Quick Reference](Battle%20Quick%20Reference.md)
+- [[#Level-scaled Wild Bond DCs(baseline for common pokemon)]]
+- [[#Common Poke Ball modifiers]]
+- [[#Pokemon Attacking and Defending]]
+- [[#Calculated combat bonus bands]]
+- [[#Battle round structure]]
+- [[#Trainer attacks, blocks, and grapples]]
+- [[#Multi Hit Attacks]]
+- [[#Attack Area Coverage, Multi, Single, Melee, Ranged, Area Denial and Field Target Attacks]]
+- [[#Research rank unlock ladder]]
+- [[#Common gather checks]]
+- [[#Step 3: Variation chart]]
+- [[#Common Rolls & Examples]]
+
 
 # Stats
 
-You have 30 points to allocate to each stat, each stat has a base of 5.
+You have 25 points to allocate to each stat, each stat has a base of 5.
 
   
 
@@ -254,45 +313,63 @@ If you want a tabletop fallback (or want it like the anime), use this:
 Take the Base HP stat of every pokemon, Divide it by 2 (Rounded down) and add 1 HP per pokemon level. This statistic does not apply to Shedinja. ((Base HP Stat / 2) + 1(Level))
 
 ### Pokemon Attacking and Defending
-- Power 30-59: D6
-    
-- Power 0-29: D4
-    
+Use the Pokemon's **calculated battle stats at its current level**, not its base stats.
 
-Roll the specified dice when attacking, and deal the amount of damage you rolled, it’s rather simple. 
+If you are using the app, use the calculated Attack, Defense, Special Attack, Special Defense, and Speed values it gives you.
 
-#### Defending
+#### Move power to damage die
 
-To determine the brackets of defence to resist damage, use this chart (This applies to both Defense and Special Defense when resisting their specific kinds of moves):
+- Adjusted power `0-29`: `1d4`
+- Adjusted power `30-49`: `1d6`
+- Adjusted power `50-69`: `1d8`
+- Adjusted power `70-89`: `1d10`
+- Adjusted power `90-109`: `1d12`
+- Adjusted power `110+`: `1d20`
 
-- Base Defense/Special Defense 150+: - 4
-    
-- Base Defense/Special Defense 120-149: -3
-    
-- Base Defense/Special Defense 100-119: -2
-    
-- Base Defense/Special Defense 80-99: -1
-    
-- Base Defense/Special Defense 60-79: None
-    
-- Base Defense/Special Defense 0-59: +1
-    
+#### Calculated combat bonus bands
 
-When received an attack, subtract the number rolled from the final result.
+Use these bands for the attacking stat, defensive stat, and speed contests:
 
-So, if my Rhydon (Defence 120) is hit with a Neutral Psycho Cut from Gallade, the following will happen.  
-- Gallade (125 base attack) uses Psycho Cut (Power 70) plus STAB (Power 105) and since it’s neutral damage, there are no type interactions or resistances, meaning it would hit Rhydon with 1D12 of damage. With Gallade’s 125 Base attack stat, it would add a flat +4 to the damage. Now, Rhydon has a 120 base defense state, meaning it would subtract a flat 3 from the final damage.
+| Calculated stat | Attack / Sp. Atk bonus | Defense / Sp. Def modifier | Speed bonus |
+|---|---:|---:|---:|
+| `0-39` | `+0` | `+1 damage taken` | `+0` |
+| `40-59` | `+1` | `0` | `+1` |
+| `60-79` | `+2` | `-1` | `+2` |
+| `80-99` | `+3` | `-2` | `+3` |
+| `100-119` | `+4` | `-3` | `+4` |
+| `120-139` | `+5` | `-4` | `+5` |
+| `140-159` | `+6` | `-5` | `+6` |
+| `160+` | `+7` | `-6` | `+7` |
 
-  
+#### Head-on move clash power bonus
 
-Take the Base power of the move and add any potential modifiers (Weather, STAB, stat boosts, Type Interactions, Terrain, etc), determine the attacking stat and defensive stat of the two pokemon, and determine what kind of Dice the attack will use.
+When two moves collide directly instead of one just hitting, use this bonus for the clash roll:
 
- For instance, take a flamethrower from Charizard on the opposing Blastoise.
+- Adjusted power `0-29`: `+0`
+- Adjusted power `30-49`: `+1`
+- Adjusted power `50-69`: `+2`
+- Adjusted power `70-89`: `+3`
+- Adjusted power `90-109`: `+4`
+- Adjusted power `110-129`: `+5`
+- Adjusted power `130+`: `+6`
 
-- Flamethrower (Power 90) would get a boost from STAB (Same Type Attack Boost) and would get a 1.5x modifier (Power 135), and then be halved by Blastoise's water type (Power 67.5) meaning it would be rolled with a D8 for damage. Added with Charizard’s 109 Special attack stat, it would add a flat +3 to the damage. Now, Blastoise's Special Defense is 109, meaning that it would subtract a flat 2 from the final damage.
-    
+#### Damage steps
 
-Add and other effects on top of the move, such as status conditions, chances to miss, and recharge as needed.
+1. Start with the move's printed power.
+2. Apply STAB, weather, terrain, abilities, held items, stat stages, and type effectiveness to get **adjusted power**.
+3. Convert adjusted power to a damage die.
+4. Add the appropriate offensive combat bonus from calculated `Attack` or `Special Attack`.
+5. Apply the appropriate defensive modifier from calculated `Defense` or `Special Defense`.
+6. Add any remaining move text effects such as status, recharge, recoil, or self-buffs.
+
+Damage from a successful damaging hit should not drop below `1` unless immunity, `Protect`, `Detect`, or a similar effect cancels it entirely.
+
+Example flow:
+- a physical move uses calculated `Attack` against calculated `Defense`
+- a special move uses calculated `Special Attack` against calculated `Special Defense`
+- if two moves collide head-on, each side can instead roll `d12 + relevant combat bonus + clash power bonus`
+
+This keeps level differences meaningful without letting base stats flatten everything.
 
 ### Held Items
 
@@ -336,13 +413,97 @@ When using a Milti-Hit attack like Fury Swipes or Double Slap, Roll a D6:
 
 ### Speed, Turn Order and Reactionary Actions
 
+#### Battle round structure
+
+Each side gets the following each round:
+
+- `1` Pokemon action
+- Pokemon movement up to **half its calculated Speed in feet**
+- `1` Trainer action
+- Trainer movement based on Athletics
+- `1` Pokemon reaction
+- `1` Trainer reaction
+
+If you are not using a battlemap, use the same structure abstractly.
+The side that wins initiative resolves its Pokemon action and Trainer action first, but reactions can still interrupt if the fiction supports it.
+
+#### Trainer actions and reactions
+
+Common Trainer actions:
+
+- throw a healing item or battle tool
+- body-block for an ally or Pokemon
+- shove, grab, or grapple a target
+- strike with fists, a baton, or improvised gear
+- trigger a trap, rope line, gadget, or field device
+- cheer, direct, or warn a Pokemon in a way that changes positioning or timing
+
+Common Trainer reactions:
+
+- dodge with Athletics
+- block or brace with Fortitude
+- intercept an item, rope, or hazard
+- warn a Pokemon and justify a better defensive line
+
+Trainer reactions should create protection, timing, or positioning.
+They should not become full extra attack turns.
+
+#### Trainer attacks, blocks, and grapples
+
+When a trainer directly attacks, blocks, or grapples, roll `d12 + trainer combat bonus`.
+
+Use this trainer combat bonus table:
+
+| Trainer stat | Combat bonus |
+|---|---:|
+| `5-7` | `+0` |
+| `8-11` | `+1` |
+| `12-15` | `+2` |
+| `16-19` | `+3` |
+| `20+` | `+4` |
+
+Stat uses:
+
+- `Strength` for punches, tackles, hauling, and grapples
+- `Athletics` for throws, dodges, fast repositioning, and desperate lunges
+- `Fortitude` for blocks, holds, and bracing against force
+- `Intelligence` for precise gadget, trap, or device actions
+
+Trainer damage:
+
+- unarmed strike: `1d4`
+- baton, tool, or proper melee weapon: `1d6`
+- thrown improvised object: `1d4`
+
+When a Pokemon hits a trainer, use the move's normal damage, but the trainer may spend a reaction to dodge or block.
+If the trainer blocks, reduce the hit by their `Fortitude` combat bonus.
+If the hit is glancing, spread, or partially covered, reduce the damage die by one step before applying that reduction.
+
+#### Grappled
+
+If a grapple succeeds, the target is **Grappled** until it breaks free.
+
+While Grappled:
+
+- movement becomes `0`
+- physical attacks become clumsier and can take a DM-assigned accuracy penalty
+- heavy contact attacks should usually drop one damage die step until the target escapes
+
+Breaking free is usually `Strength` or `Athletics` against the grappler's original roll or a fresh opposed roll.
+
 #### Speed.
 
-Take your pokemon’s base speed, that is now its speed stat, deal with it. This stat will determine turn order, and if your pokemon can take any kind of reactionary action, depending on the move.
+Use the Pokemon's **calculated Speed**, not base Speed.
+
+Speed decides initiative, reaction races, and how much ground the Pokemon can cover in battle.
+
+For a direct speed contest, roll `d12 + Speed bonus` using the table above.
 
 #### Turn Order.
 
-Which pokemon is faster and has the higher speed stat, as simple as that. If your pokemon uses a Priority Move, then you go first.
+The side with the higher active Pokemon Speed acts first.
+If Speed is tied, use trainer Initiative as the tiebreaker.
+If a move has Priority, it still jumps the line unless another Priority move contests it.
 
 ### Learning Moves and Attacks.
 
@@ -354,21 +515,30 @@ If you’re using a Battlemap, then battles work differently.
 
 ### Battlemap Movement
 
-Your trainer and your pokemon move in tandem. Your Pokemon (Depending on how big it is. See Sizes) travels and moves adjacent to your trainer on any tile they wish, and this tile can be changed at any point during their turn to an upper limit of THREE TIMES PER TURN, and takes their base movement speed as they travel together. Your pokemon may move up to one space away from their trainer to use a move or attack, but they must end their turn within the adjacent tiles of their trainer.
+Your trainer and Pokemon do **not** have to move in tandem.
+
+Use these movement rules:
+
+- the Pokemon may move up to **half its calculated Speed in feet** on its turn
+- the trainer moves using the Athletics-based formula below
+- the Pokemon can split its movement before and after its action if the scene supports it
+- the trainer and Pokemon should usually stay within about `30 feet` of each other for clean commands, item throws, and support plays
+
+If they split farther than that, the DM can impose a mild coordination penalty or require a clearer line of sight and command path.
 
 #### Movement Speed
 
 Trainer movement speed is determined by their Athletics, and the formula goes like this:
 
 - Each square is 5 feet. You can move 1 foot for each point in athletics. So, if you have 15 athletics, you can move three squares. However, if you have 9 athletics, you can still move 2 squares, as it rounds up.
-    
 
-- Pokemon move with their trainer, so their speed doesn’t apply to their movement.
+- Pokemon use half their calculated Speed in feet. Convert that to squares by dividing by `5` and rounding down, minimum `1` square if they can move at all.
     
 
 ## Battlemap Turn Order
 
-Pokemon with the highest speed PLUS trainer Initiative move first. See Initiative.
+The side with the faster active Pokemon goes first.
+If the active Pokemon are tied in Speed, use trainer Initiative as the tiebreaker.
 
 ### Initiative
 
@@ -378,7 +548,7 @@ Based on your trainer’s Intelligence and Athletics. Add both stats together an
 
 Move Power, Attacking, and Defending stay the same as always, and the math is consistent.
 
-### Attack Area Coverage, Multi, Single, Melee, Ranged, Area Denial and Field Target Attacks, 
+### Attack Area Coverage, Multi, Single, Melee, Ranged, Area Denial and Field Target Attacks
 
 Specific attacks have different area coverage depending on what kind of move it is. All moves require line of sight, unless they cannot miss. Example: Swift.
 

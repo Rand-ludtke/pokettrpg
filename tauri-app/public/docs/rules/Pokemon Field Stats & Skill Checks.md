@@ -14,6 +14,9 @@ Good uses:
 Do **not** use this to replace normal in-battle attack, defense, damage, or move-power math.
 Battle damage still uses the normal battle rules.
 
+This note is for **field scenes and direct out-of-battle Pokemon actions**.
+For **Contest Round 2**, use the contest document's version of these same five stats, which is based on the Pokemon's **calculated battle stats** instead of base stats.
+
 ## Core idea
 
 Pokemon get a short field-stat line derived from their base stats.
@@ -32,6 +35,11 @@ If a rule would call for `Speech` but the Pokemon is the one acting directly, us
 ## Quick formulas
 
 Use the Pokemon's **base stats**, not level-scaled battle stats.
+
+That is intentional for field scenes.
+It keeps environmental stunts, travel actions, and direct Pokemon character moments simple and stable across the campaign.
+
+If you are resolving **Contest Round 2** instead, keep this note's stat names and type-bonus map, but use the contest document's calculated-stat formulas instead.
 
 Define these helper functions for the app:
 
@@ -61,6 +69,16 @@ Natural 12 = 12 + relevant stat
 ```
 
 That keeps Pokemon on the same scale as the rest of your campaign and makes the app math simple.
+
+## Contest note
+
+These same five stats now have two uses:
+
+- **Field stats** in this note use **base stats** for out-of-battle scenes
+- **Contest battle stats** in [Pokemon Contest & Showcase Draft.md](Pokemon%20Contest%20%26%20Showcase%20Draft.md) use **calculated battle stats** for Round 2 exchanges
+
+Keep the shared type-bonus map between both systems.
+That way the Pokemon still "feels" like the same species, even though the scaling changes between field scenes and contest combat.
 
 ## Type bonus map
 

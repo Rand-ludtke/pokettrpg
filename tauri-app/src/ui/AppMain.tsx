@@ -18,13 +18,14 @@ import { DiceLevelingPanel } from './DiceLevelingPanel';
 import { CollapsiblePanel } from './CollapsiblePanel';
 import { RulesTab } from './RulesTab';
 import { NotesTab } from './NotesTab';
+import { ContestTab } from './ContestTab';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
 import { BugReporter } from './BugReporter';
 
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
-type Tab = 'pc' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | 'notes' | { kind: 'psbattle'; id: string; title: string };
+type Tab = 'pc' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | 'notes' | 'contest' | { kind: 'psbattle'; id: string; title: string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -434,6 +435,7 @@ export function App() {
         <nav className="tabs">
           <button className={tab === 'pc' ? 'active' : ''} onClick={() => setTab('pc')}>PC</button>
           <button className={tab === 'battle' ? 'active' : ''} onClick={() => setTab('battle')}>Battle</button>
+          <button className={tab === 'contest' ? 'active' : ''} onClick={() => setTab('contest')}>Contest</button>
           <button className={tab === 'lobby' ? 'active' : ''} onClick={() => setTab('lobby')}>Lobby</button>
           <button className={tab === 'fusion' ? 'active' : ''} onClick={() => setTab('fusion')}>Fusion</button>
           <button className={tab === 'dex' ? 'active' : ''} onClick={() => setTab('dex')}>Dex</button>
@@ -825,6 +827,7 @@ export function App() {
       {tab === "sheet" && (<CharacterSheet />)}
       {tab === 'rules' && (<RulesTab />)}
       {tab === 'badges' && (<BadgeCase />)}
+      {tab === 'contest' && (<ContestTab boxes={boxes} />)}
       {tab === 'fusion' && (
         <FusionTab
           onAddToPC={(mons) => addAcrossBoxes(mons)}
