@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import { BattlePokemon } from '../types';
-import { spriteUrlWithFallback, loadShowdownDex, normalizeName, speciesFormesInfo, eligibleMegaFormForItem, prepareBattle, toPokemon, loadTeams } from '../data/adapter';
+import { spriteUrlWithFallback, loadShowdownDex, normalizeName, speciesFormesInfo, eligibleMegaFormForItem, prepareBattle, toPokemon, loadTeams, computeRealStats } from '../data/adapter';
 
 const DEFAULT_TRAINER_SPRITE = 'acetrainer';
 
@@ -293,6 +293,12 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
               return null;
             })()}
           </header>
+          {/* Computed (level-adjusted) stats – available to all sections */}
+          {(() => {
+            const cs = active.computedStats || computeRealStats(active);
+            const speedMult = stageMultiplier(stages.speed) * (status==='par' ? 0.5 : 1);
+            const totalSpeed = Math.floor(cs.spe * speedMult);
+          return (<>
           {(() => {
             const baseId = (active.species || active.name);
             const typesLine = active.types.join(' / ');
@@ -305,10 +311,6 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
             const itemName = (active as any).item || '';
             const itemObj = itemName && dex ? Object.values(dex.items).find((i: any)=> normalizeName((i as any).name) === normalizeName(itemName)) : null;
             const itemText = (itemObj as any)?.shortDesc || (itemObj as any)?.desc || '';
-
-            // Speed summary
-            const speedMult = stageMultiplier(stages.speed) * (status==='par' ? 0.5 : 1);
-            const totalSpeed = Math.floor(active.baseStats.speed * speedMult);
 
             return (
               <>
@@ -324,13 +326,13 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                     </div>
                     <div style={{border:'1px solid #444', borderRadius:6, padding:6, fontSize:'0.95em'}}>
                       <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8}}>
-                        {(() => { const atkBase = flatAtkMod(active.baseStats.atk); const spaBase = flatAtkMod(active.baseStats.spAtk); const netAtk = clampMod(atkBase + stages.atk); const netSpA = clampMod(spaBase + stages.spAtk); return (
+                        {(() => { const atkBase = flatAtkMod(cs.atk); const spaBase = flatAtkMod(cs.spa); const netAtk = clampMod(atkBase + stages.atk); const netSpA = clampMod(spaBase + stages.spAtk); return (
                           <div style={{borderRight:'1px solid #444', paddingRight:8}}>
                             <div><span className="dim">Atk</span> <strong>{fmtSign(netAtk)}</strong> <span className="dim">(base {fmtSign(atkBase)}{stages.atk? ` • s ${fmtSign(stages.atk)}`:''})</span></div>
                             <div><span className="dim">SpA</span> <strong>{fmtSign(netSpA)}</strong> <span className="dim">(base {fmtSign(spaBase)}{stages.spAtk? ` • s ${fmtSign(stages.spAtk)}`:''})</span></div>
                           </div>
                         ); })()}
-                        {(() => { const defBase = flatDefMod(active.baseStats.def); const spdBase = flatDefMod(active.baseStats.spDef); const netDef = clampMod(defBase - stages.def); const netSpD = clampMod(spdBase - stages.spDef); return (
+                        {(() => { const defBase = flatDefMod(cs.def); const spdBase = flatDefMod(cs.spd); const netDef = clampMod(defBase - stages.def); const netSpD = clampMod(spdBase - stages.spDef); return (
                           <div>
                             <div><span className="dim">Def</span> <strong>{fmtSign(netDef)}</strong> <span className="dim">(base {fmtSign(defBase)}{stages.def? ` • s ${fmtSign(stages.def)}`:''})</span></div>
                             <div><span className="dim">SpD</span> <strong>{fmtSign(netSpD)}</strong> <span className="dim">(base {fmtSign(spdBase)}{stages.spDef? ` • s ${fmtSign(stages.spDef)}`:''})</span></div>
@@ -469,50 +471,17 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
             </div>
           </section>
 
-          {/* Initiative roll helper */}
-          <section style={{border:'1px solid #444', borderRadius:6, padding:8, marginBottom:8, background:'var(--section-bg)'}}>
-            <h4 style={{marginTop:0}}>Speed / Initiative (TTRPG)</h4>
-            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:12, marginBottom:8}}>
-              <div style={{border:'1px solid #555', borderRadius:8, padding:8}}>
-                <div className="dim">{friendlyLabel}</div>
-                <div style={{fontSize:'1.8rem', fontWeight:700}}>{initiativeRoll.friendly ?? '—'}</div>
-              </div>
-              <div style={{border:'1px solid #555', borderRadius:8, padding:8}}>
-                <div className="dim">{enemyLabel}</div>
-                <div style={{fontSize:'1.8rem', fontWeight:700}}>{initiativeRoll.enemy ?? '—'}</div>
-              </div>
-              <div style={{border:'1px solid #555', borderRadius:8, padding:8, display:'grid', gap:4}}>
-                <div className="dim">Result</div>
-                <div style={{fontSize:'1rem', fontWeight:600}}>
-                  {initiativeRoll.winner === 'friendly' && `${friendlyLabel} acts first`}
-                  {initiativeRoll.winner === 'enemy' && `${enemyLabel} acts first`}
-                  {initiativeRoll.winner === 'tie' && initiativeRoll.friendly !== null ? 'Tie — roll again' : '—'}
-                </div>
-                {initiativeRoll.rolledAt && (
-                  <div className="dim" style={{fontSize:'0.8rem'}}>
-                    Rolled {new Date(initiativeRoll.rolledAt).toLocaleTimeString()}
-                  </div>
-                )}
-              </div>
-            </div>
-            <div style={{display:'flex', gap:8, flexWrap:'wrap', alignItems:'center'}}>
-              <button onClick={rollInitiative}>Roll d20 for Initiative</button>
-              <span className="dim" style={{fontSize:'0.85rem'}}>
-                Use this roll to decide who acts first in tabletop encounters. Highest D20 takes priority.
-              </span>
-            </div>
-          </section>
-
           {/* Moves with effectiveness buttons */}
           <section style={{border:'1px solid #444', borderRadius:6, padding:8, background:'var(--section-bg)'}}>
             <h4 style={{marginTop:0}}>Moves</h4>
             <div style={{display:'grid', gap:8}}>
               {(() => {
                 // Use displayed form for STAB/types
-                const atkBase = flatAtkMod(active.baseStats.atk);
-                const spaBase = flatAtkMod(active.baseStats.spAtk);
-                const defBaseTarget = enemy ? flatDefMod(enemy.baseStats.def) : null;
-                const spdBaseTarget = enemy ? flatDefMod(enemy.baseStats.spDef) : null;
+                const atkBase = flatAtkMod(cs.atk);
+                const spaBase = flatAtkMod(cs.spa);
+                const enemyCs = enemy ? (enemy.computedStats || computeRealStats(enemy)) : null;
+                const defBaseTarget = enemyCs ? flatDefMod(enemyCs.def) : null;
+                const spdBaseTarget = enemyCs ? flatDefMod(enemyCs.spd) : null;
                 const netAtk = clampMod(atkBase + stages.atk);
                 const netSpA = clampMod(spaBase + stages.spAtk);
                 return active.moves.map((m, idx) => {
@@ -589,6 +558,53 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
               </div>
             ); })()}
           </section>
+
+          {/* Field Stats (TTRPG skill checks) */}
+          <section style={{border:'1px solid #444', borderRadius:6, padding:8, marginTop:8, background:'var(--section-bg)'}}>
+            <h4 style={{marginTop:0}}>Field Stats</h4>
+            {(() => {
+              const types = (active.types || []).map((t: string) => t.toLowerCase());
+              const TYPE_BONUS: Record<string, string> = {
+                normal:'charm', fire:'charm', water:'fortitude', electric:'athletics',
+                grass:'charm', ice:'athletics', fighting:'strength', poison:'intelligence',
+                ground:'strength', flying:'athletics', psychic:'intelligence', bug:'athletics',
+                rock:'fortitude', ghost:'intelligence', dragon:'strength', dark:'intelligence',
+                steel:'fortitude', fairy:'charm',
+                nuclear:'intelligence', cosmic:'intelligence', shadow:'intelligence',
+                sound:'charm',
+              };
+              const tbonus = (stat: string) => {
+                let b = 0;
+                for (const t of types) { if (TYPE_BONUS[t] === stat) b++; }
+                return Math.min(b, 2);
+              };
+              const ceil10 = (x: number) => Math.ceil(x / 10);
+              const ceil20 = (x: number) => Math.ceil(x / 20);
+              const clamp = (x: number) => Math.max(3, x);
+              const fStats = [
+                { label: 'Strength',     value: clamp(ceil10(cs.atk) + tbonus('strength')),     color: '#ffb347' },
+                { label: 'Athletics',    value: clamp(ceil10(cs.spe) + tbonus('athletics')),   color: '#8fff8f' },
+                { label: 'Intelligence', value: clamp(ceil20(cs.spa + cs.spd) + tbonus('intelligence')), color: '#a0a6ff' },
+                { label: 'Fortitude',    value: clamp(ceil20(cs.hp + cs.def) + tbonus('fortitude')),         color: '#ffd56e' },
+                { label: 'Charm',        value: clamp(ceil20(cs.hp + cs.spd) + tbonus('charm')),           color: '#ff9aa2' },
+              ];
+              return (
+                <div style={{display:'grid', gap:4}}>
+                  {fStats.map(fs => (
+                    <div key={fs.label} style={{display:'grid', gridTemplateColumns:'90px 1fr 36px 46px', gap:4, alignItems:'center'}}>
+                      <div className="dim">{fs.label}</div>
+                      <div className="bar" aria-valuenow={fs.value}>
+                        <span style={{ width: `${Math.min(100, (fs.value / 40) * 100)}%`, background: fs.color }} />
+                      </div>
+                      <div style={{textAlign:'right'}}>{fs.value}</div>
+                      <div className="dim" style={{textAlign:'right', fontSize:'0.85em'}}>+{Math.ceil(fs.value / 2)}</div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </section>
+        </>); })()}
         </section>
 
         {/* Right: rules/info tabs */}
@@ -749,24 +765,39 @@ function stageMultiplier(stage: number): number {
 
 function clampStage(n: number): number { return Math.max(-6, Math.min(6, n|0)); }
 
-// Flat modifiers per TTRPG rules
-function flatAtkMod(base: number): number {
-  if (base >= 200) return 7;
-  if (base >= 150) return 5;
-  if (base >= 120) return 4;
-  if (base >= 100) return 3;
-  if (base >= 80) return 2;
-  if (base >= 60) return 1;
+// Flat modifiers per TTRPG rules — use CALCULATED stat values (not base stats)
+// See Battle Quick Reference: Calculated combat bonus bands
+function flatAtkMod(calcStat: number): number {
+  if (calcStat >= 160) return 7;
+  if (calcStat >= 140) return 6;
+  if (calcStat >= 120) return 5;
+  if (calcStat >= 100) return 4;
+  if (calcStat >= 80) return 3;
+  if (calcStat >= 60) return 2;
+  if (calcStat >= 40) return 1;
   return 0;
 }
 
-function flatDefMod(base: number): number {
-  if (base >= 150) return -4;
-  if (base >= 120) return -3;
-  if (base >= 100) return -2;
-  if (base >= 80) return -1;
-  if (base >= 60) return 0;
+function flatDefMod(calcStat: number): number {
+  if (calcStat >= 160) return -6;
+  if (calcStat >= 140) return -5;
+  if (calcStat >= 120) return -4;
+  if (calcStat >= 100) return -3;
+  if (calcStat >= 80) return -2;
+  if (calcStat >= 60) return -1;
+  if (calcStat >= 40) return 0;
   return 1;
+}
+
+function flatSpeedMod(calcStat: number): number {
+  if (calcStat >= 160) return 7;
+  if (calcStat >= 140) return 6;
+  if (calcStat >= 120) return 5;
+  if (calcStat >= 100) return 4;
+  if (calcStat >= 80) return 3;
+  if (calcStat >= 60) return 2;
+  if (calcStat >= 40) return 1;
+  return 0;
 }
 
 function clampMod(n: number): number {
