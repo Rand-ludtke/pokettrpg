@@ -3670,14 +3670,15 @@ io.on("connection", (socket: Socket) => {
         processedAction = {
           type: "multi-choice",
           actorPlayerId: data.playerId,
-          choices: mcChoices.map((c: any) => {
+          choices: mcChoices.map((c: any, idx: number) => {
+            const slot = typeof c.slotIndex === 'number' ? c.slotIndex : idx;
             if (c.type === "move") {
-              return { type: "move", moveId: c.moveId, moveIndex: c.moveIndex, targetLoc: c.targetLoc, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
+              return { type: "move", slotIndex: slot, moveId: c.moveId, moveIndex: c.moveIndex, targetLoc: c.targetLoc, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
             }
             if (c.type === "switch") {
-              return { type: "switch", toIndex: c.toIndex ?? c.switchTo };
+              return { type: "switch", slotIndex: slot, toIndex: c.toIndex ?? c.switchTo };
             }
-            return { type: "move", moveId: "default" };
+            return { type: "move", slotIndex: slot, moveId: "default" };
           }),
         } as any;
         console.log(`[Server] Processed multi-choice action with ${mcChoices.length} choices`);

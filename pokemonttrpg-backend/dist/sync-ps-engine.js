@@ -356,8 +356,8 @@ class SyncPSEngine {
                 // Sort choices by slotIndex so PS receives them in correct slot order,
                 // then use each choice's explicit slotIndex (not the array position).
                 const sortedChoices = [...action.choices].sort((a, b) => (a.slotIndex ?? 0) - (b.slotIndex ?? 0));
-                const slotChoices = sortedChoices.map((c) => {
-                    const slotIdx = typeof c.slotIndex === 'number' ? c.slotIndex : 0;
+                const slotChoices = sortedChoices.map((c, idx) => {
+                    const slotIdx = typeof c.slotIndex === 'number' ? c.slotIndex : idx;
                     return this.actionToChoice(c, side, slotIdx);
                 });
                 const combinedChoice = slotChoices.join(', ');
