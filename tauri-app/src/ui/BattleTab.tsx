@@ -96,6 +96,8 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     infatuated: boolean; cursed: boolean; leeched: boolean;
     bound: boolean; bindTurns: number;
     sleepTurns: number; toxicStage: number;
+    bossPhase: 'none'|'first-break'|'recovery'|'second-break';
+    battleBond: boolean; bondStat: 'atk'|'spAtk';
   };
   const defaultState = (p: BattlePokemon): PerPokemonState => ({
     hp: p.currentHp,
@@ -103,6 +105,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     status: null, confused: false, confuseTurns: 0,
     infatuated: false, cursed: false, leeched: false,
     bound: false, bindTurns: 0, sleepTurns: 0, toxicStage: 1,
+    bossPhase: 'none', battleBond: false, bondStat: 'atk',
   });
   const [pokemonStates, setPokemonStates] = useState<Record<number, PerPokemonState>>(() => {
     const init: Record<number, PerPokemonState> = {};
@@ -390,9 +393,9 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                           </div>
                         ); })()}
                       </div>
-                      {(() => { const spdBonus = flatSpeedMod(cs.spe); const passiveEvade = 8 + Math.ceil(spdBonus / 2); const movement = Math.floor(cs.spe / 2); return (
+                      {(() => { const spdBonus = flatSpeedMod(totalSpeed); const passiveEvade = 8 + Math.ceil(spdBonus / 2); const movement = Math.floor(totalSpeed / 2); return (
                         <div style={{marginTop:6}}>
-                          <div className="dim"><span className="dim">Spe</span> <strong>{fmtSign(spdBonus)}</strong> <span className="dim">(calc {cs.spe})</span> • Passive Evade <strong>{passiveEvade}</strong> • Dodge: d12{fmtSign(spdBonus)}</div>
+                          <div className="dim"><span className="dim">Spe</span> <strong>{fmtSign(spdBonus)}</strong> <span className="dim">(calc {totalSpeed})</span> • Passive Evade <strong>{passiveEvade}</strong> • Dodge: d12{fmtSign(spdBonus)}</div>
                           <div className="dim">Movement <strong>{movement} ft</strong> / <strong>{Math.floor(movement / 5)}</strong> sq • Speed × turns: {totalSpeed >= (enemy ? ((enemy.computedStats || computeRealStats(enemy)).spe) * 3 : Infinity) ? '3 turns' : totalSpeed >= (enemy ? ((enemy.computedStats || computeRealStats(enemy)).spe) * 2 : Infinity) ? '2 turns' : '1 turn'}</div>
                         </div>
                       ); })()}
@@ -920,6 +923,36 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
           )}
           {infoTab === 'boss' && (
             <div className="dim" style={{fontSize:'0.92em', lineHeight:1.5}}>
+              {active && (() => {
+                const phase = pState.bossPhase;
+                const mHp = active.maxHp;
+                return (
+                  <div style={{border:'1px solid #666', borderRadius:6, padding:8, marginBottom:8, background:'#1a1a2e'}}>
+                    <div style={{display:'flex', gap:8, alignItems:'center', marginBottom:6, flexWrap:'wrap'}}>
+                      <strong style={{color:'#ff6b6b'}}>Boss Phase:</strong>
+                      <span style={{color: phase==='none'?'#aaa': phase==='first-break'?'#ff6b6b': phase==='recovery'?'#ffd56e':'#ff4444', fontWeight:700}}>
+                        {phase==='none'?'Active': phase==='first-break'?'Incapacitated (1st Break)': phase==='recovery'?'Recovered':'Defeated (2nd Break)'}
+                      </span>
+                    </div>
+                    <div style={{display:'flex', gap:6, flexWrap:'wrap'}}>
+                      <button disabled={phase!=='none'} onClick={() => { setHp(0); updateState(activeIdx, { bossPhase: 'first-break' }); }} style={{background: phase==='none'?'#c33':'#555', color:'#fff', padding:'4px 10px', borderRadius:4, border:'none', cursor: phase==='none'?'pointer':'not-allowed'}}>
+                        First Break (HP→0)
+                      </button>
+                      <button disabled={phase!=='first-break'} onClick={() => { setHp(Math.max(1, Math.floor(mHp / 16))); updateState(activeIdx, { bossPhase: 'recovery' }); }} style={{background: phase==='first-break'?'#b90':'#555', color:'#fff', padding:'4px 10px', borderRadius:4, border:'none', cursor: phase==='first-break'?'pointer':'not-allowed'}}>
+                        Recovery (HP→1/16)
+                      </button>
+                      <button disabled={phase!=='recovery'} onClick={() => { setHp(0); updateState(activeIdx, { bossPhase: 'second-break' }); }} style={{background: phase==='recovery'?'#a22':'#555', color:'#fff', padding:'4px 10px', borderRadius:4, border:'none', cursor: phase==='recovery'?'pointer':'not-allowed'}}>
+                        Second Break (Defeated)
+                      </button>
+                      <button onClick={() => { updateState(activeIdx, { bossPhase: 'none' }); }} style={{background:'#444', color:'#ccc', padding:'4px 10px', borderRadius:4, border:'none', cursor:'pointer'}}>
+                        Reset
+                      </button>
+                    </div>
+                    {phase==='recovery' && <div style={{marginTop:4, color:'#ffd56e'}}>HP set to {Math.max(1, Math.floor(mHp / 16))} / {mHp}. Second break will end the fight.</div>}
+                    {phase==='second-break' && <div style={{marginTop:4, color:'#ff4444'}}>Boss defeated / captured / rifted.</div>}
+                  </div>
+                );
+              })()}
               <p><strong>Boss Incapacitation &amp; Defeat</strong></p>
               <ul style={{paddingLeft:16, margin:'4px 0'}}>
                 <li><strong>Sleep / Frozen</strong>: Boss incapacitated for 1 full player round</li>
@@ -962,6 +995,42 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
           )}
           {infoTab === 'bond' && (
             <div className="dim" style={{fontSize:'0.92em', lineHeight:1.5}}>
+              {active && (() => {
+                const bond = pState.battleBond;
+                const bStat = pState.bondStat;
+                const lvl = active.level || 50;
+                const spPerTurn = lvl > 50 ? 2 : 1;
+                return (
+                  <div style={{border:'1px solid #666', borderRadius:6, padding:8, marginBottom:8, background: bond ? '#1a2e1a' : '#1a1a2e'}}>
+                    <div style={{display:'flex', gap:8, alignItems:'center', marginBottom:6, flexWrap:'wrap'}}>
+                      <strong style={{color: bond ? '#8fff8f' : '#aaa'}}>Battle Bond:</strong>
+                      <span style={{color: bond ? '#8fff8f' : '#888', fontWeight:700}}>{bond ? 'ACTIVE' : 'Inactive'}</span>
+                      {bond && <span style={{color:'#ffd56e'}}>({titleCase(bStat)} + Speed boosted) &bull; SP drain: {spPerTurn}/turn</span>}
+                    </div>
+                    {!bond && (
+                      <div style={{display:'flex', gap:6, alignItems:'center', flexWrap:'wrap', marginBottom:4}}>
+                        <span>Boost stat:</span>
+                        <select value={bStat} onChange={(e) => updateState(activeIdx, { bondStat: e.target.value as 'atk'|'spAtk' })} style={{background:'#333', color:'#eee', border:'1px solid #555', borderRadius:4, padding:'2px 6px'}}>
+                          <option value="atk">Attack</option>
+                          <option value="spAtk">Sp. Atk</option>
+                        </select>
+                      </div>
+                    )}
+                    <div style={{display:'flex', gap:6}}>
+                      {!bond ? (
+                        <button onClick={() => { setStages(s => ({...s, [bStat]: s[bStat] + 1, speed: s.speed + 1})); updateState(activeIdx, { battleBond: true }); }} style={{background:'#3a3', color:'#fff', padding:'4px 12px', borderRadius:4, border:'none', cursor:'pointer'}}>
+                          Activate Bond
+                        </button>
+                      ) : (
+                        <button onClick={() => { setStages(s => ({...s, [bStat]: s[bStat] - 1, speed: s.speed - 1})); updateState(activeIdx, { battleBond: false }); }} style={{background:'#a33', color:'#fff', padding:'4px 12px', borderRadius:4, border:'none', cursor:'pointer'}}>
+                          Deactivate Bond
+                        </button>
+                      )}
+                    </div>
+                    {bond && <div style={{marginTop:4, color:'#ffd56e'}}>Lv {lvl} &rarr; {spPerTurn} SP/turn drain. If trainer can&rsquo;t pay SP, sync ends immediately.</div>}
+                  </div>
+                );
+              })()}
               <p><strong>Battle Bond (Trait)</strong></p>
               <p>Obtained through Fusion Machine / Bond Sync setup. Temporary buff, not permanent.</p>
               <hr/>

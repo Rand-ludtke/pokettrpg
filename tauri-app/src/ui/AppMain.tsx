@@ -820,7 +820,9 @@ export function App() {
         </div>
       )}
 
-      {tab === 'battle' && (<BattleTab friendly={team[0] ?? null} enemy={selected} team={team} onReplaceTeam={replaceTeamAt} />)}
+      <div style={{ display: tab === 'battle' ? 'block' : 'none' }}>
+        <BattleTab friendly={team[0] ?? null} enemy={selected} team={team} onReplaceTeam={replaceTeamAt} />
+      </div>
       <div style={{ display: tab === 'lobby' ? 'block' : 'none' }}>
         <LobbyTab />
       </div>
