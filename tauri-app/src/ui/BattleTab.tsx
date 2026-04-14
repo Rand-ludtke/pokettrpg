@@ -87,24 +87,64 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
   const [activeIdx, setActiveIdx] = useState(0);
   const active = teamList[activeIdx] ?? friendly;
 
-  // Local battle state (per active)
-  const [hp, setHp] = useState<number>(active?.currentHp ?? 0);
-  const [stages, setStages] = useState<{atk:number;def:number;spAtk:number;spDef:number;speed:number}>({ atk:0, def:0, spAtk:0, spDef:0, speed:0 });
-  const [status, setStatus] = useState<PrimaryStatus>(null);
-  const [confused, setConfused] = useState<boolean>(false);
-  const [confuseTurns, setConfuseTurns] = useState<number>(0); // 0..5
-  const [infatuated, setInfatuated] = useState<boolean>(false);
-  const [cursed, setCursed] = useState<boolean>(false);
-  const [leeched, setLeeched] = useState<boolean>(false);
-  const [bound, setBound] = useState<boolean>(false);
-  const [bindTurns, setBindTurns] = useState<number>(0); // 0..5
-  const [sleepTurns, setSleepTurns] = useState<number>(0); // 0..3
-  const [toxicStage, setToxicStage] = useState<number>(1); // grows each turn while TOX
+  // Persistent per-Pokemon battle state (survives tab switches)
+  type PerPokemonState = {
+    hp: number;
+    stages: { atk: number; def: number; spAtk: number; spDef: number; speed: number };
+    status: PrimaryStatus;
+    confused: boolean; confuseTurns: number;
+    infatuated: boolean; cursed: boolean; leeched: boolean;
+    bound: boolean; bindTurns: number;
+    sleepTurns: number; toxicStage: number;
+  };
+  const defaultState = (p: BattlePokemon): PerPokemonState => ({
+    hp: p.currentHp,
+    stages: { atk: 0, def: 0, spAtk: 0, spDef: 0, speed: 0 },
+    status: null, confused: false, confuseTurns: 0,
+    infatuated: false, cursed: false, leeched: false,
+    bound: false, bindTurns: 0, sleepTurns: 0, toxicStage: 1,
+  });
+  const [pokemonStates, setPokemonStates] = useState<Record<number, PerPokemonState>>(() => {
+    const init: Record<number, PerPokemonState> = {};
+    teamList.forEach((p, i) => { init[i] = defaultState(p); });
+    return init;
+  });
+  const getState = (idx: number): PerPokemonState => pokemonStates[idx] || (teamList[idx] ? defaultState(teamList[idx]) : defaultState(active!));
+  const updateState = (idx: number, patch: Partial<PerPokemonState>) => {
+    setPokemonStates(prev => ({ ...prev, [idx]: { ...getState(idx), ...patch } }));
+  };
+
+  // Current active state accessors
+  const pState = getState(activeIdx);
+  const hp = pState.hp;
+  const setHp = (v: number) => updateState(activeIdx, { hp: v });
+  const stages = pState.stages;
+  const setStages = (fn: (s: typeof pState.stages) => typeof pState.stages) => updateState(activeIdx, { stages: fn(pState.stages) });
+  const status = pState.status;
+  const setStatus = (s: PrimaryStatus) => updateState(activeIdx, { status: s });
+  const confused = pState.confused;
+  const setConfused = (v: boolean) => updateState(activeIdx, { confused: v });
+  const confuseTurns = pState.confuseTurns;
+  const setConfuseTurns = (v: number) => updateState(activeIdx, { confuseTurns: v });
+  const infatuated = pState.infatuated;
+  const setInfatuated = (v: boolean) => updateState(activeIdx, { infatuated: v });
+  const cursed = pState.cursed;
+  const setCursed = (v: boolean) => updateState(activeIdx, { cursed: v });
+  const leeched = pState.leeched;
+  const setLeeched = (v: boolean) => updateState(activeIdx, { leeched: v });
+  const bound = pState.bound;
+  const setBound = (v: boolean) => updateState(activeIdx, { bound: v });
+  const bindTurns = pState.bindTurns;
+  const setBindTurns = (v: number) => updateState(activeIdx, { bindTurns: v });
+  const sleepTurns = pState.sleepTurns;
+  const setSleepTurns = (v: number) => updateState(activeIdx, { sleepTurns: v });
+  const toxicStage = pState.toxicStage;
+  const setToxicStage = (v: number) => updateState(activeIdx, { toxicStage: v });
   const [terrain, setTerrain] = useState<string>('none');
   const [weather, setWeather] = useState<string>('none');
   const [moveMult, setMoveMult] = useState<Record<number, number>>({});
   const [turnLog, setTurnLog] = useState<string>('');
-  const [infoTab, setInfoTab] = useState<'type'|'rules'|'conditions'|'terrain'|'hazards'>('type');
+  const [infoTab, setInfoTab] = useState<'type'|'quickref'|'rules'|'conditions'|'terrain'|'hazards'|'boss'|'bond'>('quickref');
   const [typePick1, setTypePick1] = useState<string>('');
   const [typePick2, setTypePick2] = useState<string>('');
   const [initiativeRoll, setInitiativeRoll] = useState<{ friendly: number | null; enemy: number | null; winner: 'friendly' | 'enemy' | 'tie' | null; rolledAt: number | null }>({ friendly: null, enemy: null, winner: null, rolledAt: null });
@@ -263,7 +303,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
           <h3>My Team</h3>
           <div style={{display:'grid', gap:6}}>
             {teamList.map((p, idx) => (
-              <button key={`${p.name}-${idx}`} className={idx===activeIdx?'active':''} onClick={()=>{ setActiveIdx(idx); setHp(p.currentHp); setStages({atk:0,def:0,spAtk:0,spDef:0,speed:0}); setStatus(null); setConfused(false); setConfuseTurns(0); setInfatuated(false); setCursed(false); setLeeched(false); setBound(false); setBindTurns(0); setSleepTurns(0); setToxicStage(1); }} style={{display:'grid',gridTemplateColumns:'auto 1fr',gap:8,alignItems:'center'}}>
+              <button key={`${p.name}-${idx}`} className={idx===activeIdx?'active':''} onClick={()=> setActiveIdx(idx)} style={{display:'grid',gridTemplateColumns:'auto 1fr',gap:8,alignItems:'center'}}>
                 <BattleTeamSprite species={p.species || p.name} shiny={!!p.shiny} />
                 <div style={{textAlign:'left'}}>
                   <div><strong>{p.name}</strong></div>
@@ -323,6 +363,16 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                     <div>
                       <strong>HP</strong>: <input type="number" value={hp} min={0} max={active.maxHp} onChange={(e)=> setHp(Math.max(0, Math.min(active.maxHp, Number(e.target.value)||0)))} style={{width:80}} /> / {active.maxHp}
                       <div className="hpbar large"><span style={{width:`${(hp/active.maxHp)*100}%`}} /></div>
+                      <div style={{display:'flex', gap:6, marginTop:4, alignItems:'center'}}>
+                        <input id="dmgInput" type="number" min={0} placeholder="Amount" style={{width:80}} onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const v = Number((e.target as HTMLInputElement).value) || 0;
+                            if (v > 0) { setHp(Math.max(0, hp - v)); (e.target as HTMLInputElement).value = ''; }
+                          }
+                        }} />
+                        <button onClick={() => { const el = document.getElementById('dmgInput') as HTMLInputElement; const v = Number(el?.value) || 0; if (v > 0) { setHp(Math.max(0, hp - v)); el.value = ''; } }} style={{background:'#a33', color:'#fff'}}>Take Damage</button>
+                        <button onClick={() => { const el = document.getElementById('dmgInput') as HTMLInputElement; const v = Number(el?.value) || 0; if (v > 0) { setHp(Math.min(active.maxHp, hp + v)); el.value = ''; } }} style={{background:'#3a3', color:'#fff'}}>Heal</button>
+                      </div>
                     </div>
                     <div style={{border:'1px solid #444', borderRadius:6, padding:6, fontSize:'0.95em'}}>
                       <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8}}>
@@ -332,13 +382,20 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                             <div><span className="dim">SpA</span> <strong>{fmtSign(netSpA)}</strong> <span className="dim">(base {fmtSign(spaBase)}{stages.spAtk? ` • s ${fmtSign(stages.spAtk)}`:''})</span></div>
                           </div>
                         ); })()}
-                        {(() => { const defBase = flatDefMod(cs.def); const spdBase = flatDefMod(cs.spd); const netDef = clampMod(defBase - stages.def); const netSpD = clampMod(spdBase - stages.spDef); return (
+                        {(() => { const defBase = flatDefMod(cs.def); const spdBase = flatDefMod(cs.spd); const guardDef = flatGuardMod(cs.def); const guardSpd = flatGuardMod(cs.spd); const netDef = clampMod(defBase - stages.def); const netSpD = clampMod(spdBase - stages.spDef); return (
                           <div>
                             <div><span className="dim">Def</span> <strong>{fmtSign(netDef)}</strong> <span className="dim">(base {fmtSign(defBase)}{stages.def? ` • s ${fmtSign(stages.def)}`:''})</span></div>
                             <div><span className="dim">SpD</span> <strong>{fmtSign(netSpD)}</strong> <span className="dim">(base {fmtSign(spdBase)}{stages.spDef? ` • s ${fmtSign(stages.spDef)}`:''})</span></div>
+                            <div><span className="dim">Guard</span> <strong>{fmtSign(guardDef)}</strong> / <strong>{fmtSign(guardSpd)}</strong> <span className="dim">(Def/SpD)</span></div>
                           </div>
                         ); })()}
                       </div>
+                      {(() => { const spdBonus = flatSpeedMod(cs.spe); const passiveEvade = 8 + Math.ceil(spdBonus / 2); const movement = Math.floor(cs.spe / 2); return (
+                        <div style={{marginTop:6}}>
+                          <div className="dim"><span className="dim">Spe</span> <strong>{fmtSign(spdBonus)}</strong> <span className="dim">(calc {cs.spe})</span> • Passive Evade <strong>{passiveEvade}</strong> • Dodge: d12{fmtSign(spdBonus)}</div>
+                          <div className="dim">Movement <strong>{movement} ft</strong> / <strong>{Math.floor(movement / 5)}</strong> sq • Speed × turns: {totalSpeed >= (enemy ? ((enemy.computedStats || computeRealStats(enemy)).spe) * 3 : Infinity) ? '3 turns' : totalSpeed >= (enemy ? ((enemy.computedStats || computeRealStats(enemy)).spe) * 2 : Infinity) ? '2 turns' : '1 turn'}</div>
+                        </div>
+                      ); })()}
                       <div style={{marginTop:6}}><strong>Buffs / Debuffs</strong></div>
                       <div className="dim">Atk {fmtSign(stages.atk)} • Def {fmtSign(stages.def)} • SpA {fmtSign(stages.spAtk)} • SpD {fmtSign(stages.spDef)} • Spe {fmtSign(stages.speed)}</div>
                       <div style={{marginTop:6}} className="dim">Speed <strong>{formatMult(speedMult)}</strong> {status==='par' ? <span className="dim">(PAR)</span> : null} • Total <strong>{totalSpeed}</strong></div>
@@ -495,7 +552,12 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                 const mult = moveMult[idx] ?? 1;
                 const effPower = isDamaging ? Math.max(0, Math.floor(base * stab * terrMult * weathMult * burnMult * mult)) : null;
                 const dice = effPower != null ? diceFromPower(effPower) : null;
+                const atkModVal = cat === 'Physical' ? netAtk : (cat === 'Special' ? netSpA : 0);
                 const atkModText = cat === 'Physical' ? `• Mod ${fmtSign(netAtk)}` : (cat === 'Special' ? `• Mod ${fmtSign(netSpA)}` : '');
+                const accVal = (m as any).accuracy;
+                const accBon = accuracyBonus(accVal);
+                const atkCheck = accBon !== null ? `d12${fmtSign(accBon + Math.floor(atkModVal / 2))}` : 'auto-hit';
+                const cBonus = effPower != null ? clashBonus(effPower) : 0;
                 const basePow = typeof base === 'number' ? base as number : -1;
                 const hasStab = isDamaging && stab > 1;
                 const stabPow = basePow >= 0 && hasStab ? Math.floor(basePow * 1.5) : basePow;
@@ -504,9 +566,10 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                     <div>
                       <div><strong>{m.name}</strong> <span className="dim">({(m as any).type}{cat ? ` • ${cat}` : ''})</span></div>
                       <div className="dim" style={{fontSize:'0.9em'}}>
-                        Power {basePow >= 0 ? basePow : '—'}{hasStab ? ` → STAB ${stabPow}` : ''} • Dice {dice ?? '—'} • Acc {((m as any).accuracy === true) ? '—' : (((m as any).accuracy ?? '—'))}
+                        Power {basePow >= 0 ? basePow : '—'}{hasStab ? ` → STAB ${stabPow}` : ''} • Dice {dice ?? '—'} • Acc {accVal === true ? '∞' : (accVal ?? '—')}
                         {isDamaging && (<>
                           {' '}• Cond {formatMult(terrMult * weathMult * burnMult)} • Eff {effPower} {atkModText}
+                          {' '}• Atk Check: {atkCheck} • Clash {fmtSign(cBonus)}
                         </>)}
                       </div>
                       {(m as any).effect && (
@@ -520,6 +583,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                           className={mult === multOpt ? 'active' : 'secondary'}
                           title={`Apply ${multOpt}x vs target`}
                           onClick={()=> setMoveMult(s=> ({...s, [idx]: multOpt}))}
+                          style={mult === multOpt ? {background:'#666', color:'#fff', fontWeight:700, border:'2px solid #aaa'} : {opacity:0.6}}
                         >
                           {multOpt}x
                         </button>
@@ -608,13 +672,16 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
         </section>
 
         {/* Right: rules/info tabs */}
-        <aside className="panel" style={{padding:8}}>
+        <aside className="panel" style={{padding:8, overflowY:'auto', maxHeight:'85vh'}}>
           <h3>Rules & Info</h3>
           <div className="tabs small" style={{display:'flex', gap:6, marginBottom:8, flexWrap:'wrap'}}>
+            <button className={infoTab==='quickref'?'active':''} onClick={()=>setInfoTab('quickref')}>Quick Ref</button>
             <button className={infoTab==='type'?'active':''} onClick={()=>setInfoTab('type')}>Type Chart</button>
-            <button className={infoTab==='rules'?'active':''} onClick={()=>setInfoTab('rules')}>Rules</button>
+            <button className={infoTab==='rules'?'active':''} onClick={()=>setInfoTab('rules')}>Damage</button>
             <button className={infoTab==='conditions'?'active':''} onClick={()=>setInfoTab('conditions')}>Conditions</button>
-            <button className={infoTab==='terrain'?'active':''} onClick={()=>setInfoTab('terrain')}>Terrain/Weather</button>
+            <button className={infoTab==='terrain'?'active':''} onClick={()=>setInfoTab('terrain')}>Terrain</button>
+            <button className={infoTab==='boss'?'active':''} onClick={()=>setInfoTab('boss')}>Boss</button>
+            <button className={infoTab==='bond'?'active':''} onClick={()=>setInfoTab('bond')}>Bond</button>
             <button className={infoTab==='hazards'?'active':''} onClick={()=>setInfoTab('hazards')}>Hazards</button>
           </div>
           {infoTab === 'type' && (
@@ -656,13 +723,170 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
               ); })()}
             </div>
           )}
+          {infoTab === 'quickref' && (
+            <div className="dim" style={{fontSize:'0.92em', lineHeight:1.5}}>
+              <p><strong>Standard Battle Round</strong></p>
+              <p>Each side gets: 1 Trainer action, trainer movement, 1 Trainer reaction, each active Pokémon gets at least 1 turn + 1 reaction.</p>
+              <p><strong>Turn Order</strong>: Higher Speed acts first. At 2× opponent Speed → 2 turns. At 3× → 3 turns (cap 3). Ties → trainer Initiative. Priority moves jump the line.</p>
+              <hr/>
+              <p><strong>Pokémon Actions</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Use a damaging move</li>
+                <li>Use a status / setup / terrain / weather / screen move</li>
+                <li>Sprint (extra half-Speed movement instead of attacking)</li>
+                <li>Battlefield interaction (break gate, carry objective, move rubble)</li>
+                <li>Hold position / protect a trainer or objective</li>
+                <li><strong>Prepare</strong>: brace or watch a lane — next dodge/block is with advantage</li>
+              </ul>
+              <p><strong>Pokémon Reactions</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li><strong>Dodge</strong>: d12 + Speed bonus</li>
+                <li><strong>Block</strong>: d12 + Guard bonus (Def vs Physical, SpDef vs Special)</li>
+                <li>Intercept with Protect / Detect / Wide Guard / Quick Guard</li>
+              </ul>
+              <hr/>
+              <p><strong>Trainer Actions</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Throw healing item or battle tool</li>
+                <li>Direct strike (unarmed 1d4, weapon/baton 1d6, thrown 1d4)</li>
+                <li>Shove, grapple, or body-block</li>
+                <li>Trigger trap / gadget / device</li>
+                <li><strong>Prepare</strong>: raise cover or steady — grants advantage on next defensive roll</li>
+                <li><strong>Hold On</strong> speech: set on allied Pokémon, later spend reaction when it’d hit 0 HP → d12 + SCH bonus, 12+ = survives at 1 HP, 16+ = also keeps reaction</li>
+                <li>Cheer, direct, warn (reposition or timing shift)</li>
+              </ul>
+              <p><strong>Trainer Reactions</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Dodge: d12 + Athletics combat bonus</li>
+                <li>Block: d12 + Fortitude combat bonus</li>
+                <li>Cash in Hold On when allied Pokémon would hit 0 HP</li>
+                <li>Intercept item/hazard, warn a Pokémon</li>
+              </ul>
+              <hr/>
+              <p><strong>Trainer Attack Check</strong>: d12 + relevant trainer combat bonus + floor(Athletics bonus / 2)</p>
+              <p><strong>Trainer Combat Bonus</strong>: 5–7 → +0, 8–11 → +1, 12–15 → +2, 16–19 → +3, 20+ → +4</p>
+              <p><strong>Trainer Movement</strong>: Athletics 5–7 → 15 ft, 8–11 → 20 ft, 12–15 → 25 ft, 16–19 → 30 ft, 20+ → 35 ft</p>
+              <hr/>
+              <p><strong>Accuracy → Attack Check</strong></p>
+              <p>d12 + accuracy bonus + floor(offensive bonus / 2)</p>
+              <p>Acc 100 → +4, 95 → +3, 90 → +2, 85 → +1, 80 → +0, 75 → −1, 70 → −2, 60–65 → −3, 50–55 → −4, 30–45 → −5</p>
+              <p><strong>Passive Evade</strong>: 8 + ceil(Speed bonus / 2)</p>
+              <hr/>
+              <p><strong>Block Results</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Beat by 10+ → −4 die steps</li>
+                <li>Beat by 5–9 → −3 die steps</li>
+                <li>Beat by 1–4 → −2 die steps</li>
+                <li>Lose by 1–4 with defensive line → −1 die step</li>
+                <li>Never below 1d4 unless fully negated</li>
+              </ul>
+              <hr/>
+              <p><strong>Clash</strong>: d12 + combat bonus + clash power bonus (0–29: +0, 30–49: +1, 50–69: +2, 70–89: +3, 90–109: +4, 110–129: +5, 130+: +6)</p>
+              <p><strong>Grappled</strong>: Movement 0, physical attacks clumsier (accuracy penalty), heavy contact drops 1 die step. Break free: Strength or Athletics vs grappler.</p>
+            </div>
+          )}
+          {infoTab === 'quickref' && (
+            <div className="dim" style={{fontSize:'0.92em', lineHeight:1.5}}>
+              <p><strong>Standard Battle Round</strong></p>
+              <p>Each side gets: 1 Trainer action, trainer movement, 1 Trainer reaction, each active Pokémon gets at least 1 turn + 1 reaction.</p>
+              <p><strong>Turn Order</strong>: Higher Speed acts first. At 2× opponent Speed → 2 turns. At 3× → 3 turns (cap 3). Ties → trainer Initiative. Priority moves jump the line.</p>
+              <hr/>
+              <p><strong>Pokémon Actions</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Use a damaging move</li>
+                <li>Use a status / setup / terrain / weather / screen move</li>
+                <li>Sprint (extra half-Speed movement instead of attacking)</li>
+                <li>Battlefield interaction (break gate, carry objective, move rubble)</li>
+                <li>Hold position / protect a trainer or objective</li>
+                <li><strong>Prepare</strong>: brace or watch a lane — next dodge/block is with advantage</li>
+              </ul>
+              <p><strong>Pokémon Reactions</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li><strong>Dodge</strong>: d12 + Speed bonus</li>
+                <li><strong>Block</strong>: d12 + Guard bonus (Def vs Physical, SpDef vs Special)</li>
+                <li>Intercept with Protect / Detect / Wide Guard / Quick Guard</li>
+              </ul>
+              <hr/>
+              <p><strong>Trainer Actions</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Throw healing item or battle tool</li>
+                <li>Direct strike (unarmed 1d4, weapon/baton 1d6, thrown 1d4)</li>
+                <li>Shove, grapple, or body-block</li>
+                <li>Trigger trap / gadget / device</li>
+                <li><strong>Prepare</strong>: raise cover or steady — grants advantage on next defensive roll</li>
+                <li><strong>Hold On</strong> speech: set on allied Pokémon, later spend reaction when it’d hit 0 HP → d12 + SCH bonus, 12+ = survives at 1 HP, 16+ = also keeps reaction</li>
+                <li>Cheer, direct, warn (reposition or timing shift)</li>
+              </ul>
+              <p><strong>Trainer Reactions</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Dodge: d12 + Athletics combat bonus</li>
+                <li>Block: d12 + Fortitude combat bonus</li>
+                <li>Cash in Hold On when allied Pokémon would hit 0 HP</li>
+                <li>Intercept item/hazard, warn a Pokémon</li>
+              </ul>
+              <hr/>
+              <p><strong>Trainer Attack Check</strong>: d12 + relevant trainer combat bonus + floor(Athletics bonus / 2)</p>
+              <p><strong>Trainer Combat Bonus</strong>: 5–7 → +0, 8–11 → +1, 12–15 → +2, 16–19 → +3, 20+ → +4</p>
+              <p><strong>Trainer Movement</strong>: Athletics 5–7 → 15 ft, 8–11 → 20 ft, 12–15 → 25 ft, 16–19 → 30 ft, 20+ → 35 ft</p>
+              <hr/>
+              <p><strong>Accuracy → Attack Check</strong></p>
+              <p>d12 + accuracy bonus + floor(offensive bonus / 2)</p>
+              <p>Acc 100 → +4, 95 → +3, 90 → +2, 85 → +1, 80 → +0, 75 → −1, 70 → −2, 60–65 → −3, 50–55 → −4, 30–45 → −5</p>
+              <p><strong>Passive Evade</strong>: 8 + ceil(Speed bonus / 2)</p>
+              <hr/>
+              <p><strong>Block Results</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Beat by 10+ → −4 die steps</li>
+                <li>Beat by 5–9 → −3 die steps</li>
+                <li>Beat by 1–4 → −2 die steps</li>
+                <li>Lose by 1–4 with defensive line → −1 die step</li>
+                <li>Never below 1d4 unless fully negated</li>
+              </ul>
+              <hr/>
+              <p><strong>Clash</strong>: d12 + combat bonus + clash power bonus (0–29: +0, 30–49: +1, 50–69: +2, 70–89: +3, 90–109: +4, 110–129: +5, 130+: +6)</p>
+              <p><strong>Grappled</strong>: Movement 0, physical attacks clumsier (accuracy penalty), heavy contact drops 1 die step. Break free: Strength or Athletics vs grappler.</p>
+            </div>
+          )}
           {infoTab === 'rules' && (
-            <div className="dim" style={{fontSize:'0.92em', lineHeight:1.4}}>
+            <div className="dim" style={{fontSize:'0.92em', lineHeight:1.5}}>
               <p><strong>HP</strong>: floor(Base HP / 2) + Level. Shedinja: 1.</p>
-              <p><strong>STAB</strong>: 1.5x for moves matching any of the user’s types.</p>
-              <p><strong>Dice by Power</strong>: D4 (0–29), D6 (30–59), D8 (60–74), D10 (75–84), D12 (85–119), D20 (120+).</p>
-              <p><strong>Stat Stages</strong>: Multiplier = (2+n)/2 for n ≥ 0, or 2/(2+|n|) for n &lt; 0. Clamp n ∈ [−6, +6].</p>
-              <p><strong>Paralysis</strong>: Speed × 0.5; Burn halves Physical damage.</p>
+              <p><strong>STAB</strong>: 1.5× for moves matching any of the user’s types.</p>
+              <hr/>
+              <p><strong>Damage Steps</strong></p>
+              <ol style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Declare move, check reactions</li>
+                <li>Roll attack check (if move can miss)</li>
+                <li>Apply STAB, weather, terrain, abilities, items, stages, type effectiveness → adjusted power</li>
+                <li>Convert adjusted power to damage dice</li>
+                <li>Add offensive combat bonus (Atk or SpA)</li>
+                <li>Apply defensive modifier (Def or SpD)</li>
+                <li>Apply remaining move effects (recoil, status, etc.)</li>
+              </ol>
+              <p>Minimum 1 damage unless immunity / Protect / Detect negates entirely.</p>
+              <hr/>
+              <p><strong>Move Power → Damage Dice</strong></p>
+              <table style={{width:'100%', borderCollapse:'collapse', fontSize:'0.9em'}}>
+                <tbody>
+                  {[['0–29','1d4'],['30–49','1d6'],['50–69','1d8'],['70–89','1d10'],['90–109','1d12'],['110–129','1d20'],['130–149','1d20+1d4'],['150–169','1d20+1d6'],['170–189','1d20+1d8'],['190–209','1d20+1d10'],['210–229','1d20+1d12'],['230–249','2d20'],['250–269','2d20+1d4']].map(([r,d]) => (
+                    <tr key={r}><td style={{padding:'1px 6px', borderBottom:'1px solid #333'}}>{r}</td><td style={{padding:'1px 6px', borderBottom:'1px solid #333', textAlign:'right'}}>{d}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="dim">Above 229: every 120 power adds +1 d20 count. Each 20-step within adds a sub-die (d4→d6→d8→d10→d12).</p>
+              <hr/>
+              <p><strong>Combat Bonus Bands (Calculated Stat)</strong></p>
+              <table style={{width:'100%', borderCollapse:'collapse', fontSize:'0.9em'}}>
+                <thead><tr><td style={{padding:'1px 4px', borderBottom:'1px solid #555', fontWeight:700}}>Stat</td><td style={{padding:'1px 4px', borderBottom:'1px solid #555', fontWeight:700}}>Atk</td><td style={{padding:'1px 4px', borderBottom:'1px solid #555', fontWeight:700}}>Guard</td><td style={{padding:'1px 4px', borderBottom:'1px solid #555', fontWeight:700}}>Def</td><td style={{padding:'1px 4px', borderBottom:'1px solid #555', fontWeight:700}}>Spd</td></tr></thead>
+                <tbody>
+                  {[['0–39','+0','+0','+1 taken','+0'],['40–59','+1','+1','0','+1'],['60–79','+2','+2','−1','+2'],['80–99','+3','+3','−2','+3'],['100–119','+4','+4','−3','+4']].map(([r,a,g,d,s]) => (
+                    <tr key={r}><td style={{padding:'1px 4px', borderBottom:'1px solid #333'}}>{r}</td><td style={{padding:'1px 4px', borderBottom:'1px solid #333'}}>{a}</td><td style={{padding:'1px 4px', borderBottom:'1px solid #333'}}>{g}</td><td style={{padding:'1px 4px', borderBottom:'1px solid #333'}}>{d}</td><td style={{padding:'1px 4px', borderBottom:'1px solid #333'}}>{s}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="dim">From 100+: every 20 extra stat → +1 Atk/Guard/Speed. Def = 1 − that bonus.</p>
+              <hr/>
+              <p><strong>Stat Stages</strong>: ×(2+n)/2 for n ≥ 0, or ×2/(2+|n|) for n &lt; 0. Clamp n ∈ [−6, +6].</p>
+              <p><strong>Paralysis</strong>: Speed × 0.5; <strong>Burn</strong>: Physical damage × 0.5.</p>
             </div>
           )}
           {infoTab === 'terrain' && (
@@ -681,17 +905,99 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
           )}
           {infoTab === 'conditions' && (
             <div className="dim" style={{fontSize:'0.92em', lineHeight:1.4}}>
-              <p><strong>Burn (BRN)</strong>: Attack ×0.5; −1/16 Max HP each turn. Non-volatile.</p>
-              <p><strong>Freeze (FRZ)</strong>: Cannot act; ~20% thaw chance each turn. Non-volatile.</p>
+              <p><strong>Burn (BRN)</strong>: Physical damage ×0.5; −1/16 Max HP each turn. Non-volatile.</p>
+              <p><strong>Freeze (FRZ)</strong>: Cannot act; ~20% thaw chance each turn. Incapacitates bosses for 1 full player round. Non-volatile.</p>
               <p><strong>Paralysis (PAR)</strong>: Speed ×0.5; ~25% fail chance per turn. Non-volatile.</p>
               <p><strong>Poison (PSN)</strong>: −1/8 Max HP each turn. Non-volatile.</p>
               <p><strong>Toxic (TOX)</strong>: −(n/16) Max HP each turn; n increases by 1 each turn. Non-volatile.</p>
-              <p><strong>Sleep (SLP)</strong>: Cannot act; lasts 1–3 turns. Non-volatile.</p>
+              <p><strong>Sleep (SLP)</strong>: Cannot act; lasts 1–3 turns. Incapacitates bosses for 1 full player round. Non-volatile.</p>
               <p><strong>Confusion</strong>: 50% to self-hit instead of moving; lasts 2–5 turns. Volatile.</p>
               <p><strong>Infatuation</strong>: 50% to fail vs opposite gender; ends when source leaves. Volatile.</p>
               <p><strong>Curse (Ghost)</strong>: −1/4 Max HP each turn; cannot switch; ends on switch faint/out. Volatile.</p>
               <p><strong>Leech Seed</strong>: −1/8 Max HP each turn; opponent heals. Volatile.</p>
               <p><strong>Bind/Trap</strong>: −1/16 Max HP each turn; cannot switch; lasts 2–5 turns. Volatile.</p>
+            </div>
+          )}
+          {infoTab === 'boss' && (
+            <div className="dim" style={{fontSize:'0.92em', lineHeight:1.5}}>
+              <p><strong>Boss Incapacitation &amp; Defeat</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li><strong>Sleep / Frozen</strong>: Boss incapacitated for 1 full player round</li>
+                <li><strong>Grapple overload</strong>: Enough bodies = incapacitated until break free or next turn</li>
+                <li><strong>First break</strong>: First time boss hits 0 HP → incapacitated (not dead)</li>
+                <li><strong>Recovery</strong>: At start of next turn → stands back up at 1/16 max HP</li>
+                <li><strong>Second break</strong>: 0 HP again after recovery → defeated / captured / rifted</li>
+              </ul>
+              <hr/>
+              <p><strong>Grapple Overload Thresholds</strong></p>
+              <table style={{width:'100%', borderCollapse:'collapse', fontSize:'0.9em'}}>
+                <tbody>
+                  {[['Normal large threat','2'],['Very large / multi-limbed','3'],['Huge boss','4'],['Raid-scale monster','5']].map(([s,n]) => (
+                    <tr key={s}><td style={{padding:'1px 6px', borderBottom:'1px solid #333'}}>{s}</td><td style={{padding:'1px 6px', borderBottom:'1px solid #333', textAlign:'right'}}>{n} bodies</td></tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="dim">Count both Pokémon and trainers as bodies if they can physically hold the target.</p>
+              <hr/>
+              <p><strong>Trainer Support Actions (Boss Fights)</strong></p>
+              <p>Each trainer gets <strong>1 Support Action</strong> per turn in addition to commanding their Pokémon.</p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Deploy or trigger a prepared trap</li>
+                <li>Throw healing item or hand gear to ally</li>
+                <li>Mark weak terrain or call a target lane</li>
+                <li>Stabilize a device, anchor, or hazard panel</li>
+                <li>Recall and resend gear, rope, or support tools</li>
+              </ul>
+              <p className="dim">Traps: 1 Support Action to place if prepared, 1 to trigger. Usually create control/positioning/openings. Max 1 trap payoff per round.</p>
+              <hr/>
+              <p><strong>Boss Damage Dice Checkpoints</strong></p>
+              <table style={{width:'100%', borderCollapse:'collapse', fontSize:'0.9em'}}>
+                <tbody>
+                  {[['350–369','3d20'],['470–489','4d20'],['590–609','5d20'],['710–729','6d20'],['830–849','7d20'],['950–969','8d20'],['970–989','8d20+1d4'],['990–1000','8d20+1d6']].map(([r,d]) => (
+                    <tr key={r}><td style={{padding:'1px 6px', borderBottom:'1px solid #333'}}>{r}</td><td style={{padding:'1px 6px', borderBottom:'1px solid #333', textAlign:'right'}}>{d}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {infoTab === 'bond' && (
+            <div className="dim" style={{fontSize:'0.92em', lineHeight:1.5}}>
+              <p><strong>Battle Bond (Trait)</strong></p>
+              <p>Obtained through Fusion Machine / Bond Sync setup. Temporary buff, not permanent.</p>
+              <hr/>
+              <p><strong>Effect</strong>: +1 stage to one offensive stat AND +1 stage Speed.</p>
+              <p><strong>Requirements</strong>:</p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Trainer Fortitude ≥ 15</li>
+                <li>Partner Pokémon must have maxed happiness</li>
+              </ul>
+              <p><strong>Activation</strong>: Once per long rest, on one Pokémon.</p>
+              <hr/>
+              <p><strong>SP Drain (while active)</strong>:</p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Level 50 and below: <strong>1 SP/turn</strong></li>
+                <li>Level 51+: <strong>2 SP/turn</strong></li>
+              </ul>
+              <p>If trainer cannot pay SP, sync ends immediately. Cannot reactivate until after a long rest.</p>
+              <hr/>
+              <p><strong>In Combat</strong>:</p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Visible synced state between trainer and Pokémon</li>
+                <li>Apply +1 stage offensive + +1 stage Speed</li>
+                <li>Track SP drain at end of each synced Pokémon turn</li>
+                <li>Treat as combat toggle (on/off)</li>
+              </ul>
+              <hr/>
+              <p><strong>Hold On Speech</strong></p>
+              <ul style={{paddingLeft:16, margin:'4px 0'}}>
+                <li>Spend trainer action to set on allied Pokémon in command range</li>
+                <li>Later: spend trainer reaction when Pokémon would hit 0 HP (from above 1 HP)</li>
+                <li>Roll: d12 + SCH combat bonus</li>
+                <li>12+ → stays at 1 HP</li>
+                <li>16+ → also keeps its next reaction</li>
+                <li>Once per trainer per Pokémon per battle</li>
+                <li>Without setup: DM may allow at disadvantage</li>
+              </ul>
             </div>
           )}
           {infoTab === 'hazards' && (
@@ -715,14 +1021,22 @@ function shortStat(k: 'atk'|'def'|'spAtk'|'spDef'|'speed') {
 }
 
 // Local helpers (mirror SidePanel behavior)
-function diceFromPower(power: number): 'D20'|'D12'|'D10'|'D8'|'D6'|'D4'|null {
-  if (power >= 120) return 'D20';
-  if (power >= 85) return 'D12';
-  if (power >= 75) return 'D10';
-  if (power >= 60) return 'D8';
-  if (power >= 30) return 'D6';
-  if (power >= 0) return 'D4';
-  return null;
+// Extended damage die ladder from Battle Quick Reference — supports up to 1000+ adjusted power
+function diceFromPower(power: number): string | null {
+  if (power < 0) return null;
+  // Base ladder 0-229
+  const BASE: [number, string][] = [
+    [0, '1d4'], [30, '1d6'], [50, '1d8'], [70, '1d10'], [90, '1d12'], [110, '1d20'],
+    [130, '1d20 + 1d4'], [150, '1d20 + 1d6'], [170, '1d20 + 1d8'], [190, '1d20 + 1d10'], [210, '1d20 + 1d12'],
+  ];
+  for (let i = BASE.length - 1; i >= 0; i--) { if (power >= BASE[i][0]) return BASE[i][1]; }
+  // Repeating ladder above 229: every 120 power adds +1 to the d20 count, each 20-step within adds a sub-die
+  const SUB = ['', ' + 1d4', ' + 1d6', ' + 1d8', ' + 1d10', ' + 1d12'];
+  const above = power - 230;
+  const cycle = Math.floor(above / 120);
+  const step = Math.floor((above % 120) / 20);
+  const d20count = 2 + cycle;
+  return `${d20count}d20${SUB[Math.min(step, 5)]}`;
 }
 
 function formatMult(n: number): string {
@@ -767,45 +1081,64 @@ function clampStage(n: number): number { return Math.max(-6, Math.min(6, n|0)); 
 
 // Flat modifiers per TTRPG rules — use CALCULATED stat values (not base stats)
 // See Battle Quick Reference: Calculated combat bonus bands
+// 0-39: +0, 40-59: +1, 60-79: +2, 80-99: +3, then every 20 above 100 adds +1
 function flatAtkMod(calcStat: number): number {
-  if (calcStat >= 160) return 7;
-  if (calcStat >= 140) return 6;
-  if (calcStat >= 120) return 5;
-  if (calcStat >= 100) return 4;
-  if (calcStat >= 80) return 3;
-  if (calcStat >= 60) return 2;
-  if (calcStat >= 40) return 1;
-  return 0;
+  if (calcStat < 40) return 0;
+  if (calcStat < 60) return 1;
+  if (calcStat < 80) return 2;
+  if (calcStat < 100) return 3;
+  return 4 + Math.floor((calcStat - 100) / 20);
 }
 
+// Guard bonus = same bands as attack bonus (used for Block rolls)
+function flatGuardMod(calcStat: number): number {
+  return flatAtkMod(calcStat);
+}
+
+// Defense/Sp.Def modifier: always 1 - attack bonus at that stat
 function flatDefMod(calcStat: number): number {
-  if (calcStat >= 160) return -6;
-  if (calcStat >= 140) return -5;
-  if (calcStat >= 120) return -4;
-  if (calcStat >= 100) return -3;
-  if (calcStat >= 80) return -2;
-  if (calcStat >= 60) return -1;
-  if (calcStat >= 40) return 0;
-  return 1;
+  return 1 - flatAtkMod(calcStat);
 }
 
+// Speed bonus: same bands as attack
 function flatSpeedMod(calcStat: number): number {
-  if (calcStat >= 160) return 7;
-  if (calcStat >= 140) return 6;
-  if (calcStat >= 120) return 5;
-  if (calcStat >= 100) return 4;
-  if (calcStat >= 80) return 3;
-  if (calcStat >= 60) return 2;
-  if (calcStat >= 40) return 1;
-  return 0;
+  return flatAtkMod(calcStat);
 }
 
 function clampMod(n: number): number {
-  // Keep within a sensible range: attackers up to +7, defenders down to -6
-  return Math.max(-6, Math.min(7, Math.round(n)));
+  // Allow full range for boss-scale stats (up to +49 atk, down to -48 def per rules)
+  return Math.round(n);
 }
 
 function fmtSign(n: number): string { return n > 0 ? `+${n}` : String(n); }
+
+// Accuracy bonus from Battle Quick Reference
+function accuracyBonus(acc: number | boolean): number | null {
+  if (acc === true) return null; // cannot miss
+  const a = Number(acc);
+  if (!a || a <= 0) return null;
+  if (a >= 100) return 4;
+  if (a >= 95) return 3;
+  if (a >= 90) return 2;
+  if (a >= 85) return 1;
+  if (a >= 80) return 0;
+  if (a >= 75) return -1;
+  if (a >= 70) return -2;
+  if (a >= 60) return -3;
+  if (a >= 50) return -4;
+  return -5;
+}
+
+// Clash power bonus from Battle Quick Reference
+function clashBonus(adjPower: number): number {
+  if (adjPower >= 130) return 6;
+  if (adjPower >= 110) return 5;
+  if (adjPower >= 90) return 4;
+  if (adjPower >= 70) return 3;
+  if (adjPower >= 50) return 2;
+  if (adjPower >= 30) return 1;
+  return 0;
+}
 
 // Apply end-of-turn effects and timers
 function useNextTurn(
@@ -876,6 +1209,8 @@ const TYPE_CHART: Record<string, Record<string, number>> = {
   fairy: { fighting: 2, dragon: 2, dark: 2, fire: 0.5, poison: 0.5, steel: 0.5 },
   nuclear: { normal: 2, fire: 2, water: 2, electric: 2, grass: 2, ice: 2, fighting: 2, poison: 2, ground: 2, flying: 2, psychic: 2, bug: 2, rock: 2, ghost: 2, dragon: 2, dark: 2, fairy: 2, cosmic: 2, nuclear: 0.5, steel: 0.5 },
   cosmic: { fairy: 2, normal: 2, nuclear: 2, psychic: 0.5 },
+  shadow: { psychic: 2, ghost: 2, normal: 0.5, shadow: 0.5 },
+  sound: { psychic: 2, ghost: 2, steel: 0.5, sound: 0.5 },
   crystal: {},
   '???': {},
 };
