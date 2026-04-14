@@ -99,6 +99,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     bossPhase: 'none'|'first-break'|'recovery'|'second-break';
     battleBond: boolean; bondStat: 'atk'|'spAtk';
     bossHpMult: number; bossStatMult: number;
+    bossStatBoosts: { atk: number; def: number; spAtk: number; spDef: number; speed: number };
   };
   const defaultState = (p: BattlePokemon): PerPokemonState => ({
     hp: p.currentHp,
@@ -108,6 +109,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     bound: false, bindTurns: 0, sleepTurns: 0, toxicStage: 1,
     bossPhase: 'none', battleBond: false, bondStat: 'atk',
     bossHpMult: 1, bossStatMult: 1,
+    bossStatBoosts: { atk: 0, def: 0, spAtk: 0, spDef: 0, speed: 0 },
   });
   const [pokemonStates, setPokemonStates] = useState<Record<number, PerPokemonState>>(() => {
     const init: Record<number, PerPokemonState> = {};
@@ -157,6 +159,28 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
   // Dex data for ability/item descriptions and mega logic
   const [dex, setDex] = useState<any | null>(null);
   useEffect(() => { (async () => { const d = await loadShowdownDex(); setDex(d); })(); }, []);
+
+  // Sync BattleTab HP → parent team (so PC tab sees changes)
+  useEffect(() => {
+    if (!onReplaceTeam || !active) return;
+    if (hp !== active.currentHp) {
+      onReplaceTeam(activeIdx, { ...active, currentHp: hp });
+    }
+  }, [hp]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync parent team HP → BattleTab (so PC tab heal/damage propagates here)
+  const prevParentHpRef = useRef<Record<number, number>>({});
+  useEffect(() => {
+    teamList.forEach((p, i) => {
+      const prevHp = prevParentHpRef.current[i];
+      const localHp = getState(i).hp;
+      // Only update if parent changed AND it differs from our local state
+      if (prevHp !== undefined && p.currentHp !== prevHp && p.currentHp !== localHp) {
+        updateState(i, { hp: p.currentHp });
+      }
+      prevParentHpRef.current[i] = p.currentHp;
+    });
+  }, [teamList.map(p => p.currentHp).join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const friendlyLabel = friendly?.name || friendly?.species || 'You';
   const enemyLabel = enemy?.name || enemy?.species || 'Opponent';
@@ -344,13 +368,14 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
             const rawCs = active.computedStats || computeRealStats(active);
             const bHpM = pState.bossHpMult;
             const bStM = pState.bossStatMult;
+            const bBoost = pState.bossStatBoosts || { atk: 0, def: 0, spAtk: 0, spDef: 0, speed: 0 };
             const cs = {
               hp: Math.floor(rawCs.hp * bHpM),
-              atk: Math.floor(rawCs.atk * bStM),
-              def: Math.floor(rawCs.def * bStM),
-              spa: Math.floor(rawCs.spa * bStM),
-              spd: Math.floor(rawCs.spd * bStM),
-              spe: Math.floor(rawCs.spe * bStM),
+              atk: Math.floor(rawCs.atk * bStM) + bBoost.atk,
+              def: Math.floor(rawCs.def * bStM) + bBoost.def,
+              spa: Math.floor(rawCs.spa * bStM) + bBoost.spAtk,
+              spd: Math.floor(rawCs.spd * bStM) + bBoost.spDef,
+              spe: Math.floor(rawCs.spe * bStM) + bBoost.speed,
             };
             const speedMult = stageMultiplier(stages.speed) * (status==='par' ? 0.5 : 1);
             const totalSpeed = Math.floor(cs.spe * speedMult);
@@ -943,6 +968,8 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                 const mHp = effectiveMaxHp;
                 const curHpM = pState.bossHpMult;
                 const curStM = pState.bossStatMult;
+                const bBoost = pState.bossStatBoosts || { atk: 0, def: 0, spAtk: 0, spDef: 0, speed: 0 };
+                const setBoost = (stat: string, val: number) => updateState(activeIdx, { bossStatBoosts: { ...bBoost, [stat]: val } });
                 return (
                   <div style={{border:'1px solid #666', borderRadius:6, padding:8, marginBottom:8, background:'#1a1a2e'}}>
                     <div style={{marginBottom:8}}>
@@ -956,7 +983,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                             updateState(activeIdx, { bossHpMult: v });
                             if (hp === effectiveMaxHp || hp > newMax) setHp(newMax);
                           }} />
-                        <span>Stats ×</span>
+                        <span>All Stats ×</span>
                         <input type="number" value={curStM} min={0.5} max={10} step={0.5} style={{width:70, background:'#222', color:'#eee', border:'1px solid #555', borderRadius:4, padding:'2px 6px'}}
                           onChange={(e) => updateState(activeIdx, { bossStatMult: Math.max(0.5, Number(e.target.value) || 1) })} />
                       </div>
@@ -969,7 +996,31 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                         ))}
                       </div>
                       {curHpM !== 1 && <div className="dim" style={{marginTop:2}}>Effective Max HP: {mHp} (base {active.maxHp})</div>}
-                      {curStM !== 1 && <div className="dim" style={{marginTop:2}}>Stats multiplied by {curStM}× (affects combat bonuses, mods, speed, etc.)</div>}
+                    </div>
+                    <hr/>
+                    <div style={{marginBottom:8}}>
+                      <strong style={{color:'#ff9f43'}}>Per-Stat Boosts</strong>
+                      <div style={{display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:4, marginTop:4}}>
+                        {(['atk','def','spAtk','spDef','speed'] as const).map(stat => (
+                          <div key={stat} style={{textAlign:'center'}}>
+                            <div className="dim" style={{fontSize:'0.8em'}}>{stat==='spAtk'?'SpA':stat==='spDef'?'SpD':stat==='speed'?'Spe':stat==='atk'?'Atk':'Def'}</div>
+                            <input type="number" value={bBoost[stat]} step={5} style={{width:'100%', background:'#222', color: bBoost[stat] > 0 ? '#8fff8f' : bBoost[stat] < 0 ? '#ff6b6b' : '#eee', border:'1px solid #555', borderRadius:4, padding:'2px 4px', textAlign:'center'}}
+                              onChange={(e) => setBoost(stat, Number(e.target.value) || 0)} />
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{display:'flex', gap:4, marginTop:4}}>
+                        {[10,20,30,50].map(n => (
+                          <button key={n} onClick={() => updateState(activeIdx, { bossStatBoosts: { atk: n, def: n, spAtk: n, spDef: n, speed: n } })}
+                            style={{background:'#333', color:'#eee', padding:'2px 8px', borderRadius:4, border:'1px solid #555', cursor:'pointer', fontSize:'0.85em'}}>
+                            All +{n}
+                          </button>
+                        ))}
+                        <button onClick={() => updateState(activeIdx, { bossStatBoosts: { atk: 0, def: 0, spAtk: 0, spDef: 0, speed: 0 } })}
+                          style={{background:'#444', color:'#ccc', padding:'2px 8px', borderRadius:4, border:'1px solid #555', cursor:'pointer', fontSize:'0.85em'}}>
+                          Reset
+                        </button>
+                      </div>
                     </div>
                     <hr/>
                     <div style={{display:'flex', gap:8, alignItems:'center', marginBottom:6, flexWrap:'wrap'}}>
@@ -1062,11 +1113,17 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                     )}
                     <div style={{display:'flex', gap:6}}>
                       {!bond ? (
-                        <button onClick={() => { setStages(s => ({...s, [bStat]: s[bStat] + 1, speed: s.speed + 1})); updateState(activeIdx, { battleBond: true }); }} style={{background:'#3a3', color:'#fff', padding:'4px 12px', borderRadius:4, border:'none', cursor:'pointer'}}>
+                        <button onClick={() => {
+                          const newStages = {...stages, [bStat]: stages[bStat] + 1, speed: stages.speed + 1};
+                          updateState(activeIdx, { stages: newStages, battleBond: true });
+                        }} style={{background:'#3a3', color:'#fff', padding:'4px 12px', borderRadius:4, border:'none', cursor:'pointer'}}>
                           Activate Bond
                         </button>
                       ) : (
-                        <button onClick={() => { setStages(s => ({...s, [bStat]: s[bStat] - 1, speed: s.speed - 1})); updateState(activeIdx, { battleBond: false }); }} style={{background:'#a33', color:'#fff', padding:'4px 12px', borderRadius:4, border:'none', cursor:'pointer'}}>
+                        <button onClick={() => {
+                          const newStages = {...stages, [bStat]: stages[bStat] - 1, speed: stages.speed - 1};
+                          updateState(activeIdx, { stages: newStages, battleBond: false });
+                        }} style={{background:'#a33', color:'#fff', padding:'4px 12px', borderRadius:4, border:'none', cursor:'pointer'}}>
                           Deactivate Bond
                         </button>
                       )}
