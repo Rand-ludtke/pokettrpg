@@ -98,6 +98,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     sleepTurns: number; toxicStage: number;
     bossPhase: 'none'|'first-break'|'recovery'|'second-break';
     battleBond: boolean; bondStat: 'atk'|'spAtk';
+    bossHpMult: number; bossStatMult: number;
   };
   const defaultState = (p: BattlePokemon): PerPokemonState => ({
     hp: p.currentHp,
@@ -106,6 +107,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     infatuated: false, cursed: false, leeched: false,
     bound: false, bindTurns: 0, sleepTurns: 0, toxicStage: 1,
     bossPhase: 'none', battleBond: false, bondStat: 'atk',
+    bossHpMult: 1, bossStatMult: 1,
   });
   const [pokemonStates, setPokemonStates] = useState<Record<number, PerPokemonState>>(() => {
     const init: Record<number, PerPokemonState> = {};
@@ -285,9 +287,10 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     if (onReplaceTeam) onReplaceTeam(activeIdx, bp);
   };
 
+  const effectiveMaxHp = Math.floor(active.maxHp * pState.bossHpMult);
   const nextTurn = useNextTurn({
     status, setStatus,
-    hp, setHp, maxHp: active.maxHp,
+    hp, setHp, maxHp: effectiveMaxHp,
     cursed, leeched, bound,
     bindTurns, setBindTurns,
     sleepTurns, setSleepTurns,
@@ -338,7 +341,17 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
           </header>
           {/* Computed (level-adjusted) stats – available to all sections */}
           {(() => {
-            const cs = active.computedStats || computeRealStats(active);
+            const rawCs = active.computedStats || computeRealStats(active);
+            const bHpM = pState.bossHpMult;
+            const bStM = pState.bossStatMult;
+            const cs = {
+              hp: Math.floor(rawCs.hp * bHpM),
+              atk: Math.floor(rawCs.atk * bStM),
+              def: Math.floor(rawCs.def * bStM),
+              spa: Math.floor(rawCs.spa * bStM),
+              spd: Math.floor(rawCs.spd * bStM),
+              spe: Math.floor(rawCs.spe * bStM),
+            };
             const speedMult = stageMultiplier(stages.speed) * (status==='par' ? 0.5 : 1);
             const totalSpeed = Math.floor(cs.spe * speedMult);
           return (<>
@@ -364,8 +377,8 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                   {/* Left: HP first, then Mods box */}
                   <div style={{display:'grid', gap:8}}>
                     <div>
-                      <strong>HP</strong>: <input type="number" value={hp} min={0} max={active.maxHp} onChange={(e)=> setHp(Math.max(0, Math.min(active.maxHp, Number(e.target.value)||0)))} style={{width:80}} /> / {active.maxHp}
-                      <div className="hpbar large"><span style={{width:`${(hp/active.maxHp)*100}%`}} /></div>
+                      <strong>HP</strong>: <input type="number" value={hp} min={0} max={effectiveMaxHp} onChange={(e)=> setHp(Math.max(0, Math.min(effectiveMaxHp, Number(e.target.value)||0)))} style={{width:80}} /> / {effectiveMaxHp}{bHpM !== 1 ? <span className="dim"> (base {active.maxHp} × {bHpM})</span> : null}
+                      <div className="hpbar large"><span style={{width:`${(hp/effectiveMaxHp)*100}%`}} /></div>
                       <div style={{display:'flex', gap:6, marginTop:4, alignItems:'center'}}>
                         <input id="dmgInput" type="number" min={0} placeholder="Amount" style={{width:80}} onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -374,7 +387,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                           }
                         }} />
                         <button onClick={() => { const el = document.getElementById('dmgInput') as HTMLInputElement; const v = Number(el?.value) || 0; if (v > 0) { setHp(Math.max(0, hp - v)); el.value = ''; } }} style={{background:'#a33', color:'#fff'}}>Take Damage</button>
-                        <button onClick={() => { const el = document.getElementById('dmgInput') as HTMLInputElement; const v = Number(el?.value) || 0; if (v > 0) { setHp(Math.min(active.maxHp, hp + v)); el.value = ''; } }} style={{background:'#3a3', color:'#fff'}}>Heal</button>
+                        <button onClick={() => { const el = document.getElementById('dmgInput') as HTMLInputElement; const v = Number(el?.value) || 0; if (v > 0) { setHp(Math.min(effectiveMaxHp, hp + v)); el.value = ''; } }} style={{background:'#3a3', color:'#fff'}}>Heal</button>
                       </div>
                     </div>
                     <div style={{border:'1px solid #444', borderRadius:6, padding:6, fontSize:'0.95em'}}>
@@ -619,6 +632,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
               <div style={{display:'grid', gap:6, fontSize:'0.92em'}}>
                 <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>4x</strong> {renderIcons(te.quadWeak)}</div>
                 <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>2x</strong> {renderIcons(te.weak)}</div>
+                <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>1x</strong> {renderIcons(te.neutral)}</div>
                 <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>1/2x</strong> {renderIcons(te.resist)}</div>
                 <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>1/4x</strong> {renderIcons(te.quadResist)}</div>
                 <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>Immune</strong> {renderIcons(te.immune)}</div>
@@ -719,6 +733,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                 <div style={{display:'grid', gap:6, fontSize:'0.92em'}}>
                   <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>4x</strong> {renderIcons(te.quadWeak)}</div>
                   <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>2x</strong> {renderIcons(te.weak)}</div>
+                  <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>1x</strong> {renderIcons(te.neutral)}</div>
                   <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>1/2x</strong> {renderIcons(te.resist)}</div>
                   <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>1/4x</strong> {renderIcons(te.quadResist)}</div>
                   <div style={{display:'grid', gridTemplateColumns:'56px 1fr', alignItems:'center'}}><strong>Immune</strong> {renderIcons(te.immune)}</div>
@@ -925,9 +940,38 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
             <div className="dim" style={{fontSize:'0.92em', lineHeight:1.5}}>
               {active && (() => {
                 const phase = pState.bossPhase;
-                const mHp = active.maxHp;
+                const mHp = effectiveMaxHp;
+                const curHpM = pState.bossHpMult;
+                const curStM = pState.bossStatMult;
                 return (
                   <div style={{border:'1px solid #666', borderRadius:6, padding:8, marginBottom:8, background:'#1a1a2e'}}>
+                    <div style={{marginBottom:8}}>
+                      <strong style={{color:'#ff9f43'}}>Boss Multipliers</strong>
+                      <div style={{display:'grid', gridTemplateColumns:'auto 1fr auto 1fr', gap:6, alignItems:'center', marginTop:4}}>
+                        <span>HP ×</span>
+                        <input type="number" value={curHpM} min={1} max={20} step={0.5} style={{width:70, background:'#222', color:'#eee', border:'1px solid #555', borderRadius:4, padding:'2px 6px'}}
+                          onChange={(e) => {
+                            const v = Math.max(1, Number(e.target.value) || 1);
+                            const newMax = Math.floor(active.maxHp * v);
+                            updateState(activeIdx, { bossHpMult: v });
+                            if (hp === effectiveMaxHp || hp > newMax) setHp(newMax);
+                          }} />
+                        <span>Stats ×</span>
+                        <input type="number" value={curStM} min={0.5} max={10} step={0.5} style={{width:70, background:'#222', color:'#eee', border:'1px solid #555', borderRadius:4, padding:'2px 6px'}}
+                          onChange={(e) => updateState(activeIdx, { bossStatMult: Math.max(0.5, Number(e.target.value) || 1) })} />
+                      </div>
+                      <div style={{display:'flex', gap:4, marginTop:4}}>
+                        {[1,2,3,4,5].map(n => (
+                          <button key={n} onClick={() => { updateState(activeIdx, { bossHpMult: n }); setHp(Math.floor(active.maxHp * n)); }}
+                            style={{background: curHpM===n?'#666':'#333', color:'#eee', padding:'2px 8px', borderRadius:4, border: curHpM===n?'2px solid #aaa':'1px solid #555', cursor:'pointer', fontSize:'0.85em'}}>
+                            HP ×{n}
+                          </button>
+                        ))}
+                      </div>
+                      {curHpM !== 1 && <div className="dim" style={{marginTop:2}}>Effective Max HP: {mHp} (base {active.maxHp})</div>}
+                      {curStM !== 1 && <div className="dim" style={{marginTop:2}}>Stats multiplied by {curStM}× (affects combat bonuses, mods, speed, etc.)</div>}
+                    </div>
+                    <hr/>
                     <div style={{display:'flex', gap:8, alignItems:'center', marginBottom:6, flexWrap:'wrap'}}>
                       <strong style={{color:'#ff6b6b'}}>Boss Phase:</strong>
                       <span style={{color: phase==='none'?'#aaa': phase==='first-break'?'#ff6b6b': phase==='recovery'?'#ffd56e':'#ff4444', fontWeight:700}}>
@@ -1094,11 +1138,13 @@ function shortStat(k: 'atk'|'def'|'spAtk'|'spDef'|'speed') {
 function diceFromPower(power: number): string | null {
   if (power < 0) return null;
   // Base ladder 0-229
-  const BASE: [number, string][] = [
-    [0, '1d4'], [30, '1d6'], [50, '1d8'], [70, '1d10'], [90, '1d12'], [110, '1d20'],
-    [130, '1d20 + 1d4'], [150, '1d20 + 1d6'], [170, '1d20 + 1d8'], [190, '1d20 + 1d10'], [210, '1d20 + 1d12'],
-  ];
-  for (let i = BASE.length - 1; i >= 0; i--) { if (power >= BASE[i][0]) return BASE[i][1]; }
+  if (power < 230) {
+    const BASE: [number, string][] = [
+      [0, '1d4'], [30, '1d6'], [50, '1d8'], [70, '1d10'], [90, '1d12'], [110, '1d20'],
+      [130, '1d20 + 1d4'], [150, '1d20 + 1d6'], [170, '1d20 + 1d8'], [190, '1d20 + 1d10'], [210, '1d20 + 1d12'],
+    ];
+    for (let i = BASE.length - 1; i >= 0; i--) { if (power >= BASE[i][0]) return BASE[i][1]; }
+  }
   // Repeating ladder above 229: every 120 power adds +1 to the d20 count, each 20-step within adds a sub-die
   const SUB = ['', ' + 1d4', ' + 1d6', ' + 1d8', ' + 1d10', ' + 1d12'];
   const above = power - 230;
@@ -1284,12 +1330,13 @@ const TYPE_CHART: Record<string, Record<string, number>> = {
   '???': {},
 };
 
-function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]; weak: string[]; resist: string[]; quadResist: string[]; immune: string[] } {
+function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]; weak: string[]; resist: string[]; quadResist: string[]; immune: string[]; neutral: string[] } {
   const TYPES = Object.keys(TYPE_CHART);
   const toId = (t: string) => String(t || '').toLowerCase();
   const def = defenderTypes.map(t => toId(t));
   const quadWeak: string[] = [];
   const weak: string[] = [];
+  const neutral: string[] = [];
   const resist: string[] = [];
   const quadResist: string[] = [];
   const immune: string[] = [];
@@ -1304,8 +1351,9 @@ function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]
     else if (mult > 1) weak.push(atk);
     else if (mult === 0.25) quadResist.push(atk);
     else if (mult < 1) resist.push(atk);
+    else neutral.push(atk);
   }
   const sort = (a: string, b: string) => a.localeCompare(b);
-  quadWeak.sort(sort); weak.sort(sort); resist.sort(sort); quadResist.sort(sort); immune.sort(sort);
-  return { quadWeak, weak, resist, quadResist, immune };
+  quadWeak.sort(sort); weak.sort(sort); neutral.sort(sort); resist.sort(sort); quadResist.sort(sort); immune.sort(sort);
+  return { quadWeak, weak, neutral, resist, quadResist, immune };
 }
