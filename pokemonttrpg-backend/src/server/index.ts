@@ -2836,56 +2836,9 @@ function startForceSwitchTimer(room: Room) {
   room.forceSwitchDeadline = Date.now() + FORCE_SWITCH_TIMEOUT_MS;
   room.forceSwitchTimer = setTimeout(() => {
     if (!room.engine || !room.forceSwitchNeeded || room.forceSwitchNeeded.size === 0) return;
-    console.log(`[ForceSwitch] Timer fired. Remaining: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
-    // Auto-switch remaining players to first healthy bench
-    for (const pid of Array.from(room.forceSwitchNeeded)) {
-      // Skip phantom entries - player's active Pokemon is alive, no switch needed
-      const timerState = room.engine.getState();
-      const timerPl = timerState.players.find(p => p.id === pid);
-      const timerActive = timerPl?.team[timerPl?.activeIndex ?? -1];
-      if (timerActive && timerActive.currentHP > 0) {
-        console.log(`[ForceSwitch] Timer: Removing phantom entry for ${pid} (active HP=${timerActive.currentHP})`);
-        room.forceSwitchNeeded.delete(pid);
-        continue;
-      }
-      let benchIndex = -1;
-      // Prefer PS request's side.pokemon for accurate faint/active status
-      const psReq = room.engine.getRequest(pid);
-      if (psReq?.side?.pokemon) {
-        benchIndex = psReq.side.pokemon.findIndex((p: any) => !p.active && !String(p.condition || '').includes('fnt'));
-        console.log(`[ForceSwitch] Auto-switch ${pid}: PS request found benchIndex=${benchIndex}`);
-      }
-      // Fallback to state mirror
-      if (benchIndex < 0) {
-        const state = room.engine.getState();
-        const pl = state.players.find(p => p.id === pid);
-        if (pl) {
-          benchIndex = pl.team.findIndex((m, idx) => idx !== pl.activeIndex && m.currentHP > 0);
-          console.log(`[ForceSwitch] Auto-switch ${pid}: state mirror benchIndex=${benchIndex}, activeIndex=${pl.activeIndex}`);
-        }
-      }
-      if (benchIndex >= 0) {
-        const res = room.engine.forceSwitch(pid, benchIndex);
-        room.replay.push({ turn: res.state.turn, events: res.events, anim: res.anim, phase: "force-switch", auto: true });
-        room.forceSwitchNeeded.delete(pid);
-      } else {
-        console.warn(`[ForceSwitch] Auto-switch ${pid}: no valid bench Pokemon found, skipping`);
-        room.forceSwitchNeeded.delete(pid);
-      }
-    }
-    io.to(room.id).emit("battleUpdate", { result: { state: room.engine.getState(), events: [], anim: [] }, needsSwitch: Array.from(room.forceSwitchNeeded ?? []) });
-    if (room.forceSwitchNeeded.size === 0) {
-      room.phase = "normal";
-      io.to(room.id).emit("phase", { phase: room.phase });
-      clearForceSwitchTimer(room);
-      // Clear prompt dedup so the next emitMovePrompts isn't blocked
-      room.lastPromptByPlayer = {};
-      // Emit new move prompts so players can choose their next action
-      const freshState = room.engine.getState();
-      emitMovePrompts(room, freshState);
-    } else {
-      // Extend time for any still-required (optional). For simplicity, clear deadline and keep old until manual switches.
-    }
+    console.log(`[ForceSwitch] Timer fired (auto-switch DISABLED). Remaining: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
+    // Auto-switch is disabled — players must manually choose their replacement.
+    // Just log and keep waiting; the server will re-prompt periodically.
   }, FORCE_SWITCH_TIMEOUT_MS);
 }
 

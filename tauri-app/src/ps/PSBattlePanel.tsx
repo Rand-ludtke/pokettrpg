@@ -4093,62 +4093,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     waitStartTimeRef.current = 0;
   }, [client, roomId, myPlayerId]);
   
-  // Auto-retry mechanism: If we've been waiting too long (5 seconds) for move/switch,
-  // automatically re-send the action. This helps when server might have "lost" the first action.
-  useEffect(() => {
-    if (!waitingForOpponent || !lastSentChoiceRef.current) return;
-    
-    const checkRetry = () => {
-      const waitTime = Date.now() - waitStartTimeRef.current;
-      // Only auto-retry on Turn 1 after 5 seconds of waiting
-      if (waitStartTimeRef.current > 0 && waitTime > 5000 && currentTurnRef.current <= 1) {
-        const lastChoice = lastSentChoiceRef.current;
-        if (lastChoice && client && roomId && mySide) {
-          PS_DEBUG && console.log('[PSBattlePanel] Auto-retrying action after', Math.round(waitTime / 1000), 'seconds wait:', lastChoice.choice);
-          diagLogProtocol('autoRetry', `Retrying action after ${Math.round(waitTime / 1000)}s wait: ${lastChoice.choice}`);
-          
-          // Parse and re-send the choice
-          const parts = lastChoice.choice.split(' ');
-          const actionType = parts[0];
-          let action: any;
-          
-          if (actionType === 'move') {
-            const isStruggle = parts[1] === 'struggle';
-            const moveIndex = isStruggle ? 0 : (parseInt(parts[1], 10) - 1);
-            const activeMoves = requestRef.current?.active?.[0]?.moves || [];
-            const selectedMove = activeMoves[moveIndex];
-            action = {
-              type: 'move',
-              moveIndex,
-              moveId: isStruggle ? 'struggle' : (selectedMove?.id || ''),
-              mega: lastChoice.choice.includes('mega'),
-              zmove: lastChoice.choice.includes('zmove'),
-              dynamax: lastChoice.choice.includes('dynamax'),
-              terastallize: lastChoice.choice.includes('terastallize'),
-            };
-          } else if (actionType === 'switch') {
-            action = {
-              type: 'switch',
-              switchTo: parseInt(parts[1], 10) - 1,
-              toIndex: parseInt(parts[1], 10) - 1,
-            };
-          }
-          
-          if (action) {
-            // Update timestamp to prevent immediate re-retry
-            actionSentTimestampRef.current = Date.now();
-            waitStartTimeRef.current = Date.now();
-            client.sendAction(roomId, action, myPlayerId);
-          }
-        }
-      }
-    };
-    
-    // Check every 2 seconds while waiting
-    const intervalId = setInterval(checkRetry, 2000);
-    return () => clearInterval(intervalId);
-  }, [waitingForOpponent, client, roomId, mySide, myPlayerId]);
-  
+  // Auto-retry mechanism REMOVED — it could send duplicate/stale actions and override
+  // the player's actual chosen move. The server already has a turn timer that re-prompts
+  // if needed, so client-side auto-retry is unnecessary.
+
   // Render move buttons
   const renderMoveButtons = useMemo(() => {
     // For multi-slot (doubles/triples), show moves for the current choice index
@@ -4404,8 +4352,11 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     // PS doubles convention: positive = opponent side, negative = own side
     //   1 = opponent slot a, 2 = opponent slot b
     //   -1 = own slot a, -2 = own slot b
+    // Use bossSlot from the request (set by server for boss mode allies) to determine
+    // which slot on the merged side this player controls. Falls back to choiceIndex.
     const rawChoiceIndex = choices?.index?.() ?? 0;
     const choiceIndex = clampChoiceIndex(rawChoiceIndex, request?.active?.length ?? 0);
+    const myActiveSlot = typeof (request as any)?.bossSlot === 'number' ? (request as any).bossSlot : choiceIndex;
     
     const targets: { label: string; loc: number; isFoe: boolean; fainted: boolean }[] = [];
     
@@ -4431,7 +4382,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const name = mon.speciesForme || mon.species || mon.name || `Ally slot ${i + 1}`;
         const fainted = mon.fainted || (mon.hp !== undefined && mon.hp <= 0);
         // Only show ally targets if it's a different slot
-        if (i !== choiceIndex) {
+        if (i !== myActiveSlot) {
           targets.push({ label: name, loc: -(i + 1), isFoe: false, fainted });
         }
       }

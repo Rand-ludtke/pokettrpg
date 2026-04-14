@@ -353,8 +353,12 @@ class SyncPSEngine {
                 continue;
             // Handle multi-choice actions (doubles/triples - one choice per active slot)
             if (action.type === 'multi-choice' && Array.isArray(action.choices)) {
-                const slotChoices = action.choices.map((c, i) => {
-                    return this.actionToChoice(c, side, i);
+                // Sort choices by slotIndex so PS receives them in correct slot order,
+                // then use each choice's explicit slotIndex (not the array position).
+                const sortedChoices = [...action.choices].sort((a, b) => (a.slotIndex ?? 0) - (b.slotIndex ?? 0));
+                const slotChoices = sortedChoices.map((c) => {
+                    const slotIdx = typeof c.slotIndex === 'number' ? c.slotIndex : 0;
+                    return this.actionToChoice(c, side, slotIdx);
                 });
                 const combinedChoice = slotChoices.join(', ');
                 console.log(`[DIAG-PROTOCOL] [engine] choose side=${side} player=${playerId} multi-choice=${combinedChoice}`);
@@ -772,8 +776,10 @@ class SyncPSEngine {
         if (!psSide)
             return 1;
         const activePokemon = psSide.active[slotIndex];
-        if (!activePokemon)
+        if (!activePokemon) {
+            console.warn(`[SyncPSEngine] findMoveIndex: no active pokemon at slot ${slotIndex} for ${side}, defaulting to move 1`);
             return 1;
+        }
         const normalizedMoveId = moveId.toLowerCase().replace(/[^a-z0-9]/g, "");
         for (let i = 0; i < activePokemon.moves.length; i++) {
             const move = activePokemon.moves[i];
@@ -782,6 +788,19 @@ class SyncPSEngine {
                 return i + 1;
             }
         }
+        // Also check the PS request's active moves (they use .id field, not raw move string)
+        const request = side === "p1" ? this.battle.p1Request : this.battle.p2Request;
+        if (request?.active?.[slotIndex]?.moves) {
+            const reqMoves = request.active[slotIndex].moves;
+            for (let i = 0; i < reqMoves.length; i++) {
+                const m = reqMoves[i];
+                const mId = (m.id || m.name || m.move || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+                if (mId === normalizedMoveId) {
+                    return i + 1;
+                }
+            }
+        }
+        console.warn(`[SyncPSEngine] findMoveIndex: moveId '${moveId}' not found in slot ${slotIndex} for ${side}, moves=[${activePokemon.moves.join(',')}], defaulting to move 1`);
         return 1;
     }
     applyStartingHP(players) {
