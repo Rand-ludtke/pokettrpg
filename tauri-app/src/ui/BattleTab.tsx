@@ -101,8 +101,8 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     bossHpMult: number; bossStatMult: number;
     bossStatBoosts: { atk: number; def: number; spAtk: number; spDef: number; speed: number };
   };
-  const defaultState = (p: BattlePokemon): PerPokemonState => ({
-    hp: p.currentHp,
+  const defaultState = (p: BattlePokemon | null | undefined): PerPokemonState => ({
+    hp: p?.currentHp ?? 0,
     stages: { atk: 0, def: 0, spAtk: 0, spDef: 0, speed: 0 },
     status: null, confused: false, confuseTurns: 0,
     infatuated: false, cursed: false, leeched: false,
@@ -116,7 +116,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     teamList.forEach((p, i) => { init[i] = defaultState(p); });
     return init;
   });
-  const getState = (idx: number): PerPokemonState => pokemonStates[idx] || (teamList[idx] ? defaultState(teamList[idx]) : defaultState(active!));
+  const getState = (idx: number): PerPokemonState => pokemonStates[idx] || defaultState(teamList[idx] ?? active);
   const updateState = (idx: number, patch: Partial<PerPokemonState>) => {
     setPokemonStates(prev => ({ ...prev, [idx]: { ...getState(idx), ...patch } }));
   };
@@ -180,7 +180,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
       }
       prevParentHpRef.current[i] = p.currentHp;
     });
-  }, [teamList.map(p => p.currentHp).join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [teamList.map(p => p?.currentHp ?? 0).join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const friendlyLabel = friendly?.name || friendly?.species || 'You';
   const enemyLabel = enemy?.name || enemy?.species || 'Opponent';
@@ -269,17 +269,8 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
 
   // lobby view removed; now a top-level tab
 
-  if (!active) {
-    return (
-      <section className="panel battle">
-        <h2>Battle</h2>
-        <p>No active Pokémon. Add to your team and switch to the Battle tab.</p>
-      </section>
-    );
-  }
-
   const { baseSpeciesName, megaTarget } = useMemo(() => {
-    if (!dex || !active) return { baseSpeciesName: active?.species || active?.name, megaTarget: null as string | null };
+    if (!dex || !active) return { baseSpeciesName: active?.species || active?.name || '', megaTarget: null as string | null };
     const baseId = (active.species || active.name);
     const { base } = speciesFormesInfo(baseId, dex.pokedex);
     const target = eligibleMegaFormForItem(base, active.item, dex.pokedex);
@@ -311,7 +302,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     if (onReplaceTeam) onReplaceTeam(activeIdx, bp);
   };
 
-  const effectiveMaxHp = Math.floor(active.maxHp * pState.bossHpMult);
+  const effectiveMaxHp = active ? Math.floor(active.maxHp * pState.bossHpMult) : 0;
   const nextTurn = useNextTurn({
     status, setStatus,
     hp, setHp, maxHp: effectiveMaxHp,
@@ -322,6 +313,15 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
     confused, confuseTurns, setConfuseTurns,
     setTurnLog,
   });
+
+  if (!active) {
+    return (
+      <section className="panel battle">
+        <h2>Battle</h2>
+        <p>No active Pokémon. Add Pokémon to your team first.</p>
+      </section>
+    );
+  }
 
   return (
     <section className="panel battle">
