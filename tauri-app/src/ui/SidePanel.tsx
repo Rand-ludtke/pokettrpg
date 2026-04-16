@@ -128,7 +128,7 @@ function AbilityPicker({ value, onChange, onCommit, onCancel, legalAbilities, de
           onFocus={()=>setOpen(true)}
           onKeyDown={e=>{ if(e.key==='Enter') onCommit(); if(e.key==='Escape') onCancel(); }}
           style={{width:'100%'}} placeholder="Type any ability..." />
-        {!hideButtons && <button className="mini" onClick={onCommit}>✓</button>}
+        {!hideButtons && <button className="mini" onClick={() => onCommit()}>✓</button>}
         {!hideButtons && <button className="mini" onClick={onCancel}>✕</button>}
       </div>
       {open && (legalDisplay.length > 0 || illegalFiltered.length > 0) && (
