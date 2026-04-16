@@ -904,7 +904,7 @@
       "spe": 40
     },
     "abilities": {
-      "0": "Sand Veil",
+      "0": "Sand Force",
       "H": "Arena Trap"
     },
     "heightm": 1,
@@ -940,7 +940,7 @@
       "spe": 45
     },
     "abilities": {
-      "0": "Sand Veil",
+      "0": "Sand Force",
       "H": "Arena Trap"
     },
     "heightm": 3.4,
@@ -1049,7 +1049,7 @@
     },
     "abilities": {
       "0": "Sturdy",
-      "1": "Rock Head",
+      "1": "Levitate",
       "H": "Sheer Force"
     },
     "heightm": 2.7,
@@ -1641,6 +1641,7 @@
     },
     "abilities": {
       "0": "Run Away",
+      "1": "Flower Veil",
       "H": "Effect Spore"
     },
     "heightm": 0.8,
@@ -1805,7 +1806,6 @@
     "num": 10050,
     "name": "Bristle",
     "types": [
-      "Rock",
       "Steel"
     ],
     "baseStats": {
@@ -1817,7 +1817,8 @@
       "spe": 5
     },
     "abilities": {
-      "0": "Iron Barbs"
+      "0": "Iron Barbs",
+      "H": "Heatproof"
     },
     "heightm": 1.2,
     "weightkg": 260,
@@ -1952,7 +1953,7 @@
     },
     "abilities": {
       "0": "Iron Fist",
-      "1": "Unburden",
+      "1": "Anger Point",
       "H": "No Guard"
     },
     "heightm": 1.7,
@@ -2006,7 +2007,8 @@
     "num": 10056,
     "name": "Baby Penguin",
     "types": [
-      "Ice"
+      "Ice",
+      "Water"
     ],
     "baseStats": {
       "hp": 35,
@@ -2041,7 +2043,8 @@
     "num": 10057,
     "name": "Penguin",
     "types": [
-      "Ice"
+      "Ice",
+      "Water"
     ],
     "gender": "F",
     "baseStats": {
@@ -2090,6 +2093,7 @@
     },
     "abilities": {
       "0": "Quick Feet",
+      "1": "Heatproof",
       "H": "Shell Armor"
     },
     "heightm": 0.6,
@@ -2126,6 +2130,7 @@
     },
     "abilities": {
       "0": "Levitate",
+      "1": "Heatproof",
       "H": "Shell Armor"
     },
     "heightm": 0.8,
@@ -2715,7 +2720,7 @@
     },
     "abilities": {
       "0": "Solid Rock",
-      "H": "Weak Armor"
+      "H": "Steely Spirit"
     },
     "heightm": 3,
     "weightkg": 262.4,
@@ -2751,7 +2756,7 @@
     },
     "abilities": {
       "0": "Ice Body",
-      "H": "Weak Armor"
+      "H": "Steely Spirit"
     },
     "heightm": 3,
     "weightkg": 505,
@@ -3096,7 +3101,8 @@
     },
     "abilities": {
       "0": "Mummy",
-      "1": "Cursed Body"
+      "1": "Cursed Body",
+      "H": "Sand Veil"
     },
     "heightm": 1.1,
     "weightkg": 35,
@@ -3328,7 +3334,7 @@
     "num": 10089,
     "name": "Trunkle",
     "types": [
-      "Grass",
+      "Rock",
       "Fighting"
     ],
     "baseStats": {
@@ -4223,7 +4229,8 @@
     "num": 10113,
     "name": "Eerie",
     "types": [
-      "Ghost"
+      "Ghost",
+      "Dragon"
     ],
     "baseStats": {
       "hp": 70,
@@ -4234,7 +4241,8 @@
       "spe": 40
     },
     "abilities": {
-      "0": "Perish Body"
+      "0": "Perish Body",
+      "H": "Rattled"
     },
     "heightm": 1.3,
     "weightkg": 0.2,
@@ -4304,7 +4312,7 @@
     "abilities": {
       "0": "Battle Armor",
       "1": "Gluttony",
-      "H": "Effect Spore"
+      "H": "Strong Jaw"
     },
     "heightm": 0.4,
     "weightkg": 6.4,
@@ -4337,7 +4345,9 @@
       "spe": 45
     },
     "abilities": {
-      "0": "Unseen Fist"
+      "0": "Unseen Fist",
+      "1": "Soundproof",
+      "H": "Thick Fat"
     },
     "heightm": 2,
     "weightkg": 39,
@@ -5185,7 +5195,8 @@
       "spe": 30
     },
     "abilities": {
-      "0": "Steam Engine"
+      "0": "Steam Engine",
+      "H": "Sturdy"
     },
     "heightm": 1.3,
     "weightkg": 16,
@@ -5220,7 +5231,8 @@
       "spe": 30
     },
     "abilities": {
-      "0": "Steam Engine"
+      "0": "Steam Engine",
+      "H": "Sturdy"
     },
     "heightm": 4.9,
     "weightkg": 240,
@@ -5287,7 +5299,7 @@
     },
     "abilities": {
       "0": "Sand Stream",
-      "H": "Sand Force"
+      "H": "Wind Rider"
     },
     "heightm": 3.1,
     "weightkg": 0.1,

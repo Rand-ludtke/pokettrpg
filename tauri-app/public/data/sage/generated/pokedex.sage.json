@@ -625,7 +625,7 @@
     },
     "abilities": {
       "0": "Permafrost",
-      "1": "Rock Head"
+      "1": "Ice Body"
     },
     "heightm": 0.5,
     "weightkg": 35.1,
@@ -658,7 +658,7 @@
     },
     "abilities": {
       "0": "Permafrost",
-      "1": "Rock Head"
+      "1": "Solid Rock"
     },
     "heightm": 1.4,
     "weightkg": 144.7,
@@ -976,7 +976,8 @@
       "spe": 45
     },
     "abilities": {
-      "0": "Prankster"
+      "0": "Permafrost",
+      "1": "Prankster"
     },
     "heightm": 0.5,
     "weightkg": 16.4,
@@ -1006,7 +1007,8 @@
       "spe": 65
     },
     "abilities": {
-      "0": "Sheer Force"
+      "0": "Permafrost",
+      "1": "Sheer Force"
     },
     "heightm": 1.8,
     "weightkg": 148,
@@ -1351,7 +1353,7 @@
     },
     "abilities": {
       "0": "Allure",
-      "1": "Stubborn"
+      "1": "Effect Spore"
     },
     "heightm": 1.2,
     "weightkg": 10.4,
@@ -1414,7 +1416,7 @@
     },
     "abilities": {
       "0": "Allure",
-      "1": "Malice"
+      "1": "Natural Cure"
     },
     "heightm": 1.1,
     "weightkg": 11.1,
@@ -2408,9 +2410,9 @@
       "spe": 60
     },
     "abilities": {
-      "0": "Poison Touch",
+      "0": "Full Force",
       "1": "Discretion",
-      "H": "Full Force"
+      "H": "Poison Touch"
     },
     "heightm": 0.8,
     "weightkg": 23.9,
@@ -2442,9 +2444,9 @@
       "spe": 83
     },
     "abilities": {
-      "0": "Poison Touch",
+      "0": "Full Force",
       "1": "Discretion",
-      "H": "Full Force"
+      "H": "Poison Touch"
     },
     "heightm": 1.3,
     "weightkg": 50.1,
@@ -3302,7 +3304,7 @@
       "spe": 100
     },
     "abilities": {
-      "0": "Lightningrod",
+      "0": "Levitate",
       "1": "Eccentric"
     },
     "heightm": 0.1,
@@ -3334,7 +3336,7 @@
       "spe": 200
     },
     "abilities": {
-      "0": "Lightningrod",
+      "0": "Levitate",
       "1": "Eccentric"
     },
     "heightm": 0.6,
@@ -3525,7 +3527,7 @@
     },
     "abilities": {
       "0": "Motor Drive",
-      "1": "Heatproof"
+      "1": "Full Force"
     },
     "heightm": 3,
     "weightkg": 455,
@@ -4462,7 +4464,7 @@
       "spe": 96
     },
     "abilities": {
-      "0": "Natural Cure",
+      "0": "Filter",
       "1": "Leaf Guard"
     },
     "heightm": 1.4,
@@ -4592,7 +4594,7 @@
     },
     "abilities": {
       "0": "Prankster",
-      "1": "Limber"
+      "1": "Moody"
     },
     "heightm": 1.1,
     "weightkg": 23,
@@ -4623,7 +4625,8 @@
       "spe": 60
     },
     "abilities": {
-      "0": "Shadow Tag"
+      "0": "Prankster",
+      "1": "Shadow Tag"
     },
     "heightm": 0.5,
     "weightkg": 8.5,
@@ -4654,7 +4657,8 @@
       "spe": 74
     },
     "abilities": {
-      "0": "Shadow Tag"
+      "0": "Prankster",
+      "1": "Shadow Tag"
     },
     "heightm": 0.9,
     "weightkg": 24.1,
@@ -5342,8 +5346,8 @@
       "spe": 97
     },
     "abilities": {
-      "0": "Immunity",
-      "1": "Limber"
+      "0": "Reckless",
+      "1": "Inner Focus"
     },
     "heightm": 1.3,
     "weightkg": 28.8,
@@ -5860,8 +5864,7 @@
       "spe": 73
     },
     "abilities": {
-      "0": "Color Change",
-      "1": "Wonder Skin"
+      "0": "Infiltrator"
     },
     "heightm": 0.6,
     "weightkg": 2.3,
@@ -5893,7 +5896,7 @@
     },
     "abilities": {
       "0": "Spectrum",
-      "1": "Wonder Skin"
+      "1": "Intimidate"
     },
     "heightm": 4.5,
     "weightkg": 30.6,
@@ -6468,7 +6471,7 @@
       "spe": 55
     },
     "abilities": {
-      "0": "Scavenger",
+      "0": "Intimidate",
       "1": "Iron Jaw"
     },
     "heightm": 0.7,
@@ -6500,7 +6503,7 @@
       "spe": 75
     },
     "abilities": {
-      "0": "Scavenger",
+      "0": "Intimidate",
       "1": "Iron Jaw"
     },
     "heightm": 1.7,
@@ -6532,7 +6535,8 @@
       "spe": 60
     },
     "abilities": {
-      "0": "Stubborn"
+      "0": "No Guard",
+      "1": "Stubborn"
     },
     "heightm": 0.6,
     "weightkg": 12.5,
@@ -6564,7 +6568,8 @@
       "spe": 96
     },
     "abilities": {
-      "0": "Stubborn"
+      "0": "No Guard",
+      "1": "Stubborn"
     },
     "heightm": 1.4,
     "weightkg": 57.7,
@@ -6759,6 +6764,7 @@
     },
     "abilities": {
       "0": "Pressure",
+      "1": "Rock Head",
       "H": "Conditioning"
     },
     "heightm": 0.7,
@@ -6792,6 +6798,7 @@
     },
     "abilities": {
       "0": "Pressure",
+      "1": "Sturdy",
       "H": "Conditioning"
     },
     "heightm": 1,

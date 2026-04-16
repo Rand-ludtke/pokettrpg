@@ -3776,9 +3776,9 @@
       "spe": 95
     },
     "abilities": {
-      "0": "Chlorophyll",
-      "1": "Tinted Lens",
-      "H": "Contrary"
+      "0": "Adaptability",
+      "1": "Chlorophyll",
+      "H": "Natural Cure"
     },
     "heightm": 1.9,
     "weightkg": 51.5,
@@ -9110,7 +9110,7 @@
       "spe": 130
     },
     "abilities": {
-      "0": "Tinted Lens"
+      "0": "Amplifier"
     },
     "requiredItem": "Flygonite ZA",
     "heightm": 2,
