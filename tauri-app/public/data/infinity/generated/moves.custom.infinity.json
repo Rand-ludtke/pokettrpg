@@ -235,7 +235,8 @@
     },
     "contestType": "Cool",
     "shortDesc": "Hits twice.",
-    "isNonstandard": "Custom"
+    "isNonstandard": "Custom",
+    "desc": "Hits twice. If the first hit breaks the target's substitute, it will take damage for the second hit."
   },
   "rampartsmight": {
     "num": 0,
@@ -1050,7 +1051,9 @@
     },
     "secondary": null,
     "target": "allAdjacentFoes",
-    "type": "Dragon"
+    "type": "Dragon",
+    "desc": "Ignores the target's stat stage changes to evasiveness and defensive stats. Can hit Fairy-type Pokemon. Hits all adjacent foes.",
+    "shortDesc": "Ignores evasion/defensive stat changes. Hits Fairy. Hits foe(s)."
   },
   "dragonify": {
     "num": 0,
