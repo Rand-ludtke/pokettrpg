@@ -81,7 +81,7 @@ function itemOptionLabel(itemName: string, dex: any): string {
 function AbilityPicker({ value, onChange, onCommit, onCancel, legalAbilities, dex, getLabel, style, hideButtons }: {
   value: string;
   onChange: (v: string) => void;
-  onCommit: () => void;
+  onCommit: (picked?: string) => void;
   onCancel: () => void;
   legalAbilities: string[];
   dex: any;
@@ -94,7 +94,12 @@ function AbilityPicker({ value, onChange, onCommit, onCancel, legalAbilities, de
   const inputRef = useRef<HTMLInputElement>(null);
   const filter = value.toLowerCase();
 
-  const legalFiltered = legalAbilities.filter(a => a.toLowerCase().includes(filter));
+  // Always show all legal abilities; only filter the "Other" section
+  const legalFiltered = filter
+    ? legalAbilities.filter(a => a.toLowerCase().includes(filter))
+    : legalAbilities;
+  // If nothing typed or filter matches nothing in legal, show all legal anyway
+  const legalDisplay = legalFiltered.length > 0 ? legalFiltered : legalAbilities;
   const allAbilities = useMemo(() => {
     if (!dex?.abilities) return [];
     return Object.values(dex.abilities).map((a: any) => a.name as string).sort();
@@ -113,7 +118,7 @@ function AbilityPicker({ value, onChange, onCommit, onCancel, legalAbilities, de
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const pick = (name: string) => { onChange(name); setOpen(false); setTimeout(onCommit, 0); };
+  const pick = (name: string) => { onChange(name); setOpen(false); onCommit(name); };
   const maxItems = 80;
 
   return (
@@ -126,18 +131,19 @@ function AbilityPicker({ value, onChange, onCommit, onCancel, legalAbilities, de
         {!hideButtons && <button className="mini" onClick={onCommit}>✓</button>}
         {!hideButtons && <button className="mini" onClick={onCancel}>✕</button>}
       </div>
-      {open && (legalFiltered.length > 0 || illegalFiltered.length > 0) && (
+      {open && (legalDisplay.length > 0 || illegalFiltered.length > 0) && (
         <div style={{position:'absolute', top:'100%', left:0, right:0, zIndex:999, maxHeight:260, overflowY:'auto',
           background:'#1e1e1e', border:'1px solid #555', borderRadius:4, boxShadow:'0 4px 12px rgba(0,0,0,.5)', marginTop:2}}>
-          {legalFiltered.length > 0 && (
+          {legalDisplay.length > 0 && (
             <>
               <div style={{padding:'4px 8px', fontSize:'0.7em', fontWeight:'bold', color:'#4caf50', background:'rgba(76,175,80,.1)', borderBottom:'1px solid #333',
                 position:'sticky', top:0, zIndex:1}}>
                 ✓ Legal Abilities
               </div>
-              {legalFiltered.map(a => (
+              {legalDisplay.map(a => (
                 <div key={a} onClick={()=>pick(a)} title={getLabel(a)}
-                  style={{padding:'4px 8px', cursor:'pointer', fontSize:'0.85em', borderBottom:'1px solid #2a2a2a'}}
+                  style={{padding:'4px 8px', cursor:'pointer', fontSize:'0.85em', borderBottom:'1px solid #2a2a2a',
+                    fontWeight: a.toLowerCase() === filter ? 'bold' : 'normal'}}
                   onMouseEnter={e=>(e.currentTarget.style.background='#333')} onMouseLeave={e=>(e.currentTarget.style.background='transparent')}>
                   <span style={{color:'#e0e0e0'}}>{a}</span>
                 </div>
@@ -147,8 +153,8 @@ function AbilityPicker({ value, onChange, onCommit, onCancel, legalAbilities, de
           {illegalFiltered.length > 0 && (
             <>
               <div style={{padding:'4px 8px', fontSize:'0.7em', fontWeight:'bold', color:'#888', background:'rgba(255,255,255,.03)',
-                borderTop: legalFiltered.length > 0 ? '2px solid #555' : 'none', borderBottom:'1px solid #333',
-                position:'sticky', top: legalFiltered.length > 0 ? undefined : 0, zIndex:1}}>
+                borderTop: legalDisplay.length > 0 ? '2px solid #555' : 'none', borderBottom:'1px solid #333',
+                position:'sticky', top: legalDisplay.length > 0 ? undefined : 0, zIndex:1}}>
                 Other Abilities
               </div>
               {illegalFiltered.slice(0, maxItems).map(a => (
@@ -962,27 +968,28 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     setShowdownFieldValue('');
   };
 
-  const commitShowdownEdit = () => {
+  const commitShowdownEdit = (pickedValue?: string) => {
     const field = showdownEditField;
     if (!field) return;
+    const val = pickedValue ?? showdownFieldValue;
     if (field === 'level') {
-      const lvl = Math.max(1, Math.min(100, Number(showdownFieldValue) || selected.level));
+      const lvl = Math.max(1, Math.min(100, Number(val) || selected.level));
       applyShowdownUpdate({ level: lvl });
     } else if (field === 'gender') {
-      const g = (showdownFieldValue || 'N') as 'M'|'F'|'N';
+      const g = (val || 'N') as 'M'|'F'|'N';
       applyShowdownUpdate({ gender: g });
     } else if (field === 'shiny') {
-      applyShowdownUpdate({ shiny: showdownFieldValue === 'yes' });
+      applyShowdownUpdate({ shiny: val === 'yes' });
     } else if (field === 'tera') {
-      applyShowdownUpdate({ teraType: showdownFieldValue || undefined });
+      applyShowdownUpdate({ teraType: val || undefined });
     } else if (field === 'species') {
-      applyShowdownUpdate({ species: showdownFieldValue || resolveSpeciesName() });
+      applyShowdownUpdate({ species: val || resolveSpeciesName() });
     } else if (field === 'item') {
-      applyShowdownUpdate({ item: showdownFieldValue || '' });
+      applyShowdownUpdate({ item: val || '' });
     } else if (field === 'ability') {
-      applyShowdownUpdate({ ability: showdownFieldValue || selected.ability || '' });
+      applyShowdownUpdate({ ability: val || selected.ability || '' });
     } else if (field === 'nickname') {
-      applyShowdownUpdate({ name: showdownFieldValue || selected.name });
+      applyShowdownUpdate({ name: val || selected.name });
     }
     cancelShowdownEdit();
   };
@@ -2019,7 +2026,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
 
             {/* Pokemon, Item, Ability row */}
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:4, fontSize:'0.85em'}}>
-              <div style={{cursor:'pointer'}} onClick={()=> startShowdownEdit('species', resolveSpeciesName())} title="Click to edit">
+              <div style={{cursor:'pointer'}} onClick={()=>{ if (showdownEditField !== 'species') startShowdownEdit('species', resolveSpeciesName()); }} title="Click to edit">
                 <div className="dim" style={{fontSize:'0.75em'}}>Pokémon</div>
                 {showdownEditField === 'species' ? (
                   <div style={{display:'flex', gap:4, alignItems:'center'}} onClick={(e)=>e.stopPropagation()}>
@@ -2034,7 +2041,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   <div style={{fontWeight:'bold', fontSize:'0.9em'}}>{resolveSpeciesName()}</div>
                 )}
               </div>
-              <div style={{cursor:'pointer'}} onClick={()=> startShowdownEdit('item', (selected as any).item || '')} title="Click to edit">
+              <div style={{cursor:'pointer'}} onClick={()=>{ if (showdownEditField !== 'item') startShowdownEdit('item', (selected as any).item || ''); }} title="Click to edit">
                 <div className="dim" style={{fontSize:'0.75em'}}>Item</div>
                 {showdownEditField === 'item' ? (
                   <div style={{display:'flex', gap:4, alignItems:'center'}} onClick={(e)=>e.stopPropagation()}>
@@ -2049,7 +2056,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   <div style={{fontWeight:'bold', fontSize:'0.9em'}}>{itemText || '—'}</div>
                 )}
               </div>
-              <div style={{cursor:'pointer'}} onClick={()=> startShowdownEdit('ability', selected.ability || '')} title="Click to edit">
+              <div style={{cursor:'pointer'}} onClick={()=>{ if (showdownEditField !== 'ability') startShowdownEdit('ability', selected.ability || ''); }} title="Click to edit">
                 <div className="dim" style={{fontSize:'0.75em'}}>Ability</div>
                 {showdownEditField === 'ability' ? (
                   <AbilityPicker
