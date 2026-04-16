@@ -1249,7 +1249,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
                   onKeyDown={e => { if (e.key === 'Enter') commitShowdownEdit(); if (e.key === 'Escape') cancelShowdownEdit(); }}
                   style={{flex:1, padding:'2px 4px', fontSize:'0.9em'}}
                 />
-                <button className="mini" onClick={commitShowdownEdit}>✓</button>
+                <button className="mini" onClick={() => commitShowdownEdit()}>✓</button>
                 <button className="mini" onClick={cancelShowdownEdit}>✕</button>
               </div>
             )}
