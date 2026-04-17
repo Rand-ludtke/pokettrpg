@@ -5,12 +5,16 @@ import { GameProps } from './types';
   Plinko – Drop a ball through a peg board.
   Ball bounces L/R at each row. Landing zone determines multiplier.
   Cost: 5 coins per drop. Multipliers: 0× 0.5× 1× 2× 5× 10× 5× 2× 1× 0.5× 0×
+  Uses pokeball sprite from pokeemerald game corner expansion.
 */
 
 const ROWS = 10;
 const COLS = 11; // landing zones = ROWS + 1
 const MULTIPLIERS = [0, 0.5, 1, 2, 5, 10, 5, 2, 1, 0.5, 0];
 const DROP_COST = 5;
+
+/* Pokeball sprite for the ball (reuse from pinball) */
+const BALL_IMG = '/gamecorner/pinball/ball_pokeball.png';
 
 interface BallState {
   row: number;
@@ -72,7 +76,7 @@ export function Plinko({ coins, addCoins, spendCoins }: GameProps) {
 
   return (
     <div className="plinko">
-      <h2>📍 Plinko</h2>
+      <h2>Plinko</h2>
 
       <button className="plinko-drop-btn" onClick={drop} disabled={animating}>
         {animating ? 'Dropping...' : `Drop Ball (${DROP_COST} coins)`}
@@ -89,7 +93,11 @@ export function Plinko({ coins, addCoins, spendCoins }: GameProps) {
             ))}
             {/* Ball on this row */}
             {ball && Math.floor(ball.row) === r && !ball.done && (
-              <div className="plinko-ball" style={{ left: `${(ball.col / (COLS - 1)) * 100}%` }}>⚪</div>
+              <div className="plinko-ball" style={{ left: `${(ball.col / (COLS - 1)) * 100}%` }}>
+                <span style={{ display: 'inline-block', width: 16, height: 16, overflow: 'hidden', lineHeight: 0 }}>
+                  <img src={BALL_IMG} alt="ball" style={{ imageRendering: 'pixelated', width: 16, display: 'block' }} />
+                </span>
+              </div>
             )}
           </div>
         ))}

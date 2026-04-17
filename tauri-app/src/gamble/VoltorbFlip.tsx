@@ -6,7 +6,55 @@ import { GameProps } from './types';
   Row/column info shows sum + voltorb count.
   Flipping multipliers multiply current winnings. Hitting voltorb = lose current round.
   Level progression: winning advances level, losing resets to level based on max flipped.
+  Uses sprites from pokeemerald game corner expansion.
 */
+
+const VF_SP = '/gamecorner/voltorbflip/';
+
+/* Voltorb icon – CSS-styled to match GBA aesthetic */
+function VoltorbIcon({ size = 16 }: { size?: number }) {
+  return (
+    <span
+      className="vf-voltorb-icon"
+      style={{ width: size, height: size, display: 'inline-block', verticalAlign: 'middle' }}
+    >
+      <img
+        src={`${VF_SP}gameboard.png`}
+        alt="V"
+        style={{
+          imageRendering: 'pixelated',
+          width: 16 * 3,
+          height: 56 * 3 / 16 * 16,
+          objectFit: 'none',
+          objectPosition: `-${3 * 32}px -${3 * 8}px`,
+          transform: `scale(${size / (16 * 3)})`,
+          transformOrigin: 'top left',
+          display: 'block',
+          clip: `rect(0, ${16 * 3}px, ${16 * 3}px, 0)`,
+        }}
+      />
+    </span>
+  );
+}
+
+/* Memo marker from sprites.png (frame 2 = yellow arrow at y=64) */
+function MemoMark() {
+  return (
+    <span className="vf-memo-mark" style={{ display: 'inline-flex', width: 28, height: 28, overflow: 'hidden', justifyContent: 'center', alignItems: 'flex-start' }}>
+      <img
+        src={`${VF_SP}sprites.png`}
+        alt="M"
+        style={{
+          imageRendering: 'pixelated',
+          width: 28,
+          height: 'auto',
+          marginTop: -28 * 2,
+          display: 'block',
+        }}
+      />
+    </span>
+  );
+}
 
 interface Tile {
   value: number; // 0=voltorb, 1, 2, 3
@@ -94,7 +142,7 @@ export function VoltorbFlip({ coins, addCoins, spendCoins }: GameProps) {
       setRevealAll(true);
       setGameState('lost');
       const nextLevel = Math.max(1, Math.min(level, Math.max(1, flippedMultiplierTiles)));
-      setMessage(`💥 Voltorb! You lose your winnings. Dropping to level ${nextLevel}.`);
+      setMessage(`Voltorb! You lose your winnings. Dropping to level ${nextLevel}.`);
       setLevel(nextLevel);
     } else {
       const newMult = multiplier * tile.value;
@@ -108,7 +156,7 @@ export function VoltorbFlip({ coins, addCoins, spendCoins }: GameProps) {
         setRevealAll(true);
         setGameState('won');
         const nextLevel = Math.min(level + 1, LEVEL_CONFIGS.length);
-        setMessage(`🎉 Round clear! Won ${newMult} coins! Advancing to level ${nextLevel}.`);
+        setMessage(`Round clear! Won ${newMult} coins! Advancing to level ${nextLevel}.`);
         setLevel(nextLevel);
       } else {
         setMessage(`Multiplier: ×${newMult} — Keep going or collect!`);
@@ -170,7 +218,7 @@ export function VoltorbFlip({ coins, addCoins, spendCoins }: GameProps) {
           {board.colInfo.map((info, c) => (
             <div key={c} className="vf-info-cell col">
               <div className="vf-info-sum">{info.sum}</div>
-              <div className="vf-info-volt">💣{info.voltorbs}</div>
+              <div className="vf-info-volt"><VoltorbIcon size={14} />{info.voltorbs}</div>
             </div>
           ))}
         </div>
@@ -180,7 +228,7 @@ export function VoltorbFlip({ coins, addCoins, spendCoins }: GameProps) {
           <div key={r} className="vf-grid-row">
             <div className="vf-info-cell row">
               <div className="vf-info-sum">{board.rowInfo[r].sum}</div>
-              <div className="vf-info-volt">💣{board.rowInfo[r].voltorbs}</div>
+              <div className="vf-info-volt"><VoltorbIcon size={14} />{board.rowInfo[r].voltorbs}</div>
             </div>
             {row.map((tile, c) => {
               const show = tile.flipped || revealAll;
@@ -193,9 +241,9 @@ export function VoltorbFlip({ coins, addCoins, spendCoins }: GameProps) {
                   disabled={show || gameState !== 'playing'}
                 >
                   {show ? (
-                    tile.value === 0 ? '💣' : tile.value
+                    tile.value === 0 ? <VoltorbIcon size={24} /> : tile.value
                   ) : (
-                    tile.marked ? '🚩' : '?'
+                    tile.marked ? <MemoMark /> : '?'
                   )}
                 </button>
               );

@@ -2,14 +2,32 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GameProps } from './types';
 
 /*
-  Snake – Classic snake game. Eat coins on the grid.
-  Each coin eaten = +1 coin. Score at end = bonus coins.
+  Snake – Classic snake game with Onix sprites from pokeemerald game corner.
+  Each berry eaten = +1 coin. Score at end = bonus coins.
   Entry cost: 5 coins. Payout: 1 coin per food eaten.
 */
 
 const GRID = 20;
 const TICK_MS = 120;
 const ENTRY_COST = 5;
+
+/* Sprite frame helpers – sprites are vertical strips of 16×16 frames */
+const SP = '/gamecorner/snake/';
+const HEAD_FRAMES: Record<Dir, number> = { down: 0, up: 4, left: 8, right: 12 };
+const BERRIES = [`${SP}berry1.png`, `${SP}berry2.png`, `${SP}berry3.png`];
+
+function SpriteFrame({ src, frame = 0, size = 16 }: { src: string; frame?: number; size?: number }) {
+  return (
+    <div className="snake-sprite" style={{ width: size, height: size, overflow: 'hidden' }}>
+      <img
+        src={src}
+        alt=""
+        style={{ width: size, display: 'block', marginTop: -frame * size, imageRendering: 'pixelated' }}
+        draggable={false}
+      />
+    </div>
+  );
+}
 
 type Pos = { x: number; y: number };
 type Dir = 'up' | 'down' | 'left' | 'right';
@@ -30,6 +48,7 @@ export function SnakeGame({ coins, addCoins, spendCoins }: GameProps) {
   const [dir, setDir] = useState<Dir>('right');
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState(`Play Snake for ${ENTRY_COST} coins!`);
+  const [berryIdx, setBerryIdx] = useState(0);
   const dirRef = useRef<Dir>('right');
   const tickRef = useRef<number>(0);
 
@@ -115,6 +134,7 @@ export function SnakeGame({ coins, addCoins, spendCoins }: GameProps) {
         setFood(f => {
           if (next.x === f.x && next.y === f.y) {
             setScore(s => s + 1);
+            setBerryIdx(i => (i + 1) % BERRIES.length);
             // Don't pop tail (grow)
             const newFood = randomPos(newSnake);
             return newFood;
@@ -134,7 +154,7 @@ export function SnakeGame({ coins, addCoins, spendCoins }: GameProps) {
 
   return (
     <div className="snake-game">
-      <h2>🐍 Snake</h2>
+      <h2><SpriteFrame src={`${SP}onix-head.png`} frame={12} /> Snake</h2>
 
       <div className="snake-status">
         <span>Score: {score}</span>
@@ -152,7 +172,11 @@ export function SnakeGame({ coins, addCoins, spendCoins }: GameProps) {
           const isFood = food.x === x && food.y === y;
           return (
             <div key={i} className={`snake-cell ${isHead ? 'head' : isBody ? 'body' : ''} ${isFood ? 'food' : ''}`}>
-              {isHead ? '🟢' : isFood ? '🪙' : ''}
+              {isHead ? (
+                <SpriteFrame src={`${SP}onix-head.png`} frame={HEAD_FRAMES[dir]} />
+              ) : isFood ? (
+                <SpriteFrame src={BERRIES[berryIdx]} frame={0} />
+              ) : ''}
             </div>
           );
         })}

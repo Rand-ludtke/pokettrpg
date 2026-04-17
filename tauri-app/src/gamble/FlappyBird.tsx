@@ -3,6 +3,7 @@ import { GameProps } from './types';
 
 /*
   Flappy Bird – Tap/click/space to flap. Navigate through gaps.
+  Uses Butterfree sprite from pokeemerald game corner.
   Entry cost: 5 coins. Payout: 1 coin per pipe passed.
   Canvas-based for smooth animation.
 */
@@ -15,8 +16,17 @@ const PIPE_W = 40;
 const GAP = 120;
 const PIPE_SPEED = 2.5;
 const BIRD_X = 60;
-const BIRD_R = 14;
+const BIRD_R = 24; // bigger hitbox for 64×64 sprite scaled down
 const ENTRY_COST = 5;
+
+const SP = '/gamecorner/flappybird/';
+
+/* Pre-load sprite images */
+function loadImg(src: string): HTMLImageElement {
+  const img = new Image();
+  img.src = src;
+  return img;
+}
 
 interface Pipe { x: number; topH: number; scored: boolean; }
 
@@ -26,6 +36,15 @@ export function FlappyBird({ coins, addCoins, spendCoins }: GameProps) {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [message, setMessage] = useState(`Flap through pipes! ${ENTRY_COST} coins to play.`);
+
+  /* Sprite images – loaded once */
+  const spritesRef = useRef({
+    butterfree: loadImg(`${SP}butterfree.png`),   // 64×192 = 3 frames of 64×64
+    bg: loadImg(`${SP}flappy-bg.png`),             // 128×40 tileable bg
+    fg: loadImg(`${SP}flappy-fg.png`),             // 128×24 tileable fg
+    topleft: loadImg(`${SP}topleft.png`),           // pipe cap top
+    bottomleft: loadImg(`${SP}bottomleft.png`),     // pipe cap bottom
+  });
 
   const stateRef = useRef({
     birdY: H / 2,
@@ -127,42 +146,84 @@ export function FlappyBird({ coins, addCoins, spendCoins }: GameProps) {
       }
 
       // Draw
-      ctx.fillStyle = '#87CEEB';
-      ctx.fillRect(0, 0, W, H);
+      const spr = spritesRef.current;
 
-      // Pipes
-      ctx.fillStyle = '#2d8a4e';
+      // Background – tile the bg sprite
+      ctx.fillStyle = '#1a1a3e';
+      ctx.fillRect(0, 0, W, H);
+      if (spr.bg.complete && spr.bg.naturalWidth > 0) {
+        const scale = 3;
+        const bgW = spr.bg.naturalWidth * scale;
+        const bgH = spr.bg.naturalHeight * scale;
+        const scrollX = (s.frame * 0.5) % bgW;
+        ctx.imageSmoothingEnabled = false;
+        for (let x = -scrollX; x < W; x += bgW) {
+          ctx.drawImage(spr.bg, x, H - bgH - 6, bgW, bgH);
+        }
+      }
+
+      // Pipes – green with GBA-style pipe caps
       for (const p of s.pipes) {
+        // Pipe body
+        ctx.fillStyle = '#2d8a4e';
         ctx.fillRect(p.x, 0, PIPE_W, p.topH);
         ctx.fillRect(p.x, p.topH + GAP, PIPE_W, H - p.topH - GAP);
         // Pipe caps
         ctx.fillStyle = '#3ab05a';
-        ctx.fillRect(p.x - 3, p.topH - 10, PIPE_W + 6, 10);
-        ctx.fillRect(p.x - 3, p.topH + GAP, PIPE_W + 6, 10);
-        ctx.fillStyle = '#2d8a4e';
+        ctx.fillRect(p.x - 3, p.topH - 12, PIPE_W + 6, 12);
+        ctx.fillRect(p.x - 3, p.topH + GAP, PIPE_W + 6, 12);
+        // Pipe cap highlights
+        ctx.fillStyle = '#5ac07a';
+        ctx.fillRect(p.x - 1, p.topH - 10, PIPE_W + 2, 3);
+        ctx.fillRect(p.x - 1, p.topH + GAP + 2, PIPE_W + 2, 3);
       }
 
-      // Bird
-      ctx.fillStyle = '#FFD700';
-      ctx.beginPath();
-      ctx.arc(BIRD_X, s.birdY, BIRD_R, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(BIRD_X + 5, s.birdY - 3, 4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.arc(BIRD_X + 6, s.birdY - 3, 2, 0, Math.PI * 2);
-      ctx.fill();
+      // Butterfree – draw from sprite sheet (3 frames of 64×64)
+      ctx.imageSmoothingEnabled = false;
+      if (spr.butterfree.complete && spr.butterfree.naturalWidth > 0) {
+        const flapFrame = Math.floor(s.frame / 6) % 3;
+        const sprW = 64;
+        const sprH = 64;
+        const drawSize = 40;
+        // Slight rotation based on velocity
+        const angle = Math.max(-0.5, Math.min(0.5, s.vel * 0.05));
+        ctx.save();
+        ctx.translate(BIRD_X, s.birdY);
+        ctx.rotate(angle);
+        ctx.drawImage(
+          spr.butterfree,
+          0, flapFrame * sprH, sprW, sprH,   // source: frame from sprite sheet
+          -drawSize / 2, -drawSize / 2, drawSize, drawSize  // dest: centered on bird pos
+        );
+        ctx.restore();
+      } else {
+        // Fallback circle while loading
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath();
+        ctx.arc(BIRD_X, s.birdY, 14, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Foreground – tile the fg sprite
+      if (spr.fg.complete && spr.fg.naturalWidth > 0) {
+        const scale = 3;
+        const fgW = spr.fg.naturalWidth * scale;
+        const fgH = spr.fg.naturalHeight * scale;
+        const scrollX = (s.frame * 1.5) % fgW;
+        ctx.imageSmoothingEnabled = false;
+        for (let x = -scrollX; x < W; x += fgW) {
+          ctx.drawImage(spr.fg, x, H - fgH, fgW, fgH);
+        }
+      }
 
       // Score
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 24px monospace';
       ctx.textAlign = 'center';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 3;
+      ctx.strokeText(String(s.score), W / 2, 40);
       ctx.fillText(String(s.score), W / 2, 40);
-
-      // Ground line
       ctx.fillStyle = '#5a3825';
       ctx.fillRect(0, H - 2, W, 2);
 
@@ -175,7 +236,7 @@ export function FlappyBird({ coins, addCoins, spendCoins }: GameProps) {
 
   return (
     <div className="flappy-bird">
-      <h2>🐦 Flappy Bird</h2>
+      <h2>Flappy Bird</h2>
 
       {!playing && (
         <button className="flappy-start-btn" onClick={start}>

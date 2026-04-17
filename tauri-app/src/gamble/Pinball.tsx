@@ -4,18 +4,28 @@ import { GameProps } from './types';
 /*
   Pinball / Pachinko – launch a ball and watch it bounce through pegs into scoring zones.
   Inspired by the pokeemerald pachinko mini-game.
+  Uses pokeball sprite from pokeemerald game corner expansion.
   Canvas-based for smooth animation.
 */
 
 const W = 320;
 const H = 480;
-const BALL_R = 6;
+const BALL_R = 8;
 const PEG_R = 4;
 const GRAVITY = 0.15;
 const BOUNCE = 0.55;
 const FRICTION = 0.998;
 const ENTRY_COST = 10;
 const BALLS_PER_GAME = 5;
+
+const PIN_SP = '/gamecorner/pinball/';
+
+/* ball_pokeball.png: 16×128 = 8 frames of 16×16 */
+function loadImg(src: string): HTMLImageElement {
+  const img = new Image();
+  img.src = src;
+  return img;
+}
 
 const ZONE_COUNT = 9;
 const ZONE_MULTIPLIERS = [0, 1, 2, 5, 10, 5, 2, 1, 0];
@@ -56,6 +66,7 @@ export function Pinball({ coins, addCoins, spendCoins }: GameProps) {
   const [ballsLeft, setBallsLeft] = useState(0);
   const [message, setMessage] = useState(`Launch ${BALLS_PER_GAME} balls for ${ENTRY_COST} coins!`);
   const animRef = useRef(0);
+  const pokeballImg = useRef(loadImg(`${PIN_SP}ball_pokeball.png`));
 
   const launchBall = useCallback(() => {
     const s = stateRef.current;
@@ -186,19 +197,30 @@ export function Pinball({ coins, addCoins, spendCoins }: GameProps) {
         ctx.fillText(ZONE_LABELS[i], x + zoneW / 2, zoneY + 22);
       }
 
-      // Balls
+      // Balls – draw with pokeball sprite
+      const pbImg = pokeballImg.current;
+      ctx.imageSmoothingEnabled = false;
       for (const ball of s.balls) {
         if (!ball.active) continue;
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
-        const ballGrad = ctx.createRadialGradient(ball.x - 2, ball.y - 2, 1, ball.x, ball.y, BALL_R);
-        ballGrad.addColorStop(0, '#ff6');
-        ballGrad.addColorStop(1, '#c90');
-        ctx.fillStyle = ballGrad;
-        ctx.fill();
-        ctx.strokeStyle = '#a70';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+        if (pbImg.complete && pbImg.naturalWidth > 0) {
+          // 8 frames of 16×16, animate based on frame counter
+          const frame = Math.floor(Date.now() / 100) % 8;
+          const sprSize = 16;
+          const drawSize = BALL_R * 2.5;
+          ctx.drawImage(
+            pbImg,
+            0, frame * sprSize, sprSize, sprSize,
+            ball.x - drawSize / 2, ball.y - drawSize / 2, drawSize, drawSize
+          );
+        } else {
+          // Fallback while loading
+          ctx.beginPath();
+          ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
+          ctx.fillStyle = '#ff4444';
+          ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(ball.x - BALL_R, ball.y - 1, BALL_R * 2, 2);
+        }
       }
 
       // Launch area indicator
@@ -227,7 +249,7 @@ export function Pinball({ coins, addCoins, spendCoins }: GameProps) {
 
   return (
     <div className="pinball" style={{ textAlign: 'center' }}>
-      <h2>🎱 Pinball</h2>
+      <h2>Pinball</h2>
       <div style={{ display: 'flex', gap: 12, justifyContent: 'center', margin: '8px 0', flexWrap: 'wrap', alignItems: 'center' }}>
         <span>Score: <b>{score}</b></span>
         <span>Balls: <b>{ballsLeft}</b></span>

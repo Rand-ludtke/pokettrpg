@@ -5,12 +5,15 @@ import { GameProps } from './types';
   Block Stacker – Blocks slide L/R, press to drop.
   Each successful stack = score. Misaligned parts get trimmed.
   Entry cost: 5 coins. Payout: score × 2 coins.
+  Uses block sprites from pokeemerald game corner expansion.
 */
 
 const COLS = 10;
 const ROWS = 15;
 const TICK_MS = 200;
 const ENTRY_COST = 5;
+
+const SP = '/gamecorner/block_stacker/';
 
 interface Layer { left: number; width: number; }
 
@@ -129,7 +132,10 @@ export function BlockStacker({ coins, addCoins, spendCoins }: GameProps) {
 
   return (
     <div className="block-stacker">
-      <h2>🧱 Block Stacker</h2>
+      <h2>
+        <img src={`${SP}rhydon.png`} alt="" className="stacker-rhydon-title" style={{ width: 32, height: 32, objectFit: 'none', objectPosition: '0 0', overflow: 'hidden', imageRendering: 'pixelated', verticalAlign: 'middle' }} />
+        {' '}Block Stacker
+      </h2>
 
       <div className="stacker-status">
         <span>Score: {score}</span>
@@ -153,17 +159,32 @@ export function BlockStacker({ coins, addCoins, spendCoins }: GameProps) {
           // Check if current moving block
           const isCurrent = playing && row === currentRow && col >= current.left && col < current.left + current.width;
 
-          const hue = stackIdx >= 0 ? (stackIdx * 25) % 360 : 0;
+          const filled = stackIdx >= 0 || isCurrent;
 
           return (
             <div
               key={i}
               className={`stacker-cell ${stackIdx >= 0 ? 'stacked' : ''} ${isCurrent ? 'current' : ''}`}
-              style={stackIdx >= 0 ? { backgroundColor: `hsl(${hue}, 70%, 55%)` } : isCurrent ? { backgroundColor: '#FFD700' } : undefined}
+              style={filled ? {
+                backgroundImage: `url(${SP}blocks.png)`,
+                backgroundSize: '100% 200%',
+                backgroundPosition: isCurrent ? '0 100%' : '0 0',
+                imageRendering: 'pixelated',
+              } : undefined}
             />
           );
         })}
       </div>
+
+      {gameOver && score > 5 && (
+        <div className="stacker-rhydon-victory">
+          <img
+            src={`${SP}rhydon.png`}
+            alt="Rhydon"
+            style={{ imageRendering: 'pixelated', width: 128, height: 128, objectFit: 'none', objectPosition: '0 0' }}
+          />
+        </div>
+      )}
     </div>
   );
 }

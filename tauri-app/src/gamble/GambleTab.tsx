@@ -16,17 +16,17 @@ import './GambleStyles.css';
 type Game = 'menu' | 'slots' | 'voltorb' | 'blackjack' | 'plinko' | 'snake' | 'flappy' | 'stacker' | 'derby' | 'gacha' | 'pinball' | 'roulette';
 
 const GAMES: { id: Game; label: string; desc: string; icon: string }[] = [
-  { id: 'slots',    label: 'Slot Machine',   desc: 'Spin the reels! Match symbols to win.',        icon: '🎰' },
-  { id: 'voltorb',  label: 'Voltorb Flip',   desc: 'Flip cards — avoid the Voltorb!',             icon: '⚡' },
-  { id: 'blackjack',label: 'Blackjack',       desc: 'Beat the dealer to 21.',                      icon: '🃏' },
-  { id: 'plinko',   label: 'Plinko',          desc: 'Drop a ball through pegs for prizes.',         icon: '📍' },
-  { id: 'pinball',  label: 'Pinball',         desc: 'Launch balls through pegs into scoring zones.', icon: '🎱' },
-  { id: 'roulette', label: 'Roulette',        desc: 'Bet on numbers or colors — spin the wheel!',   icon: '🎡' },
-  { id: 'snake',    label: 'Snake',            desc: 'Eat coins, grow longer, don\'t crash.',       icon: '🐍' },
-  { id: 'flappy',   label: 'Flappy Bird',     desc: 'Fly through pipes — how far can you go?',     icon: '🐦' },
-  { id: 'stacker',  label: 'Block Stacker',   desc: 'Stack blocks to reach the top.',               icon: '🧱' },
-  { id: 'derby',    label: 'Derby',            desc: 'Bet on Pokémon in a race!',                   icon: '🏇' },
-  { id: 'gacha',    label: 'Gacha Machine',   desc: 'Multi-tier prizes — Basic to Master!',         icon: '🎲' },
+  { id: 'slots',    label: 'Slot Machine',   desc: 'Spin the reels! Match symbols to win.',        icon: '/gamecorner/slots/reel_pokeball.png' },
+  { id: 'voltorb',  label: 'Voltorb Flip',   desc: 'Flip cards — avoid the Voltorb!',             icon: '/gamecorner/voltorbflip/gameboard.png' },
+  { id: 'blackjack',label: 'Blackjack',       desc: 'Beat the dealer to 21.',                      icon: '/gamecorner/blackjack/facedown.png' },
+  { id: 'plinko',   label: 'Plinko',          desc: 'Drop a ball through pegs for prizes.',         icon: '/gamecorner/pinball/ball_pokeball.png' },
+  { id: 'pinball',  label: 'Pinball',         desc: 'Launch balls through pegs into scoring zones.', icon: '/gamecorner/pinball/flipper.png' },
+  { id: 'roulette', label: 'Roulette',        desc: 'Bet on numbers or colors — spin the wheel!',   icon: '/gamecorner/pinball/ball_pokeball.png' },
+  { id: 'snake',    label: 'Snake',            desc: 'Eat coins, grow longer, don\'t crash.',       icon: '/gamecorner/snake/onix-head.png' },
+  { id: 'flappy',   label: 'Flappy Bird',     desc: 'Fly through pipes — how far can you go?',     icon: '/gamecorner/flappy/butterfree.png' },
+  { id: 'stacker',  label: 'Block Stacker',   desc: 'Stack blocks to reach the top.',               icon: '/gamecorner/block_stacker/rhydon.png' },
+  { id: 'derby',    label: 'Derby',            desc: 'Bet on Pokémon in a race!',                   icon: '/gamecorner/derby/ponyta_ow.png' },
+  { id: 'gacha',    label: 'Gacha Machine',   desc: 'Multi-tier prizes — Basic to Master!',         icon: '/gamecorner/gacha/elekid.png' },
 ];
 
 export function GambleTab() {
@@ -82,7 +82,9 @@ export function GambleTab() {
           <div className="gamble-grid">
             {GAMES.map(g => (
               <button key={g.id} className="gamble-card" onClick={() => setGame(g.id)}>
-                <span className="gamble-card-icon">{g.icon}</span>
+                <span className="gamble-card-icon">
+                  <img src={g.icon} alt="" style={{ width: 32, height: 32, objectFit: 'cover', objectPosition: 'top', imageRendering: 'pixelated' }} />
+                </span>
                 <span className="gamble-card-label">{g.label}</span>
                 <span className="gamble-card-desc">{g.desc}</span>
               </button>

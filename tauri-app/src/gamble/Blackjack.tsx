@@ -7,7 +7,22 @@ import { GameProps } from './types';
   - Actions: Hit, Stand, Double, Insurance
   - Payouts: 1:1, 3:2 for natural blackjack
   - Dealer hits on <17, stands on >=17
+  Uses facedown card sprite from pokeemerald game corner expansion.
 */
+
+const BJ_SP = '/gamecorner/blackjack/';
+
+function FaceDownCard() {
+  return (
+    <span className="bj-facedown" style={{ display: 'inline-block', width: 48, height: 48, overflow: 'hidden', lineHeight: 0 }}>
+      <img
+        src={`${BJ_SP}facedown.png`}
+        alt="?"
+        style={{ imageRendering: 'pixelated', width: 48, height: 'auto', display: 'block' }}
+      />
+    </span>
+  );
+}
 
 const SUITS = ['♥', '♦', '♣', '♠'] as const;
 const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] as const;
@@ -220,7 +235,7 @@ export function Blackjack({ coins, addCoins, spendCoins }: GameProps) {
 
   return (
     <div className="blackjack">
-      <h2>🃏 Blackjack</h2>
+      <h2>Blackjack</h2>
 
       {phase === 'betting' && (
         <div className="bj-betting">
@@ -242,7 +257,7 @@ export function Blackjack({ coins, addCoins, spendCoins }: GameProps) {
               <div className="bj-cards">
                 {dealer.map((card, i) => (
                   <div key={i} className={`bj-card ${isRed(card) ? 'red' : 'black'} ${i === 1 && phase === 'playing' ? 'face-down' : ''}`}>
-                    {i === 1 && phase === 'playing' ? '🂠' : cardDisplay(card)}
+                    {i === 1 && phase === 'playing' ? <FaceDownCard /> : cardDisplay(card)}
                   </div>
                 ))}
               </div>

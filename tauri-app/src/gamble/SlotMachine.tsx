@@ -2,23 +2,27 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { GameProps } from './types';
 
 /*
-  Slot Machine – faithful to pokeemerald game corner:
-  - 3 reels × 21 symbols each, 3 visible rows (top / center / bottom)
-  - 5 match lines: center (bet 1), top+bottom (bet 2), 2 diagonals (bet 3)
-  - Pika Power meter (0-16 bolts), fills on losses, triggers bonus
-  - Symbols: 7_RED, 7_BLUE, AZURILL, LOTAD, CHERRY, POWER, REPLAY
-  - Staggered reel stops
+  Slot Machine – faithful to pokeemerald-gamecorner-expansion
+  Uses actual repo PNG sprites from /gamecorner/slot_machine/
+  Reel strips, payouts, Pika Power, digital display all from C source
 */
 
-const SYMBOLS = ['🔴', '🔵', '💧', '🌿', '🍒', '⚡', '🔁'] as const;
+// Symbol IDs matching the C enum
+const SYM = { RED7: 0, BLUE7: 1, AZURILL: 2, LOTAD: 3, CHERRY: 4, POWER: 5, REPLAY: 6 } as const;
 const SYM_LABELS = ['7 Red', '7 Blue', 'Azurill', 'Lotad', 'Cherry', 'Power', 'Replay'];
 const SYM_COUNT = 21;
 
-// Original reel strips (indices into SYMBOLS), 21 positions each
+// Sprite path for each symbol (1-indexed PNGs)
+const symSprite = (id: number) => `/gamecorner/slot_machine/reel_symbols/${id + 1}.png`;
+
+// Exact reel strips from pokeemerald C source
 const REEL_STRIPS: number[][] = [
-  [0, 5, 3, 4, 2, 6, 3, 5, 4, 6, 2, 3, 5, 4, 6, 1, 3, 4, 5, 2, 6], // left
-  [1, 4, 3, 5, 6, 2, 4, 3, 6, 5, 4, 2, 3, 6, 5, 0, 4, 3, 2, 6, 5], // mid
-  [2, 6, 4, 3, 5, 4, 6, 3, 2, 5, 4, 6, 3, 5, 0, 4, 6, 3, 1, 5, 4], // right
+  // LEFT_REEL
+  [0, 4, 2, 6, 5, 3, 1, 3, 4, 5, 6, 2, 0, 5, 3, 6, 2, 1, 5, 3, 6],
+  // MIDDLE_REEL
+  [0, 4, 6, 3, 2, 4, 6, 5, 5, 3, 1, 3, 6, 4, 2, 3, 6, 4, 3, 6, 4],
+  // RIGHT_REEL
+  [0, 5, 1, 6, 3, 2, 6, 3, 5, 2, 6, 3, 2, 5, 6, 3, 2, 5, 6, 3, 4],
 ];
 
 function symAt(reel: number, pos: number) {
@@ -26,7 +30,7 @@ function symAt(reel: number, pos: number) {
   return REEL_STRIPS[reel][p];
 }
 
-// Match-line definitions
+// Match-line definitions from C source
 const MATCH_LINES = [
   { name: 'Center',  rows: [1, 1, 1], color: '#FFD700', minBet: 1 },
   { name: 'Top',     rows: [0, 0, 0], color: '#FF6B6B', minBet: 2 },
@@ -35,38 +39,70 @@ const MATCH_LINES = [
   { name: 'Diag ↗',  rows: [2, 1, 0], color: '#6BFFB8', minBet: 3 },
 ];
 
-function calcLinePayout(syms: number[]): { payout: number; label: string } {
+// Digital display states
+type DigDisplay = 'INSERT' | 'STOP' | 'WIN' | 'LOSE' | 'BONUS_REG' | 'BONUS_BIG' | 'REPLAY';
+
+// Payout calculation - exact C source logic
+function getMatchResult(syms: number[]): { payout: number; label: string; display: DigDisplay } {
   const [a, b, c] = syms;
+  // All 3 same
   if (a === b && b === c) {
-    if (a === 0) return { payout: 300, label: '7 RED!' };
-    if (a === 1) return { payout: 300, label: '7 BLUE!' };
-    if (a === 2) return { payout: 12, label: 'Azurill!' };
-    if (a === 3) return { payout: 6, label: 'Lotad!' };
-    if (a === 4) return { payout: 2, label: 'Cherry!' };
-    if (a === 5) return { payout: 6, label: 'Power!' };
-    if (a === 6) return { payout: 0, label: 'REPLAY' };
+    switch (a) {
+      case SYM.RED7:   return { payout: 300, label: 'BIG BONUS!', display: 'BONUS_BIG' };
+      case SYM.BLUE7:  return { payout: 300, label: 'BIG BONUS!', display: 'BONUS_BIG' };
+      case SYM.AZURILL: return { payout: 12, label: 'Azurill!', display: 'WIN' };
+      case SYM.LOTAD:  return { payout: 6, label: 'Lotad!', display: 'WIN' };
+      case SYM.CHERRY: return { payout: 6, label: 'Cherry!', display: 'WIN' };
+      case SYM.POWER:  return { payout: 3, label: 'Power!', display: 'WIN' };
+      case SYM.REPLAY: return { payout: 0, label: 'REPLAY', display: 'REPLAY' };
+    }
   }
-  if ([a, b, c].every(s => s <= 1)) return { payout: 90, label: 'Mixed 7s!' };
-  if (a === 4) return { payout: 2, label: 'Cherry' };
-  return { payout: 0, label: '' };
+  // Mixed 7s (all are 7s but not all same)
+  if ([a, b, c].every(s => s <= SYM.BLUE7)) return { payout: 90, label: 'REG BONUS!', display: 'BONUS_REG' };
+  // Cherry on reel 1 (center)
+  if (a === SYM.CHERRY) return { payout: 2, label: 'Cherry', display: 'WIN' };
+  return { payout: 0, label: '', display: 'LOSE' };
+}
+
+// Top/Bottom cherry special check (C source: CheckMatch_TopAndBottom)
+function checkTopBotCherry(grid: number[][]): number {
+  const topLeft = grid[0][0] === SYM.CHERRY;
+  const botLeft = grid[2][0] === SYM.CHERRY;
+  if (topLeft && botLeft) return 4; // MATCH_TOPBOT_CHERRY
+  if (topLeft || botLeft) return 2; // MATCH_CHERRY
+  return 0;
 }
 
 export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
   const [bet, setBet] = useState(1);
-  const [reelPos, setReelPos] = useState([0, 7, 14]);
+  const [reelPos, setReelPos] = useState([0, 0, 0]);
   const [spinning, setSpinning] = useState(false);
   const [reelStopped, setReelStopped] = useState([true, true, true]);
-  const [message, setMessage] = useState('Insert coins and press SPIN!');
+  const [digDisplay, setDigDisplay] = useState<DigDisplay>('INSERT');
   const [lastWin, setLastWin] = useState(0);
   const [winLineIdxs, setWinLineIdxs] = useState<number[]>([]);
   const [freeSpins, setFreeSpins] = useState(0);
   const [pikaPower, setPikaPower] = useState(0);
+  const [payout, setPayout] = useState(0);
+  const [paying, setPaying] = useState(false);
   const animRef = useRef(0);
+  const payRef = useRef(0);
+
+  // Coin-by-coin payout animation (faithful to C source - 8 frame delay per coin)
+  useEffect(() => {
+    if (payout <= 0) { setPaying(false); return; }
+    setPaying(true);
+    payRef.current = window.setTimeout(() => {
+      addCoins(1);
+      setPayout(p => p - 1);
+    }, 50); // ~8 frames at 60fps
+    return () => clearTimeout(payRef.current);
+  }, [payout, addCoins]);
 
   const spin = useCallback(() => {
-    if (spinning) return;
+    if (spinning || paying) return;
     if (freeSpins <= 0 && coins < bet) {
-      setMessage('Not enough coins!');
+      setDigDisplay('INSERT');
       return;
     }
     if (freeSpins > 0) {
@@ -78,7 +114,7 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
     setSpinning(true);
     setLastWin(0);
     setWinLineIdxs([]);
-    setMessage('');
+    setDigDisplay('STOP');
     setReelStopped([false, false, false]);
 
     const targets = [
@@ -88,7 +124,7 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
     ];
 
     let frame = 0;
-    const stopFrames = [30, 42, 54];
+    const stopFrames = [30, 42, 54]; // staggered stops
     const startPos = [...reelPos];
 
     const animate = () => {
@@ -109,7 +145,7 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
         setReelStopped([true, true, true]);
         setSpinning(false);
 
-        // Build 3×3 grid: grid[row][col]
+        // Build 3×3 grid: grid[row][col] with top=pos-1, center=pos, bottom=pos+1
         const grid = [0, 1, 2].map(row =>
           [0, 1, 2].map(col => symAt(col, targets[col] + row - 1))
         );
@@ -117,17 +153,35 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
         let totalPay = 0;
         const wins: number[] = [];
         let gotReplay = false;
+        let gotPower = false;
+        let bestDisplay: DigDisplay = 'LOSE';
 
+        // Check all active match lines
         for (let li = 0; li < MATCH_LINES.length; li++) {
           if (MATCH_LINES[li].minBet > bet) continue;
           const syms = MATCH_LINES[li].rows.map((r, c) => grid[r][c]);
-          const result = calcLinePayout(syms);
+          const result = getMatchResult(syms);
           if (result.label === 'REPLAY') {
             gotReplay = true;
             wins.push(li);
           } else if (result.payout > 0) {
             totalPay += result.payout;
             wins.push(li);
+            // Priority: BONUS_BIG > BONUS_REG > WIN
+            if (result.display === 'BONUS_BIG') bestDisplay = 'BONUS_BIG';
+            else if (result.display === 'BONUS_REG' && bestDisplay !== 'BONUS_BIG') bestDisplay = 'BONUS_REG';
+            else if (result.display === 'WIN' && bestDisplay === 'LOSE') bestDisplay = 'WIN';
+          }
+          // Track Power matches
+          if (syms.every(s => s === SYM.POWER)) gotPower = true;
+        }
+
+        // Cherry top/bottom special (only at bet >= 2)
+        if (bet >= 2) {
+          const cherryBonus = checkTopBotCherry(grid);
+          if (cherryBonus > 0) {
+            totalPay += cherryBonus;
+            if (bestDisplay === 'LOSE') bestDisplay = 'WIN';
           }
         }
 
@@ -135,22 +189,30 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
 
         if (gotReplay) {
           setFreeSpins(f => f + 1);
-          setMessage('🔁 REPLAY! Free spin!');
+          setDigDisplay('REPLAY');
+        }
+
+        if (gotPower) {
           setPikaPower(pp => Math.min(16, pp + 1));
         }
+
         if (totalPay > 0) {
-          addCoins(totalPay);
           setLastWin(totalPay);
-          setMessage(`🎉 WIN ${totalPay} coins!`);
+          setPayout(totalPay);
+          if (!gotReplay) setDigDisplay(bestDisplay);
         } else if (!gotReplay) {
-          setMessage('No match...');
+          setDigDisplay('LOSE');
+          // Pika Power accumulates on losses (C source behavior)
           setPikaPower(pp => {
             const next = pp + 1;
             if (next >= 16) {
+              // Pika Power bonus - multiplied by bet
               setTimeout(() => {
-                addCoins(bet * 10);
-                setMessage('⚡ PIKA POWER! Bonus ' + (bet * 10) + ' coins!');
-              }, 300);
+                const bonus = bet * 10;
+                setPayout(bonus);
+                setLastWin(bonus);
+                setDigDisplay('WIN');
+              }, 400);
               return 0;
             }
             return next;
@@ -160,9 +222,12 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
     };
 
     animRef.current = requestAnimationFrame(animate);
-  }, [spinning, freeSpins, coins, bet, reelPos, spendCoins, addCoins]);
+  }, [spinning, paying, freeSpins, coins, bet, reelPos, spendCoins, addCoins]);
 
-  useEffect(() => () => cancelAnimationFrame(animRef.current), []);
+  useEffect(() => () => {
+    cancelAnimationFrame(animRef.current);
+    clearTimeout(payRef.current);
+  }, []);
 
   // Visible 3×3 grid
   const grid = [0, 1, 2].map(row =>
@@ -176,37 +241,63 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
     return false;
   };
 
+  // Digital display text
+  const displayText: Record<DigDisplay, string> = {
+    INSERT: 'INSERT COIN',
+    STOP: '• • STOP • •',
+    WIN: `WIN ${lastWin || payout}`,
+    LOSE: 'LOSE',
+    BONUS_REG: 'REG BONUS',
+    BONUS_BIG: 'BIG BONUS',
+    REPLAY: 'REPLAY',
+  };
+
   return (
     <div className="slot-machine">
-      <div className="slot-header">
-        <h2>🎰 Slot Machine</h2>
+      {/* Digital display panel */}
+      <div className={`slot-digital-display ${digDisplay.toLowerCase()}`}>
+        <span>{displayText[digDisplay]}</span>
+      </div>
+
+      {/* Credit / Payout / Pika Power bar */}
+      <div className="slot-info-bar">
+        <div className="slot-info-item">
+          <span className="slot-info-label">CREDIT</span>
+          <span className="slot-info-value">{coins}</span>
+        </div>
         <div className="slot-pika-power">
-          <span className="slot-pika-label">⚡ Pika Power</span>
+          <img src="/gamecorner/slot_machine/bolt.png" alt="" className="slot-pika-icon" />
           <div className="slot-pika-bar">
             {Array.from({ length: 16 }, (_, i) => (
               <div key={i} className={`slot-pika-bolt ${i < pikaPower ? 'lit' : ''}`} />
             ))}
           </div>
         </div>
+        <div className="slot-info-item">
+          <span className="slot-info-label">PAYOUT</span>
+          <span className={`slot-info-value ${payout > 0 ? 'paying' : ''}`}>{payout}</span>
+        </div>
       </div>
 
+      {/* Bet selector */}
       <div className="slot-bet-area">
         <div className="slot-bet-buttons">
           {[1, 2, 3].map(b => (
             <button
               key={b}
               className={`slot-bet-btn ${bet === b ? 'active' : ''}`}
-              onClick={() => !spinning && setBet(b)}
-              disabled={spinning}
+              onClick={() => !spinning && !paying && setBet(b)}
+              disabled={spinning || paying}
             >
-              {b} Line{b > 1 ? 's' : ''}
+              {b}
             </button>
           ))}
         </div>
-        <span className="slot-bet-cost">Cost: {bet} coin{bet > 1 ? 's' : ''}</span>
-        {freeSpins > 0 && <span className="slot-free-spins">🔁 Free: {freeSpins}</span>}
+        <span className="slot-bet-cost">BET: {bet}</span>
+        {freeSpins > 0 && <span className="slot-free-spins">FREE: {freeSpins}</span>}
       </div>
 
+      {/* Cabinet: line markers + reels + line markers */}
       <div className="slot-cabinet">
         <div className="slot-line-marks left">
           {MATCH_LINES.map((ml, i) => (
@@ -222,12 +313,6 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
         </div>
 
         <div className="slot-reels-box">
-          <div className="slot-row-labels">
-            <span className={bet >= 2 ? 'active' : ''}>TOP</span>
-            <span className="active">MID</span>
-            <span className={bet >= 2 ? 'active' : ''}>BOT</span>
-          </div>
-
           <div className="slot-reel-grid">
             {[0, 1, 2].map(row => (
               <div key={row} className={`slot-reel-row ${row === 1 ? 'center-row' : 'outer-row'}`}>
@@ -244,8 +329,12 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
                         (win ? ' win' : '')
                       }
                     >
-                      <span className="slot-sym-emoji">{SYMBOLS[sym]}</span>
-                      <span className="slot-sym-name">{SYM_LABELS[sym]}</span>
+                      <img
+                        src={symSprite(sym)}
+                        alt={SYM_LABELS[sym]}
+                        className="slot-sym-img"
+                        draggable={false}
+                      />
                     </div>
                   );
                 })}
@@ -268,32 +357,78 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
         </div>
       </div>
 
+      {/* Spin button */}
       <button
         className={`slot-spin-btn ${spinning ? 'spinning' : ''}`}
         onClick={spin}
-        disabled={spinning}
+        disabled={spinning || paying}
       >
-        {spinning ? '⏳ SPINNING...' : '🎰 SPIN'}
+        {paying ? 'PAYING...' : spinning ? 'SPINNING...' : 'SPIN'}
       </button>
 
-      <div className={`slot-message ${lastWin > 0 ? 'win' : ''}`}>{message}</div>
-
+      {/* Paytable with actual sprites */}
       <div className="slot-paytable">
         <h3>Paytable</h3>
         <div className="slot-pay-grid">
-          <div className="slot-pay-row jackpot"><span>🔴🔴🔴 or 🔵🔵🔵</span><span>300×</span></div>
-          <div className="slot-pay-row jackpot"><span>🔴🔵 Mixed 7s</span><span>90×</span></div>
-          <div className="slot-pay-row"><span>💧💧💧 Azurill</span><span>12×</span></div>
-          <div className="slot-pay-row"><span>🌿🌿🌿 Lotad</span><span>6×</span></div>
-          <div className="slot-pay-row"><span>⚡⚡⚡ Power</span><span>6×</span></div>
-          <div className="slot-pay-row"><span>🍒🍒🍒 Cherry</span><span>2×</span></div>
-          <div className="slot-pay-row"><span>🍒 on reel 1</span><span>2×</span></div>
-          <div className="slot-pay-row replay"><span>🔁🔁🔁 Replay</span><span>Free Spin</span></div>
+          <div className="slot-pay-row jackpot">
+            <span className="slot-pay-syms">
+              <img src={symSprite(0)} alt="7R" /><img src={symSprite(0)} alt="7R" /><img src={symSprite(0)} alt="7R" />
+            </span>
+            <span>300</span>
+          </div>
+          <div className="slot-pay-row jackpot">
+            <span className="slot-pay-syms">
+              <img src={symSprite(1)} alt="7B" /><img src={symSprite(1)} alt="7B" /><img src={symSprite(1)} alt="7B" />
+            </span>
+            <span>300</span>
+          </div>
+          <div className="slot-pay-row jackpot">
+            <span className="slot-pay-syms">
+              <img src={symSprite(0)} alt="7" /><img src={symSprite(1)} alt="7" /> Mixed
+            </span>
+            <span>90</span>
+          </div>
+          <div className="slot-pay-row">
+            <span className="slot-pay-syms">
+              <img src={symSprite(2)} alt="Az" /><img src={symSprite(2)} alt="Az" /><img src={symSprite(2)} alt="Az" />
+            </span>
+            <span>12</span>
+          </div>
+          <div className="slot-pay-row">
+            <span className="slot-pay-syms">
+              <img src={symSprite(3)} alt="Lo" /><img src={symSprite(3)} alt="Lo" /><img src={symSprite(3)} alt="Lo" />
+            </span>
+            <span>6</span>
+          </div>
+          <div className="slot-pay-row">
+            <span className="slot-pay-syms">
+              <img src={symSprite(4)} alt="Ch" /><img src={symSprite(4)} alt="Ch" /><img src={symSprite(4)} alt="Ch" />
+            </span>
+            <span>6</span>
+          </div>
+          <div className="slot-pay-row">
+            <span className="slot-pay-syms">
+              <img src={symSprite(5)} alt="Pw" /><img src={symSprite(5)} alt="Pw" /><img src={symSprite(5)} alt="Pw" />
+            </span>
+            <span>3</span>
+          </div>
+          <div className="slot-pay-row">
+            <span className="slot-pay-syms">
+              <img src={symSprite(4)} alt="Ch" /> on reel 1
+            </span>
+            <span>2</span>
+          </div>
+          <div className="slot-pay-row replay">
+            <span className="slot-pay-syms">
+              <img src={symSprite(6)} alt="Re" /><img src={symSprite(6)} alt="Re" /><img src={symSprite(6)} alt="Re" />
+            </span>
+            <span>Free Spin</span>
+          </div>
         </div>
         <div className="slot-line-legend">
           <span><b>Bet 1:</b> Center row</span>
-          <span><b>Bet 2:</b> + Top &amp; Bottom rows</span>
-          <span><b>Bet 3:</b> + Both diagonals</span>
+          <span><b>Bet 2:</b> + Top &amp; Bottom</span>
+          <span><b>Bet 3:</b> + Diagonals</span>
         </div>
       </div>
     </div>

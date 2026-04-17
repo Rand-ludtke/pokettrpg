@@ -1,18 +1,41 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GameProps } from './types';
 
 /*
   Gacha Machine – 4 tiers (Basic / Great / Ultra / Master).
   Higher tiers cost more but have better drop rates and exclusive prizes.
-  Inspired by pokeemerald game-corner gacha.
+  Uses Pokémon sprites from pokeemerald game corner expansion.
 */
+
+const SP = '/gamecorner/gacha/';
+
+/* 5 Pokémon sprites – each 32×128, 4 frames of 32×32 */
+const POKEMON_SPRITES = ['belossom', 'elekid', 'hoppip', 'phanpy', 'teddiursa'] as const;
+
+function PokemonSprite({ name, frame = 0, size = 48 }: { name: string; frame?: number; size?: number }) {
+  return (
+    <span style={{ display: 'inline-block', width: size, height: size, overflow: 'hidden', lineHeight: 0 }}>
+      <img
+        src={`${SP}${name}.png`}
+        alt={name}
+        style={{
+          imageRendering: 'pixelated',
+          width: size,
+          height: 'auto',
+          marginTop: -(frame * size),
+          display: 'block',
+        }}
+      />
+    </span>
+  );
+}
 
 type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary';
 
 interface Prize {
   name: string;
   rarity: Rarity;
-  emoji: string;
+  sprite: string; // one of POKEMON_SPRITES or empty for coin-icon
 }
 
 interface MachineTier {
@@ -28,74 +51,74 @@ interface MachineTier {
 
 const TIERS: MachineTier[] = [
   {
-    id: 'basic', label: 'Basic', cost: 50, color: '#aaa', icon: '⚪',
+    id: 'basic', label: 'Basic', cost: 50, color: '#aaa', icon: 'hoppip',
     rates: { legendary: 2, rare: 10, uncommon: 35, common: 100 },
     bonusCoins: { common: 0, uncommon: 0, rare: 25, legendary: 100 },
     prizes: [
-      { name: 'Potion', rarity: 'common', emoji: '🧴' },
-      { name: 'Poké Ball', rarity: 'common', emoji: '🔴' },
-      { name: 'Antidote', rarity: 'common', emoji: '💊' },
-      { name: 'Repel', rarity: 'common', emoji: '🌫️' },
-      { name: 'Berry', rarity: 'common', emoji: '🍓' },
-      { name: 'Great Ball', rarity: 'uncommon', emoji: '🔵' },
-      { name: 'Super Potion', rarity: 'uncommon', emoji: '💧' },
-      { name: 'Rare Candy', rarity: 'uncommon', emoji: '🍬' },
-      { name: 'Ultra Ball', rarity: 'rare', emoji: '🟡' },
-      { name: 'Nugget', rarity: 'rare', emoji: '🪙' },
-      { name: 'PP Up', rarity: 'legendary', emoji: '⬆️' },
+      { name: 'Potion', rarity: 'common', sprite: 'hoppip' },
+      { name: 'Poké Ball', rarity: 'common', sprite: 'hoppip' },
+      { name: 'Antidote', rarity: 'common', sprite: 'phanpy' },
+      { name: 'Repel', rarity: 'common', sprite: 'phanpy' },
+      { name: 'Berry', rarity: 'common', sprite: 'teddiursa' },
+      { name: 'Great Ball', rarity: 'uncommon', sprite: 'teddiursa' },
+      { name: 'Super Potion', rarity: 'uncommon', sprite: 'elekid' },
+      { name: 'Rare Candy', rarity: 'uncommon', sprite: 'elekid' },
+      { name: 'Ultra Ball', rarity: 'rare', sprite: 'belossom' },
+      { name: 'Nugget', rarity: 'rare', sprite: 'belossom' },
+      { name: 'PP Up', rarity: 'legendary', sprite: 'belossom' },
     ],
   },
   {
-    id: 'great', label: 'Great', cost: 250, color: '#2196F3', icon: '🔵',
+    id: 'great', label: 'Great', cost: 250, color: '#2196F3', icon: 'elekid',
     rates: { legendary: 3, rare: 15, uncommon: 45, common: 100 },
     bonusCoins: { common: 0, uncommon: 25, rare: 125, legendary: 500 },
     prizes: [
-      { name: 'Super Potion', rarity: 'common', emoji: '💧' },
-      { name: 'Great Ball', rarity: 'common', emoji: '🔵' },
-      { name: 'Revive', rarity: 'common', emoji: '💛' },
-      { name: 'Ether', rarity: 'common', emoji: '🔮' },
-      { name: 'Rare Candy', rarity: 'uncommon', emoji: '🍬' },
-      { name: 'PP Up', rarity: 'uncommon', emoji: '⬆️' },
-      { name: 'Heart Scale', rarity: 'uncommon', emoji: '💖' },
-      { name: 'TM Disc', rarity: 'rare', emoji: '💿' },
-      { name: 'Gold Nugget', rarity: 'rare', emoji: '🪙' },
-      { name: 'Lucky Egg', rarity: 'legendary', emoji: '🥚' },
-      { name: 'Leftovers', rarity: 'legendary', emoji: '🍖' },
+      { name: 'Super Potion', rarity: 'common', sprite: 'hoppip' },
+      { name: 'Great Ball', rarity: 'common', sprite: 'hoppip' },
+      { name: 'Revive', rarity: 'common', sprite: 'phanpy' },
+      { name: 'Ether', rarity: 'common', sprite: 'phanpy' },
+      { name: 'Rare Candy', rarity: 'uncommon', sprite: 'teddiursa' },
+      { name: 'PP Up', rarity: 'uncommon', sprite: 'teddiursa' },
+      { name: 'Heart Scale', rarity: 'uncommon', sprite: 'elekid' },
+      { name: 'TM Disc', rarity: 'rare', sprite: 'elekid' },
+      { name: 'Gold Nugget', rarity: 'rare', sprite: 'belossom' },
+      { name: 'Lucky Egg', rarity: 'legendary', sprite: 'belossom' },
+      { name: 'Leftovers', rarity: 'legendary', sprite: 'belossom' },
     ],
   },
   {
-    id: 'ultra', label: 'Ultra', cost: 1000, color: '#FFD700', icon: '🟡',
+    id: 'ultra', label: 'Ultra', cost: 1000, color: '#FFD700', icon: 'phanpy',
     rates: { legendary: 5, rare: 20, uncommon: 50, common: 100 },
     bonusCoins: { common: 0, uncommon: 100, rare: 500, legendary: 2000 },
     prizes: [
-      { name: 'Hyper Potion', rarity: 'common', emoji: '💧' },
-      { name: 'Ultra Ball', rarity: 'common', emoji: '🟡' },
-      { name: 'Max Revive', rarity: 'common', emoji: '💛' },
-      { name: 'Elixir', rarity: 'uncommon', emoji: '🔮' },
-      { name: 'Bottle Cap', rarity: 'uncommon', emoji: '🧢' },
-      { name: 'Ability Capsule', rarity: 'uncommon', emoji: '💊' },
-      { name: 'Choice Band', rarity: 'rare', emoji: '🎗️' },
-      { name: 'Life Orb', rarity: 'rare', emoji: '🔴' },
-      { name: 'Sacred Ash', rarity: 'legendary', emoji: '✨' },
-      { name: 'Master Ball', rarity: 'legendary', emoji: '🟣' },
+      { name: 'Hyper Potion', rarity: 'common', sprite: 'hoppip' },
+      { name: 'Ultra Ball', rarity: 'common', sprite: 'phanpy' },
+      { name: 'Max Revive', rarity: 'common', sprite: 'phanpy' },
+      { name: 'Elixir', rarity: 'uncommon', sprite: 'teddiursa' },
+      { name: 'Bottle Cap', rarity: 'uncommon', sprite: 'teddiursa' },
+      { name: 'Ability Capsule', rarity: 'uncommon', sprite: 'elekid' },
+      { name: 'Choice Band', rarity: 'rare', sprite: 'elekid' },
+      { name: 'Life Orb', rarity: 'rare', sprite: 'belossom' },
+      { name: 'Sacred Ash', rarity: 'legendary', sprite: 'belossom' },
+      { name: 'Master Ball', rarity: 'legendary', sprite: 'belossom' },
     ],
   },
   {
-    id: 'master', label: 'Master', cost: 4500, color: '#9C27B0', icon: '🟣',
+    id: 'master', label: 'Master', cost: 4500, color: '#9C27B0', icon: 'belossom',
     rates: { legendary: 10, rare: 30, uncommon: 60, common: 100 },
     bonusCoins: { common: 0, uncommon: 500, rare: 2250, legendary: 9000 },
     prizes: [
-      { name: 'Max Elixir', rarity: 'common', emoji: '🔮' },
-      { name: 'Bottle Cap', rarity: 'common', emoji: '🧢' },
-      { name: 'Gold Bottle Cap', rarity: 'uncommon', emoji: '👑' },
-      { name: 'Ability Patch', rarity: 'uncommon', emoji: '🩹' },
-      { name: 'Focus Sash', rarity: 'uncommon', emoji: '🎀' },
-      { name: 'Choice Specs', rarity: 'rare', emoji: '👓' },
-      { name: 'Assault Vest', rarity: 'rare', emoji: '🦺' },
-      { name: 'Shiny Charm', rarity: 'rare', emoji: '💎' },
-      { name: 'Master Ball', rarity: 'legendary', emoji: '🟣' },
-      { name: 'Sacred Ash', rarity: 'legendary', emoji: '✨' },
-      { name: 'Enigma Berry', rarity: 'legendary', emoji: '🫐' },
+      { name: 'Max Elixir', rarity: 'common', sprite: 'hoppip' },
+      { name: 'Bottle Cap', rarity: 'common', sprite: 'phanpy' },
+      { name: 'Gold Bottle Cap', rarity: 'uncommon', sprite: 'teddiursa' },
+      { name: 'Ability Patch', rarity: 'uncommon', sprite: 'elekid' },
+      { name: 'Focus Sash', rarity: 'uncommon', sprite: 'elekid' },
+      { name: 'Choice Specs', rarity: 'rare', sprite: 'belossom' },
+      { name: 'Assault Vest', rarity: 'rare', sprite: 'belossom' },
+      { name: 'Shiny Charm', rarity: 'rare', sprite: 'belossom' },
+      { name: 'Master Ball', rarity: 'legendary', sprite: 'belossom' },
+      { name: 'Sacred Ash', rarity: 'legendary', sprite: 'belossom' },
+      { name: 'Enigma Berry', rarity: 'legendary', sprite: 'belossom' },
     ],
   },
 ];
@@ -124,8 +147,16 @@ export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
   const [result, setResult] = useState<Prize | null>(null);
   const [history, setHistory] = useState<Prize[]>([]);
   const [message, setMessage] = useState('Select a machine tier and pull!');
+  const [animFrame, setAnimFrame] = useState(0);
 
   const tier = TIERS[tierIdx];
+
+  // Animate pulled sprite
+  useEffect(() => {
+    if (!result) return;
+    const id = setInterval(() => setAnimFrame(f => f + 1), 250);
+    return () => clearInterval(id);
+  }, [result]);
 
   const pull = useCallback(() => {
     if (pulling) return;
@@ -141,17 +172,18 @@ export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
       setResult(prize);
       setHistory(prev => [prize, ...prev].slice(0, 30));
       setPulling(false);
+      setAnimFrame(0);
 
       const bonus = tier.bonusCoins[prize.rarity];
       if (bonus > 0) addCoins(bonus);
       const bonusMsg = bonus > 0 ? ` (+${bonus} bonus coins!)` : '';
-      setMessage(`You got: ${prize.emoji} ${prize.name} (${prize.rarity})!${bonusMsg}`);
+      setMessage(`You got: ${prize.name} (${prize.rarity})!${bonusMsg}`);
     }, delay);
   }, [pulling, coins, tier, tierIdx, spendCoins, addCoins]);
 
   return (
     <div className="gacha-machine">
-      <h2>🎲 Gacha Machine</h2>
+      <h2>Gacha Machine</h2>
 
       {/* Tier selector */}
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', margin: '12px 0', flexWrap: 'wrap' }}>
@@ -160,22 +192,25 @@ export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
             onClick={() => { setTierIdx(i); setResult(null); setMessage(`${t.label} Machine – ${t.cost} coins per pull`); }}
             disabled={pulling}
             style={{
-              padding: '8px 16px', border: `2px solid ${t.color}`,
+              padding: '6px 12px', border: `2px solid ${t.color}`,
               background: tierIdx === i ? t.color : 'transparent',
               color: tierIdx === i ? '#fff' : 'var(--fg)',
               borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 14,
               opacity: pulling ? 0.5 : 1,
               transition: 'all 0.2s',
+              display: 'flex', alignItems: 'center', gap: 4,
             }}
           >
-            {t.icon} {t.label} ({t.cost}c)
+            <PokemonSprite name={t.icon} frame={0} size={24} /> {t.label} ({t.cost}c)
           </button>
         ))}
       </div>
 
-      {/* Rates display */}
-      <div style={{ fontSize: 11, opacity: 0.6, margin: '0 0 8px' }}>
-        Drop rates: ⭐ {tier.rates.uncommon - tier.rates.rare}% | 💎 {tier.rates.rare - tier.rates.legendary}% | 👑 {tier.rates.legendary}%
+      {/* Machine backdrop */}
+      <div className="gacha-backdrop">
+        <img src={`${SP}bg_left.png`} alt="" className="gacha-bg-piece" />
+        <img src={`${SP}bg_middle.png`} alt="" className="gacha-bg-piece" />
+        <img src={`${SP}bg_right.png`} alt="" className="gacha-bg-piece" />
       </div>
 
       <div className="gacha-capsule-area">
@@ -183,7 +218,7 @@ export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
              style={{ borderColor: pulling ? tier.color : undefined }}>
           {result ? (
             <div className="gacha-reveal">
-              <span className="gacha-emoji">{result.emoji}</span>
+              <PokemonSprite name={result.sprite} frame={animFrame % 4} size={64} />
               <span className="gacha-name" style={{ color: RARITY_COLORS[result.rarity] }}>{result.name}</span>
               <span className="gacha-rarity" style={{ color: RARITY_COLORS[result.rarity] }}>{result.rarity.toUpperCase()}</span>
               {tier.bonusCoins[result.rarity] > 0 && (
@@ -208,7 +243,7 @@ export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
           <div className="gacha-history-list">
             {history.map((p, i) => (
               <span key={i} className="gacha-history-item" style={{ borderColor: RARITY_COLORS[p.rarity] }} title={`${p.name} (${p.rarity})`}>
-                {p.emoji}
+                <PokemonSprite name={p.sprite} frame={0} size={28} />
               </span>
             ))}
           </div>
@@ -216,7 +251,7 @@ export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
       )}
 
       <div className="gacha-rates dim">
-        Drop rates: Common 60% · Uncommon 25% · Rare 12% (+25🪙) · Legendary 3% (+100🪙)
+        Drop rates vary by tier. Higher tiers = better odds for rare pulls + bonus coins.
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ const POCKETS = 12;
 const COLORS = ['#e74c3c', '#2c3e50', '#e74c3c', '#2c3e50', '#e74c3c', '#2c3e50',
                 '#e74c3c', '#2c3e50', '#e74c3c', '#2c3e50', '#e74c3c', '#2c3e50'];
 const POCKET_LABELS = ['1','2','3','4','5','6','7','8','9','10','11','12'];
-const EMOJIS = ['🔥','💧','🔥','💧','🔥','💧','🔥','💧','🔥','💧','🔥','💧'];
+const EMOJIS = ['F','W','F','W','F','W','F','W','F','W','F','W'];
 
 type BetType = 'number' | 'red' | 'black' | 'odd' | 'even' | 'high' | 'low';
 
@@ -21,8 +21,8 @@ interface Bet {
 }
 
 const BET_OPTIONS: { type: BetType; label: string; payout: number; desc: string }[] = [
-  { type: 'red', label: '🔥 Red', payout: 2, desc: '2×' },
-  { type: 'black', label: '💧 Black', payout: 2, desc: '2×' },
+  { type: 'red', label: 'Fire (Red)', payout: 2, desc: '2×' },
+  { type: 'black', label: 'Water (Black)', payout: 2, desc: '2×' },
   { type: 'odd', label: 'Odd', payout: 2, desc: '2×' },
   { type: 'even', label: 'Even', payout: 2, desc: '2×' },
   { type: 'low', label: '1-6', payout: 2, desc: '2×' },
@@ -110,12 +110,13 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
         ctx.fillText(POCKET_LABELS[i], 0, 0);
         ctx.restore();
 
-        // Emoji in inner ring
+        // Type symbol in inner ring
         const ex = CX + Math.cos(midA) * (OUTER_R * 0.45);
         const ey = CY + Math.sin(midA) * (OUTER_R * 0.45);
-        ctx.font = '16px sans-serif';
+        ctx.font = 'bold 14px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        ctx.fillStyle = i % 2 === 0 ? '#ff8' : '#8ef';
         ctx.fillText(EMOJIS[i], ex, ey);
       }
 
@@ -196,7 +197,7 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
         if (won) {
           const payout = getPayout(bet);
           addCoins(payout);
-          setMessage(`🎉 Landed on ${winPocket + 1}! You won ${payout} coins!`);
+          setMessage(`Landed on ${winPocket + 1}! You won ${payout} coins!`);
         } else {
           setMessage(`Landed on ${winPocket + 1}. Better luck next time!`);
         }
@@ -208,7 +209,7 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
 
   return (
     <div className="roulette" style={{ textAlign: 'center' }}>
-      <h2>🎡 Roulette</h2>
+      <h2>Roulette</h2>
 
       <canvas
         ref={canvasRef}
