@@ -444,7 +444,7 @@ export function App() {
           <button className={tab === 'sheet' ? 'active' : ''} onClick={() => setTab('sheet')}>Character</button>
           <button className={tab === 'rules' ? 'active' : ''} onClick={() => setTab('rules')}>Rules</button>
           <button className={tab === 'badges' ? 'active' : ''} onClick={() => setTab('badges')}>Badges</button>
-          <button className={tab === 'gamble' ? 'active' : ''} onClick={() => setTab('gamble')}>Game Corner</button>
+          <button className={tab === 'gamble' ? 'active' : ''} onClick={() => setTab('gamble')}>Gamble???</button>
           {extraTabs.map(t => (
             <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
               <button className={(typeof tab === 'object' && (tab as any).id === t.id) ? 'active' : ''} onClick={() => setTab(t)}>{t.title}</button>

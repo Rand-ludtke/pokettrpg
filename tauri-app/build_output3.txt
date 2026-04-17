@@ -1,0 +1,132 @@
+
+> pokettrpg@1.3.0 tauri:build
+> tauri build
+
+        Info Looking up installed tauri packages to check mismatched versions...
+     Running beforeBuildCommand `npm run build:tauri`
+
+> pokettrpg@1.3.0 build:tauri
+> tsc -b && vite build --mode tauri
+
+[36mvite v7.3.1 [32mbuilding client environment for tauri...[36m[39m
+transforming...
+[32mΓ£ô[39m 94 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.58 kB[22m[1m[22m[2m Γöé gzip:   0.34 kB[22m
+[2mdist/[22m[35massets/index-Dkyn6U78.css  [39m[1m[2m 74.99 kB[22m[1m[22m[2m Γöé gzip:  13.77 kB[22m
+[2mdist/[22m[36massets/index-B-7510i8.js   [39m[1m[33m610.17 kB[39m[22m[2m Γöé gzip: 173.52 kB[22m
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[32mΓ£ô built in 1m 56s[39m
+   Compiling app v0.1.0 (D:\GitHub\pokettrpg\tauri-app\src-tauri)
+warning: methods `base_filename` and `has_variants` are never used
+  --> src\sync\state.rs:56:12
+   |
+42 | impl FusionSprite {
+   | ----------------- methods in this implementation
+...
+56 |     pub fn base_filename(&self) -> String {
+   |            ^^^^^^^^^^^^^
+...
+61 |     pub fn has_variants(&self) -> bool {
+   |            ^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: associated function `new` is never used
+  --> src\sync\state.rs:90:12
+   |
+89 | impl BattleState {
+   | ---------------- associated function in this implementation
+90 |     pub fn new(room_id: String) -> Self {
+   |            ^^^
+
+warning: fields `rooms`, `battles`, and `last_sync_timestamp` are never read
+   --> src\sync\state.rs:125:9
+    |
+115 | pub struct GameState {
+    |            --------- fields in this struct
+...
+125 |     pub rooms: HashMap<String, RoomInfo>,
+    |         ^^^^^
+126 |     /// Active battle states
+127 |     pub battles: HashMap<String, BattleState>,
+    |         ^^^^^^^
+...
+133 |     pub last_sync_timestamp: u64,
+    |         ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `GameState` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `update_battle` is never used
+   --> src\sync\state.rs:191:12
+    |
+136 | impl GameState {
+    | -------------- method in this implementation
+...
+191 |     pub fn update_battle(&mut self, room_id: &str, update: BattleState) {
+    |            ^^^^^^^^^^^^^
+
+warning: methods `get_base_sprite`, `has_fusion`, `sprite_count`, and `list_fusions` are never used
+   --> src\sync\fusion.rs:142:12
+    |
+42  | impl FusionSpriteIndex {
+    | ---------------------- methods in this implementation
+...
+142 |     pub fn get_base_sprite(&self, head_id: u32, body_id: u32) -> Option<&FusionSpriteInfo> {
+    |            ^^^^^^^^^^^^^^^
+...
+149 |     pub fn has_fusion(&self, head_id: u32, body_id: u32) -> bool {
+    |            ^^^^^^^^^^
+...
+160 |     pub fn sprite_count(&self) -> usize {
+    |            ^^^^^^^^^^^^
+...
+165 |     pub fn list_fusions(&self) -> Vec<(u32, u32)> {
+    |            ^^^^^^^^^^^^
+
+warning: field `remote_base` is never read
+   --> src\sync\fusion.rs:183:9
+    |
+181 | pub struct SpriteUrlBuilder {
+    |            ---------------- field in this struct
+182 |     /// Base URL for remote sprites
+183 |     pub remote_base: String,
+    |         ^^^^^^^^^^^
+    |
+    = note: `SpriteUrlBuilder` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: method `build_remote_url` is never used
+   --> src\sync\fusion.rs:211:12
+    |
+197 | impl SpriteUrlBuilder {
+    | --------------------- method in this implementation
+...
+211 |     pub fn build_remote_url(&self, head_id: u32, body_id: u32, variant: Option<&str>) -> String {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: method `total` is never used
+   --> src\sync\fusion.rs:284:12
+    |
+263 | impl FusionStats {
+    | ---------------- method in this implementation
+...
+284 |     pub fn total(&self) -> u32 {
+    |            ^^^^^
+
+warning: `app` (bin "app") generated 8 warnings
+    Finished `release` profile [optimized] target(s) in 5m 01s
+       Built application at: D:\GitHub\pokettrpg\tauri-app\src-tauri\target\release\app.exe
+        Info Patching binary "D:\\GitHub\\pokettrpg\\tauri-app\\src-tauri\\target\\release\\app.exe" for type nsis
+        Info Target: x64
+     Running makensis to produce D:\GitHub\pokettrpg\tauri-app\src-tauri\target\release\bundle\nsis\pokettrpg_1.3.0_x64-setup.exe
+
+Internal compiler error #12345: error creating mmap the size of 616663970.
+
+Note: you may have one or two (large) stale temporary file(s) left in your temporary directory (Generally this only happens on Windows 9x).
+failed to bundle project `The system cannot find the file specified. (os error 2)`
+       Error failed to bundle project `The system cannot find the file specified. (os error 2)`
