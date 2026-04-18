@@ -1,17 +1,99 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { GameProps } from './types';
 
-/*
-  Voltorb Flip – 5×5 grid. Each tile is 1, 2, 3, or Voltorb (0).
-  Row/column info shows sum + voltorb count.
-  Flipping multipliers multiply current winnings. Hitting voltorb = lose current round.
-  Level progression: winning advances level, losing resets to level based on max flipped.
-  Uses sprites from pokeemerald game corner expansion.
-*/
-
 const VF_SP = '/gamecorner/voltorbflip/';
+const BOARD_WIDTH = 5;
+const BOARD_HEIGHT = 5;
+const MAX_LEVEL = 8;
 
-/* Voltorb icon – CSS-styled to match GBA aesthetic */
+type CursorMode = 'flip' | '1' | '2' | '3' | 'voltorb';
+type GameState = 'playing' | 'won' | 'lost';
+
+interface Tile {
+  value: number;
+  flipped: boolean;
+  note1: boolean;
+  note2: boolean;
+  note3: boolean;
+  noteVoltorb: boolean;
+}
+
+interface BoardInfo {
+  sum: number;
+  voltorbs: number;
+}
+
+interface BoardState {
+  tiles: Tile[][];
+  rowInfo: BoardInfo[];
+  colInfo: BoardInfo[];
+}
+
+interface SpawnCounts {
+  x2Count: number;
+  x3Count: number;
+  voltorbCount: number;
+}
+
+const SPAWN_TABLE: SpawnCounts[][] = [
+  [
+    { x2Count: 3, x3Count: 1, voltorbCount: 6 },
+    { x2Count: 0, x3Count: 3, voltorbCount: 6 },
+    { x2Count: 5, x3Count: 0, voltorbCount: 6 },
+    { x2Count: 2, x3Count: 2, voltorbCount: 6 },
+    { x2Count: 4, x3Count: 1, voltorbCount: 6 },
+  ],
+  [
+    { x2Count: 1, x3Count: 3, voltorbCount: 7 },
+    { x2Count: 6, x3Count: 0, voltorbCount: 7 },
+    { x2Count: 3, x3Count: 2, voltorbCount: 7 },
+    { x2Count: 0, x3Count: 4, voltorbCount: 7 },
+    { x2Count: 5, x3Count: 1, voltorbCount: 7 },
+  ],
+  [
+    { x2Count: 2, x3Count: 3, voltorbCount: 8 },
+    { x2Count: 7, x3Count: 0, voltorbCount: 8 },
+    { x2Count: 4, x3Count: 2, voltorbCount: 8 },
+    { x2Count: 1, x3Count: 4, voltorbCount: 8 },
+    { x2Count: 6, x3Count: 1, voltorbCount: 8 },
+  ],
+  [
+    { x2Count: 3, x3Count: 3, voltorbCount: 8 },
+    { x2Count: 0, x3Count: 5, voltorbCount: 8 },
+    { x2Count: 8, x3Count: 0, voltorbCount: 10 },
+    { x2Count: 5, x3Count: 2, voltorbCount: 10 },
+    { x2Count: 2, x3Count: 4, voltorbCount: 10 },
+  ],
+  [
+    { x2Count: 7, x3Count: 1, voltorbCount: 10 },
+    { x2Count: 4, x3Count: 3, voltorbCount: 10 },
+    { x2Count: 1, x3Count: 5, voltorbCount: 10 },
+    { x2Count: 9, x3Count: 0, voltorbCount: 10 },
+    { x2Count: 6, x3Count: 2, voltorbCount: 10 },
+  ],
+  [
+    { x2Count: 3, x3Count: 4, voltorbCount: 10 },
+    { x2Count: 0, x3Count: 6, voltorbCount: 10 },
+    { x2Count: 8, x3Count: 1, voltorbCount: 10 },
+    { x2Count: 5, x3Count: 3, voltorbCount: 10 },
+    { x2Count: 2, x3Count: 5, voltorbCount: 10 },
+  ],
+  [
+    { x2Count: 7, x3Count: 2, voltorbCount: 10 },
+    { x2Count: 4, x3Count: 4, voltorbCount: 10 },
+    { x2Count: 1, x3Count: 6, voltorbCount: 10 },
+    { x2Count: 9, x3Count: 1, voltorbCount: 10 },
+    { x2Count: 6, x3Count: 3, voltorbCount: 10 },
+  ],
+  [
+    { x2Count: 0, x3Count: 7, voltorbCount: 10 },
+    { x2Count: 8, x3Count: 2, voltorbCount: 10 },
+    { x2Count: 5, x3Count: 4, voltorbCount: 10 },
+    { x2Count: 2, x3Count: 6, voltorbCount: 10 },
+    { x2Count: 7, x3Count: 3, voltorbCount: 10 },
+  ],
+];
+
 function VoltorbIcon({ size = 16 }: { size?: number }) {
   return (
     <span
@@ -23,188 +105,241 @@ function VoltorbIcon({ size = 16 }: { size?: number }) {
         alt="V"
         style={{
           imageRendering: 'pixelated',
-          width: 16 * 3,
-          height: 56 * 3 / 16 * 16,
+          width: 48,
+          height: 48,
           objectFit: 'none',
-          objectPosition: `-${3 * 32}px -${3 * 8}px`,
-          transform: `scale(${size / (16 * 3)})`,
+          objectPosition: '-96px -24px',
+          transform: `scale(${size / 48})`,
           transformOrigin: 'top left',
           display: 'block',
-          clip: `rect(0, ${16 * 3}px, ${16 * 3}px, 0)`,
+          clip: 'rect(0, 48px, 48px, 0)',
         }}
       />
     </span>
   );
 }
 
-/* Memo marker from sprites.png (frame 2 = yellow arrow at y=64) */
-function MemoMark() {
-  return (
-    <span className="vf-memo-mark" style={{ display: 'inline-flex', width: 28, height: 28, overflow: 'hidden', justifyContent: 'center', alignItems: 'flex-start' }}>
-      <img
-        src={`${VF_SP}sprites.png`}
-        alt="M"
-        style={{
-          imageRendering: 'pixelated',
-          width: 28,
-          height: 'auto',
-          marginTop: -28 * 2,
-          display: 'block',
-        }}
-      />
-    </span>
-  );
+function createTile(value = 1): Tile {
+  return {
+    value,
+    flipped: false,
+    note1: false,
+    note2: false,
+    note3: false,
+    noteVoltorb: false,
+  };
 }
 
-interface Tile {
-  value: number; // 0=voltorb, 1, 2, 3
-  flipped: boolean;
-  marked: boolean; // player note
-}
-
-interface BoardInfo { sum: number; voltorbs: number; }
-
-const LEVEL_CONFIGS: { twos: number; threes: number; voltorbs: number }[] = [
-  { twos: 3, threes: 1, voltorbs: 6 },  // Level 1
-  { twos: 1, threes: 3, voltorbs: 7 },  // Level 2
-  { twos: 2, threes: 3, voltorbs: 7 },  // Level 3
-  { twos: 3, threes: 3, voltorbs: 8 },  // Level 4
-  { twos: 1, threes: 4, voltorbs: 8 },  // Level 5
-  { twos: 2, threes: 4, voltorbs: 10 }, // Level 6
-  { twos: 3, threes: 4, voltorbs: 10 }, // Level 7
-  { twos: 4, threes: 4, voltorbs: 10 }, // Level 8
-];
-
-function generateBoard(level: number): { tiles: Tile[][]; rowInfo: BoardInfo[]; colInfo: BoardInfo[] } {
-  const cfg = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
-  const values: number[] = [];
-
-  // Place special tiles
-  for (let i = 0; i < cfg.threes; i++) values.push(3);
-  for (let i = 0; i < cfg.twos; i++) values.push(2);
-  for (let i = 0; i < cfg.voltorbs; i++) values.push(0);
-  // Fill rest with 1s
-  while (values.length < 25) values.push(1);
-
-  // Shuffle
-  for (let i = values.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [values[i], values[j]] = [values[j], values[i]];
-  }
-
-  const tiles: Tile[][] = [];
-  for (let r = 0; r < 5; r++) {
-    tiles.push([]);
-    for (let c = 0; c < 5; c++) {
-      tiles[r].push({ value: values[r * 5 + c], flipped: false, marked: false });
-    }
-  }
-
-  const rowInfo = tiles.map(row => ({
-    sum: row.reduce((s, t) => s + t.value, 0),
-    voltorbs: row.filter(t => t.value === 0).length,
+function computeBoardInfo(tiles: Tile[][]): Pick<BoardState, 'rowInfo' | 'colInfo'> {
+  const rowInfo = tiles.map((row) => ({
+    sum: row.reduce((total, tile) => total + tile.value, 0),
+    voltorbs: row.filter((tile) => tile.value === 0).length,
   }));
 
-  const colInfo: BoardInfo[] = [];
-  for (let c = 0; c < 5; c++) {
-    let sum = 0, voltorbs = 0;
-    for (let r = 0; r < 5; r++) {
-      sum += tiles[r][c].value;
-      if (tiles[r][c].value === 0) voltorbs++;
+  const colInfo = Array.from({ length: BOARD_WIDTH }, (_, column) => {
+    let sum = 0;
+    let voltorbs = 0;
+    for (let row = 0; row < BOARD_HEIGHT; row++) {
+      sum += tiles[row][column].value;
+      if (tiles[row][column].value === 0) voltorbs++;
     }
-    colInfo.push({ sum, voltorbs });
-  }
+    return { sum, voltorbs };
+  });
 
-  return { tiles, rowInfo, colInfo };
+  return { rowInfo, colInfo };
 }
 
-export function VoltorbFlip({ coins, addCoins, spendCoins }: GameProps) {
-  const [level, setLevel] = useState(1);
-  const [board, setBoard] = useState(() => generateBoard(1));
-  const [multiplier, setMultiplier] = useState(1);
-  const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
-  const [message, setMessage] = useState(`Level ${1} — Flip tiles to multiply your coins!`);
-  const [revealAll, setRevealAll] = useState(false);
+function generateBoard(level: number): BoardState {
+  const levelIndex = Math.max(0, Math.min(MAX_LEVEL - 1, level - 1));
+  const variants = SPAWN_TABLE[levelIndex];
+  const variant = variants[Math.floor(Math.random() * variants.length)];
+  const values = new Array(BOARD_WIDTH * BOARD_HEIGHT).fill(1);
 
-  const totalMultiplierTiles = board.tiles.flat().filter(t => t.value >= 2).length;
-  const flippedMultiplierTiles = board.tiles.flat().filter(t => t.value >= 2 && t.flipped).length;
-
-  const flipTile = useCallback((r: number, c: number) => {
-    if (gameState !== 'playing') return;
-    const tile = board.tiles[r][c];
-    if (tile.flipped) return;
-
-    const newTiles = board.tiles.map(row => row.map(t => ({ ...t })));
-    newTiles[r][c].flipped = true;
-
-    if (tile.value === 0) {
-      // Hit Voltorb!
-      setRevealAll(true);
-      setGameState('lost');
-      const nextLevel = Math.max(1, Math.min(level, Math.max(1, flippedMultiplierTiles)));
-      setMessage(`Voltorb! You lose your winnings. Dropping to level ${nextLevel}.`);
-      setLevel(nextLevel);
-    } else {
-      const newMult = multiplier * tile.value;
-      setMultiplier(newMult);
-
-      // Check if all multiplier tiles flipped
-      const newFlippedMult = newTiles.flat().filter(t => t.value >= 2 && t.flipped).length;
-      if (newFlippedMult === totalMultiplierTiles) {
-        // Won the round!
-        addCoins(newMult);
-        setRevealAll(true);
-        setGameState('won');
-        const nextLevel = Math.min(level + 1, LEVEL_CONFIGS.length);
-        setMessage(`Round clear! Won ${newMult} coins! Advancing to level ${nextLevel}.`);
-        setLevel(nextLevel);
-      } else {
-        setMessage(`Multiplier: ×${newMult} — Keep going or collect!`);
+  const placeValue = (value: number, count: number) => {
+    let placed = 0;
+    while (placed < count) {
+      const index = Math.floor(Math.random() * values.length);
+      if (values[index] === 1) {
+        values[index] = value;
+        placed++;
       }
     }
+  };
 
-    setBoard({ ...board, tiles: newTiles });
-  }, [board, gameState, multiplier, level, flippedMultiplierTiles, totalMultiplierTiles, addCoins]);
+  placeValue(0, variant.voltorbCount);
+  placeValue(2, variant.x2Count);
+  placeValue(3, variant.x3Count);
 
-  const toggleMark = useCallback((r: number, c: number, e: React.MouseEvent) => {
-    e.preventDefault();
+  const tiles = Array.from({ length: BOARD_HEIGHT }, (_, row) =>
+    Array.from({ length: BOARD_WIDTH }, (_, column) => createTile(values[row * BOARD_WIDTH + column]))
+  );
+
+  return { tiles, ...computeBoardInfo(tiles) };
+}
+
+function calculateBoardState(tiles: Tile[][]): GameState | 'playing' {
+  let inProgress = false;
+
+  for (const row of tiles) {
+    for (const tile of row) {
+      if (tile.flipped) {
+        if (tile.value === 0) return 'lost';
+      } else if (tile.value === 2 || tile.value === 3) {
+        inProgress = true;
+      }
+    }
+  }
+
+  return inProgress ? 'playing' : 'won';
+}
+
+function revealAllTiles(tiles: Tile[][]): Tile[][] {
+  return tiles.map((row) => row.map((tile) => ({ ...tile, flipped: true })));
+}
+
+function NoteGrid({ tile }: { tile: Tile }) {
+  const hasNotes = tile.note1 || tile.note2 || tile.note3 || tile.noteVoltorb;
+  if (!hasNotes) return <span className="vf-hidden-fill" />;
+
+  return (
+    <span className="vf-note-grid">
+      <span className={`vf-note ${tile.note1 ? 'active' : ''}`}>1</span>
+      <span className={`vf-note ${tile.note2 ? 'active' : ''}`}>2</span>
+      <span className={`vf-note ${tile.note3 ? 'active' : ''}`}>3</span>
+      <span className={`vf-note ${tile.noteVoltorb ? 'active vf-note-voltorb' : ''}`}>V</span>
+    </span>
+  );
+}
+
+export function VoltorbFlip({ addCoins }: GameProps) {
+  const [currentLevel, setCurrentLevel] = useState(1);
+  const [nextLevel, setNextLevel] = useState(1);
+  const [board, setBoard] = useState<BoardState>(() => generateBoard(1));
+  const [cursorMode, setCursorMode] = useState<CursorMode>('flip');
+  const [gameState, setGameState] = useState<GameState>('playing');
+  const [sessionWinnings, setSessionWinnings] = useState(0);
+  const [roundWinnings, setRoundWinnings] = useState(0);
+  const [message, setMessage] = useState('Level 1. Clear every hidden 2 and 3 tile to win.');
+
+  const displayedWinnings = useMemo(() => sessionWinnings + roundWinnings, [sessionWinnings, roundWinnings]);
+
+  const applyMode = useCallback((tile: Tile, mode: CursorMode): Tile => {
+    if (mode === 'flip') return { ...tile, flipped: true };
+    if (mode === '1') return { ...tile, note1: !tile.note1 };
+    if (mode === '2') return { ...tile, note2: !tile.note2 };
+    if (mode === '3') return { ...tile, note3: !tile.note3 };
+    return { ...tile, noteVoltorb: !tile.noteVoltorb };
+  }, []);
+
+  const handleTileAction = useCallback((rowIndex: number, columnIndex: number) => {
     if (gameState !== 'playing') return;
-    const tile = board.tiles[r][c];
-    if (tile.flipped) return;
-    const newTiles = board.tiles.map(row => row.map(t => ({ ...t })));
-    newTiles[r][c].marked = !newTiles[r][c].marked;
-    setBoard({ ...board, tiles: newTiles });
-  }, [board, gameState]);
 
-  const collect = useCallback(() => {
-    if (gameState !== 'playing' || multiplier <= 1) return;
-    addCoins(multiplier);
-    setRevealAll(true);
-    setGameState('won');
-    setMessage(`Collected ${multiplier} coins!`);
-  }, [gameState, multiplier, addCoins]);
+    const currentTile = board.tiles[rowIndex][columnIndex];
+    if (currentTile.flipped) return;
 
-  const newRound = useCallback(() => {
-    const b = generateBoard(level);
-    setBoard(b);
-    setMultiplier(1);
+    const nextTiles = board.tiles.map((row) => row.map((tile) => ({ ...tile })));
+    nextTiles[rowIndex][columnIndex] = applyMode(nextTiles[rowIndex][columnIndex], cursorMode);
+
+    if (cursorMode !== 'flip') {
+      setBoard({ tiles: nextTiles, ...computeBoardInfo(nextTiles) });
+      return;
+    }
+
+    const revealedTile = nextTiles[rowIndex][columnIndex];
+    let updatedRoundWinnings = roundWinnings;
+
+    if (revealedTile.value === 0) {
+      setBoard({ tiles: revealAllTiles(nextTiles), ...computeBoardInfo(nextTiles) });
+      setRoundWinnings(0);
+      setSessionWinnings(0);
+      setGameState('lost');
+      setCurrentLevel(1);
+      setNextLevel(1);
+      setMessage('Voltorb hit. Session winnings lost and the board resets to level 1.');
+      return;
+    }
+
+    if (updatedRoundWinnings === 0) {
+      updatedRoundWinnings = revealedTile.value;
+    } else if (revealedTile.value > 1) {
+      updatedRoundWinnings *= revealedTile.value;
+    }
+
+    const resolvedState = calculateBoardState(nextTiles);
+    if (resolvedState === 'won') {
+      const totalSession = sessionWinnings + updatedRoundWinnings;
+      const advancedLevel = Math.min(MAX_LEVEL, currentLevel + 1);
+      setBoard({ tiles: revealAllTiles(nextTiles), ...computeBoardInfo(nextTiles) });
+      setRoundWinnings(0);
+      setSessionWinnings(totalSession);
+      setGameState('won');
+      setNextLevel(advancedLevel);
+      setMessage(`Board clear. Session winnings are ${totalSession}. Continue to level ${advancedLevel} or cash out.`);
+      return;
+    }
+
+    setRoundWinnings(updatedRoundWinnings);
+    setBoard({ tiles: nextTiles, ...computeBoardInfo(nextTiles) });
+    setMessage(`Current round winnings: ${updatedRoundWinnings}. Reveal all hidden 2 and 3 tiles to clear the board.`);
+  }, [applyMode, board.tiles, currentLevel, cursorMode, gameState, roundWinnings, sessionWinnings]);
+
+  const startBoard = useCallback((level: number, winnings: number) => {
+    setBoard(generateBoard(level));
+    setCurrentLevel(level);
+    setNextLevel(level);
+    setRoundWinnings(0);
+    setSessionWinnings(winnings);
     setGameState('playing');
-    setRevealAll(false);
-    setMessage(`Level ${level} — Flip tiles to multiply your coins!`);
-  }, [level]);
+    setCursorMode('flip');
+    setMessage(`Level ${level}. Clear every hidden 2 and 3 tile to win.`);
+  }, []);
+
+  const continueSession = useCallback(() => {
+    startBoard(nextLevel, sessionWinnings);
+  }, [nextLevel, sessionWinnings, startBoard]);
+
+  const startNewSession = useCallback(() => {
+    startBoard(1, 0);
+  }, [startBoard]);
+
+  const cashOut = useCallback(() => {
+    if (sessionWinnings <= 0) return;
+    const winnings = sessionWinnings;
+    addCoins(winnings);
+    startBoard(1, 0);
+    setMessage(`Cashed out ${winnings} coins. Starting again at level 1.`);
+  }, [addCoins, sessionWinnings, startBoard]);
 
   return (
     <div className="voltorb-flip">
-      <h2>⚡ Voltorb Flip — Level {level}</h2>
+      <h2>Voltorb Flip - Level {currentLevel}</h2>
 
       <div className="vf-status">
-        <span>Current Multiplier: <strong>×{multiplier}</strong></span>
-        {gameState === 'playing' && multiplier > 1 && (
-          <button className="mini" onClick={collect}>Collect {multiplier} coins</button>
+        <span>Session Winnings: <strong>{displayedWinnings}</strong></span>
+        <span>Mode:</span>
+        {[
+          ['flip', 'Flip'],
+          ['1', '1'],
+          ['2', '2'],
+          ['3', '3'],
+          ['voltorb', 'V'],
+        ].map(([mode, label]) => (
+          <button
+            key={mode}
+            className={`vf-mode-btn ${cursorMode === mode ? 'active' : ''}`}
+            onClick={() => setCursorMode(mode as CursorMode)}
+            disabled={gameState !== 'playing'}
+          >
+            {label}
+          </button>
+        ))}
+        {gameState === 'won' && (
+          <>
+            <button className="mini" onClick={continueSession}>Continue</button>
+            <button className="mini" onClick={cashOut}>Cash Out</button>
+          </>
         )}
-        {gameState !== 'playing' && (
-          <button className="mini" onClick={newRound}>New Round</button>
-        )}
+        {gameState === 'lost' && <button className="mini" onClick={startNewSession}>New Session</button>}
       </div>
 
       <div className={`vf-message ${gameState === 'won' ? 'win' : gameState === 'lost' ? 'lose' : ''}`}>
@@ -212,48 +347,42 @@ export function VoltorbFlip({ coins, addCoins, spendCoins }: GameProps) {
       </div>
 
       <div className="vf-board">
-        {/* Column info header */}
         <div className="vf-grid-row">
           <div className="vf-corner" />
-          {board.colInfo.map((info, c) => (
-            <div key={c} className="vf-info-cell col">
+          {board.colInfo.map((info, column) => (
+            <div key={column} className="vf-info-cell col">
               <div className="vf-info-sum">{info.sum}</div>
               <div className="vf-info-volt"><VoltorbIcon size={14} />{info.voltorbs}</div>
             </div>
           ))}
         </div>
 
-        {/* Rows */}
-        {board.tiles.map((row, r) => (
-          <div key={r} className="vf-grid-row">
+        {board.tiles.map((row, rowIndex) => (
+          <div key={rowIndex} className="vf-grid-row">
             <div className="vf-info-cell row">
-              <div className="vf-info-sum">{board.rowInfo[r].sum}</div>
-              <div className="vf-info-volt"><VoltorbIcon size={14} />{board.rowInfo[r].voltorbs}</div>
+              <div className="vf-info-sum">{board.rowInfo[rowIndex].sum}</div>
+              <div className="vf-info-volt"><VoltorbIcon size={14} />{board.rowInfo[rowIndex].voltorbs}</div>
             </div>
-            {row.map((tile, c) => {
-              const show = tile.flipped || revealAll;
-              return (
-                <button
-                  key={c}
-                  className={`vf-tile ${show ? 'flipped' : ''} ${tile.marked && !show ? 'marked' : ''} ${show && tile.value === 0 ? 'voltorb' : ''} ${show && tile.value >= 2 ? 'multiplier' : ''}`}
-                  onClick={() => flipTile(r, c)}
-                  onContextMenu={(e) => toggleMark(r, c, e)}
-                  disabled={show || gameState !== 'playing'}
-                >
-                  {show ? (
-                    tile.value === 0 ? <VoltorbIcon size={24} /> : tile.value
-                  ) : (
-                    tile.marked ? <MemoMark /> : '?'
-                  )}
-                </button>
-              );
-            })}
+            {row.map((tile, columnIndex) => (
+              <button
+                key={columnIndex}
+                className={`vf-tile ${tile.flipped ? 'flipped' : ''} ${tile.flipped && tile.value === 0 ? 'voltorb' : ''} ${tile.flipped && tile.value >= 2 ? 'multiplier' : ''}`}
+                onClick={() => handleTileAction(rowIndex, columnIndex)}
+                disabled={gameState !== 'playing' && !tile.flipped}
+              >
+                {tile.flipped ? (
+                  tile.value === 0 ? <VoltorbIcon size={24} /> : tile.value
+                ) : (
+                  <NoteGrid tile={tile} />
+                )}
+              </button>
+            ))}
           </div>
         ))}
       </div>
 
       <div className="vf-help dim">
-        Left-click to flip. Right-click to mark/unmark.
+        Source-faithful pass: exact Rogue level variants, note modes, no manual collect shortcut, and Voltorb resets the session winnings.
       </div>
     </div>
   );

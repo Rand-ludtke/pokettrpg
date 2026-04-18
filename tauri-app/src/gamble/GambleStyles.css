@@ -298,6 +298,14 @@
 .vf-message { font-size: 15px; margin: 8px 0; min-height: 24px; }
 .vf-message.win { color: #28c76f; font-weight: 700; }
 .vf-message.lose { color: #e74c3c; font-weight: 700; }
+.vf-mode-btn {
+  min-width: 38px; height: 34px; padding: 0 10px;
+  border: 1px solid var(--accent); border-radius: 8px;
+  background: var(--panel-bg-dark); color: var(--fg);
+  font-weight: 700; cursor: pointer;
+}
+.vf-mode-btn.active { background: var(--accent); color: #fff; }
+.vf-mode-btn:disabled { opacity: 0.55; cursor: default; }
 
 .vf-board { display: inline-flex; flex-direction: column; gap: 2px; margin: 8px 0; }
 .vf-grid-row { display: flex; gap: 2px; }
@@ -313,12 +321,11 @@
 .vf-info-volt { font-size: 11px; display: flex; align-items: center; gap: 2px; }
 
 .vf-voltorb-icon { overflow: hidden; line-height: 0; }
-.vf-memo-mark { image-rendering: pixelated; }
-.vf-memo-mark img { image-rendering: pixelated; }
 
 .vf-tile {
   width: 52px; height: 52px;
   display: flex; align-items: center; justify-content: center;
+  padding: 0;
   font-size: 20px; font-weight: 700;
   border: 2px solid var(--accent); background: var(--slot-bg);
   border-radius: 8px; cursor: pointer;
@@ -329,8 +336,36 @@
 .vf-tile.flipped { background: var(--panel-bg); cursor: default; animation: vfFlip 0.4s ease; }
 .vf-tile.voltorb { background: #ffcccc; border-color: #e74c3c; animation: vfExplode 0.5s ease; }
 .vf-tile.multiplier { background: #ccffcc; border-color: #28c76f; animation: vfFlip 0.4s ease; }
-.vf-tile.marked { background: #fff3cd; }
 .vf-tile:disabled { cursor: default; }
+
+.vf-hidden-fill {
+  width: 100%; height: 100%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.08));
+  border-radius: 6px;
+}
+
+.vf-note-grid {
+  width: 100%; height: 100%;
+  display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);
+  align-items: center; justify-items: center;
+}
+
+.vf-note {
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,0.25);
+}
+
+.vf-note.active {
+  color: var(--fg);
+  background: rgba(255,255,255,0.18);
+}
+
+.vf-note-voltorb.active {
+  color: #ffb3b3;
+}
 
 @keyframes vfFlip {
   0% { transform: rotateY(0deg); }
