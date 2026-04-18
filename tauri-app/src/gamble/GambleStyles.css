@@ -381,6 +381,229 @@
 
 .vf-help { margin-top: 8px; font-size: 12px; }
 
+/* ===== ROULETTE ===== */
+.roulette { text-align: center; image-rendering: pixelated; }
+.roulette-status {
+  display: flex; flex-direction: column; gap: 10px;
+  align-items: center; margin: 8px 0 14px;
+}
+.roulette-table-picker {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+}
+.roulette-table-btn {
+  min-width: 132px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 2px; align-items: center;
+  border: 2px solid var(--accent); border-radius: 10px;
+  background: var(--panel-bg-dark); color: var(--fg);
+  cursor: pointer; font-weight: 700;
+}
+.roulette-table-btn.active { background: var(--accent); color: #fff; }
+.roulette-table-btn:disabled { opacity: 0.55; cursor: default; }
+
+.roulette-summary {
+  display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+  font-size: 13px;
+}
+
+.roulette-ball-strip {
+  display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;
+}
+
+.roulette-ball-sprite {
+  width: 16px; height: 16px; overflow: hidden;
+  display: inline-flex; align-items: flex-start; justify-content: center;
+}
+.roulette-ball-sprite img {
+  width: 16px; height: auto; image-rendering: pixelated; display: block;
+}
+.roulette-ball-sprite.dimmed { opacity: 0.25; }
+
+.roulette-message {
+  min-height: 24px; margin: 8px auto 14px; max-width: 720px;
+  font-size: 14px; font-weight: 700;
+}
+
+.roulette-layout {
+  display: grid; grid-template-columns: minmax(280px, 340px) minmax(320px, 1fr);
+  gap: 18px; align-items: start;
+}
+
+.roulette-wheel-shell {
+  padding: 16px; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(255,255,255,0.08), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.12));
+}
+
+.roulette-wheel-stage {
+  position: relative; width: 280px; height: 280px; margin: 0 auto;
+}
+
+.roulette-pointer {
+  position: absolute; left: 50%; top: 8px; transform: translateX(-50%);
+  width: 0; height: 0; z-index: 5;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 16px solid #ffd166;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+.roulette-wheel-rotor {
+  position: absolute; inset: 12px; transition: transform 0.08s linear;
+}
+
+.roulette-wheel-base,
+.roulette-wheel-center {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  image-rendering: pixelated; display: block;
+}
+
+.roulette-wheel-base {
+  width: 256px; height: 256px;
+}
+
+.roulette-wheel-center {
+  width: 72px; height: 72px; z-index: 4;
+}
+
+.roulette-wheel-icon {
+  position: absolute; left: 50%; top: 50%; z-index: 3;
+  width: 28px; height: 28px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid rgba(255,255,255,0.1); border-radius: 999px;
+  background: rgba(20,20,20,0.85); cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
+
+.roulette-wheel-icon.winner {
+  border-color: #ffd166;
+  box-shadow: 0 0 0 2px rgba(255,209,102,0.18), 0 0 12px rgba(255,209,102,0.45);
+}
+
+.roulette-wheel-icon .roulette-pokemon-icon {
+  width: 18px; height: 18px; image-rendering: pixelated; display: block;
+}
+
+.roulette-actions {
+  display: flex; gap: 10px; justify-content: center; align-items: center;
+  flex-wrap: wrap; margin-top: 12px;
+}
+
+.roulette-spin-btn {
+  padding: 12px 24px; border: none; border-radius: 10px;
+  background: var(--accent); color: #fff;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.roulette-spin-btn:disabled { opacity: 0.55; cursor: default; }
+
+.roulette-board {
+  min-width: 0; padding: 14px; border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.roulette-board-grid {
+  display: grid; grid-template-columns: 120px repeat(4, minmax(64px, 1fr));
+  gap: 8px; align-items: stretch;
+}
+
+.roulette-board-corner {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; background: var(--panel-bg-dark);
+  border: 1px solid rgba(255,255,255,0.08); font-weight: 700;
+}
+
+.roulette-bet-button {
+  position: relative; min-height: 70px; padding: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  border: 2px solid rgba(255,255,255,0.08); border-radius: 12px;
+  background: rgba(16,16,18,0.8); color: var(--fg); cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+}
+
+.roulette-bet-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.22);
+}
+
+.roulette-bet-button.selected {
+  border-color: #ff7043;
+  box-shadow: 0 0 0 2px rgba(255,112,67,0.15);
+}
+
+.roulette-bet-button.closed {
+  opacity: 0.5;
+}
+
+.roulette-bet-button.hit {
+  background: rgba(255,255,255,0.09);
+}
+
+.roulette-bet-button.winner {
+  border-color: #ffd166;
+  box-shadow: 0 0 0 2px rgba(255,209,102,0.16), inset 0 0 10px rgba(255,209,102,0.12);
+}
+
+.roulette-bet-button:disabled { cursor: default; }
+
+.roulette-column-button,
+.roulette-row-button {
+  min-height: 76px;
+}
+
+.roulette-slot-button .roulette-pokemon-icon,
+.roulette-column-button .roulette-pokemon-icon {
+  width: 28px; height: 28px; image-rendering: pixelated; display: block;
+}
+
+.roulette-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 34px; height: 20px; padding: 0 6px;
+  border-radius: 999px; background: rgba(0,0,0,0.35);
+  font-size: 11px; font-weight: 700;
+}
+
+.roulette-hit-token {
+  position: absolute; right: 4px; bottom: 4px;
+}
+
+.roulette-hit-token .roulette-ball-sprite {
+  transform: scale(0.9);
+  transform-origin: bottom right;
+}
+
+.roulette-row-orange { background: linear-gradient(180deg, rgba(232,145,72,0.34), rgba(40,20,12,0.92)); }
+.roulette-row-green { background: linear-gradient(180deg, rgba(117,196,117,0.30), rgba(15,36,17,0.92)); }
+.roulette-row-purple { background: linear-gradient(180deg, rgba(184,126,214,0.30), rgba(28,17,39,0.92)); }
+
+.roulette-theme-left .roulette-spin-btn,
+.roulette-theme-left .roulette-table-btn.active {
+  background: linear-gradient(180deg, #d96b3b, #b24c24);
+}
+
+.roulette-theme-right .roulette-spin-btn,
+.roulette-theme-right .roulette-table-btn.active {
+  background: linear-gradient(180deg, #4fa96f, #2d7a49);
+}
+
+.roulette-help {
+  margin-top: 12px; text-align: left;
+}
+
+@media (max-width: 900px) {
+  .roulette-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .roulette-board {
+    overflow-x: auto;
+  }
+
+  .roulette-board-grid {
+    min-width: 460px;
+  }
+}
+
 /* ===== BLACKJACK ===== */
 .blackjack { text-align: center; }
 

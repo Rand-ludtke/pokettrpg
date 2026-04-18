@@ -1,295 +1,412 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GameProps } from './types';
 
-/*
-  Roulette – bet on numbers, colors, or sections; spin the wheel.
-  Simplified Pokémon-themed roulette with canvas wheel rendering.
-*/
+type TableId = 'left' | 'right';
+type RowId = 'orange' | 'green' | 'purple';
+type PokemonId = 'wynaut' | 'azurill' | 'skitty' | 'makuhita';
+type SelectionId = string;
 
-const POCKETS = 12;
-const COLORS = ['#e74c3c', '#2c3e50', '#e74c3c', '#2c3e50', '#e74c3c', '#2c3e50',
-                '#e74c3c', '#2c3e50', '#e74c3c', '#2c3e50', '#e74c3c', '#2c3e50'];
-const POCKET_LABELS = ['1','2','3','4','5','6','7','8','9','10','11','12'];
-const EMOJIS = ['F','W','F','W','F','W','F','W','F','W','F','W'];
-
-type BetType = 'number' | 'red' | 'black' | 'odd' | 'even' | 'high' | 'low';
-
-interface Bet {
-  type: BetType;
-  value?: number; // for number bets
-  amount: number;
+interface TableDef {
+  id: TableId;
+  label: string;
+  minBet: number;
+  themeClass: string;
 }
 
-const BET_OPTIONS: { type: BetType; label: string; payout: number; desc: string }[] = [
-  { type: 'red', label: 'Fire (Red)', payout: 2, desc: '2×' },
-  { type: 'black', label: 'Water (Black)', payout: 2, desc: '2×' },
-  { type: 'odd', label: 'Odd', payout: 2, desc: '2×' },
-  { type: 'even', label: 'Even', payout: 2, desc: '2×' },
-  { type: 'low', label: '1-6', payout: 2, desc: '2×' },
-  { type: 'high', label: '7-12', payout: 2, desc: '2×' },
+interface SlotDef {
+  slotId: number;
+  row: RowId;
+  pokemon: PokemonId;
+  icon: string;
+}
+
+const ASSET_ROOT = '/gamecorner/roulette';
+const BALLS_PER_ROUND = 6;
+const MAX_MULTIPLIER = 12;
+const MULTIPLIER_TABLE = [0, 3, 4, 6, MAX_MULTIPLIER];
+const WHEEL_SIZE = 256;
+
+const TABLES: TableDef[] = [
+  { id: 'left', label: 'Left Table', minBet: 1, themeClass: 'roulette-theme-left' },
+  { id: 'right', label: 'Right Table', minBet: 3, themeClass: 'roulette-theme-right' },
 ];
 
-const W = 300;
-const H = 300;
-const CX = W / 2;
-const CY = H / 2;
-const OUTER_R = 130;
-const INNER_R = 70;
+const ROW_META: Record<RowId, { label: string; colorClass: string }> = {
+  orange: { label: 'Orange', colorClass: 'roulette-row-orange' },
+  green: { label: 'Green', colorClass: 'roulette-row-green' },
+  purple: { label: 'Purple', colorClass: 'roulette-row-purple' },
+};
 
-function checkWin(pocket: number, bet: Bet): boolean {
-  const num = pocket + 1;
-  switch (bet.type) {
-    case 'number': return num === bet.value;
-    case 'red': return pocket % 2 === 0;
-    case 'black': return pocket % 2 === 1;
-    case 'odd': return num % 2 === 1;
-    case 'even': return num % 2 === 0;
-    case 'low': return num <= 6;
-    case 'high': return num >= 7;
-  }
+const POKEMON_META: Record<PokemonId, { label: string; icon: string }> = {
+  wynaut: { label: 'Wynaut', icon: `${ASSET_ROOT}/wynaut.png` },
+  azurill: { label: 'Azurill', icon: `${ASSET_ROOT}/azurill.png` },
+  skitty: { label: 'Skitty', icon: `${ASSET_ROOT}/skitty.png` },
+  makuhita: { label: 'Makuhita', icon: `${ASSET_ROOT}/makuhita.png` },
+};
+
+const POKEMON_ORDER: PokemonId[] = ['wynaut', 'azurill', 'skitty', 'makuhita'];
+const ROW_ORDER: RowId[] = ['orange', 'green', 'purple'];
+
+const SLOTS: SlotDef[] = [
+  { slotId: 0, row: 'orange', pokemon: 'wynaut', icon: POKEMON_META.wynaut.icon },
+  { slotId: 1, row: 'green', pokemon: 'azurill', icon: POKEMON_META.azurill.icon },
+  { slotId: 2, row: 'purple', pokemon: 'skitty', icon: POKEMON_META.skitty.icon },
+  { slotId: 3, row: 'orange', pokemon: 'makuhita', icon: POKEMON_META.makuhita.icon },
+  { slotId: 4, row: 'green', pokemon: 'wynaut', icon: POKEMON_META.wynaut.icon },
+  { slotId: 5, row: 'purple', pokemon: 'azurill', icon: POKEMON_META.azurill.icon },
+  { slotId: 6, row: 'orange', pokemon: 'skitty', icon: POKEMON_META.skitty.icon },
+  { slotId: 7, row: 'green', pokemon: 'makuhita', icon: POKEMON_META.makuhita.icon },
+  { slotId: 8, row: 'purple', pokemon: 'wynaut', icon: POKEMON_META.wynaut.icon },
+  { slotId: 9, row: 'orange', pokemon: 'azurill', icon: POKEMON_META.azurill.icon },
+  { slotId: 10, row: 'green', pokemon: 'skitty', icon: POKEMON_META.skitty.icon },
+  { slotId: 11, row: 'purple', pokemon: 'makuhita', icon: POKEMON_META.makuhita.icon },
+];
+
+function slotSelection(slotId: number): SelectionId {
+  return `slot:${slotId}`;
 }
 
-function getPayout(bet: Bet): number {
-  if (bet.type === 'number') return bet.amount * POCKETS;
-  return bet.amount * 2;
+function columnSelection(pokemon: PokemonId): SelectionId {
+  return `column:${pokemon}`;
+}
+
+function rowSelection(row: RowId): SelectionId {
+  return `row:${row}`;
+}
+
+function parseSelection(selectionId: SelectionId): { kind: 'slot' | 'column' | 'row'; value: string } {
+  const [kind, value] = selectionId.split(':');
+  if (kind === 'slot' || kind === 'column' || kind === 'row') {
+    return { kind, value };
+  }
+  return { kind: 'slot', value: '0' };
+}
+
+function firstOpenSelection(hitSet: Set<number>): SelectionId {
+  const nextSlot = SLOTS.find((slot) => !hitSet.has(slot.slotId));
+  return slotSelection(nextSlot ? nextSlot.slotId : 0);
+}
+
+function selectionMatchesSlot(selectionId: SelectionId, slot: SlotDef): boolean {
+  const selection = parseSelection(selectionId);
+  if (selection.kind === 'slot') return Number(selection.value) === slot.slotId;
+  if (selection.kind === 'column') return selection.value === slot.pokemon;
+  return selection.value === slot.row;
+}
+
+function wheelSlotStyle(slotId: number): React.CSSProperties {
+  const angle = -90 + slotId * 30;
+  return {
+    transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-92px) rotate(${-angle}deg)`,
+  };
+}
+
+function normalizeAngle(angle: number): number {
+  const normalized = angle % 360;
+  return normalized < 0 ? normalized + 360 : normalized;
+}
+
+function BallSprite({ dimmed = false }: { dimmed?: boolean }) {
+  return (
+    <span className={`roulette-ball-sprite ${dimmed ? 'dimmed' : ''}`}>
+      <img src={`${ASSET_ROOT}/ball.png`} alt="" />
+    </span>
+  );
 }
 
 export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [tableId, setTableId] = useState<TableId>('left');
+  const [selectedSelectionId, setSelectedSelectionId] = useState<SelectionId>(slotSelection(0));
+  const [hitSlotIds, setHitSlotIds] = useState<number[]>([]);
+  const [ballsUsed, setBallsUsed] = useState(0);
   const [spinning, setSpinning] = useState(false);
-  const [result, setResult] = useState<number | null>(null);
-  const [message, setMessage] = useState('Place your bets!');
-  const [betAmount, setBetAmount] = useState(10);
-  const [selectedBet, setSelectedBet] = useState<BetType>('red');
-  const [numberBet, setNumberBet] = useState(1);
-  const angleRef = useRef(0);
-  const targetAngleRef = useRef(0);
-  const spinningRef = useRef(false);
-  const animRef = useRef(0);
+  const [needsBoardClear, setNeedsBoardClear] = useState(false);
+  const [winningSlotId, setWinningSlotId] = useState<number | null>(null);
+  const [message, setMessage] = useState('The minimum wager changes by table. Pick a square, row, or column to place a Rogue-style bet.');
+  const [wheelAngle, setWheelAngle] = useState(0);
 
-  // Draw wheel
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
+  const wheelAngleRef = useRef(0);
+  const animationFrameRef = useRef<number | null>(null);
 
-    function draw() {
-      ctx.clearRect(0, 0, W, H);
+  const currentTable = TABLES.find((table) => table.id === tableId) ?? TABLES[0];
+  const hitSet = useMemo(() => new Set(hitSlotIds), [hitSlotIds]);
 
-      const angle = angleRef.current;
-      const sliceAngle = (Math.PI * 2) / POCKETS;
-
-      // Draw pockets
-      for (let i = 0; i < POCKETS; i++) {
-        const startA = angle + i * sliceAngle;
-        const endA = startA + sliceAngle;
-
-        ctx.beginPath();
-        ctx.moveTo(CX, CY);
-        ctx.arc(CX, CY, OUTER_R, startA, endA);
-        ctx.closePath();
-
-        const isResult = result === i && !spinningRef.current;
-        ctx.fillStyle = isResult ? '#FFD700' : COLORS[i];
-        ctx.fill();
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Label
-        const midA = startA + sliceAngle / 2;
-        const lx = CX + Math.cos(midA) * (OUTER_R * 0.72);
-        const ly = CY + Math.sin(midA) * (OUTER_R * 0.72);
-        ctx.save();
-        ctx.translate(lx, ly);
-        ctx.rotate(midA + Math.PI / 2);
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(POCKET_LABELS[i], 0, 0);
-        ctx.restore();
-
-        // Type symbol in inner ring
-        const ex = CX + Math.cos(midA) * (OUTER_R * 0.45);
-        const ey = CY + Math.sin(midA) * (OUTER_R * 0.45);
-        ctx.font = 'bold 14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = i % 2 === 0 ? '#ff8' : '#8ef';
-        ctx.fillText(EMOJIS[i], ex, ey);
-      }
-
-      // Center circle
-      ctx.beginPath();
-      ctx.arc(CX, CY, 25, 0, Math.PI * 2);
-      const cg = ctx.createRadialGradient(CX, CY, 5, CX, CY, 25);
-      cg.addColorStop(0, '#555');
-      cg.addColorStop(1, '#222');
-      ctx.fillStyle = cg;
-      ctx.fill();
-      ctx.strokeStyle = '#888';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Pointer (top)
-      ctx.beginPath();
-      ctx.moveTo(CX, CY - OUTER_R - 10);
-      ctx.lineTo(CX - 8, CY - OUTER_R - 22);
-      ctx.lineTo(CX + 8, CY - OUTER_R - 22);
-      ctx.closePath();
-      ctx.fillStyle = '#FFD700';
-      ctx.fill();
-      ctx.strokeStyle = '#a90';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      animRef.current = requestAnimationFrame(draw);
+  const rowHits = useMemo(() => {
+    const counts: Record<RowId, number> = { orange: 0, green: 0, purple: 0 };
+    for (const slotId of hitSlotIds) {
+      const slot = SLOTS[slotId];
+      if (slot) counts[slot.row] += 1;
     }
+    return counts;
+  }, [hitSlotIds]);
 
-    animRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [result]);
+  const columnHits = useMemo(() => {
+    const counts: Record<PokemonId, number> = { wynaut: 0, azurill: 0, skitty: 0, makuhita: 0 };
+    for (const slotId of hitSlotIds) {
+      const slot = SLOTS[slotId];
+      if (slot) counts[slot.pokemon] += 1;
+    }
+    return counts;
+  }, [hitSlotIds]);
+
+  const getMultiplier = useCallback((selectionId: SelectionId) => {
+    const selection = parseSelection(selectionId);
+    if (selection.kind === 'row') {
+      const row = selection.value as RowId;
+      if (rowHits[row] >= POKEMON_ORDER.length) return 0;
+      return MULTIPLIER_TABLE[rowHits[row] + 1];
+    }
+    if (selection.kind === 'column') {
+      const pokemon = selection.value as PokemonId;
+      if (columnHits[pokemon] >= ROW_ORDER.length) return 0;
+      return MULTIPLIER_TABLE[columnHits[pokemon] + 2];
+    }
+    const slotId = Number(selection.value);
+    return hitSet.has(slotId) ? 0 : MAX_MULTIPLIER;
+  }, [columnHits, hitSet, rowHits]);
+
+  const selectedMultiplier = getMultiplier(selectedSelectionId);
+  const ballsRemaining = BALLS_PER_ROUND - ballsUsed;
+
+  const resetBoard = useCallback((nextMessage: string) => {
+    setHitSlotIds([]);
+    setBallsUsed(0);
+    setNeedsBoardClear(false);
+    setWinningSlotId(null);
+    setSelectedSelectionId(slotSelection(0));
+    setMessage(nextMessage);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
+  const changeTable = useCallback((nextTableId: TableId) => {
+    if (spinning || tableId === nextTableId) return;
+    setTableId(nextTableId);
+    resetBoard(`Switched to the ${TABLES.find((table) => table.id === nextTableId)?.label ?? 'selected'} roulette table.`);
+  }, [resetBoard, spinning, tableId]);
+
+  const clearBoard = useCallback(() => {
+    resetBoard('The board was cleared after six balls, just like the Rogue table flow.');
+  }, [resetBoard]);
 
   const spin = useCallback(() => {
     if (spinning) return;
-    if (!spendCoins(betAmount)) { setMessage('Not enough coins!'); return; }
-
-    setSpinning(true);
-    spinningRef.current = true;
-    setResult(null);
-    setMessage('Spinning...');
-
-    const winPocket = Math.floor(Math.random() * POCKETS);
-    const sliceAngle = (Math.PI * 2) / POCKETS;
-    // Spin several full rotations + land on pocket
-    // The pointer is at top (angle = -π/2), so we need to align pocket center to top
-    const targetAngle = -(winPocket * sliceAngle + sliceAngle / 2) - Math.PI / 2;
-    const fullSpins = 4 + Math.floor(Math.random() * 3);
-    const totalAngle = fullSpins * Math.PI * 2 + (targetAngle - (angleRef.current % (Math.PI * 2)));
-
-    const startAngle = angleRef.current;
-    const endAngle = startAngle + totalAngle;
-    const duration = 3000 + Math.random() * 1000;
-    const startTime = performance.now();
-
-    function animateSpin() {
-      const elapsed = performance.now() - startTime;
-      const t = Math.min(1, elapsed / duration);
-      // Ease out cubic
-      const ease = 1 - Math.pow(1 - t, 3);
-      angleRef.current = startAngle + (endAngle - startAngle) * ease;
-
-      if (t < 1) {
-        requestAnimationFrame(animateSpin);
-      } else {
-        angleRef.current = endAngle;
-        spinningRef.current = false;
-        setSpinning(false);
-        setResult(winPocket);
-
-        const bet: Bet = {
-          type: selectedBet,
-          value: selectedBet === 'number' ? numberBet : undefined,
-          amount: betAmount,
-        };
-        const won = checkWin(winPocket, bet);
-        if (won) {
-          const payout = getPayout(bet);
-          addCoins(payout);
-          setMessage(`Landed on ${winPocket + 1}! You won ${payout} coins!`);
-        } else {
-          setMessage(`Landed on ${winPocket + 1}. Better luck next time!`);
-        }
-      }
+    if (needsBoardClear) {
+      setMessage('Board clear is pending. Start the next board before placing another wager.');
+      return;
+    }
+    if (selectedMultiplier === 0) {
+      setSelectedSelectionId(firstOpenSelection(hitSet));
+      setMessage('That wager is already closed by the current board state. Pick a live square, row, or column.');
+      return;
+    }
+    if (!spendCoins(currentTable.minBet)) {
+      setMessage(`Not enough coins. ${currentTable.label} requires a minimum wager of ${currentTable.minBet}.`);
+      return;
     }
 
-    requestAnimationFrame(animateSpin);
-  }, [spinning, spendCoins, betAmount, selectedBet, numberBet, addCoins]);
+    const landedSlot = SLOTS[Math.floor(Math.random() * SLOTS.length)];
+    const selectionAtSpin = selectedSelectionId;
+    const multiplierAtSpin = selectedMultiplier;
+    const hitSetAtSpin = new Set(hitSet);
+    const currentAngle = wheelAngleRef.current;
+    const targetAngle = normalizeAngle(-landedSlot.slotId * 30);
+    const currentNormalized = normalizeAngle(currentAngle);
+    let delta = targetAngle - currentNormalized;
+    if (delta < 0) delta += 360;
+
+    const fullSpins = currentTable.id === 'left' ? 4 + Math.floor(Math.random() * 2) : 5 + Math.floor(Math.random() * 2);
+    const endAngle = currentAngle + fullSpins * 360 + delta;
+    const duration = currentTable.id === 'left' ? 2200 : 1800;
+    const startTime = performance.now();
+
+    setSpinning(true);
+    setWinningSlotId(null);
+    setMessage('The wheel is spinning...');
+
+    const animate = (timestamp: number) => {
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const nextAngle = currentAngle + (endAngle - currentAngle) * eased;
+      wheelAngleRef.current = nextAngle;
+      setWheelAngle(nextAngle);
+
+      if (progress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      const nextHitSet = new Set(hitSetAtSpin);
+      nextHitSet.add(landedSlot.slotId);
+      const nextBallsUsed = ballsUsed + 1;
+      const won = selectionMatchesSlot(selectionAtSpin, landedSlot);
+      const payout = currentTable.minBet * multiplierAtSpin;
+
+      wheelAngleRef.current = endAngle;
+      setWheelAngle(endAngle);
+      setSpinning(false);
+      setWinningSlotId(landedSlot.slotId);
+      setHitSlotIds(Array.from(nextHitSet));
+      setBallsUsed(nextBallsUsed);
+      setSelectedSelectionId(firstOpenSelection(nextHitSet));
+
+      if (won) {
+        addCoins(payout);
+      }
+
+      if (nextBallsUsed >= BALLS_PER_ROUND) {
+        setNeedsBoardClear(true);
+      }
+
+      if (won && multiplierAtSpin === MAX_MULTIPLIER) {
+        setMessage(`Jackpot. ${POKEMON_META[landedSlot.pokemon].label} on ${ROW_META[landedSlot.row].label.toLowerCase()} paid ${payout} coins.${nextBallsUsed >= BALLS_PER_ROUND ? ' The board will be cleared next.' : ''}`);
+      } else if (won) {
+        setMessage(`It's a hit. ${POKEMON_META[landedSlot.pokemon].label} on ${ROW_META[landedSlot.row].label.toLowerCase()} paid ${payout} coins.${nextBallsUsed >= BALLS_PER_ROUND ? ' The board will be cleared next.' : ''}`);
+      } else {
+        setMessage(`Nothing doing. The ball stopped on ${POKEMON_META[landedSlot.pokemon].label} / ${ROW_META[landedSlot.row].label}.${nextBallsUsed >= BALLS_PER_ROUND ? ' The board will be cleared next.' : ''}`);
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, [addCoins, ballsUsed, currentTable, hitSet, needsBoardClear, selectedMultiplier, selectedSelectionId, spendCoins, spinning]);
 
   return (
-    <div className="roulette" style={{ textAlign: 'center' }}>
+    <div className={`roulette ${currentTable.themeClass}`}>
       <h2>Roulette</h2>
 
-      <canvas
-        ref={canvasRef}
-        width={W}
-        height={H}
-        style={{ display: 'block', margin: '8px auto' }}
-      />
-
-      <div className="roulette-message" style={{ margin: '8px 0', minHeight: 24, fontWeight: result !== null ? 700 : 400 }}>{message}</div>
-
-      {/* Bet amount */}
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', margin: '8px 0', flexWrap: 'wrap' }}>
-        <span style={{ fontWeight: 700 }}>Bet:</span>
-        {[5, 10, 25, 50, 100].map(v => (
-          <button key={v}
-            style={{
-              padding: '4px 10px', border: '2px solid var(--accent)',
-              background: betAmount === v ? 'var(--accent)' : 'transparent',
-              color: betAmount === v ? 'white' : 'var(--fg)',
-              borderRadius: 6, cursor: 'pointer', fontWeight: 700,
-            }}
-            onClick={() => setBetAmount(v)}
-            disabled={spinning}
-          >{v}</button>
-        ))}
-      </div>
-
-      {/* Bet type */}
-      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap', margin: '8px 0' }}>
-        {BET_OPTIONS.map(o => (
-          <button key={o.type}
-            style={{
-              padding: '6px 12px', border: '2px solid var(--accent)',
-              background: selectedBet === o.type ? 'var(--accent)' : 'transparent',
-              color: selectedBet === o.type ? 'white' : 'var(--fg)',
-              borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600,
-            }}
-            onClick={() => setSelectedBet(o.type)}
-            disabled={spinning}
-          >{o.label} ({o.desc})</button>
-        ))}
-        <button
-          style={{
-            padding: '6px 12px', border: '2px solid var(--accent)',
-            background: selectedBet === 'number' ? 'var(--accent)' : 'transparent',
-            color: selectedBet === 'number' ? 'white' : 'var(--fg)',
-            borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600,
-          }}
-          onClick={() => setSelectedBet('number')}
-          disabled={spinning}
-        ># Exact ({POCKETS}×)</button>
-      </div>
-
-      {selectedBet === 'number' && (
-        <div style={{ display: 'flex', gap: 4, justifyContent: 'center', margin: '4px 0', flexWrap: 'wrap' }}>
-          {Array.from({ length: POCKETS }, (_, i) => i + 1).map(n => (
-            <button key={n}
-              style={{
-                width: 30, height: 30, border: '2px solid',
-                borderColor: numberBet === n ? '#FFD700' : COLORS[n - 1],
-                background: numberBet === n ? '#FFD700' : COLORS[n - 1],
-                color: 'white', borderRadius: '50%', cursor: 'pointer',
-                fontWeight: 700, fontSize: 12,
-                opacity: numberBet === n ? 1 : 0.7,
-              }}
-              onClick={() => setNumberBet(n)}
+      <div className="roulette-status">
+        <div className="roulette-table-picker">
+          {TABLES.map((table) => (
+            <button
+              key={table.id}
+              className={`roulette-table-btn ${table.id === tableId ? 'active' : ''}`}
+              onClick={() => changeTable(table.id)}
               disabled={spinning}
-            >{n}</button>
+            >
+              <span>{table.label}</span>
+              <span>Min {table.minBet}</span>
+            </button>
           ))}
         </div>
-      )}
 
-      <button onClick={spin} disabled={spinning} style={{
-        padding: '12px 28px', fontSize: 16, fontWeight: 700,
-        background: 'var(--accent)', color: 'white', border: 'none',
-        borderRadius: 10, cursor: 'pointer', margin: '12px 0',
-        opacity: spinning ? 0.5 : 1,
-      }}>
-        {spinning ? 'Spinning...' : `Spin! (${betAmount} coins)`}
-      </button>
+        <div className="roulette-summary">
+          <span>Selected payout: <strong>{selectedMultiplier}x</strong></span>
+          <span>Wager: <strong>{currentTable.minBet}</strong></span>
+          <span>Board balls: <strong>{ballsRemaining}</strong></span>
+        </div>
+
+        <div className="roulette-ball-strip" aria-label="Balls remaining this round">
+          {Array.from({ length: BALLS_PER_ROUND }, (_, index) => (
+            <BallSprite key={index} dimmed={index < ballsUsed} />
+          ))}
+        </div>
+      </div>
+
+      <div className="roulette-message">{message}</div>
+
+      <div className="roulette-layout">
+        <div className="roulette-wheel-shell">
+          <div className="roulette-wheel-stage">
+            <div className="roulette-pointer" />
+            <div className="roulette-wheel-rotor" style={{ transform: `rotate(${wheelAngle}deg)` }}>
+              <img src={`${ASSET_ROOT}/wheel.png`} alt="" className="roulette-wheel-base" />
+              {SLOTS.map((slot) => (
+                <button
+                  key={slot.slotId}
+                  type="button"
+                  className={`roulette-wheel-icon ${ROW_META[slot.row].colorClass} ${winningSlotId === slot.slotId ? 'winner' : ''}`}
+                  style={wheelSlotStyle(slot.slotId)}
+                  onClick={() => !spinning && setSelectedSelectionId(slotSelection(slot.slotId))}
+                  disabled={spinning}
+                  title={`${POKEMON_META[slot.pokemon].label} / ${ROW_META[slot.row].label}`}
+                >
+                  <img src={slot.icon} alt="" className="roulette-pokemon-icon" />
+                </button>
+              ))}
+            </div>
+            <img src={`${ASSET_ROOT}/center.png`} alt="" className="roulette-wheel-center" />
+          </div>
+
+          <div className="roulette-actions">
+            <button className="roulette-spin-btn" onClick={spin} disabled={spinning || needsBoardClear}>
+              {spinning ? 'Spinning...' : `Spin (${currentTable.minBet} coin${currentTable.minBet === 1 ? '' : 's'})`}
+            </button>
+            {needsBoardClear && (
+              <button className="mini" onClick={clearBoard}>
+                Clear Board
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="roulette-board">
+          <div className="roulette-board-grid">
+            <div className="roulette-board-corner">Bet</div>
+            {POKEMON_ORDER.map((pokemon) => {
+              const selectionId = columnSelection(pokemon);
+              const multiplier = getMultiplier(selectionId);
+              return (
+                <button
+                  key={pokemon}
+                  className={`roulette-bet-button roulette-column-button ${selectedSelectionId === selectionId ? 'selected' : ''} ${multiplier === 0 ? 'closed' : ''}`}
+                  onClick={() => setSelectedSelectionId(selectionId)}
+                  disabled={spinning}
+                >
+                  <img src={POKEMON_META[pokemon].icon} alt="" className="roulette-pokemon-icon" />
+                  <span>{POKEMON_META[pokemon].label}</span>
+                  <span className="roulette-badge">x{multiplier}</span>
+                </button>
+              );
+            })}
+
+            {ROW_ORDER.map((row) => {
+              const rowSelectionId = rowSelection(row);
+              return (
+                <React.Fragment key={row}>
+                  <button
+                    className={`roulette-bet-button roulette-row-button ${ROW_META[row].colorClass} ${selectedSelectionId === rowSelectionId ? 'selected' : ''} ${getMultiplier(rowSelectionId) === 0 ? 'closed' : ''}`}
+                    onClick={() => setSelectedSelectionId(rowSelectionId)}
+                    disabled={spinning}
+                  >
+                    <span>{ROW_META[row].label}</span>
+                    <span className="roulette-badge">x{getMultiplier(rowSelectionId)}</span>
+                  </button>
+
+                  {POKEMON_ORDER.map((pokemon) => {
+                    const slot = SLOTS.find((entry) => entry.row === row && entry.pokemon === pokemon);
+                    if (!slot) return null;
+                    const selectionId = slotSelection(slot.slotId);
+                    const hit = hitSet.has(slot.slotId);
+                    return (
+                      <button
+                        key={selectionId}
+                        className={`roulette-bet-button roulette-slot-button ${ROW_META[row].colorClass} ${selectedSelectionId === selectionId ? 'selected' : ''} ${hit ? 'hit' : ''} ${winningSlotId === slot.slotId ? 'winner' : ''}`}
+                        onClick={() => setSelectedSelectionId(selectionId)}
+                        disabled={spinning}
+                      >
+                        <img src={slot.icon} alt="" className="roulette-pokemon-icon" />
+                        <span className="roulette-badge">x{getMultiplier(selectionId)}</span>
+                        {hit && <span className="roulette-hit-token"><BallSprite /></span>}
+                      </button>
+                    );
+                  })}
+                </React.Fragment>
+              );
+            })}
+          </div>
+
+          <div className="vf-help dim roulette-help">
+            Rogue rules: twelve fixed slots, row or column multipliers rise as those lanes fill, exact-square bets always pay 12x until hit, and the board clears after six balls.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

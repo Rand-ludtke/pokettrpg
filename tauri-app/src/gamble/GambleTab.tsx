@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useCoins } from './useCoins';
 import { SlotMachine } from './SlotMachine';
+import { Roulette } from './Roulette';
 import { VoltorbFlip } from './VoltorbFlip';
 import { Blackjack } from './Blackjack';
 import { Plinko } from './Plinko';
@@ -12,10 +13,11 @@ import { GachaMachine } from './GachaMachine';
 import { Pinball } from './Pinball';
 import './GambleStyles.css';
 
-type Game = 'menu' | 'slots' | 'voltorb' | 'blackjack' | 'plinko' | 'snake' | 'flappy' | 'stacker' | 'derby' | 'gacha' | 'pinball';
+type Game = 'menu' | 'slots' | 'roulette' | 'voltorb' | 'blackjack' | 'plinko' | 'snake' | 'flappy' | 'stacker' | 'derby' | 'gacha' | 'pinball';
 
 const GAMES: { id: Game; label: string; desc: string; icon: string }[] = [
   { id: 'slots',    label: 'Slot Machine',   desc: 'Spin the reels! Match symbols to win.',        icon: '/gamecorner/slot_machine/menu.png' },
+  { id: 'roulette', label: 'Roulette',       desc: 'Rogue-style wheel with color and Pokemon bets.', icon: '/gamecorner/roulette/wheel.png' },
   { id: 'voltorb',  label: 'Voltorb Flip',   desc: 'Flip cards — avoid the Voltorb!',             icon: '/gamecorner/voltorbflip/gameboard.png' },
   { id: 'blackjack',label: 'Blackjack',       desc: 'Beat the dealer to 21.',                      icon: '/gamecorner/blackjack/facedown.png' },
   { id: 'plinko',   label: 'Pachinko',        desc: 'Drop balls through pegs for prizes.',          icon: '/gamecorner/pachinko/title.png' },
@@ -92,6 +94,7 @@ export function GambleTab() {
       )}
 
       {game === 'slots'     && <SlotMachine coins={coins} addCoins={addCoins} spendCoins={spendCoins} />}
+  {game === 'roulette'  && <Roulette coins={coins} addCoins={addCoins} spendCoins={spendCoins} />}
       {game === 'voltorb'   && <VoltorbFlip coins={coins} addCoins={addCoins} spendCoins={spendCoins} />}
       {game === 'blackjack' && <Blackjack coins={coins} addCoins={addCoins} spendCoins={spendCoins} />}
       {game === 'plinko'    && <Plinko coins={coins} addCoins={addCoins} spendCoins={spendCoins} />}
