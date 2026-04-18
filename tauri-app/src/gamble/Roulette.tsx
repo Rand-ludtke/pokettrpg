@@ -262,6 +262,10 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
 
   const currentTable = TABLES.find((table) => table.id === tableId) ?? TABLES[0];
   const hitSet = useMemo(() => new Set(hitSlotIds), [hitSlotIds]);
+  const rouletteStyle = {
+    '--roulette-shell-art': `url("${ASSET_ROOT}/wheel.png")`,
+    '--roulette-panel-art': `url("${ASSET_ROOT}/headers.png")`,
+  } as React.CSSProperties;
 
   const rowHits = useMemo(() => {
     const counts: Record<RowId, number> = { orange: 0, green: 0, purple: 0 };
@@ -431,7 +435,7 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
   }, [addCoins, ballsUsed, currentTable, hitSet, needsBoardClear, selectedMultiplier, selectedSelectionId, spendCoins, spinning]);
 
   return (
-    <div className={`roulette ${currentTable.themeClass}`}>
+    <div className={`roulette ${currentTable.themeClass}`} style={rouletteStyle}>
       <h2>Roulette</h2>
 
       <div className="roulette-status">

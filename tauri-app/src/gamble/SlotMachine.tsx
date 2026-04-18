@@ -253,8 +253,14 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
     REPLAY: 'REPLAY',
   };
 
+  const shellStyle = {
+    '--slot-shell-art': `url("${gamecornerAsset('slot_machine/menu.png')}")`,
+    '--slot-cabinet-art': `url("${gamecornerAsset('slot_machine/reel_time_machine.png')}")`,
+    '--slot-paytable-art': `url("${gamecornerAsset('slot_machine/digital_display.png')}")`,
+  } as React.CSSProperties;
+
   return (
-    <div className="slot-machine">
+    <div className="slot-machine" style={shellStyle}>
       {/* Digital display panel */}
       <div className={`slot-digital-display ${digDisplay.toLowerCase()}`}>
         <span>{displayText[digDisplay]}</span>
@@ -375,55 +381,64 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
             <span className="slot-pay-syms">
               <img src={symSprite(0)} alt="7R" /><img src={symSprite(0)} alt="7R" /><img src={symSprite(0)} alt="7R" />
             </span>
-            <span>300</span>
+            <span className="slot-pay-desc">Red 7 jackpot</span>
+            <span className="slot-pay-value">300</span>
           </div>
           <div className="slot-pay-row jackpot">
             <span className="slot-pay-syms">
               <img src={symSprite(1)} alt="7B" /><img src={symSprite(1)} alt="7B" /><img src={symSprite(1)} alt="7B" />
             </span>
-            <span>300</span>
+            <span className="slot-pay-desc">Blue 7 jackpot</span>
+            <span className="slot-pay-value">300</span>
           </div>
           <div className="slot-pay-row jackpot">
             <span className="slot-pay-syms">
               <img src={symSprite(0)} alt="7" /><img src={symSprite(1)} alt="7" /> Mixed
             </span>
-            <span>90</span>
+            <span className="slot-pay-desc">Mixed 7 bonus</span>
+            <span className="slot-pay-value">90</span>
           </div>
           <div className="slot-pay-row">
             <span className="slot-pay-syms">
               <img src={symSprite(2)} alt="Az" /><img src={symSprite(2)} alt="Az" /><img src={symSprite(2)} alt="Az" />
             </span>
-            <span>12</span>
+            <span className="slot-pay-desc">Azurill line</span>
+            <span className="slot-pay-value">12</span>
           </div>
           <div className="slot-pay-row">
             <span className="slot-pay-syms">
               <img src={symSprite(3)} alt="Lo" /><img src={symSprite(3)} alt="Lo" /><img src={symSprite(3)} alt="Lo" />
             </span>
-            <span>6</span>
+            <span className="slot-pay-desc">Lotad line</span>
+            <span className="slot-pay-value">6</span>
           </div>
           <div className="slot-pay-row">
             <span className="slot-pay-syms">
               <img src={symSprite(4)} alt="Ch" /><img src={symSprite(4)} alt="Ch" /><img src={symSprite(4)} alt="Ch" />
             </span>
-            <span>6</span>
+            <span className="slot-pay-desc">Cherry line</span>
+            <span className="slot-pay-value">6</span>
           </div>
           <div className="slot-pay-row">
             <span className="slot-pay-syms">
               <img src={symSprite(5)} alt="Pw" /><img src={symSprite(5)} alt="Pw" /><img src={symSprite(5)} alt="Pw" />
             </span>
-            <span>3</span>
+            <span className="slot-pay-desc">Power line</span>
+            <span className="slot-pay-value">3</span>
           </div>
           <div className="slot-pay-row">
             <span className="slot-pay-syms">
               <img src={symSprite(4)} alt="Ch" /> on reel 1
             </span>
-            <span>2</span>
+            <span className="slot-pay-desc">Single cherry</span>
+            <span className="slot-pay-value">2</span>
           </div>
           <div className="slot-pay-row replay">
             <span className="slot-pay-syms">
               <img src={symSprite(6)} alt="Re" /><img src={symSprite(6)} alt="Re" /><img src={symSprite(6)} alt="Re" />
             </span>
-            <span>Free Spin</span>
+            <span className="slot-pay-desc">Replay</span>
+            <span className="slot-pay-value">Free Spin</span>
           </div>
         </div>
         <div className="slot-line-legend">
