@@ -24,7 +24,30 @@ const ASSET_ROOT = '/gamecorner/roulette';
 const BALLS_PER_ROUND = 6;
 const MAX_MULTIPLIER = 12;
 const MULTIPLIER_TABLE = [0, 3, 4, 6, MAX_MULTIPLIER];
-const WHEEL_SIZE = 256;
+const DIGIT_WIDTH = 8;
+const DIGIT_HEIGHT = 8;
+const GRID_ICON_SIZE = 16;
+const HEADER_ICON_SIZE = 16;
+const CURSOR_SIZE = 16;
+const MULTIPLIER_WIDTH = 24;
+const MULTIPLIER_HEIGHT = 16;
+const POKEMON_HEADER_FRAME: Record<PokemonId, number> = {
+  wynaut: 4,
+  azurill: 5,
+  skitty: 6,
+  makuhita: 7,
+};
+const ROW_HEADER_FRAME: Record<RowId, number> = {
+  orange: 8,
+  green: 9,
+  purple: 10,
+};
+const MULTIPLIER_FRAME: Record<number, number> = {
+  3: 0,
+  4: 1,
+  6: 2,
+  12: 3,
+};
 
 const TABLES: TableDef[] = [
   { id: 'left', label: 'Left Table', minBet: 1, themeClass: 'roulette-theme-left' },
@@ -106,6 +129,111 @@ function normalizeAngle(angle: number): number {
   return normalized < 0 ? normalized + 360 : normalized;
 }
 
+function SpriteFrame({
+  src,
+  width,
+  height,
+  x = 0,
+  y = 0,
+  scale = 1,
+  className = '',
+  alt = '',
+}: {
+  src: string;
+  width: number;
+  height: number;
+  x?: number;
+  y?: number;
+  scale?: number;
+  className?: string;
+  alt?: string;
+}) {
+  return (
+    <span className={`roulette-sprite-frame ${className}`.trim()} style={{ width: width * scale, height: height * scale }}>
+      <img
+        src={src}
+        alt={alt}
+        style={{
+          left: -x * scale,
+          top: -y * scale,
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+        }}
+      />
+    </span>
+  );
+}
+
+function DigitDisplay({ value, minDigits = 1 }: { value: number; minDigits?: number }) {
+  const digits = Math.max(0, Math.floor(value)).toString().padStart(minDigits, '0');
+  return (
+    <span className="roulette-digit-strip" aria-label={digits}>
+      {digits.split('').map((digit, index) => (
+        <SpriteFrame
+          key={`${digit}-${index}`}
+          src={`${ASSET_ROOT}/numbers.png`}
+          width={DIGIT_WIDTH}
+          height={DIGIT_HEIGHT}
+          x={Number(digit) * DIGIT_WIDTH}
+          scale={2}
+        />
+      ))}
+    </span>
+  );
+}
+
+function MultiplierBadge({ multiplier }: { multiplier: number }) {
+  return (
+    <SpriteFrame
+      src={`${ASSET_ROOT}/multiplier.png`}
+      width={MULTIPLIER_WIDTH}
+      height={MULTIPLIER_HEIGHT}
+      y={(MULTIPLIER_FRAME[multiplier] ?? 0) * MULTIPLIER_HEIGHT}
+      scale={2}
+      className="roulette-multiplier-sprite"
+    />
+  );
+}
+
+function HelperSprite({ tableId }: { tableId: TableId }) {
+  if (tableId === 'left') {
+    return <SpriteFrame src={`${ASSET_ROOT}/shroomish.png`} width={24} height={16} scale={2} className="roulette-helper-sprite" />;
+  }
+  return <SpriteFrame src={`${ASSET_ROOT}/tailow.png`} width={32} height={16} scale={2} className="roulette-helper-sprite" />;
+}
+
+function GridIcon({ slotId, scale = 2 }: { slotId: number; scale?: number }) {
+  return (
+    <SpriteFrame
+      src={`${ASSET_ROOT}/grid_icons.png`}
+      width={GRID_ICON_SIZE}
+      height={GRID_ICON_SIZE}
+      y={slotId * GRID_ICON_SIZE}
+      scale={scale}
+      className="roulette-grid-icon"
+    />
+  );
+}
+
+function HeaderIcon({ frame, scale = 2 }: { frame: number; scale?: number }) {
+  return (
+    <SpriteFrame
+      src={`${ASSET_ROOT}/headers.png`}
+      width={HEADER_ICON_SIZE}
+      height={HEADER_ICON_SIZE}
+      y={frame * HEADER_ICON_SIZE}
+      scale={scale}
+      className="roulette-header-icon"
+    />
+  );
+}
+
+function wheelBallStyle(angle: number, radius: number): React.CSSProperties {
+  return {
+    transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${radius}px)`,
+  };
+}
+
 function BallSprite({ dimmed = false }: { dimmed?: boolean }) {
   return (
     <span className={`roulette-ball-sprite ${dimmed ? 'dimmed' : ''}`}>
@@ -124,8 +252,11 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
   const [winningSlotId, setWinningSlotId] = useState<number | null>(null);
   const [message, setMessage] = useState('The minimum wager changes by table. Pick a square, row, or column to place a Rogue-style bet.');
   const [wheelAngle, setWheelAngle] = useState(0);
+  const [ballAngle, setBallAngle] = useState(-90);
+  const [ballRadius, setBallRadius] = useState(96);
 
   const wheelAngleRef = useRef(0);
+  const ballAngleRef = useRef(-90);
   const animationFrameRef = useRef<number | null>(null);
 
   const currentTable = TABLES.find((table) => table.id === tableId) ?? TABLES[0];
@@ -169,12 +300,17 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
   const ballsRemaining = BALLS_PER_ROUND - ballsUsed;
 
   const resetBoard = useCallback((nextMessage: string) => {
+    wheelAngleRef.current = 0;
+    ballAngleRef.current = -90;
     setHitSlotIds([]);
     setBallsUsed(0);
     setNeedsBoardClear(false);
     setWinningSlotId(null);
     setSelectedSelectionId(slotSelection(0));
     setMessage(nextMessage);
+    setWheelAngle(0);
+    setBallAngle(-90);
+    setBallRadius(96);
   }, []);
 
   useEffect(() => {
@@ -223,20 +359,33 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
 
     const fullSpins = currentTable.id === 'left' ? 4 + Math.floor(Math.random() * 2) : 5 + Math.floor(Math.random() * 2);
     const endAngle = currentAngle + fullSpins * 360 + delta;
-    const duration = currentTable.id === 'left' ? 2200 : 1800;
+    const duration = currentTable.id === 'left' ? 3800 : 3200;
     const startTime = performance.now();
+    const startBallAngle = ballAngleRef.current;
+    const startBallRadius = currentTable.id === 'left' ? 116 : 112;
+    const endBallAngle = startBallAngle - (currentTable.id === 'left' ? 6 : 7) * 360;
+    const endBallRadius = 94;
 
     setSpinning(true);
     setWinningSlotId(null);
-    setMessage('The wheel is spinning...');
+    setBallRadius(startBallRadius);
+    setMessage('The wheel is spinning. Follow the ball to the winning slot.');
 
     const animate = (timestamp: number) => {
       const elapsed = timestamp - startTime;
       const progress = Math.min(1, elapsed / duration);
       const eased = 1 - Math.pow(1 - progress, 3);
+      const ballEase = 1 - Math.pow(1 - progress, 2.2);
+      const dropProgress = Math.max(0, (progress - 0.55) / 0.45);
+      const dropEase = 1 - Math.pow(1 - dropProgress, 2.4);
       const nextAngle = currentAngle + (endAngle - currentAngle) * eased;
+      const nextBallAngle = startBallAngle + (endBallAngle - startBallAngle) * ballEase;
+      const nextBallRadius = startBallRadius + (endBallRadius - startBallRadius) * dropEase;
       wheelAngleRef.current = nextAngle;
+      ballAngleRef.current = nextBallAngle;
       setWheelAngle(nextAngle);
+      setBallAngle(nextBallAngle);
+      setBallRadius(nextBallRadius);
 
       if (progress < 1) {
         animationFrameRef.current = requestAnimationFrame(animate);
@@ -250,7 +399,10 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
       const payout = currentTable.minBet * multiplierAtSpin;
 
       wheelAngleRef.current = endAngle;
+  ballAngleRef.current = endBallAngle;
       setWheelAngle(endAngle);
+  setBallAngle(endBallAngle);
+  setBallRadius(endBallRadius);
       setSpinning(false);
       setWinningSlotId(landedSlot.slotId);
       setHitSlotIds(Array.from(nextHitSet));
@@ -296,16 +448,32 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
           ))}
         </div>
 
-        <div className="roulette-summary">
-          <span>Selected payout: <strong>{selectedMultiplier}x</strong></span>
-          <span>Wager: <strong>{currentTable.minBet}</strong></span>
-          <span>Board balls: <strong>{ballsRemaining}</strong></span>
-        </div>
+        <div className="roulette-readouts">
+          <div className="roulette-window-panel roulette-credit-panel">
+            <SpriteFrame src={`${ASSET_ROOT}/credit.png`} width={48} height={11} scale={2} className="roulette-credit-label" />
+            <DigitDisplay value={coins} minDigits={4} />
+          </div>
 
-        <div className="roulette-ball-strip" aria-label="Balls remaining this round">
-          {Array.from({ length: BALLS_PER_ROUND }, (_, index) => (
-            <BallSprite key={index} dimmed={index < ballsUsed} />
-          ))}
+          <div className="roulette-window-panel roulette-summary-panel">
+            <div className="roulette-summary-item">
+              <span className="roulette-summary-label">Wager</span>
+              <DigitDisplay value={currentTable.minBet} />
+            </div>
+            <div className="roulette-summary-item">
+              <span className="roulette-summary-label">Payout</span>
+              {selectedMultiplier > 0 ? <MultiplierBadge multiplier={selectedMultiplier} /> : <span className="roulette-closed-label">Closed</span>}
+            </div>
+          </div>
+
+          <div className="roulette-window-panel roulette-balls-panel">
+            <img src={`${ASSET_ROOT}/ball_counter.png`} alt="" className="roulette-ball-counter-art" />
+            <div className="roulette-ball-strip" aria-label="Balls remaining this round">
+              {Array.from({ length: BALLS_PER_ROUND }, (_, index) => (
+                <BallSprite key={index} dimmed={index < ballsUsed} />
+              ))}
+            </div>
+            <div className="roulette-balls-remaining">Board balls: <strong>{ballsRemaining}</strong></div>
+          </div>
         </div>
       </div>
 
@@ -328,8 +496,21 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
                   title={`${POKEMON_META[slot.pokemon].label} / ${ROW_META[slot.row].label}`}
                 >
                   <img src={slot.icon} alt="" className="roulette-pokemon-icon" />
+                  {selectedSelectionId === slotSelection(slot.slotId) && (
+                    <SpriteFrame
+                      src={`${ASSET_ROOT}/cursor.png`}
+                      width={CURSOR_SIZE}
+                      height={CURSOR_SIZE}
+                      scale={1.4}
+                      className="roulette-wheel-cursor"
+                    />
+                  )}
                 </button>
               ))}
+            </div>
+            <div className="roulette-wheel-ball" style={wheelBallStyle(ballAngle, ballRadius)}>
+              <SpriteFrame src={`${ASSET_ROOT}/shadow.png`} width={16} height={8} scale={2} className="roulette-ball-shadow" />
+              <BallSprite />
             </div>
             <img src={`${ASSET_ROOT}/center.png`} alt="" className="roulette-wheel-center" />
           </div>
@@ -339,9 +520,15 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
               {spinning ? 'Spinning...' : `Spin (${currentTable.minBet} coin${currentTable.minBet === 1 ? '' : 's'})`}
             </button>
             {needsBoardClear && (
-              <button className="mini" onClick={clearBoard}>
-                Clear Board
-              </button>
+              <div className="roulette-clear-helper">
+                <div className="roulette-helper-stack">
+                  <SpriteFrame src={`${ASSET_ROOT}/shadow.png`} width={16} height={8} scale={2} className="roulette-helper-shadow" />
+                  <HelperSprite tableId={tableId} />
+                </div>
+                <button className="mini" onClick={clearBoard}>
+                  Clear Board
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -359,9 +546,18 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
                   onClick={() => setSelectedSelectionId(selectionId)}
                   disabled={spinning}
                 >
-                  <img src={POKEMON_META[pokemon].icon} alt="" className="roulette-pokemon-icon" />
+                  <HeaderIcon frame={POKEMON_HEADER_FRAME[pokemon]} />
                   <span>{POKEMON_META[pokemon].label}</span>
-                  <span className="roulette-badge">x{multiplier}</span>
+                  {multiplier > 0 ? <MultiplierBadge multiplier={multiplier} /> : <span className="roulette-badge">Closed</span>}
+                  {selectedSelectionId === selectionId && (
+                    <SpriteFrame
+                      src={`${ASSET_ROOT}/cursor.png`}
+                      width={CURSOR_SIZE}
+                      height={CURSOR_SIZE}
+                      scale={3.2}
+                      className="roulette-selection-cursor"
+                    />
+                  )}
                 </button>
               );
             })}
@@ -375,8 +571,18 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
                     onClick={() => setSelectedSelectionId(rowSelectionId)}
                     disabled={spinning}
                   >
+                    <HeaderIcon frame={ROW_HEADER_FRAME[row]} />
                     <span>{ROW_META[row].label}</span>
-                    <span className="roulette-badge">x{getMultiplier(rowSelectionId)}</span>
+                    {getMultiplier(rowSelectionId) > 0 ? <MultiplierBadge multiplier={getMultiplier(rowSelectionId)} /> : <span className="roulette-badge">Closed</span>}
+                    {selectedSelectionId === rowSelectionId && (
+                      <SpriteFrame
+                        src={`${ASSET_ROOT}/cursor.png`}
+                        width={CURSOR_SIZE}
+                        height={CURSOR_SIZE}
+                        scale={3.2}
+                        className="roulette-selection-cursor"
+                      />
+                    )}
                   </button>
 
                   {POKEMON_ORDER.map((pokemon) => {
@@ -391,8 +597,17 @@ export function Roulette({ coins, addCoins, spendCoins }: GameProps) {
                         onClick={() => setSelectedSelectionId(selectionId)}
                         disabled={spinning}
                       >
-                        <img src={slot.icon} alt="" className="roulette-pokemon-icon" />
-                        <span className="roulette-badge">x{getMultiplier(selectionId)}</span>
+                        <GridIcon slotId={slot.slotId} />
+                        {getMultiplier(selectionId) > 0 ? <MultiplierBadge multiplier={getMultiplier(selectionId)} /> : <span className="roulette-badge">Closed</span>}
+                        {selectedSelectionId === selectionId && (
+                          <SpriteFrame
+                            src={`${ASSET_ROOT}/cursor.png`}
+                            width={CURSOR_SIZE}
+                            height={CURSOR_SIZE}
+                            scale={3.2}
+                            className="roulette-selection-cursor"
+                          />
+                        )}
                         {hit && <span className="roulette-hit-token"><BallSprite /></span>}
                       </button>
                     );

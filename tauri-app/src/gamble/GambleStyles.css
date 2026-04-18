@@ -387,6 +387,20 @@
   display: flex; flex-direction: column; gap: 10px;
   align-items: center; margin: 8px 0 14px;
 }
+.roulette-sprite-frame {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  image-rendering: pixelated;
+  line-height: 0;
+}
+
+.roulette-sprite-frame img {
+  position: absolute;
+  image-rendering: pixelated;
+  display: block;
+}
+
 .roulette-table-picker {
   display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
 }
@@ -400,13 +414,61 @@
 .roulette-table-btn.active { background: var(--accent); color: #fff; }
 .roulette-table-btn:disabled { opacity: 0.55; cursor: default; }
 
-.roulette-summary {
-  display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
-  font-size: 13px;
+.roulette-readouts {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: stretch;
+}
+
+.roulette-window-panel {
+  min-width: 140px; padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.18)),
+    radial-gradient(circle at top left, rgba(255,255,255,0.12), transparent 45%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.roulette-credit-panel,
+.roulette-summary-panel,
+.roulette-balls-panel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+}
+
+.roulette-credit-label {
+  margin-bottom: 2px;
+}
+
+.roulette-digit-strip {
+  display: inline-flex; gap: 2px; align-items: center;
+}
+
+.roulette-summary-panel {
+  flex-direction: row; gap: 14px;
+}
+
+.roulette-summary-item {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+
+.roulette-summary-label,
+.roulette-balls-remaining {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+}
+
+.roulette-multiplier-sprite {
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.3));
+}
+
+.roulette-closed-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase; opacity: 0.75;
 }
 
 .roulette-ball-strip {
   display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;
+}
+
+.roulette-ball-counter-art {
+  width: 30px; height: auto; image-rendering: pixelated;
 }
 
 .roulette-ball-sprite {
@@ -452,6 +514,17 @@
   position: absolute; inset: 12px; transition: transform 0.08s linear;
 }
 
+.roulette-wheel-ball {
+  position: absolute; left: 50%; top: 50%; z-index: 6;
+  pointer-events: none;
+}
+
+.roulette-ball-shadow {
+  position: absolute; left: 50%; top: 18px;
+  transform: translateX(-50%);
+  opacity: 0.7;
+}
+
 .roulette-wheel-base,
 .roulette-wheel-center {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -484,6 +557,12 @@
   width: 18px; height: 18px; image-rendering: pixelated; display: block;
 }
 
+.roulette-wheel-cursor {
+  position: absolute; inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 .roulette-actions {
   display: flex; gap: 10px; justify-content: center; align-items: center;
   flex-wrap: wrap; margin-top: 12px;
@@ -495,6 +574,22 @@
   font-size: 15px; font-weight: 700; cursor: pointer;
 }
 .roulette-spin-btn:disabled { opacity: 0.55; cursor: default; }
+
+.roulette-clear-helper {
+  display: inline-flex; align-items: center; gap: 8px;
+}
+
+.roulette-helper-stack {
+  position: relative; width: 48px; height: 36px;
+}
+
+.roulette-helper-shadow {
+  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+}
+
+.roulette-helper-sprite {
+  position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%);
+}
 
 .roulette-board {
   min-width: 0; padding: 14px; border-radius: 16px;
@@ -551,6 +646,11 @@
   min-height: 76px;
 }
 
+.roulette-header-icon,
+.roulette-grid-icon {
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35));
+}
+
 .roulette-slot-button .roulette-pokemon-icon,
 .roulette-column-button .roulette-pokemon-icon {
   width: 28px; height: 28px; image-rendering: pixelated; display: block;
@@ -565,6 +665,12 @@
 
 .roulette-hit-token {
   position: absolute; right: 4px; bottom: 4px;
+}
+
+.roulette-selection-cursor {
+  position: absolute; inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .roulette-hit-token .roulette-ball-sprite {
@@ -593,6 +699,14 @@
 @media (max-width: 900px) {
   .roulette-layout {
     grid-template-columns: 1fr;
+  }
+
+  .roulette-readouts {
+    width: 100%;
+  }
+
+  .roulette-window-panel {
+    flex: 1 1 140px;
   }
 
   .roulette-board {

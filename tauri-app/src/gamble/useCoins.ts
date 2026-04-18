@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 const STORAGE_KEY = 'ttrpg.gambleCoins';
 const DEFAULT_COINS = 500;
@@ -10,21 +10,22 @@ export function useCoins() {
       return v != null ? Math.max(0, parseInt(v, 10) || 0) : DEFAULT_COINS;
     } catch { return DEFAULT_COINS; }
   });
+  const coinsRef = useRef(coins);
 
   const setCoins = useCallback((next: number | ((prev: number) => number)) => {
-    setCoinsRaw(prev => {
-      const val = typeof next === 'function' ? next(prev) : next;
-      const clamped = Math.max(0, val);
-      try { localStorage.setItem(STORAGE_KEY, String(clamped)); } catch {}
-      return clamped;
-    });
+    const prev = coinsRef.current;
+    const val = typeof next === 'function' ? next(prev) : next;
+    const clamped = Math.max(0, val);
+    coinsRef.current = clamped;
+    try { localStorage.setItem(STORAGE_KEY, String(clamped)); } catch {}
+    setCoinsRaw(clamped);
   }, []);
 
   const addCoins = useCallback((amount: number) => setCoins(c => c + amount), [setCoins]);
   const spendCoins = useCallback((amount: number): boolean => {
-    let ok = false;
-    setCoins(c => { if (c >= amount) { ok = true; return c - amount; } return c; });
-    return ok;
+    if (coinsRef.current < amount) return false;
+    setCoins(coinsRef.current - amount);
+    return true;
   }, [setCoins]);
 
   return { coins, setCoins, addCoins, spendCoins };
