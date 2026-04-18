@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Block Stacker – Blocks slide L/R, press to drop.
@@ -13,7 +14,7 @@ const ROWS = 15;
 const TICK_MS = 200;
 const ENTRY_COST = 5;
 
-const SP = '/gamecorner/block_stacker/';
+const SP = gamecornerAsset('block_stacker/');
 
 interface Layer { left: number; width: number; }
 

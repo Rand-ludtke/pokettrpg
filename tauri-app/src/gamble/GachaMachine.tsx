@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Gacha Machine – 4 tiers (Basic / Great / Ultra / Master).
@@ -7,7 +8,7 @@ import { GameProps } from './types';
   Uses Pokémon sprites from pokeemerald game corner expansion.
 */
 
-const SP = '/gamecorner/gacha/';
+const SP = gamecornerAsset('gacha/');
 
 /* 5 Pokémon sprites – each 32×128, 4 frames of 32×32 */
 const POKEMON_SPRITES = ['belossom', 'elekid', 'hoppip', 'phanpy', 'teddiursa'] as const;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pokettrpg-pwa-v7';
+const CACHE_NAME = 'pokettrpg-pwa-v8';
 const scope = self?.registration?.scope || '/';
 const base = scope.endsWith('/') ? scope : `${scope}/`;
 const CORE_ASSETS = [
@@ -24,6 +24,24 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const isNavigation = event.request.mode === 'navigate';
+  const url = new URL(event.request.url);
+
+  // Compatibility shim for older cached bundles that still request root-level gamecorner assets.
+  if (url.origin === self.location.origin && url.pathname.startsWith('/gamecorner/')) {
+    const rewrittenUrl = new URL(`${base}${url.pathname.replace(/^\//, '')}`, self.location.origin);
+    event.respondWith(
+      fetch(rewrittenUrl.toString())
+        .then(response => {
+          if (response && response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(rewrittenUrl.toString(), clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(rewrittenUrl.toString()).then(cached => cached || new Response('Offline', { status: 503, statusText: 'Service Unavailable' })))
+    );
+    return;
+  }
 
   // Always revalidate document requests first so deployed updates are picked up.
   if (isNavigation) {
@@ -42,7 +60,6 @@ self.addEventListener('fetch', event => {
   }
 
   // Never cache fusion/API endpoints — gen-check, generate, sprites must always hit the server
-  const url = new URL(event.request.url);
   if (url.pathname.includes('/fusion/') || url.pathname.startsWith('/api/')) {
     event.respondWith(fetch(event.request).catch(() => new Response('Offline', { status: 503 })));
     return;

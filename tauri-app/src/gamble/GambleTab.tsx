@@ -11,22 +11,23 @@ import { BlockStacker } from './BlockStacker';
 import { Derby } from './Derby';
 import { GachaMachine } from './GachaMachine';
 import { Pinball } from './Pinball';
+import { gamecornerAsset } from './assets';
 import './GambleStyles.css';
 
 type Game = 'menu' | 'slots' | 'roulette' | 'voltorb' | 'blackjack' | 'plinko' | 'snake' | 'flappy' | 'stacker' | 'derby' | 'gacha' | 'pinball';
 
 const GAMES: { id: Game; label: string; desc: string; icon: string }[] = [
-  { id: 'slots',    label: 'Slot Machine',   desc: 'Spin the reels! Match symbols to win.',        icon: '/gamecorner/slot_machine/menu.png' },
-  { id: 'roulette', label: 'Roulette',       desc: 'Rogue-style wheel with color and Pokemon bets.', icon: '/gamecorner/roulette/wheel.png' },
-  { id: 'voltorb',  label: 'Voltorb Flip',   desc: 'Flip cards — avoid the Voltorb!',             icon: '/gamecorner/voltorbflip/gameboard.png' },
-  { id: 'blackjack',label: 'Blackjack',       desc: 'Beat the dealer to 21.',                      icon: '/gamecorner/blackjack/facedown.png' },
-  { id: 'plinko',   label: 'Pachinko',        desc: 'Drop balls through pegs for prizes.',          icon: '/gamecorner/pachinko/title.png' },
-  { id: 'pinball',  label: 'Pinball',         desc: 'Play the Emerald-style pinball machines.',     icon: '/gamecorner/pinball/bg_tiles_meowth.png' },
-  { id: 'snake',    label: 'Snake',            desc: 'Eat coins, grow longer, don\'t crash.',       icon: '/gamecorner/snake/onix-head.png' },
-  { id: 'flappy',   label: 'Flappy Bird',     desc: 'Fly through pipes — how far can you go?',     icon: '/gamecorner/flappybird/arcade-screen.png' },
-  { id: 'stacker',  label: 'Block Stacker',   desc: 'Stack blocks to reach the top.',               icon: '/gamecorner/block_stacker/title.png' },
-  { id: 'derby',    label: 'Derby',            desc: 'Bet on Pokemon in a race.',                   icon: '/gamecorner/derby/selection.png' },
-  { id: 'gacha',    label: 'Gacha Machine',   desc: 'Multi-tier prizes from the repo machine UI.',  icon: '/gamecorner/gacha/menu_1.png' },
+  { id: 'slots',    label: 'Slot Machine',   desc: 'Spin the reels! Match symbols to win.',        icon: gamecornerAsset('slot_machine/menu.png') },
+  { id: 'roulette', label: 'Roulette',       desc: 'Rogue-style wheel with color and Pokemon bets.', icon: gamecornerAsset('roulette/wheel.png') },
+  { id: 'voltorb',  label: 'Voltorb Flip',   desc: 'Flip cards — avoid the Voltorb!',             icon: gamecornerAsset('voltorbflip/gameboard.png') },
+  { id: 'blackjack',label: 'Blackjack',       desc: 'Beat the dealer to 21.',                      icon: gamecornerAsset('blackjack/facedown.png') },
+  { id: 'plinko',   label: 'Pachinko',        desc: 'Drop balls through pegs for prizes.',          icon: gamecornerAsset('pachinko/title.png') },
+  { id: 'pinball',  label: 'Pinball',         desc: 'Play the Emerald-style pinball machines.',     icon: gamecornerAsset('pinball/bg_tiles_meowth.png') },
+  { id: 'snake',    label: 'Snake',            desc: 'Eat coins, grow longer, don\'t crash.',       icon: gamecornerAsset('snake/onix-head.png') },
+  { id: 'flappy',   label: 'Flappy Bird',     desc: 'Fly through pipes — how far can you go?',     icon: gamecornerAsset('flappybird/arcade-screen.png') },
+  { id: 'stacker',  label: 'Block Stacker',   desc: 'Stack blocks to reach the top.',               icon: gamecornerAsset('block_stacker/title.png') },
+  { id: 'derby',    label: 'Derby',            desc: 'Bet on Pokemon in a race.',                   icon: gamecornerAsset('derby/selection.png') },
+  { id: 'gacha',    label: 'Gacha Machine',   desc: 'Multi-tier prizes from the repo machine UI.',  icon: gamecornerAsset('gacha/menu_1.png') },
 ];
 
 export function GambleTab() {

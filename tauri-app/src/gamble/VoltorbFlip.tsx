@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
-const VF_SP = '/gamecorner/voltorbflip/';
+const VF_SP = gamecornerAsset('voltorbflip/');
 const BOARD_WIDTH = 5;
 const BOARD_HEIGHT = 5;
 const MAX_LEVEL = 8;

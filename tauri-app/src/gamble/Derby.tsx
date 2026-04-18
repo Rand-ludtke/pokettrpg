@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Derby – Bet on Pokémon racers from pokeemerald game corner.
@@ -11,7 +12,7 @@ const ENTRY_COST = 10;
 const TRACK_LEN = 20;
 const TICK_MS = 200;
 
-const SP = '/gamecorner/derby/';
+const SP = gamecornerAsset('derby/');
 
 /* Sprite sheet helper – overworld sprites are 32×32 frames stacked vertically */
 function RacerSprite({ src, frame = 0 }: { src: string; frame?: number }) {

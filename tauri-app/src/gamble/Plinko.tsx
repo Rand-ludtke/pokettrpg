@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Plinko – Drop a ball through a peg board.
@@ -14,7 +15,7 @@ const MULTIPLIERS = [0, 0.5, 1, 2, 5, 10, 5, 2, 1, 0.5, 0];
 const DROP_COST = 5;
 
 /* Pokeball sprite for the ball (reuse from pinball) */
-const BALL_IMG = '/gamecorner/pinball/ball_pokeball.png';
+const BALL_IMG = gamecornerAsset('pinball/ball_pokeball.png');
 
 interface BallState {
   row: number;

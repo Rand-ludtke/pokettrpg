@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 type TableId = 'left' | 'right';
 type RowId = 'orange' | 'green' | 'purple';
@@ -20,7 +21,7 @@ interface SlotDef {
   icon: string;
 }
 
-const ASSET_ROOT = '/gamecorner/roulette';
+const ASSET_ROOT = gamecornerAsset('roulette').replace(/\/$/, '');
 const BALLS_PER_ROUND = 6;
 const MAX_MULTIPLIER = 12;
 const MULTIPLIER_TABLE = [0, 3, 4, 6, MAX_MULTIPLIER];

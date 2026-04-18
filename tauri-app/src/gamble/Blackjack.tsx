@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Blackjack – Standard rules:
@@ -10,7 +11,7 @@ import { GameProps } from './types';
   Uses facedown card sprite from pokeemerald game corner expansion.
 */
 
-const BJ_SP = '/gamecorner/blackjack/';
+const BJ_SP = gamecornerAsset('blackjack/');
 
 function FaceDownCard() {
   return (

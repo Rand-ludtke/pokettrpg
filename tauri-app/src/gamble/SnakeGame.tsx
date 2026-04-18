@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Snake – Classic snake game with Onix sprites from pokeemerald game corner.
@@ -12,7 +13,7 @@ const TICK_MS = 120;
 const ENTRY_COST = 5;
 
 /* Sprite frame helpers – sprites are vertical strips of 16×16 frames */
-const SP = '/gamecorner/snake/';
+const SP = gamecornerAsset('snake/');
 const HEAD_FRAMES: Record<Dir, number> = { down: 0, up: 4, left: 8, right: 12 };
 const BERRIES = [`${SP}berry1.png`, `${SP}berry2.png`, `${SP}berry3.png`];
 

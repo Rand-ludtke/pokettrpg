@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Pinball / Pachinko – launch a ball and watch it bounce through pegs into scoring zones.
@@ -18,7 +19,7 @@ const FRICTION = 0.998;
 const ENTRY_COST = 10;
 const BALLS_PER_GAME = 5;
 
-const PIN_SP = '/gamecorner/pinball/';
+const PIN_SP = gamecornerAsset('pinball/');
 
 /* ball_pokeball.png: 16×128 = 8 frames of 16×16 */
 function loadImg(src: string): HTMLImageElement {

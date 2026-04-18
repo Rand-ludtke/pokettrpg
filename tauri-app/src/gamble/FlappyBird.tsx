@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Flappy Bird – Tap/click/space to flap. Navigate through gaps.
@@ -19,7 +20,7 @@ const BIRD_X = 60;
 const BIRD_R = 24; // bigger hitbox for 64×64 sprite scaled down
 const ENTRY_COST = 5;
 
-const SP = '/gamecorner/flappybird/';
+const SP = gamecornerAsset('flappybird/');
 
 /* Pre-load sprite images */
 function loadImg(src: string): HTMLImageElement {

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { GameProps } from './types';
+import { gamecornerAsset } from './assets';
 
 /*
   Slot Machine – faithful to pokeemerald-gamecorner-expansion
@@ -13,7 +14,7 @@ const SYM_LABELS = ['7 Red', '7 Blue', 'Azurill', 'Lotad', 'Cherry', 'Power', 'R
 const SYM_COUNT = 21;
 
 // Sprite path for each symbol (1-indexed PNGs)
-const symSprite = (id: number) => `/gamecorner/slot_machine/reel_symbols/${id + 1}.png`;
+const symSprite = (id: number) => gamecornerAsset(`slot_machine/reel_symbols/${id + 1}.png`);
 
 // Exact reel strips from pokeemerald C source
 const REEL_STRIPS: number[][] = [
@@ -266,7 +267,7 @@ export function SlotMachine({ coins, addCoins, spendCoins }: GameProps) {
           <span className="slot-info-value">{coins}</span>
         </div>
         <div className="slot-pika-power">
-          <img src="/gamecorner/slot_machine/bolt.png" alt="" className="slot-pika-icon" />
+          <img src={gamecornerAsset('slot_machine/bolt.png')} alt="" className="slot-pika-icon" />
           <div className="slot-pika-bar">
             {Array.from({ length: 16 }, (_, i) => (
               <div key={i} className={`slot-pika-bolt ${i < pikaPower ? 'lit' : ''}`} />
