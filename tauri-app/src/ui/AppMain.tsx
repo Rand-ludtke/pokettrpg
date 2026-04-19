@@ -22,6 +22,7 @@ import { ContestTab } from './ContestTab';
 import { GambleTab } from '../gamble/GambleTab';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
 import { BugReporter } from './BugReporter';
+import { PC_BOX_SIZE, PC_MAX_BOXES, PC_BOXES_STORAGE_KEY, readPcBoxesState } from '../data/pcStorage';
 
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
@@ -144,23 +145,9 @@ export function App() {
   const [selected, setSelected] = useState<BattlePokemon | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const BOX_SIZE = 30;
-  const MAX_BOXES = 64;
-  const [boxes, setBoxes] = useState<Array<Array<BattlePokemon | null>>>(() => {
-    try {
-      const raw = localStorage.getItem('ttrpg.boxes');
-      if (raw) {
-        const parsed = JSON.parse(raw) as Array<Array<BattlePokemon | null>>;
-        const out: Array<Array<BattlePokemon | null>> = Array.from({ length: MAX_BOXES }, (_, i) => {
-          const src = parsed[i] || [];
-          const row: Array<BattlePokemon | null> = Array.from({ length: BOX_SIZE }, (_, j) => src[j] ?? null);
-          return row;
-        });
-        return out;
-      }
-    } catch {}
-    return Array.from({ length: MAX_BOXES }, () => Array.from({ length: BOX_SIZE }, () => null));
-  });
+  const initialBoxesRef = useRef(readPcBoxesState());
+  const lastBoxesSnapshotRef = useRef<string | null>(initialBoxesRef.current.raw);
+  const [boxes, setBoxes] = useState<Array<Array<BattlePokemon | null>>>(() => initialBoxesRef.current.boxes);
   const [boxIndex, setBoxIndex] = useState<number>(() => {
     const raw = localStorage.getItem('ttrpg.boxIndex');
     return raw ? Number(raw) : 0;
@@ -235,9 +222,21 @@ export function App() {
     location.reload();
   }
 
+  useEffect(() => {
+    const onBoxesUpdated = () => {
+      const next = readPcBoxesState();
+      if (next.raw === lastBoxesSnapshotRef.current) return;
+      lastBoxesSnapshotRef.current = next.raw;
+      setBoxes(next.boxes);
+    };
+
+    window.addEventListener('ttrpg-boxes-updated', onBoxesUpdated);
+    return () => window.removeEventListener('ttrpg-boxes-updated', onBoxesUpdated);
+  }, []);
+
   function currentBox(): Array<BattlePokemon | null> { return boxes[boxIndex] ?? []; }
   function setCurrentBox(next: Array<BattlePokemon | null>) {
-    const row = Array.from({ length: BOX_SIZE }, (_, j) => next[j] ?? null);
+    const row = Array.from({ length: PC_BOX_SIZE }, (_, j) => next[j] ?? null);
     setBoxes(prev => prev.map((b, i) => (i === boxIndex ? row : b)));
   }
   function prevBox() { setBoxIndex(i => (i - 1 + boxes.length) % boxes.length); }
@@ -249,14 +248,14 @@ export function App() {
       let queue = newMons.slice();
       let boxPtr = 0;
       while (queue.length) {
-        if (!out[boxPtr]) out[boxPtr] = Array.from({ length: BOX_SIZE }, () => null);
+        if (!out[boxPtr]) out[boxPtr] = Array.from({ length: PC_BOX_SIZE }, () => null);
         const box = out[boxPtr];
-        for (let s = 0; s < BOX_SIZE && queue.length; s++) {
+        for (let s = 0; s < PC_BOX_SIZE && queue.length; s++) {
           if (!box[s]) { box[s] = queue.shift()!; }
         }
         if (queue.length) boxPtr++;
-        if (boxPtr >= out.length && queue.length && out.length < MAX_BOXES) {
-          out.push(Array.from({ length: BOX_SIZE }, () => null));
+        if (boxPtr >= out.length && queue.length && out.length < PC_MAX_BOXES) {
+          out.push(Array.from({ length: PC_BOX_SIZE }, () => null));
         }
         if (boxPtr > 200) break;
       }
@@ -373,7 +372,11 @@ export function App() {
 
   useEffect(() => { saveTeams(teams.teams, teams.activeId); }, [teams]);
   useEffect(() => {
-    try { localStorage.setItem('ttrpg.boxes', JSON.stringify(boxes)); } catch {}
+    try {
+      const raw = JSON.stringify(boxes);
+      localStorage.setItem(PC_BOXES_STORAGE_KEY, raw);
+      lastBoxesSnapshotRef.current = raw;
+    } catch {}
     window.dispatchEvent(new Event('ttrpg-boxes-updated'));
   }, [boxes]);
   useEffect(() => { try { localStorage.setItem('ttrpg.boxIndex', String(boxIndex)); } catch {} }, [boxIndex]);
@@ -495,23 +498,23 @@ export function App() {
                 setBoxes(prev => {
                   const out = prev.map(b => b.slice());
                   for (const i of indices) { if (fromBox>=0 && fromBox<out.length && i>=0 && i<out[fromBox].length) out[fromBox][i] = null; }
-                  let bIdx = boxIndex; let sIdx = Math.max(0, Math.min(BOX_SIZE-1, targetIdx));
+                  let bIdx = boxIndex; let sIdx = Math.max(0, Math.min(PC_BOX_SIZE - 1, targetIdx));
                   for (const mon of mons) {
                     let placed = false; let scans = 0;
-                    while (!placed && scans < (out.length * BOX_SIZE)) {
+                    while (!placed && scans < (out.length * PC_BOX_SIZE)) {
                       if (!out[bIdx][sIdx]) { out[bIdx][sIdx] = mon; placed = true; break; }
                       if (mons.length===1 && scans===0) {
                         const temp = out[bIdx][sIdx];
                         out[bIdx][sIdx] = mon;
-                        let fb = bIdx, fs = (sIdx+1)%BOX_SIZE; let guard=0;
-                        while (guard < out.length*BOX_SIZE) {
+                        let fb = bIdx, fs = (sIdx + 1) % PC_BOX_SIZE; let guard=0;
+                        while (guard < out.length * PC_BOX_SIZE) {
                           if (!out[fb][fs]) { out[fb][fs] = temp!; break; }
-                          fs++; if (fs>=BOX_SIZE) { fs=0; fb=(fb+1)%out.length; }
+                          fs++; if (fs >= PC_BOX_SIZE) { fs = 0; fb = (fb + 1) % out.length; }
                           guard++;
                         }
                         placed = true; break;
                       }
-                      sIdx++; if (sIdx>=BOX_SIZE) { sIdx=0; bIdx=(bIdx+1)%out.length; }
+                      sIdx++; if (sIdx >= PC_BOX_SIZE) { sIdx = 0; bIdx = (bIdx + 1) % out.length; }
                       scans++;
                     }
                   }
@@ -832,7 +835,9 @@ export function App() {
       {tab === 'rules' && (<RulesTab />)}
       {tab === 'badges' && (<BadgeCase />)}
       {tab === 'contest' && (<ContestTab boxes={boxes} />)}
-      {tab === 'gamble' && (<GambleTab />)}
+      <div style={{ display: tab === 'gamble' ? 'block' : 'none' }}>
+        <GambleTab />
+      </div>
       {tab === 'fusion' && (
         <FusionTab
           onAddToPC={(mons) => addAcrossBoxes(mons)}

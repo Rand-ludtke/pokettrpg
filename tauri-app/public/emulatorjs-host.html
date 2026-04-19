@@ -77,10 +77,13 @@
       let saveBootstrapped = false;
       let stateBootstrapped = false;
       let autoContinueScheduled = false;
+      let stateCaptureIntervalId = null;
       const autoloadTimers = [];
 
       function cleanup() {
+        captureAndEmitState('cleanup');
         clearAutoloadTimers();
+        stopStateCaptureLoop();
         pendingStateBuffer = null;
         if (romUrl) {
           URL.revokeObjectURL(romUrl);
@@ -91,6 +94,13 @@
       function clearAutoloadTimers() {
         while (autoloadTimers.length) {
           clearTimeout(autoloadTimers.pop());
+        }
+      }
+
+      function stopStateCaptureLoop() {
+        if (stateCaptureIntervalId !== null) {
+          clearInterval(stateCaptureIntervalId);
+          stateCaptureIntervalId = null;
         }
       }
 
@@ -208,6 +218,48 @@
           },
           [clonedBuffer],
         );
+      }
+
+      function emitStateUpdate(buffer, reason) {
+        const clonedBuffer = cloneBuffer(buffer);
+        if (!clonedBuffer) return;
+
+        send(
+          'ejs:state-update',
+          {
+            byteLength: clonedBuffer.byteLength,
+            reason,
+            stateBuffer: clonedBuffer,
+          },
+          [clonedBuffer],
+        );
+      }
+
+      function captureAndEmitState(reason) {
+        const gameManager = window.EJS_emulator && window.EJS_emulator.gameManager;
+        if (!gameManager || !gameManager.supportsStates || !gameManager.supportsStates()) {
+          return false;
+        }
+
+        try {
+          const stateBuffer = cloneBuffer(gameManager.getState());
+          if (!stateBuffer) return false;
+          emitStateUpdate(stateBuffer, reason);
+          return true;
+        } catch (error) {
+          logDebug('state-capture-failed', {
+            reason,
+            message: error instanceof Error ? error.message : 'Unknown state capture error.',
+          });
+          return false;
+        }
+      }
+
+      function startStateCaptureLoop() {
+        if (stateCaptureIntervalId !== null) return;
+        stateCaptureIntervalId = setInterval(() => {
+          captureAndEmitState('interval');
+        }, 15000);
       }
 
       function restoreSaveBuffer(saveBuffer) {
@@ -387,16 +439,18 @@
             booting.style.display = 'none';
             romUrl = URL.createObjectURL(new Blob([data.romBuffer], { type: 'application/octet-stream' }));
             pendingSaveBuffer = data.saveBuffer instanceof ArrayBuffer ? data.saveBuffer.slice(0) : null;
-            pendingStateBuffer = null;
+            pendingStateBuffer = data.stateBuffer instanceof ArrayBuffer ? data.stateBuffer.slice(0) : null;
             saveBootstrapped = false;
             stateBootstrapped = false;
             autoContinueScheduled = false;
+            stopStateCaptureLoop();
             logDebug('init-received', {
               romName: data.romName || 'Game Corner Expansion',
               hasIncomingSave: !!pendingSaveBuffer,
+              hasIncomingState: !!pendingStateBuffer,
             });
 
-            if (!pendingSaveBuffer) {
+            if (!pendingSaveBuffer && !pendingStateBuffer) {
               const bundledBootstrap = await loadBundledBootstrap();
               if (bundledBootstrap) {
                 pendingSaveBuffer = bundledBootstrap.saveBuffer;
@@ -417,6 +471,7 @@
               if (!pendingStateBuffer && !bootstrapSaveFile()) {
                 injectSaveFile();
               }
+              startStateCaptureLoop();
               scheduleAutoContinue();
               send('ejs:ready');
             };
@@ -425,6 +480,7 @@
               if (!pendingStateBuffer && !bootstrapSaveFile()) {
                 injectSaveFile();
               }
+              startStateCaptureLoop();
               scheduleAutoContinue();
             };
             window.EJS_onSaveUpdate = (saveEvent) => {
@@ -442,6 +498,7 @@
                 },
                 [buffer],
               );
+              captureAndEmitState('save-update');
             };
 
             const loader = document.createElement('script');
@@ -455,6 +512,14 @@
         })();
       });
 
+      window.addEventListener('pagehide', () => {
+        captureAndEmitState('pagehide');
+      });
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          captureAndEmitState('visibilitychange');
+        }
+      });
       window.addEventListener('beforeunload', cleanup);
       send('ejs:host-ready');
     })();

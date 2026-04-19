@@ -1,7 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import { parseEmeraldSave } from './emeraldSave';
-import { loadStoredRom, loadStoredSave, persistRom, persistSave, StoredRom } from './gameCornerPersistence';
+import {
+  loadStoredRom,
+  loadStoredSave,
+  loadStoredState,
+  persistRom,
+  persistSave,
+  persistState,
+  StoredRom,
+} from './gameCornerPersistence';
 import { importParsedEmeraldSaveToPc } from './gameCornerPokemonSync';
 
 type EmulatorControlAlias =
@@ -32,27 +40,20 @@ function isArrayBuffer(value: unknown): value is ArrayBuffer {
 }
 
 export function GameCornerEmulator({
-  appCoins,
   setAppCoins,
-  stationLabel,
-  stationSubtitle,
 }: {
-  appCoins: number;
   setAppCoins: (coins: number) => void;
-  stationLabel: string;
-  stationSubtitle: string;
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const restoreCommandTimerRef = useRef<number | null>(null);
   const [storedRom, setStoredRom] = useState<StoredRom | null>(null);
   const [pendingSave, setPendingSave] = useState<ArrayBuffer | null>(null);
+  const [pendingState, setPendingState] = useState<ArrayBuffer | null>(null);
   const [hostReady, setHostReady] = useState(false);
   const [bootNonce, setBootNonce] = useState(0);
   const [launchRequestedAt, setLaunchRequestedAt] = useState<number | null>(null);
-  const [status, setStatus] = useState('Preparing the exact ROM runtime for this station.');
   const [error, setError] = useState<string | null>(null);
   const [romReady, setRomReady] = useState(false);
-  const [syncNote, setSyncNote] = useState('Save files stay hidden and sync automatically.');
   const [activeControls, setActiveControls] = useState<Record<string, boolean>>({});
 
   const hostSrc = useMemo(() => `${withPublicBase('emulatorjs-host.html')}?session=${bootNonce}`, [bootNonce]);
@@ -66,7 +67,7 @@ export function GameCornerEmulator({
 
   function scheduleBundledStateRestore() {
     clearRestoreCommandTimer();
-    if (pendingSave) return;
+    if (!pendingState) return;
 
     restoreCommandTimerRef.current = window.setTimeout(() => {
       iframeRef.current?.contentWindow?.postMessage(
@@ -111,27 +112,16 @@ export function GameCornerEmulator({
     });
   }
 
-  function requestFullscreen() {
-    if (!iframeRef.current) return;
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
-      return;
-    }
-    iframeRef.current.requestFullscreen?.().catch(() => {});
-  }
-
   useEffect(() => {
     let cancelled = false;
 
-    Promise.all([loadStoredRom(), loadStoredSave()])
-      .then(([rom, save]) => {
+    Promise.all([loadStoredRom(), loadStoredSave(), loadStoredState()])
+      .then(([rom, save, state]) => {
         if (cancelled) return;
         setStoredRom(rom);
         setPendingSave(save);
+        setPendingState(state);
         setRomReady(true);
-        setStatus(rom
-          ? `Exact ROM ready for ${stationLabel}.`
-          : 'Install a compiled Game Corner .gba once, then this station will reopen it automatically.');
       })
       .catch((reason) => {
         if (cancelled) return;
@@ -142,7 +132,7 @@ export function GameCornerEmulator({
     return () => {
       cancelled = true;
     };
-  }, [stationLabel]);
+  }, []);
 
   useEffect(() => {
     function onMessage(event: MessageEvent) {
@@ -161,7 +151,6 @@ export function GameCornerEmulator({
       }
 
       if (data.type === 'ejs:ready') {
-        setStatus(`Exact ROM running for ${stationLabel}.`);
         setError(null);
         scheduleBundledStateRestore();
         return;
@@ -178,12 +167,19 @@ export function GameCornerEmulator({
         return;
       }
 
+      if (data.type === 'ejs:state-update' && isArrayBuffer(data.stateBuffer)) {
+        const stateBuffer = data.stateBuffer;
+        clearRestoreCommandTimer();
+        setPendingState(stateBuffer);
+        persistState(stateBuffer).catch(console.error);
+        return;
+      }
+
       if (data.type === 'ejs:save-update' && isArrayBuffer(data.saveBuffer)) {
         const saveBuffer = data.saveBuffer;
         clearRestoreCommandTimer();
         setPendingSave(saveBuffer);
         persistSave(saveBuffer).catch(console.error);
-        setSyncNote('A fresh ROM save was captured. Syncing coins and imported Pokemon now.');
       }
     }
 
@@ -193,7 +189,7 @@ export function GameCornerEmulator({
       releaseAllControls();
       window.removeEventListener('message', onMessage);
     };
-  }, [pendingSave, stationLabel]);
+  }, []);
 
   useEffect(() => {
     if (!isArrayBuffer(pendingSave)) return;
@@ -202,41 +198,25 @@ export function GameCornerEmulator({
 
     async function syncSave() {
       const parsed = parseEmeraldSave(saveBuffer);
-      if (!parsed) {
-        if (!cancelled) {
-          setSyncNote('A save was captured, but sync is waiting for a recognizable Emerald-format save.');
-        }
-        return;
-      }
+      if (!parsed) return;
 
       setAppCoins(parsed.coins);
       const imported = await importParsedEmeraldSaveToPc(parsed);
       if (cancelled) return;
-
-      const fragments = [`ROM save synced automatically. Current ROM coin total: ${parsed.coins.toLocaleString()}.`];
-      if (imported.importedCount > 0) {
-        fragments.push(`Imported ${imported.importedCount} new Pokemon into the app PC.`);
-      } else if (parsed.party.length || parsed.boxes.length) {
-        fragments.push('No new Pokemon were added because this save has already been imported.');
-      } else {
-        fragments.push('No importable Pokemon were present in the current party or PC boxes yet.');
-      }
       if (imported.droppedCount > 0) {
-        fragments.push(`${imported.droppedCount} Pokemon could not be stored because the app PC is full.`);
+        console.warn('Some imported Game Corner Pokemon could not be stored because the app PC is full.', imported);
       }
-      setSyncNote(fragments.join(' '));
-      setStatus(`Exact ROM running for ${stationLabel}.`);
     }
 
     syncSave().catch((reason) => {
       if (cancelled) return;
-      setSyncNote(reason instanceof Error ? reason.message : 'Save sync failed.');
+      console.error(reason instanceof Error ? reason.message : 'Save sync failed.');
     });
 
     return () => {
       cancelled = true;
     };
-  }, [pendingSave, setAppCoins, stationLabel]);
+  }, [pendingSave, setAppCoins]);
 
   useEffect(() => {
     if (!hostReady || !launchRequestedAt || !storedRom || !iframeRef.current?.contentWindow) return;
@@ -259,10 +239,15 @@ export function GameCornerEmulator({
       transfer.push(saveBuffer);
     }
 
+    if (pendingState) {
+      const stateBuffer = pendingState.slice(0);
+      message.stateBuffer = stateBuffer;
+      transfer.push(stateBuffer);
+    }
+
     iframeRef.current.contentWindow.postMessage(message, '*', transfer);
     setLaunchRequestedAt(null);
-    setStatus(`Booting the exact ROM for ${stationLabel}...`);
-  }, [hostReady, launchRequestedAt, pendingSave, stationLabel, storedRom]);
+  }, [hostReady, launchRequestedAt, pendingSave, pendingState, storedRom]);
 
   useEffect(() => {
     if (!romReady || !storedRom) return;
@@ -270,7 +255,7 @@ export function GameCornerEmulator({
     setHostReady(false);
     setBootNonce((value) => value + 1);
     setLaunchRequestedAt(Date.now());
-  }, [romReady, stationLabel, storedRom]);
+  }, [romReady, storedRom]);
 
   async function onInstallRom(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -280,24 +265,11 @@ export function GameCornerEmulator({
       const rom = await persistRom(file);
       setStoredRom(rom);
       setError(null);
-      setSyncNote('ROM installed. Future saves remain hidden and persist automatically.');
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Failed to store the selected ROM.');
     } finally {
       event.target.value = '';
     }
-  }
-
-  function relaunchInstalledRom() {
-    if (!storedRom) {
-      setError('Install a compiled Game Corner .gba first.');
-      return;
-    }
-    setError(null);
-    clearRestoreCommandTimer();
-    setHostReady(false);
-    setBootNonce((value) => value + 1);
-    setLaunchRequestedAt(Date.now());
   }
 
   function renderControlButton({ label, alias, className }: ControlButton) {
@@ -326,17 +298,6 @@ export function GameCornerEmulator({
 
   return (
     <div className="gamecorner-emulator">
-      <div className="emulator-topline">
-        <div className="emulator-topline-copy">
-          <strong>{stationLabel}</strong>
-          <span>{status}</span>
-        </div>
-        <div className="emulator-topline-meta">
-          <span>{stationSubtitle}</span>
-          <span>{appCoins.toLocaleString()} app coins</span>
-        </div>
-      </div>
-
       {error && <div className="emulator-error">{error}</div>}
 
       {!storedRom ? (
@@ -354,24 +315,7 @@ export function GameCornerEmulator({
             />
           </label>
         </div>
-      ) : (
-        <div className="emulator-toolbar">
-          <div className="emulator-runtime-chip">
-            <strong>ROM</strong>
-            <span>{storedRom.name}</span>
-          </div>
-          <button className="emulator-launch-btn" onClick={relaunchInstalledRom}>Reload ROM</button>
-          <button className="emulator-secondary-btn" onClick={requestFullscreen}>Fullscreen</button>
-          <label className="emulator-replace-link">
-            Replace ROM
-            <input
-              type="file"
-              accept=".gba,application/octet-stream"
-              onChange={onInstallRom}
-            />
-          </label>
-        </div>
-      )}
+      ) : null}
 
       <div className="emulator-frame-wrap">
         <iframe
@@ -396,10 +340,6 @@ export function GameCornerEmulator({
         <div className="emulator-controls-cluster" onPointerLeave={releaseAllControls}>
           <div className="emulator-controls-actions">
             {PRIMARY_CONTROLS.map(renderControlButton)}
-          </div>
-          <div className="emulator-sync-copy emulator-sync-copy--compact">
-            <strong>Hidden save sync</strong>
-            <p>{syncNote}</p>
           </div>
         </div>
       </div>

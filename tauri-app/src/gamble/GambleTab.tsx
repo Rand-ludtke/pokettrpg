@@ -14,9 +14,6 @@ const LOBBY_STAGE_STYLE = {
   '--gamble-scene-accent': '#d79334',
 } as React.CSSProperties;
 
-const LOBBY_LABEL = 'Game Corner Lobby';
-const LOBBY_HINT = 'Boots straight into the restored lobby so you can walk to any machine.';
-
 export function GambleTab() {
   const { coins, setCoins, addCoins, spendCoins } = useCoins();
   const [editingCoins, setEditingCoins] = useState(false);
@@ -63,10 +60,7 @@ export function GambleTab() {
       <div className="gamble-stage gamble-stage--emulator-only" style={LOBBY_STAGE_STYLE}>
         <div className="gamble-stage-body gamble-stage-body--emulator-only">
           <GameCornerEmulator
-            appCoins={coins}
             setAppCoins={setCoins}
-            stationLabel={LOBBY_LABEL}
-            stationSubtitle={LOBBY_HINT}
           />
         </div>
       </div>
