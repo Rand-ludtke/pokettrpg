@@ -9,8 +9,8 @@ import { SnakeGame } from './SnakeGame';
 import { FlappyBird } from './FlappyBird';
 import { BlockStacker } from './BlockStacker';
 import { Derby } from './Derby';
-import { GachaMachine } from './GachaMachine';
-import { Pinball } from './Pinball';
+import { GachaMachine, GachaTierId } from './GachaMachine';
+import { Pinball, PinballThemeId } from './Pinball';
 import { gamecornerAsset } from './assets';
 import './GambleStyles.css';
 
@@ -21,135 +21,103 @@ type PlayableGame = Exclude<Game, 'menu'>;
 interface GameMeta {
   id: PlayableGame;
   label: string;
-  desc: string;
-  icon: string;
-  banner: string;
-  scene: string;
-  decorLeft: string;
-  decorRight: string;
+  titleArt: string;
+  stageArt: string;
   accent: string;
+}
+
+interface StationMeta {
+  id: string;
+  section: string;
+  zone: string;
+  game: PlayableGame;
+  label: string;
+  subtitle: string;
+  cost: string;
+  menuArt: string;
+  titleArt: string;
+  stageArt: string;
+  accent: string;
+  pinballTheme?: PinballThemeId;
+  gachaTier?: GachaTierId;
 }
 
 const GAMES: GameMeta[] = [
   {
     id: 'slots',
     label: 'Slot Machine',
-    desc: 'Spin the reels on a cabinet styled around the original machine art and payoff table.',
-    icon: gamecornerAsset('slot_machine/menu.png'),
-    banner: gamecornerAsset('slot_machine/menu.png'),
-    scene: gamecornerAsset('slot_machine/reel_time_machine.png'),
-    decorLeft: gamecornerAsset('slot_machine/digital_display.png'),
-    decorRight: gamecornerAsset('slot_machine/reel_time_pikachu.png'),
+    titleArt: gamecornerAsset('slot_machine/menu.png'),
+    stageArt: gamecornerAsset('slot_machine/reel_time_machine.png'),
     accent: '#d79334',
   },
   {
     id: 'roulette',
     label: 'Roulette',
-    desc: 'A Rogue-style wheel and betting table framed like the original Game Corner roulette layout.',
-    icon: gamecornerAsset('roulette/wheel.png'),
-    banner: gamecornerAsset('roulette/wheel.png'),
-    scene: gamecornerAsset('roulette/wheel.png'),
-    decorLeft: gamecornerAsset('roulette/credit.png'),
-    decorRight: gamecornerAsset('roulette/ball_counter.png'),
+    titleArt: gamecornerAsset('roulette/headers.png'),
+    stageArt: gamecornerAsset('roulette/wheel.png'),
     accent: '#db8b43',
   },
   {
     id: 'voltorb',
     label: 'Voltorb Flip',
-    desc: 'Flip cards against the original board art instead of a blank panel.',
-    icon: gamecornerAsset('voltorbflip/gameboard.png'),
-    banner: gamecornerAsset('voltorbflip/gameboard.png'),
-    scene: gamecornerAsset('voltorbflip/gameboard.png'),
-    decorLeft: gamecornerAsset('voltorbflip/coins.png'),
-    decorRight: gamecornerAsset('voltorbflip/sprites.png'),
+    titleArt: gamecornerAsset('voltorbflip/coins.png'),
+    stageArt: gamecornerAsset('voltorbflip/gameboard.png'),
     accent: '#d7aa5e',
   },
   {
     id: 'blackjack',
     label: 'Blackjack',
-    desc: 'Card play now sits on a darker felt-and-tile stage using the repo blackjack assets.',
-    icon: gamecornerAsset('blackjack/facedown.png'),
-    banner: gamecornerAsset('blackjack/background_tiles.png'),
-    scene: gamecornerAsset('blackjack/background_tiles.png'),
-    decorLeft: gamecornerAsset('blackjack/popup.png'),
-    decorRight: gamecornerAsset('blackjack/option_1.png'),
+    titleArt: gamecornerAsset('blackjack/popup.png'),
+    stageArt: gamecornerAsset('blackjack/background_tiles.png'),
     accent: '#6aa26f',
   },
   {
     id: 'plinko',
     label: 'Pachinko',
-    desc: 'The peg board is staged with the original pachinko signage and board texture.',
-    icon: gamecornerAsset('pachinko/title.png'),
-    banner: gamecornerAsset('pachinko/title.png'),
-    scene: gamecornerAsset('pachinko/bgtiles.png'),
-    decorLeft: gamecornerAsset('pachinko/multiplier.png'),
-    decorRight: gamecornerAsset('pachinko/arrow.png'),
+    titleArt: gamecornerAsset('pachinko/title.png'),
+    stageArt: gamecornerAsset('pachinko/bgtiles.png'),
     accent: '#efb453',
   },
   {
     id: 'pinball',
     label: 'Pinball',
-    desc: 'Emerald-style pinball machines deserve their own cabinet floor art, not a plain wrapper.',
-    icon: gamecornerAsset('pinball/bg_tiles_meowth.png'),
-    banner: gamecornerAsset('pinball/bg_tiles_meowth.png'),
-    scene: gamecornerAsset('pinball/bg_tiles_meowth.png'),
-    decorLeft: gamecornerAsset('pinball/bg_tiles_gengar.png'),
-    decorRight: gamecornerAsset('pinball/bg_tiles_seel.png'),
+    titleArt: gamecornerAsset('pinball/bg_cover_tiles.png'),
+    stageArt: gamecornerAsset('pinball/bg_tiles_meowth.png'),
     accent: '#e2b560',
   },
   {
     id: 'snake',
     label: 'Snake',
-    desc: 'The arcade shell now uses the actual snake board art and start screen as room decor.',
-    icon: gamecornerAsset('snake/onix-head.png'),
-    banner: gamecornerAsset('snake/start.png'),
-    scene: gamecornerAsset('snake/snake-bg.png'),
-    decorLeft: gamecornerAsset('snake/menu.png'),
-    decorRight: gamecornerAsset('snake/gameover.png'),
+    titleArt: gamecornerAsset('snake/menu.png'),
+    stageArt: gamecornerAsset('snake/snake-bg.png'),
     accent: '#91ba6a',
   },
   {
     id: 'flappy',
     label: 'Flappy Bird',
-    desc: 'The cabinet shell now pulls from the repo arcade screen and parallax background art.',
-    icon: gamecornerAsset('flappybird/arcade-screen.png'),
-    banner: gamecornerAsset('flappybird/arcade-screen.png'),
-    scene: gamecornerAsset('flappybird/flappy-bg.png'),
-    decorLeft: gamecornerAsset('flappybird/start.png'),
-    decorRight: gamecornerAsset('flappybird/flappy-fg.png'),
+    titleArt: gamecornerAsset('flappybird/start.png'),
+    stageArt: gamecornerAsset('flappybird/flappy-bg.png'),
     accent: '#8bc3ea',
   },
   {
     id: 'stacker',
     label: 'Block Stacker',
-    desc: 'Rhydon and the original tile art now anchor the stacker cabinet instead of a pale panel.',
-    icon: gamecornerAsset('block_stacker/title.png'),
-    banner: gamecornerAsset('block_stacker/title.png'),
-    scene: gamecornerAsset('block_stacker/blockbgtiles.png'),
-    decorLeft: gamecornerAsset('block_stacker/rhydon.png'),
-    decorRight: gamecornerAsset('block_stacker/commands.png'),
+    titleArt: gamecornerAsset('block_stacker/title.png'),
+    stageArt: gamecornerAsset('block_stacker/blockbgtiles.png'),
     accent: '#c2a06a',
   },
   {
     id: 'derby',
     label: 'Derby',
-    desc: 'The race and betting slip art finally frame the derby like a proper corner attraction.',
-    icon: gamecornerAsset('derby/selection.png'),
-    banner: gamecornerAsset('derby/selection.png'),
-    scene: gamecornerAsset('derby/race_bg.png'),
-    decorLeft: gamecornerAsset('derby/betslip_bg.png'),
-    decorRight: gamecornerAsset('derby/payout.png'),
+    titleArt: gamecornerAsset('derby/selection.png'),
+    stageArt: gamecornerAsset('derby/race_bg.png'),
     accent: '#d99558',
   },
   {
     id: 'gacha',
     label: 'Gacha Machine',
-    desc: 'The machine shell now uses the actual gacha cabinet pieces and digital panels from the repo.',
-    icon: gamecornerAsset('gacha/menu_1.png'),
-    banner: gamecornerAsset('gacha/menu_1.png'),
-    scene: gamecornerAsset('gacha/bg_middle.png'),
-    decorLeft: gamecornerAsset('gacha/bg_left.png'),
-    decorRight: gamecornerAsset('gacha/bg_right.png'),
+    titleArt: gamecornerAsset('gacha/menu_1.png'),
+    stageArt: gamecornerAsset('gacha/bg_middle.png'),
     accent: '#f0c870',
   },
 ];
@@ -159,22 +127,248 @@ const GAMES_BY_ID: Record<PlayableGame, GameMeta> = GAMES.reduce((acc, game) => 
   return acc;
 }, {} as Record<PlayableGame, GameMeta>);
 
+const STATIONS: StationMeta[] = [
+  {
+    id: 'slots-bank',
+    section: 'Main Floor',
+    zone: 'Slot Bank',
+    game: 'slots',
+    label: 'Slot Machine Row',
+    subtitle: 'The reel bank from Mauville.',
+    cost: 'Variable bet',
+    menuArt: gamecornerAsset('slot_machine/menu.png'),
+    titleArt: gamecornerAsset('slot_machine/menu.png'),
+    stageArt: gamecornerAsset('slot_machine/reel_time_machine.png'),
+    accent: '#d79334',
+  },
+  {
+    id: 'roulette-table',
+    section: 'Main Floor',
+    zone: 'Table Games',
+    game: 'roulette',
+    label: 'Roulette Table',
+    subtitle: 'Pick a square, row, or column.',
+    cost: '1 or 3 coins',
+    menuArt: gamecornerAsset('roulette/wheel.png'),
+    titleArt: gamecornerAsset('roulette/headers.png'),
+    stageArt: gamecornerAsset('roulette/wheel.png'),
+    accent: '#db8b43',
+  },
+  {
+    id: 'blackjack-dealer',
+    section: 'Main Floor',
+    zone: 'Dealer Counter',
+    game: 'blackjack',
+    label: 'Blackjack Dealer',
+    subtitle: 'Hit, stand, double, or insure.',
+    cost: 'Table bet',
+    menuArt: gamecornerAsset('blackjack/popup.png'),
+    titleArt: gamecornerAsset('blackjack/popup.png'),
+    stageArt: gamecornerAsset('blackjack/background_tiles.png'),
+    accent: '#6aa26f',
+  },
+  {
+    id: 'voltorb-station',
+    section: 'Arcade Row',
+    zone: 'Puzzle Machines',
+    game: 'voltorb',
+    label: 'Voltorb Flip',
+    subtitle: 'Source board with escalating levels.',
+    cost: '50 coins',
+    menuArt: gamecornerAsset('voltorbflip/gameboard.png'),
+    titleArt: gamecornerAsset('voltorbflip/coins.png'),
+    stageArt: gamecornerAsset('voltorbflip/gameboard.png'),
+    accent: '#d7aa5e',
+  },
+  {
+    id: 'pachinko-station',
+    section: 'Arcade Row',
+    zone: 'Puzzle Machines',
+    game: 'plinko',
+    label: 'Pachinko Machine',
+    subtitle: 'Drop into the tile-built board.',
+    cost: 'Board entry',
+    menuArt: gamecornerAsset('pachinko/title.png'),
+    titleArt: gamecornerAsset('pachinko/title.png'),
+    stageArt: gamecornerAsset('pachinko/bgtiles.png'),
+    accent: '#efb453',
+  },
+  {
+    id: 'snake-station',
+    section: 'Arcade Row',
+    zone: 'Arcade Machines',
+    game: 'snake',
+    label: 'Snake Cabinet',
+    subtitle: 'Onix run from the arcade row.',
+    cost: '25 coins',
+    menuArt: gamecornerAsset('snake/menu.png'),
+    titleArt: gamecornerAsset('snake/menu.png'),
+    stageArt: gamecornerAsset('snake/snake-bg.png'),
+    accent: '#91ba6a',
+  },
+  {
+    id: 'flappy-station',
+    section: 'Arcade Row',
+    zone: 'Arcade Machines',
+    game: 'flappy',
+    label: 'Butterfree Cabinet',
+    subtitle: 'Arcade-screen flier from the repo.',
+    cost: '25 coins',
+    menuArt: gamecornerAsset('flappybird/start.png'),
+    titleArt: gamecornerAsset('flappybird/start.png'),
+    stageArt: gamecornerAsset('flappybird/flappy-bg.png'),
+    accent: '#8bc3ea',
+  },
+  {
+    id: 'stacker-station',
+    section: 'Arcade Row',
+    zone: 'Arcade Machines',
+    game: 'stacker',
+    label: 'Block Stacker',
+    subtitle: 'Rhydon stacker lane.',
+    cost: '25 coins',
+    menuArt: gamecornerAsset('block_stacker/title.png'),
+    titleArt: gamecornerAsset('block_stacker/title.png'),
+    stageArt: gamecornerAsset('block_stacker/blockbgtiles.png'),
+    accent: '#c2a06a',
+  },
+  {
+    id: 'derby-station',
+    section: 'Arcade Row',
+    zone: 'Race Desk',
+    game: 'derby',
+    label: 'Derby Desk',
+    subtitle: 'Bet on the race lineup.',
+    cost: 'Race wager',
+    menuArt: gamecornerAsset('derby/selection.png'),
+    titleArt: gamecornerAsset('derby/selection.png'),
+    stageArt: gamecornerAsset('derby/race_bg.png'),
+    accent: '#d99558',
+  },
+  {
+    id: 'pinball-meowth',
+    section: 'Pinball Line',
+    zone: 'Pinball Tables',
+    game: 'pinball',
+    label: 'Meowth Table',
+    subtitle: 'The standard 25-coin table.',
+    cost: '25 coins',
+    menuArt: gamecornerAsset('pinball/bg_tiles_meowth.png'),
+    titleArt: gamecornerAsset('pinball/bg_cover_tiles.png'),
+    stageArt: gamecornerAsset('pinball/bg_tiles_meowth.png'),
+    accent: '#e2b560',
+    pinballTheme: 'meowth',
+  },
+  {
+    id: 'pinball-diglett',
+    section: 'Pinball Line',
+    zone: 'Pinball Tables',
+    game: 'pinball',
+    label: 'Diglett Table',
+    subtitle: 'The 50-coin diglett board.',
+    cost: '50 coins',
+    menuArt: gamecornerAsset('pinball/bg_tiles_diglett.png'),
+    titleArt: gamecornerAsset('pinball/bg_cover_tiles.png'),
+    stageArt: gamecornerAsset('pinball/bg_tiles_diglett.png'),
+    accent: '#d0a15c',
+    pinballTheme: 'diglett',
+  },
+  {
+    id: 'pinball-seel',
+    section: 'Pinball Line',
+    zone: 'Pinball Tables',
+    game: 'pinball',
+    label: 'Seel Table',
+    subtitle: 'The ship-theme 25-coin board.',
+    cost: '25 coins',
+    menuArt: gamecornerAsset('pinball/bg_tiles_seel.png'),
+    titleArt: gamecornerAsset('pinball/bg_cover_tiles.png'),
+    stageArt: gamecornerAsset('pinball/bg_tiles_seel.png'),
+    accent: '#76b1d7',
+    pinballTheme: 'seel',
+  },
+  {
+    id: 'pinball-gengar',
+    section: 'Pinball Line',
+    zone: 'Pinball Tables',
+    game: 'pinball',
+    label: 'Gengar Table',
+    subtitle: 'The 100-coin haunted board.',
+    cost: '100 coins',
+    menuArt: gamecornerAsset('pinball/bg_tiles_gengar.png'),
+    titleArt: gamecornerAsset('pinball/bg_cover_tiles.png'),
+    stageArt: gamecornerAsset('pinball/bg_tiles_gengar.png'),
+    accent: '#9d72cc',
+    pinballTheme: 'gengar',
+  },
+  {
+    id: 'gacha-basic',
+    section: 'Prize Corner',
+    zone: 'Gacha Counter',
+    game: 'gacha',
+    label: 'Basic Capsule Machine',
+    subtitle: 'Tier 1 capsule draw.',
+    cost: '50 coins',
+    menuArt: gamecornerAsset('gacha/menu_1.png'),
+    titleArt: gamecornerAsset('gacha/menu_1.png'),
+    stageArt: gamecornerAsset('gacha/bg_middle.png'),
+    accent: '#b9b9b9',
+    gachaTier: 'basic',
+  },
+  {
+    id: 'gacha-great',
+    section: 'Prize Corner',
+    zone: 'Gacha Counter',
+    game: 'gacha',
+    label: 'Great Capsule Machine',
+    subtitle: 'Tier 2 capsule draw.',
+    cost: '250 coins',
+    menuArt: gamecornerAsset('gacha/menu_2.png'),
+    titleArt: gamecornerAsset('gacha/menu_1.png'),
+    stageArt: gamecornerAsset('gacha/bg_middle.png'),
+    accent: '#4f9ae8',
+    gachaTier: 'great',
+  },
+  {
+    id: 'gacha-ultra',
+    section: 'Prize Corner',
+    zone: 'Gacha Counter',
+    game: 'gacha',
+    label: 'Ultra Capsule Machine',
+    subtitle: 'Tier 3 capsule draw.',
+    cost: '1000 coins',
+    menuArt: gamecornerAsset('gacha/menu_2.png'),
+    titleArt: gamecornerAsset('gacha/menu_1.png'),
+    stageArt: gamecornerAsset('gacha/bg_middle.png'),
+    accent: '#f0c04f',
+    gachaTier: 'ultra',
+  },
+  {
+    id: 'gacha-master',
+    section: 'Prize Corner',
+    zone: 'Gacha Counter',
+    game: 'gacha',
+    label: 'Master Capsule Machine',
+    subtitle: 'Tier 4 capsule draw.',
+    cost: '4500 coins',
+    menuArt: gamecornerAsset('gacha/menu_2.png'),
+    titleArt: gamecornerAsset('gacha/menu_1.png'),
+    stageArt: gamecornerAsset('gacha/bg_middle.png'),
+    accent: '#b66bf2',
+    gachaTier: 'master',
+  },
+];
+
+const STATION_SECTIONS = Array.from(new Set(STATIONS.map((station) => station.section)));
+
 const ROOM_STYLE = {
   '--gamble-room-primary': `url("${gamecornerAsset('room/building_tiles.png')}")`,
   '--gamble-room-secondary': `url("${gamecornerAsset('room/mauville_tiles.png')}")`,
 } as React.CSSProperties;
 
-const MENU_SCENE = {
-  banner: gamecornerAsset('slot_machine/menu.png'),
-  scene: gamecornerAsset('room/mauville_tiles.png'),
-  decorLeft: gamecornerAsset('roulette/wheel.png'),
-  decorRight: gamecornerAsset('slot_machine/reel_time_machine.png'),
-  accent: '#d79334',
-};
-
-function getSceneStyle(scene: { scene: string; accent: string }): React.CSSProperties {
+function getStageStyle(scene: { stageArt: string; accent: string }): React.CSSProperties {
   return {
-    '--gamble-scene-image': `url("${scene.scene}")`,
+    '--gamble-scene-image': `url("${scene.stageArt}")`,
     '--gamble-scene-accent': scene.accent,
   } as React.CSSProperties;
 }
@@ -182,12 +376,21 @@ function getSceneStyle(scene: { scene: string; accent: string }): React.CSSPrope
 export function GambleTab() {
   const { coins, setCoins, addCoins, spendCoins } = useCoins();
   const [game, setGame] = useState<Game>('menu');
+  const [activeStation, setActiveStation] = useState<StationMeta | null>(null);
   const [editingCoins, setEditingCoins] = useState(false);
   const [coinInput, setCoinInput] = useState('');
   const coinInputRef = useRef<HTMLInputElement>(null);
-  const activeGame = game === 'menu' ? null : GAMES_BY_ID[game];
+  const activeGame = activeStation ?? (game === 'menu' ? null : GAMES_BY_ID[game]);
 
-  const back = () => setGame('menu');
+  const openStation = (station: StationMeta) => {
+    setActiveStation(station);
+    setGame(station.game);
+  };
+
+  const back = () => {
+    setGame('menu');
+    setActiveStation(null);
+  };
 
   useEffect(() => {
     if (editingCoins && coinInputRef.current) coinInputRef.current.focus();
@@ -217,7 +420,7 @@ export function GambleTab() {
       case 'plinko':
         return <Plinko coins={coins} addCoins={addCoins} spendCoins={spendCoins} />;
       case 'pinball':
-        return <Pinball coins={coins} addCoins={addCoins} spendCoins={spendCoins} />;
+        return <Pinball coins={coins} addCoins={addCoins} spendCoins={spendCoins} initialThemeId={activeStation?.pinballTheme} />;
       case 'snake':
         return <SnakeGame coins={coins} addCoins={addCoins} spendCoins={spendCoins} />;
       case 'flappy':
@@ -227,7 +430,7 @@ export function GambleTab() {
       case 'derby':
         return <Derby coins={coins} addCoins={addCoins} spendCoins={spendCoins} />;
       case 'gacha':
-        return <GachaMachine coins={coins} addCoins={addCoins} spendCoins={spendCoins} />;
+        return <GachaMachine coins={coins} addCoins={addCoins} spendCoins={spendCoins} initialTierId={activeStation?.gachaTier} />;
       default:
         return null;
     }
@@ -257,60 +460,60 @@ export function GambleTab() {
       </div>
 
       {game === 'menu' && (
-        <div className="gamble-scene gamble-menu" style={getSceneStyle(MENU_SCENE)}>
-          <div className="gamble-scene-decor gamble-scene-decor-left" aria-hidden="true">
-            <img src={MENU_SCENE.decorLeft} alt="" />
-          </div>
-          <div className="gamble-scene-decor gamble-scene-decor-right" aria-hidden="true">
-            <img src={MENU_SCENE.decorRight} alt="" />
-          </div>
-          <div className="gamble-scene-header">
-            <div className="gamble-scene-marquee" aria-hidden="true">
-              <img src={MENU_SCENE.banner} alt="" />
+        <div className="gamble-menu-shell">
+          <div className="gamble-menu-content">
+            <div className="gamble-menu-header">
+              <div className="gamble-menu-copy">
+                <p className="gamble-scene-kicker">Mauville Floor</p>
+                <h2>Game Corner</h2>
+                <p>Walk up to a station. This layout follows the Mauville floor script instead of a flat launcher.</p>
+              </div>
+              <div className="gamble-room-preview" aria-hidden="true">
+                <img src={gamecornerAsset('room/mauville_tiles.png')} alt="" />
+              </div>
             </div>
-            <div className="gamble-scene-copy">
-              <p className="gamble-scene-kicker">Mauville Floor</p>
-              <h2>Game Corner</h2>
-              <p>Built around the original repo&apos;s machine art and Mauville Game Corner tiles so the whole tab reads like one room instead of disconnected widgets.</p>
+            <div className="gamble-station-sections">
+              {STATION_SECTIONS.map((section) => (
+                <section key={section} className="gamble-station-section">
+                  <div className="gamble-station-section-head">
+                    <h3>{section}</h3>
+                    <p>{STATIONS.filter((station) => station.section === section)[0]?.zone}</p>
+                  </div>
+                  <div className="gamble-grid gamble-station-grid">
+                    {STATIONS.filter((station) => station.section === section).map((station) => (
+                      <button
+                        key={station.id}
+                        className="gamble-machine-card gamble-station-card"
+                        onClick={() => openStation(station)}
+                        style={{ '--card-accent': station.accent } as React.CSSProperties}
+                      >
+                        <span className="gamble-machine-screen">
+                          <img src={station.menuArt} alt="" />
+                        </span>
+                        <span className="gamble-machine-bar">
+                          <span className="gamble-machine-label">{station.label}</span>
+                          <span className="gamble-machine-cost">{station.cost}</span>
+                        </span>
+                        <span className="gamble-machine-subtitle">{station.subtitle}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ))}
             </div>
-          </div>
-          <div className="gamble-grid">
-            {GAMES.map(g => (
-              <button
-                key={g.id}
-                className="gamble-card"
-                onClick={() => setGame(g.id)}
-                style={{
-                  '--card-accent': g.accent,
-                  '--card-scene-image': `url("${g.scene}")`,
-                } as React.CSSProperties}
-              >
-                <span className="gamble-card-icon">
-                  <img src={g.icon} alt="" className="gamble-card-icon-img" />
-                </span>
-                <span className="gamble-card-label">{g.label}</span>
-                <span className="gamble-card-desc">{g.desc}</span>
-              </button>
-            ))}
           </div>
         </div>
       )}
 
       {activeGame && (
-        <div className={`gamble-stage gamble-stage-${game}`} style={getSceneStyle(activeGame)}>
-          <div className="gamble-scene-decor gamble-scene-decor-left" aria-hidden="true">
-            <img src={activeGame.decorLeft} alt="" />
-          </div>
-          <div className="gamble-scene-decor gamble-scene-decor-right" aria-hidden="true">
-            <img src={activeGame.decorRight} alt="" />
-          </div>
-          <div className="gamble-scene-header gamble-stage-header">
-            <div className="gamble-scene-marquee gamble-stage-marquee" aria-hidden="true">
-              <img src={activeGame.banner} alt="" />
+        <div className={`gamble-stage gamble-stage-${game}`} style={getStageStyle(activeGame)}>
+          <div className="gamble-stage-chrome">
+            <div className="gamble-stage-banner" aria-hidden="true">
+              <img src={activeGame.titleArt} alt="" />
             </div>
-            <div className="gamble-scene-copy">
-              <p className="gamble-scene-kicker">{activeGame.label}</p>
-              <p>{activeGame.desc}</p>
+            <div className="gamble-stage-nameplate">
+              <p className="gamble-scene-kicker">Mauville Floor</p>
+              <strong>{activeGame.label}</strong>
             </div>
           </div>
           <div className="gamble-stage-body">

@@ -12,23 +12,38 @@ import { gamecornerAsset } from './assets';
 */
 
 const BJ_SP = gamecornerAsset('blackjack/');
-
-function FaceDownCard() {
-  return (
-    <span className="bj-facedown" style={{ display: 'inline-block', width: 48, height: 48, overflow: 'hidden', lineHeight: 0 }}>
-      <img
-        src={`${BJ_SP}facedown.png`}
-        alt="?"
-        style={{ imageRendering: 'pixelated', width: 48, height: 'auto', display: 'block' }}
-      />
-    </span>
-  );
-}
+const CARD_ROOT = gamecornerAsset('blackjack/cards/').replace(/\/$/, '');
+const DIGIT_WIDTH = 8;
+const DIGIT_HEIGHT = 8;
+const DIGIT_SCALE = 3;
 
 const SUITS = ['♥', '♦', '♣', '♠'] as const;
 const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] as const;
 
 interface Card { rank: typeof RANKS[number]; suit: typeof SUITS[number]; }
+
+const SUIT_TO_FOLDER: Record<typeof SUITS[number], 'hearts' | 'diamonds' | 'clubs' | 'spades'> = {
+  '♥': 'hearts',
+  '♦': 'diamonds',
+  '♣': 'clubs',
+  '♠': 'spades',
+};
+
+const RANK_TO_FILE: Record<typeof RANKS[number], string> = {
+  A: 'a',
+  '2': '2',
+  '3': '3',
+  '4': '4',
+  '5': '5',
+  '6': '6',
+  '7': '7',
+  '8': '8',
+  '9': '9',
+  '10': '10',
+  J: 'j',
+  Q: 'q',
+  K: 'k',
+};
 
 function newDeck(): Card[] {
   const deck: Card[] = [];
@@ -66,9 +81,60 @@ function isRed(card: Card): boolean {
   return card.suit === '♥' || card.suit === '♦';
 }
 
+function cardSprite(card: Card): string {
+  const suit = SUIT_TO_FOLDER[card.suit];
+  const rank = RANK_TO_FILE[card.rank];
+  return `${CARD_ROOT}/${suit}/cards_${suit}_${rank}.png`;
+}
+
+function SpriteDigits({ value, src, minDigits = 2, tone = 'credit' }: { value: number; src: string; minDigits?: number; tone?: 'credit' | 'player' | 'dealer'; }) {
+  const digits = Math.max(0, Math.floor(value)).toString().padStart(minDigits, '0');
+  return (
+    <span className={`bj-digit-strip bj-digit-strip-${tone}`} aria-label={digits}>
+      {digits.split('').map((digit, index) => (
+        <span key={`${digit}-${index}`} className="bj-digit-frame" style={{ width: DIGIT_WIDTH * DIGIT_SCALE, height: DIGIT_HEIGHT * DIGIT_SCALE }}>
+          <img
+            src={src}
+            alt=""
+            aria-hidden="true"
+            style={{
+              left: 0,
+              top: -Number(digit) * DIGIT_HEIGHT * DIGIT_SCALE,
+              transform: `scale(${DIGIT_SCALE})`,
+              transformOrigin: 'top left',
+            }}
+          />
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function CardSprite({ card, hidden = false }: { card: Card; hidden?: boolean }) {
+  const src = hidden ? `${BJ_SP}facedown.png` : cardSprite(card);
+  const label = hidden ? 'Face-down dealer card' : `${card.rank}${card.suit}`;
+  return (
+    <span className={`bj-card-sprite ${hidden ? 'hidden' : ''}`} aria-label={label}>
+      <img src={src} alt="" aria-hidden="true" />
+    </span>
+  );
+}
+
+function OptionButton({ src, label, disabled, onClick, priority = false }: { src: string; label: string; disabled?: boolean; onClick: () => void; priority?: boolean; }) {
+  return (
+    <button className={`bj-option-btn ${priority ? 'priority' : ''}`} onClick={onClick} disabled={disabled} aria-label={label} title={label}>
+      <img src={src} alt="" aria-hidden="true" />
+      <span>{label}</span>
+    </button>
+  );
+}
+
 type Phase = 'betting' | 'playing' | 'dealer' | 'done';
 
 export function Blackjack({ coins, addCoins, spendCoins }: GameProps) {
+  const shellStyle = {
+    '--game-shell-art': `url("${BJ_SP}background_tiles.png")`,
+  } as React.CSSProperties;
   const [deck, setDeck] = useState<Card[]>(() => newDeck());
   const [player, setPlayer] = useState<Card[]>([]);
   const [dealer, setDealer] = useState<Card[]>([]);
@@ -233,67 +299,89 @@ export function Blackjack({ coins, addCoins, spendCoins }: GameProps) {
   }, []);
 
   const canInsure = phase === 'playing' && !insured && dealer.length >= 1 && dealer[0].rank === 'A' && coins >= Math.floor(bet / 2);
+  const canDouble = phase === 'playing' && player.length === 2 && coins >= bet && !doubled;
+  const actionBet = doubled ? bet * 2 : bet;
+  const dealerShownTotal = phase === 'done' ? handTotal(dealer) : handTotal(dealer.slice(0, 1));
 
   return (
-    <div className="blackjack">
-      <h2>Blackjack</h2>
-
-      {phase === 'betting' && (
-        <div className="bj-betting">
-          <div className="bj-bet-controls">
-            <button className="mini" onClick={() => setBet(b => Math.max(10, b - 10))}>-10</button>
-            <span className="bj-bet-amount">{bet}</span>
-            <button className="mini" onClick={() => setBet(b => Math.min(coins, b + 10))}>+10</button>
-            <button className="mini" onClick={() => setBet(b => Math.min(coins, b + 50))}>+50</button>
+    <div className="blackjack" style={shellStyle}>
+      <div className="gamble-game-banner" aria-hidden="true">
+        <img src={`${BJ_SP}popup.png`} alt="" />
+      </div>
+      <div className="bj-screen">
+        <div className="bj-topline">
+          <div className="bj-meter">
+            <span className="bj-meter-label">Coins</span>
+            <SpriteDigits value={coins} src={`${BJ_SP}digits.png`} minDigits={4} />
           </div>
-          <button className="bj-deal-btn" onClick={deal} disabled={coins < bet}>DEAL</button>
+          <div className="bj-meter">
+            <span className="bj-meter-label">Bet</span>
+            <SpriteDigits value={actionBet} src={`${BJ_SP}digits.png`} minDigits={3} />
+          </div>
         </div>
-      )}
 
-      {(phase === 'playing' || phase === 'done') && (
-        <>
-          <div className="bj-table">
-            <div className="bj-hand">
-              <div className="bj-hand-label">Dealer {phase === 'done' ? `(${handTotal(dealer)})` : ''}</div>
-              <div className="bj-cards">
-                {dealer.map((card, i) => (
-                  <div key={i} className={`bj-card ${isRed(card) ? 'red' : 'black'} ${i === 1 && phase === 'playing' ? 'face-down' : ''}`}>
-                    {i === 1 && phase === 'playing' ? <FaceDownCard /> : cardDisplay(card)}
-                  </div>
-                ))}
-              </div>
+        <div className="bj-table">
+          <div className="bj-hand bj-hand-dealer">
+            <div className="bj-hand-head">
+              <span className="bj-hand-label">Dealer</span>
+              {(phase === 'playing' || phase === 'done') && (
+                <SpriteDigits value={dealerShownTotal} src={`${BJ_SP}digits_dealer.png`} tone="dealer" />
+              )}
             </div>
-
-            <div className="bj-hand">
-              <div className="bj-hand-label">You ({handTotal(player)})</div>
-              <div className="bj-cards">
-                {player.map((card, i) => (
-                  <div key={i} className={`bj-card ${isRed(card) ? 'red' : 'black'}`}>
-                    {cardDisplay(card)}
-                  </div>
-                ))}
-              </div>
+            <div className="bj-card-row">
+              {dealer.map((card, index) => (
+                <CardSprite key={`${card.rank}-${card.suit}-${index}`} card={card} hidden={phase === 'playing' && index === 1} />
+              ))}
             </div>
           </div>
 
-          <div className={`bj-message ${phase === 'done' && handTotal(player) <= 21 && (handTotal(player) > handTotal(dealer) || handTotal(dealer) > 21) ? 'win' : ''}`}>
-            {message}
+          <div className="bj-hand bj-hand-player">
+            <div className="bj-hand-head">
+              <span className="bj-hand-label">Player</span>
+              {(phase === 'playing' || phase === 'done') && player.length > 0 && (
+                <SpriteDigits value={handTotal(player)} src={`${BJ_SP}digits_player.png`} tone="player" />
+              )}
+            </div>
+            <div className="bj-card-row">
+              {player.map((card, index) => (
+                <CardSprite key={`${card.rank}-${card.suit}-${index}`} card={card} />
+              ))}
+            </div>
           </div>
+        </div>
+
+        <div className={`bj-message-box ${phase === 'done' && handTotal(player) <= 21 && (handTotal(player) > handTotal(dealer) || handTotal(dealer) > 21) ? 'win' : ''}`}>
+          {message}
+        </div>
+
+        <div className="bj-option-row">
+          {phase === 'betting' && (
+            <>
+              <OptionButton src={`${BJ_SP}option_2.png`} label="Lower bet by 10" onClick={() => setBet(b => Math.max(10, b - 10))} disabled={bet <= 10} />
+              <OptionButton src={`${BJ_SP}option_1.png`} label="Raise bet by 10" onClick={() => setBet(b => Math.min(coins, b + 10))} disabled={bet >= coins} />
+              <OptionButton src={`${BJ_SP}option_3.png`} label="Deal hand" onClick={deal} disabled={coins < bet} priority />
+            </>
+          )}
 
           {phase === 'playing' && (
-            <div className="bj-actions">
-              <button onClick={hit}>Hit</button>
-              <button onClick={stand}>Stand</button>
-              {player.length === 2 && coins >= bet && <button onClick={double}>Double</button>}
-              {canInsure && <button onClick={buyInsurance}>Insurance</button>}
-            </div>
+            <>
+              <OptionButton src={`${BJ_SP}option_1.png`} label="Hit" onClick={hit} />
+              <OptionButton src={`${BJ_SP}option_2.png`} label="Stand" onClick={stand} />
+              <OptionButton
+                src={`${BJ_SP}option_3.png`}
+                label={canDouble ? 'Double' : canInsure ? 'Insurance' : 'Action unavailable'}
+                onClick={canDouble ? double : buyInsurance}
+                disabled={!canDouble && !canInsure}
+                priority={canDouble || canInsure}
+              />
+            </>
           )}
 
           {phase === 'done' && (
-            <button className="bj-deal-btn" onClick={newGame}>New Hand</button>
+            <OptionButton src={`${BJ_SP}option_3.png`} label="New hand" onClick={newGame} priority />
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

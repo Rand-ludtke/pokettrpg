@@ -32,6 +32,7 @@ function PokemonSprite({ name, frame = 0, size = 48 }: { name: string; frame?: n
 }
 
 type Rarity = 'common' | 'uncommon' | 'rare' | 'legendary';
+export type GachaTierId = 'basic' | 'great' | 'ultra' | 'master';
 
 interface Prize {
   name: string;
@@ -40,7 +41,7 @@ interface Prize {
 }
 
 interface MachineTier {
-  id: string;
+  id: GachaTierId;
   label: string;
   cost: number;
   color: string;
@@ -142,8 +143,11 @@ const RARITY_COLORS: Record<string, string> = {
   legendary: '#FFD700',
 };
 
-export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
-  const [tierIdx, setTierIdx] = useState(0);
+export function GachaMachine({ coins, addCoins, spendCoins, initialTierId = 'basic' }: GameProps & { initialTierId?: GachaTierId }) {
+  const shellStyle = {
+    '--game-shell-art': `url("${SP}bg_middle.png")`,
+  } as React.CSSProperties;
+  const [tierIdx, setTierIdx] = useState(() => Math.max(0, TIERS.findIndex((tier) => tier.id === initialTierId)));
   const [pulling, setPulling] = useState(false);
   const [result, setResult] = useState<Prize | null>(null);
   const [history, setHistory] = useState<Prize[]>([]);
@@ -151,6 +155,15 @@ export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
   const [animFrame, setAnimFrame] = useState(0);
 
   const tier = TIERS[tierIdx];
+
+  useEffect(() => {
+    const nextIndex = TIERS.findIndex((entry) => entry.id === initialTierId);
+    if (nextIndex >= 0) {
+      setTierIdx(nextIndex);
+      setResult(null);
+      setMessage(`${TIERS[nextIndex].label} Machine – ${TIERS[nextIndex].cost} coins per pull`);
+    }
+  }, [initialTierId]);
 
   // Animate pulled sprite
   useEffect(() => {
@@ -183,7 +196,10 @@ export function GachaMachine({ coins, addCoins, spendCoins }: GameProps) {
   }, [pulling, coins, tier, tierIdx, spendCoins, addCoins]);
 
   return (
-    <div className="gacha-machine">
+    <div className="gacha-machine" style={shellStyle}>
+      <div className="gamble-game-banner" aria-hidden="true">
+        <img src={`${SP}menu_1.png`} alt="" />
+      </div>
       <h2>Gacha Machine</h2>
 
       {/* Tier selector */}

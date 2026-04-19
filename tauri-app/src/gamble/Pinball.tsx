@@ -33,6 +33,15 @@ const ZONE_MULTIPLIERS = [0, 1, 2, 5, 10, 5, 2, 1, 0];
 const ZONE_LABELS = ['0×', '1×', '2×', '5×', '10×', '5×', '2×', '1×', '0×'];
 const ZONE_COLORS = ['#555', '#666', '#2d8a4e', '#2196F3', '#FFD700', '#2196F3', '#2d8a4e', '#666', '#555'];
 
+export type PinballThemeId = 'meowth' | 'diglett' | 'seel' | 'gengar';
+
+const PINBALL_THEMES: Array<{ id: PinballThemeId; label: string; cost: number; board: string; }> = [
+  { id: 'meowth', label: 'Meowth Table', cost: 25, board: 'bg_tiles_meowth.png' },
+  { id: 'diglett', label: 'Diglett Table', cost: 50, board: 'bg_tiles_diglett.png' },
+  { id: 'seel', label: 'Seel Table', cost: 25, board: 'bg_tiles_seel.png' },
+  { id: 'gengar', label: 'Gengar Table', cost: 100, board: 'bg_tiles_gengar.png' },
+];
+
 interface Peg { x: number; y: number; lit: number }
 interface Ball { x: number; y: number; vx: number; vy: number; active: boolean }
 
@@ -51,7 +60,12 @@ function buildPegs(): Peg[] {
   return pegs;
 }
 
-export function Pinball({ coins, addCoins, spendCoins }: GameProps) {
+export function Pinball({ coins, addCoins, spendCoins, initialThemeId = 'meowth' }: GameProps & { initialThemeId?: PinballThemeId }) {
+  const [themeId, setThemeId] = useState<PinballThemeId>(initialThemeId);
+  const theme = PINBALL_THEMES.find((entry) => entry.id === themeId) ?? PINBALL_THEMES[0];
+  const shellStyle = {
+    '--game-shell-art': `url("${PIN_SP}${theme.board}")`,
+  } as React.CSSProperties;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef({
     balls: [] as Ball[],
@@ -65,9 +79,13 @@ export function Pinball({ coins, addCoins, spendCoins }: GameProps) {
   const [phase, setPhase] = useState<'idle' | 'playing' | 'done'>('idle');
   const [score, setScore] = useState(0);
   const [ballsLeft, setBallsLeft] = useState(0);
-  const [message, setMessage] = useState(`Launch ${BALLS_PER_GAME} balls for ${ENTRY_COST} coins!`);
+  const [message, setMessage] = useState(`${theme.label} is ready. ${theme.cost} coins to play.`);
   const animRef = useRef(0);
   const pokeballImg = useRef(loadImg(`${PIN_SP}ball_pokeball.png`));
+
+  useEffect(() => {
+    setThemeId(initialThemeId);
+  }, [initialThemeId]);
 
   const launchBall = useCallback(() => {
     const s = stateRef.current;
@@ -79,7 +97,7 @@ export function Pinball({ coins, addCoins, spendCoins }: GameProps) {
   }, []);
 
   const startGame = useCallback(() => {
-    if (!spendCoins(ENTRY_COST)) { setMessage('Not enough coins!'); return; }
+    if (!spendCoins(theme.cost)) { setMessage('Not enough coins!'); return; }
     const s = stateRef.current;
     s.balls = [];
     s.pegs = buildPegs();
@@ -91,8 +109,14 @@ export function Pinball({ coins, addCoins, spendCoins }: GameProps) {
     setPhase('playing');
     setScore(0);
     setBallsLeft(BALLS_PER_GAME);
-    setMessage('Click to launch balls!');
-  }, [spendCoins]);
+    setMessage(`${theme.label} active. Click the board to launch.`);
+  }, [spendCoins, theme]);
+
+  useEffect(() => {
+    if (phase !== 'playing') {
+      setMessage(`${theme.label} is ready. ${theme.cost} coins to play.`);
+    }
+  }, [theme, phase]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -249,27 +273,42 @@ export function Pinball({ coins, addCoins, spendCoins }: GameProps) {
   }, [launchBall]);
 
   return (
-    <div className="pinball" style={{ textAlign: 'center' }}>
-      <h2>Pinball</h2>
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', margin: '8px 0', flexWrap: 'wrap', alignItems: 'center' }}>
+    <div className="pinball" style={shellStyle}>
+      <div className="gamble-game-banner" aria-hidden="true">
+        <img src={`${PIN_SP}bg_cover_tiles.png`} alt="" />
+      </div>
+      <div className="pinball-variant-grid">
+        {PINBALL_THEMES.map((entry) => (
+          <button
+            key={entry.id}
+            className={`pinball-variant-btn ${entry.id === theme.id ? 'active' : ''}`}
+            onClick={() => setThemeId(entry.id)}
+            disabled={phase === 'playing'}
+          >
+            <img src={`${PIN_SP}${entry.board}`} alt="" aria-hidden="true" />
+            <span className="pinball-variant-copy">
+              <strong>{entry.label}</strong>
+              <span>{entry.cost} coins</span>
+            </span>
+          </button>
+        ))}
+      </div>
+      <div className="pinball-stats">
+        <span>Theme: <b>{theme.label}</b></span>
         <span>Score: <b>{score}</b></span>
         <span>Balls: <b>{ballsLeft}</b></span>
       </div>
-      <div className="pinball-message" style={{ margin: '8px 0', minHeight: 24 }}>{message}</div>
+      <div className="pinball-message">{message}</div>
       <canvas
         ref={canvasRef}
         width={W}
         height={H}
         onClick={handleCanvasClick}
-        style={{ display: 'block', margin: '8px auto', border: '2px solid var(--accent)', borderRadius: 8, cursor: phase === 'playing' ? 'pointer' : 'default' }}
+        className="pinball-canvas"
       />
       {phase !== 'playing' && (
-        <button className="pinball-start-btn" onClick={startGame} style={{
-          padding: '10px 24px', fontSize: 16, fontWeight: 700,
-          background: 'var(--accent)', color: 'white', border: 'none',
-          borderRadius: 10, cursor: 'pointer', margin: '8px 0',
-        }}>
-          {phase === 'done' ? 'Play Again' : 'Start'} ({ENTRY_COST} coins)
+        <button className="pinball-start-btn" onClick={startGame}>
+          {phase === 'done' ? 'Play Again' : 'Start'} {theme.label} ({theme.cost} coins)
         </button>
       )}
     </div>
