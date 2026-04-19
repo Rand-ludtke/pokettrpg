@@ -45,6 +45,7 @@
   position: relative;
   z-index: 2;
   display: flex; align-items: center; gap: 12px;
+  justify-content: space-between;
   margin-bottom: 14px; padding: 10px 14px;
   background: linear-gradient(180deg, rgba(26, 58, 96, 0.95), rgba(11, 28, 48, 0.98));
   border: 2px solid #f0b44c;
@@ -64,6 +65,15 @@
   padding: 4px 8px; border: 2px solid #f0b44c;
   border-radius: 6px; background: rgba(7, 14, 24, 0.92);
   color: #ffedba; outline: none;
+}
+
+.gamble-coin-bar-note {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 230, 168, 0.7);
 }
 
 /* Shared Game Corner scene shell */
@@ -111,6 +121,17 @@
 
 .gamble-stage {
   min-height: 460px;
+}
+
+.gamble-stage--emulator-only {
+  padding: 14px;
+}
+
+.gamble-stage-body--emulator-only {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .gamble-menu-content,
@@ -386,6 +407,366 @@
   image-rendering: pixelated;
 }
 
+.gamble-game-banner-text {
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.gamble-game-banner-text strong {
+  font-size: clamp(18px, 2.6vw, 26px);
+  color: #fff1cc;
+}
+
+.gamble-game-banner-text span {
+  color: rgba(255, 244, 214, 0.72);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+}
+
+.gamecorner-emulator {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.emulator-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 4px 2px;
+}
+
+.emulator-topline-copy,
+.emulator-topline-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.emulator-topline-copy strong {
+  font-size: clamp(18px, 2.3vw, 24px);
+  color: #fff0c5;
+}
+
+.emulator-topline-copy span,
+.emulator-topline-meta span {
+  color: rgba(255, 244, 214, 0.72);
+  font-size: 13px;
+}
+
+.emulator-topline-meta {
+  text-align: right;
+}
+
+.emulator-callout,
+.emulator-install-panel,
+.emulator-status-panel,
+.emulator-sync-panel,
+.emulator-error {
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(8, 16, 29, 0.94), rgba(4, 9, 17, 0.98));
+}
+
+.emulator-callout p,
+.emulator-status-panel p,
+.emulator-sync-panel p,
+.emulator-footnote p {
+  margin: 0;
+  color: rgba(255, 244, 214, 0.82);
+  line-height: 1.5;
+}
+
+.emulator-callout {
+  display: grid;
+  gap: 8px;
+}
+
+.emulator-install-panel {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.emulator-install-copy {
+  max-width: 32rem;
+}
+
+.emulator-install-copy strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #fff0c5;
+}
+
+.emulator-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.emulator-runtime-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 48px;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(7, 16, 30, 0.96), rgba(4, 8, 16, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 244, 214, 0.82);
+}
+
+.emulator-runtime-chip strong {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 244, 214, 0.58);
+}
+
+.emulator-file-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: min(100%, 320px);
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(7, 16, 30, 0.96), rgba(4, 8, 16, 0.98));
+  color: #fff1cc;
+  font-weight: 700;
+}
+
+.emulator-file-picker input {
+  width: 100%;
+  color: rgba(255, 244, 214, 0.86);
+}
+
+.emulator-launch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #8de2d9, #4e9cb2);
+  color: #08202a;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+}
+
+.emulator-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(18, 34, 54, 0.94), rgba(7, 14, 24, 0.98));
+  color: #f4e7bd;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.emulator-replace-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 4px;
+  color: rgba(255, 244, 214, 0.74);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.emulator-replace-link input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.emulator-status-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.emulator-status-panel strong,
+.emulator-sync-copy strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #fff0c5;
+}
+
+.emulator-error {
+  color: #ffd2c5;
+  border-color: rgba(234, 120, 87, 0.45);
+  background: linear-gradient(180deg, rgba(53, 14, 12, 0.96), rgba(29, 8, 8, 0.98));
+}
+
+.emulator-frame-wrap {
+  padding: 8px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(2, 5, 10, 0.98), rgba(4, 8, 14, 0.98));
+  border: 2px solid rgba(141, 226, 217, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 20px 34px rgba(0, 0, 0, 0.24);
+}
+
+.emulator-frame {
+  display: block;
+  width: 100%;
+  min-height: min(78vh, 760px);
+  border: 0;
+  border-radius: 12px;
+  background: #02050a;
+}
+
+.emulator-controls-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.emulator-dpad,
+.emulator-controls-cluster {
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(8, 16, 29, 0.94), rgba(4, 9, 17, 0.98));
+}
+
+.emulator-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(56px, 1fr));
+  grid-template-rows: repeat(3, minmax(56px, 1fr));
+  gap: 8px;
+  align-items: center;
+  justify-items: center;
+}
+
+.emulator-controls-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.emulator-controls-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.emulator-control-btn {
+  min-height: 56px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(22, 41, 64, 0.98), rgba(9, 19, 34, 0.98));
+  color: #fff0c5;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+  transition: transform 0.08s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.emulator-control-btn.is-pressed {
+  transform: translateY(1px) scale(0.98);
+  background: linear-gradient(180deg, #f2d07d, #cc8f32);
+  border-color: rgba(255, 224, 154, 0.8);
+  color: #2c1706;
+}
+
+.emulator-control-btn--action {
+  min-height: 64px;
+  border-radius: 999px;
+}
+
+.emulator-control-btn--alt {
+  background: linear-gradient(180deg, rgba(44, 31, 72, 0.98), rgba(22, 15, 39, 0.98));
+}
+
+.emulator-control-btn--dpad {
+  width: 100%;
+  height: 100%;
+  min-height: 56px;
+}
+
+.emulator-control-btn--up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.emulator-control-btn--left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.emulator-control-btn--right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.emulator-control-btn--down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.emulator-dpad-center {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  color: rgba(255, 240, 197, 0.42);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.emulator-sync-panel {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.emulator-sync-copy {
+  max-width: 36rem;
+}
+
+.emulator-sync-copy--compact {
+  max-width: none;
+  padding: 0;
+}
+
+.emulator-sync-copy--compact p {
+  margin: 0;
+}
+
+.emulator-footnote {
+  padding: 0 2px;
+}
+
 @media (max-width: 860px) {
   .gamble-tab {
     padding: 14px;
@@ -404,6 +785,61 @@
 
   .gamble-stage-body {
     padding: 14px;
+  }
+
+  .emulator-frame {
+    min-height: 440px;
+  }
+
+  .emulator-install-panel {
+    flex-direction: column;
+  }
+
+  .emulator-topline {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .emulator-topline-meta {
+    text-align: left;
+  }
+
+  .emulator-controls-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .emulator-controls-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .gamble-tab--emulator {
+    padding: 10px;
+  }
+
+  .gamble-coin-bar {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .gamble-coin-bar-note {
+    margin-left: 0;
+  }
+
+  .emulator-toolbar {
+    align-items: stretch;
+  }
+
+  .emulator-launch-btn,
+  .emulator-secondary-btn,
+  .emulator-runtime-chip,
+  .emulator-replace-link {
+    width: 100%;
+  }
+
+  .emulator-frame {
+    min-height: 320px;
   }
 }
 
