@@ -18,6 +18,7 @@ export function GambleTab() {
   const { coins, setCoins, addCoins, spendCoins } = useCoins();
   const [editingCoins, setEditingCoins] = useState(false);
   const [coinInput, setCoinInput] = useState('');
+  const [coinWritebackVersion, setCoinWritebackVersion] = useState(0);
   const coinInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -31,7 +32,10 @@ export function GambleTab() {
 
   const commitEdit = () => {
     const val = parseInt(coinInput, 10);
-    if (!isNaN(val) && val >= 0) setCoins(val);
+    if (!isNaN(val) && val >= 0) {
+      setCoins(val);
+      setCoinWritebackVersion((current) => current + 1);
+    }
     setEditingCoins(false);
   };
 
@@ -60,6 +64,8 @@ export function GambleTab() {
       <div className="gamble-stage gamble-stage--emulator-only" style={LOBBY_STAGE_STYLE}>
         <div className="gamble-stage-body gamble-stage-body--emulator-only">
           <GameCornerEmulator
+            appCoins={coins}
+            coinWritebackVersion={coinWritebackVersion}
             setAppCoins={setCoins}
           />
         </div>

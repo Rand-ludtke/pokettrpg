@@ -310,6 +310,33 @@
         }
       }
 
+      function applyStateBuffer(stateBuffer, reason) {
+        if (!stateBuffer || !window.EJS_emulator || !window.EJS_emulator.gameManager) {
+          return false;
+        }
+
+        try {
+          const stateBytes = cloneByteArray(stateBuffer);
+          if (!stateBytes) return false;
+          window.EJS_emulator.gameManager.loadState(stateBytes);
+          pendingStateBuffer = stateBytes.buffer.slice(0);
+          stateBootstrapped = true;
+          saveBootstrapped = true;
+          logDebug('state-buffer-applied', {
+            reason: reason || 'parent',
+            stateBytes: stateBytes.byteLength,
+          });
+          return true;
+        } catch (error) {
+          logDebug('state-buffer-apply-failed', {
+            reason: reason || 'parent',
+            message: error instanceof Error ? error.message : 'Unknown load-state error.',
+          });
+          send('ejs:error', { message: error instanceof Error ? error.message : 'Failed to load the requested savestate.' });
+          return false;
+        }
+      }
+
       function bootstrapSaveFile() {
         if (saveBootstrapped || pendingStateBuffer || !pendingSaveBuffer || !window.EJS_emulator || !window.EJS_emulator.gameManager) {
           return false;
@@ -427,6 +454,11 @@
 
         if (data.type === 'ejs:input') {
           simulateAliasInput(data.alias, data.pressed);
+          return;
+        }
+
+        if (data.type === 'ejs:load-state' && data.stateBuffer instanceof ArrayBuffer) {
+          applyStateBuffer(data.stateBuffer, data.reason || 'parent');
           return;
         }
 
