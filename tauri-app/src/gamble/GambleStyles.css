@@ -490,6 +490,52 @@
   font-weight: 700;
 }
 
+.emulator-url-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: min(100%, 360px);
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(7, 16, 30, 0.96), rgba(4, 8, 16, 0.98));
+  color: #fff1cc;
+  font-weight: 700;
+}
+
+.emulator-url-picker input {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(2, 5, 10, 0.92);
+  color: rgba(255, 244, 214, 0.92);
+}
+
+.emulator-url-picker p {
+  margin: 0;
+  color: rgba(255, 244, 214, 0.82);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.emulator-url-btn {
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(141, 226, 217, 0.3);
+  background: linear-gradient(180deg, rgba(34, 86, 82, 0.96), rgba(21, 56, 53, 0.98));
+  color: #f3fff9;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.emulator-url-btn:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
 .emulator-file-picker input {
   width: 100%;
   color: rgba(255, 244, 214, 0.86);

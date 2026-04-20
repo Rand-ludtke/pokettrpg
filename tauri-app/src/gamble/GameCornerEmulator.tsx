@@ -6,11 +6,13 @@ import {
   parseEmeraldSave,
 } from './emeraldSave';
 import {
+  getConfiguredRemoteRomUrl,
   loadStoredRom,
   loadStoredSave,
   loadStoredState,
   persistRom,
   persistSave,
+  setConfiguredRemoteRom,
   persistState,
   StoredRom,
 } from './gameCornerPersistence';
@@ -97,6 +99,9 @@ export function GameCornerEmulator({
   const [error, setError] = useState<string | null>(null);
   const [romReady, setRomReady] = useState(false);
   const [activeControls, setActiveControls] = useState<Record<string, boolean>>({});
+  const [romImportDir, setRomImportDir] = useState<string | null>(null);
+  const [remoteRomUrl, setRemoteRomUrl] = useState('');
+  const [remoteRomLoading, setRemoteRomLoading] = useState(false);
 
   const hostSrc = useMemo(() => `${withPublicBase('emulatorjs-host.html')}?session=${bootNonce}`, [bootNonce]);
 
@@ -190,13 +195,18 @@ export function GameCornerEmulator({
     let cancelled = false;
 
     Promise.all([loadStoredRom(), loadStoredSave(), loadStoredState()])
-      .then(([rom, save, state]) => {
+      .then(([romResult, save, state]) => {
         if (cancelled) return;
         const meaningfulSave = getMeaningfulSaveBuffer(save);
         const meaningfulState = getMeaningfulStateBuffer(state);
-        setStoredRom(rom);
+        setStoredRom(romResult.rom);
+        setRomImportDir(romResult.importDir);
+        setRemoteRomUrl(romResult.remoteUrl || getConfiguredRemoteRomUrl() || '');
         setPendingSave(meaningfulSave);
         setPendingState(meaningfulState);
+        if (romResult.autoImported) {
+          setError(null);
+        }
         setRomReady(true);
       })
       .catch((reason) => {
@@ -389,6 +399,28 @@ export function GameCornerEmulator({
     }
   }
 
+  async function onUseRemoteRomUrl() {
+    const nextUrl = remoteRomUrl.trim();
+    if (!nextUrl) return;
+
+    setRemoteRomLoading(true);
+    try {
+      setConfiguredRemoteRom(null, nextUrl);
+      const romResult = await loadStoredRom();
+      if (!romResult.rom) {
+        throw new Error('The configured ROM URL did not provide a usable .gba file.');
+      }
+
+      setStoredRom(romResult.rom);
+      setRemoteRomUrl(romResult.remoteUrl || nextUrl);
+      setError(null);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Failed to download the configured ROM URL.');
+    } finally {
+      setRemoteRomLoading(false);
+    }
+  }
+
   function renderControlButton({ label, alias, className }: ControlButton) {
     const isPressed = !!activeControls[alias];
     return (
@@ -421,7 +453,11 @@ export function GameCornerEmulator({
         <div className="emulator-install-panel">
           <div className="emulator-install-copy">
             <strong>Install compiled ROM</strong>
-            <p>Select a locally built .gba once. After that this tab reopens it directly.</p>
+            {romImportDir ? (
+              <p>Drop a compiled .gba into {romImportDir}. The desktop app will import it automatically on next open.</p>
+            ) : (
+              <p>Select a locally built .gba once, or use the prefilled ROM URL so the PWA can download and cache the hosted build automatically.</p>
+            )}
           </div>
           <label className="emulator-file-picker">
             <span>Game Corner ROM (.gba)</span>
@@ -431,6 +467,26 @@ export function GameCornerEmulator({
               onChange={onInstallRom}
             />
           </label>
+          {!romImportDir ? (
+            <div className="emulator-url-picker">
+              <span>Your ROM URL</span>
+              <input
+                type="url"
+                value={remoteRomUrl}
+                placeholder="https://example.com/pokeemerald_modern.gba"
+                onChange={(event) => setRemoteRomUrl(event.target.value)}
+              />
+              <button
+                type="button"
+                className="emulator-url-btn"
+                onClick={onUseRemoteRomUrl}
+                disabled={remoteRomLoading || !remoteRomUrl.trim()}
+              >
+                {remoteRomLoading ? 'Downloading ROM...' : 'Download ROM From URL'}
+              </button>
+              <p>For web and PWA installs, this downloads the ROM once, starts it immediately, and reuses the cached copy on later launches.</p>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
