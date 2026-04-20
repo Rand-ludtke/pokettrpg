@@ -74,6 +74,9 @@
       let romUrl = null;
       let pendingSaveBuffer = null;
       let pendingStateBuffer = null;
+      let bundledSaveBuffer = null;
+      let bundledStateBuffer = null;
+      let bundledBootstrapPromise = null;
       let saveBootstrapped = false;
       let stateBootstrapped = false;
       let autoContinueScheduled = false;
@@ -185,7 +188,7 @@
         }
 
         try {
-          const response = await fetch('/gamecorner-bootstrap.json', { cache: 'no-store' });
+          const response = await fetch(new URL('./gamecorner-bootstrap.json', window.location.href), { cache: 'no-store' });
           if (response.ok) {
             const bootstrap = await response.json();
             const decodedBootstrap = await decodeBootstrap(bootstrap, 'asset');
@@ -203,6 +206,35 @@
           console.warn('Failed to load bundled Game Corner bootstrap.', error);
           return null;
         }
+      }
+
+      async function ensureBundledBootstrapLoaded() {
+        if (bundledSaveBuffer || bundledStateBuffer) {
+          return {
+            saveBuffer: cloneBuffer(bundledSaveBuffer),
+            stateBuffer: cloneBuffer(bundledStateBuffer),
+          };
+        }
+
+        if (!bundledBootstrapPromise) {
+          bundledBootstrapPromise = loadBundledBootstrap()
+            .then((bootstrap) => {
+              bundledSaveBuffer = cloneBuffer(bootstrap && bootstrap.saveBuffer);
+              bundledStateBuffer = cloneBuffer(bootstrap && bootstrap.stateBuffer);
+              return bootstrap;
+            })
+            .finally(() => {
+              bundledBootstrapPromise = null;
+            });
+        }
+
+        const bootstrap = await bundledBootstrapPromise;
+        if (!bootstrap) return null;
+
+        return {
+          saveBuffer: cloneBuffer(bundledSaveBuffer),
+          stateBuffer: cloneBuffer(bundledStateBuffer),
+        };
       }
 
       function emitSaveUpdate(buffer) {
@@ -285,18 +317,26 @@
         }
       }
 
-      function bootstrapBundledState() {
-        if (stateBootstrapped || !pendingStateBuffer || !window.EJS_emulator || !window.EJS_emulator.gameManager) {
+      function bootstrapBundledState(stateBuffer, saveBuffer, sourceLabel) {
+        if (stateBootstrapped || !stateBuffer || !window.EJS_emulator || !window.EJS_emulator.gameManager) {
           return false;
         }
 
         try {
-          const stateBytes = cloneByteArray(pendingStateBuffer);
+          const stateBytes = cloneByteArray(stateBuffer);
           if (!stateBytes) return false;
           window.EJS_emulator.gameManager.loadState(stateBytes);
+          pendingStateBuffer = stateBytes.buffer.slice(0);
+          if (saveBuffer) {
+            pendingSaveBuffer = cloneBuffer(saveBuffer);
+          }
           stateBootstrapped = true;
           saveBootstrapped = true;
-          logDebug('bundled-state-restored', { stateBytes: stateBytes.byteLength });
+          logDebug('bundled-state-restored', {
+            sourceLabel: sourceLabel || 'bundled',
+            stateBytes: stateBytes.byteLength,
+          });
+          emitStateUpdate(pendingStateBuffer, 'bundled-state-restored');
           if (pendingSaveBuffer) {
             emitSaveUpdate(pendingSaveBuffer);
           }
@@ -350,6 +390,21 @@
           send('ejs:error', { message: error instanceof Error ? error.message : 'Failed to bootstrap the previous save.' });
           return false;
         }
+      }
+
+      function restorePendingState(reason) {
+        if (stateBootstrapped || !pendingStateBuffer) {
+          return false;
+        }
+
+        const restored = applyStateBuffer(pendingStateBuffer, reason || 'pending-state');
+        if (!restored) return false;
+
+        emitStateUpdate(pendingStateBuffer, reason || 'pending-state');
+        if (pendingSaveBuffer) {
+          emitSaveUpdate(pendingSaveBuffer);
+        }
+        return true;
       }
 
       function cloneBuffer(value) {
@@ -443,12 +498,17 @@
       window.addEventListener('message', (event) => {
         const data = event.data || {};
         if (data.type === 'ejs:restore-bundled-state') {
-          logDebug('restore-command-received', { source: data.source || 'parent' });
-          const restored = bootstrapBundledState();
-          send('ejs:restore-bundled-state-result', {
-            ok: restored,
-            source: data.source || 'parent',
-          });
+          (async () => {
+            logDebug('restore-command-received', { source: data.source || 'parent' });
+            const bootstrap = await ensureBundledBootstrapLoaded();
+            const restored = bootstrap
+              ? bootstrapBundledState(bootstrap.stateBuffer, bootstrap.saveBuffer, data.source || 'parent')
+              : false;
+            send('ejs:restore-bundled-state-result', {
+              ok: restored,
+              source: data.source || 'parent',
+            });
+          })();
           return;
         }
 
@@ -483,7 +543,7 @@
             });
 
             if (!pendingSaveBuffer && !pendingStateBuffer) {
-              const bundledBootstrap = await loadBundledBootstrap();
+              const bundledBootstrap = await ensureBundledBootstrapLoaded();
               if (bundledBootstrap) {
                 pendingSaveBuffer = bundledBootstrap.saveBuffer;
                 pendingStateBuffer = bundledBootstrap.stateBuffer;
@@ -500,7 +560,7 @@
             window.EJS_browserMode = window.matchMedia('(max-width: 860px)').matches ? 'mobile' : 'auto';
             window.EJS_ready = () => {
               logDebug('emulator-ready');
-              if (!pendingStateBuffer && !bootstrapSaveFile()) {
+              if (!restorePendingState('ready') && !bootstrapSaveFile()) {
                 injectSaveFile();
               }
               startStateCaptureLoop();
@@ -509,7 +569,7 @@
             };
             window.EJS_onGameStart = () => {
               logDebug('game-started');
-              if (!pendingStateBuffer && !bootstrapSaveFile()) {
+              if (!restorePendingState('game-started') && !bootstrapSaveFile()) {
                 injectSaveFile();
               }
               startStateCaptureLoop();

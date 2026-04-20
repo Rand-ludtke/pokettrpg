@@ -2,8 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { withPublicBase } from '../utils/publicBase';
 import {
   extractEmeraldSaveFromMgbaState,
+  parseEmeraldState,
   parseEmeraldSave,
   replaceEmeraldSaveInMgbaState,
+  updateEmeraldStateCoins,
   updateEmeraldSaveCoins,
 } from './emeraldSave';
 import {
@@ -53,6 +55,27 @@ function getMeaningfulSaveFromState(stateBuffer: ArrayBuffer | null | undefined)
   if (!(stateBuffer instanceof ArrayBuffer)) return null;
   const extractedSave = extractEmeraldSaveFromMgbaState(stateBuffer);
   return extractedSave && parseEmeraldSave(extractedSave) ? extractedSave : null;
+}
+
+function getMeaningfulStateBuffer(stateBuffer: ArrayBuffer | null | undefined): ArrayBuffer | null {
+  if (!(stateBuffer instanceof ArrayBuffer)) return null;
+  return parseEmeraldState(stateBuffer) ? stateBuffer : null;
+}
+
+function parseCurrentGameData(
+  stateBuffer: ArrayBuffer | null | undefined,
+  saveBuffer: ArrayBuffer | null | undefined,
+) {
+  if (stateBuffer instanceof ArrayBuffer) {
+    const parsedState = parseEmeraldState(stateBuffer);
+    if (parsedState) return parsedState;
+  }
+
+  if (saveBuffer instanceof ArrayBuffer) {
+    return parseEmeraldSave(saveBuffer);
+  }
+
+  return null;
 }
 
 export function GameCornerEmulator({
@@ -139,9 +162,11 @@ export function GameCornerEmulator({
     Promise.all([loadStoredRom(), loadStoredSave(), loadStoredState()])
       .then(([rom, save, state]) => {
         if (cancelled) return;
+        const meaningfulSave = getMeaningfulSaveBuffer(save);
+        const meaningfulState = getMeaningfulStateBuffer(state);
         setStoredRom(rom);
-        setPendingSave(save);
-        setPendingState(state);
+        setPendingSave(meaningfulSave);
+        setPendingState(meaningfulState);
         setRomReady(true);
       })
       .catch((reason) => {
@@ -230,12 +255,10 @@ export function GameCornerEmulator({
   }, [pendingSave, pendingState]);
 
   useEffect(() => {
-    if (!isArrayBuffer(pendingSave)) return;
-    const saveBuffer: ArrayBuffer = pendingSave;
     let cancelled = false;
 
     async function syncSave() {
-      const parsed = parseEmeraldSave(saveBuffer);
+      const parsed = parseCurrentGameData(pendingState, pendingSave);
       if (!parsed) return;
 
       setAppCoins(parsed.coins);
@@ -254,27 +277,27 @@ export function GameCornerEmulator({
     return () => {
       cancelled = true;
     };
-  }, [pendingSave, setAppCoins]);
+  }, [pendingSave, pendingState, setAppCoins]);
 
   useEffect(() => {
     if (coinWritebackVersion < 1 || !emulatorReady || !pendingState || !iframeRef.current?.contentWindow) return;
 
-    const currentSave = getMeaningfulSaveFromState(pendingState);
-    if (!currentSave) return;
-
-    const parsed = parseEmeraldSave(currentSave);
+    const parsed = parseEmeraldState(pendingState);
     if (!parsed || parsed.coins === appCoins) return;
 
-    const updatedSave = updateEmeraldSaveCoins(currentSave, appCoins);
-    if (!updatedSave) return;
-
-    const updatedState = replaceEmeraldSaveInMgbaState(pendingState, updatedSave);
+    const currentSave = getMeaningfulSaveFromState(pendingState);
+    const updatedSave = currentSave ? updateEmeraldSaveCoins(currentSave, appCoins) : null;
+    const updatedState = updatedSave
+      ? replaceEmeraldSaveInMgbaState(pendingState, updatedSave)
+      : updateEmeraldStateCoins(pendingState, appCoins);
     if (!updatedState) return;
 
-    setPendingSave(updatedSave);
     setPendingState(updatedState);
-    persistSave(updatedSave).catch(console.error);
     persistState(updatedState).catch(console.error);
+    if (updatedSave) {
+      setPendingSave(updatedSave);
+      persistSave(updatedSave).catch(console.error);
+    }
 
     const stateBuffer = updatedState.slice(0);
     iframeRef.current.contentWindow.postMessage(

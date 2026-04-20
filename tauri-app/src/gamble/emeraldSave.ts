@@ -36,6 +36,14 @@ const MGBA_GBA_STATE_MAGIC = 0x01000000;
 const MGBA_GBA_STATE_VERSION = 0x0000000a;
 const MGBA_EXTDATA_HEADER_SIZE = 16;
 const MGBA_EXTDATA_SAVEDATA = 2;
+const GBA_BASE_EWRAM = 0x02000000;
+const GBA_STATE_IWRAM_OFFSET = 0x19000;
+const GBA_STATE_EWRAM_OFFSET = 0x21000;
+const GBA_STATE_IWRAM_SIZE = 0x8000;
+const GBA_STATE_EWRAM_SIZE = 0x40000;
+const G_SAVEBLOCK1_PTR_IWRAM_OFFSET = 0x71f0;
+const G_SAVEBLOCK2_PTR_IWRAM_OFFSET = 0x71f4;
+const G_POKEMON_STORAGE_PTR_IWRAM_OFFSET = 0x71f8;
 
 const SUBSTRUCT_ORDERS: ReadonlyArray<ReadonlyArray<number>> = [
   [0, 1, 2, 3],
@@ -121,6 +129,12 @@ interface ParsedSlot {
   slot: 1 | 2;
   counter: number;
   sectors: Map<number, ParsedSector>;
+}
+
+interface EmeraldStateLayout {
+  saveBlock1Offset: number;
+  saveBlock2Offset: number;
+  pokemonStorageOffset: number;
 }
 
 function readU16(bytes: Uint8Array, offset: number): number {
@@ -398,6 +412,51 @@ function rebuildPokemonStorage(slot: ParsedSlot): Uint8Array | null {
   return out;
 }
 
+function buildParsedEmeraldSave(
+  block1Bytes: Uint8Array,
+  block2Bytes: Uint8Array,
+  storageBytes: Uint8Array | null,
+  slot: 1 | 2,
+  counter: number,
+): ParsedEmeraldSave | null {
+  if (block1Bytes.length < COINS_OFFSET + 2 || block2Bytes.length < ENCRYPTION_KEY_OFFSET + 4) {
+    return null;
+  }
+
+  const encryptionKey = readU32(block2Bytes, ENCRYPTION_KEY_OFFSET);
+  const encryptedCoins = readU16(block1Bytes, COINS_OFFSET);
+  const coins = (encryptedCoins ^ (encryptionKey & 0xffff)) & 0xffff;
+
+  const partyCount = Math.min(MAX_PARTY_SIZE, block1Bytes[PARTY_COUNT_OFFSET] ?? 0);
+  const party: ParsedEmeraldMon[] = [];
+  for (let slotIndex = 0; slotIndex < partyCount; slotIndex++) {
+    const offset = PARTY_OFFSET + (slotIndex * PARTY_MON_SIZE);
+    const mon = parseStoredMon(block1Bytes.subarray(offset, offset + PARTY_MON_SIZE), 'party', slotIndex);
+    if (mon) party.push(mon);
+  }
+
+  const boxes: ParsedEmeraldMon[] = [];
+  const currentBox = storageBytes?.[STORAGE_CURRENT_BOX_OFFSET] ?? 0;
+  if (storageBytes) {
+    for (let boxIndex = 0; boxIndex < TOTAL_BOXES; boxIndex++) {
+      for (let slotIndex = 0; slotIndex < BOX_SIZE; slotIndex++) {
+        const offset = STORAGE_BOXES_OFFSET + (((boxIndex * BOX_SIZE) + slotIndex) * BOX_MON_SIZE);
+        const mon = parseStoredMon(storageBytes.subarray(offset, offset + BOX_MON_SIZE), 'box', slotIndex, boxIndex);
+        if (mon) boxes.push(mon);
+      }
+    }
+  }
+
+  return {
+    coins,
+    slot,
+    counter,
+    currentBox,
+    party,
+    boxes,
+  };
+}
+
 export function parseEmeraldSave(saveBuffer: ArrayBuffer): ParsedEmeraldSave | null {
   const bytes = new Uint8Array(saveBuffer);
   if (bytes.length < SECTOR_SIZE * NUM_SECTORS_PER_SLOT * 2) return null;
@@ -415,39 +474,8 @@ export function parseEmeraldSave(saveBuffer: ArrayBuffer): ParsedEmeraldSave | n
   const block1 = chosen.sectors.get(SAVEBLOCK1_FIRST_ID);
   if (!block2 || !block1) return null;
 
-  const encryptionKey = readU32(block2.data, ENCRYPTION_KEY_OFFSET);
-  const encryptedCoins = readU16(block1.data, COINS_OFFSET);
-  const coins = (encryptedCoins ^ (encryptionKey & 0xffff)) & 0xffff;
-
-  const partyCount = Math.min(MAX_PARTY_SIZE, block1.data[PARTY_COUNT_OFFSET] ?? 0);
-  const party: ParsedEmeraldMon[] = [];
-  for (let slotIndex = 0; slotIndex < partyCount; slotIndex++) {
-    const offset = PARTY_OFFSET + (slotIndex * PARTY_MON_SIZE);
-    const mon = parseStoredMon(block1.data.subarray(offset, offset + PARTY_MON_SIZE), 'party', slotIndex);
-    if (mon) party.push(mon);
-  }
-
   const storageBytes = rebuildPokemonStorage(chosen);
-  const boxes: ParsedEmeraldMon[] = [];
-  const currentBox = storageBytes?.[STORAGE_CURRENT_BOX_OFFSET] ?? 0;
-  if (storageBytes) {
-    for (let boxIndex = 0; boxIndex < TOTAL_BOXES; boxIndex++) {
-      for (let slotIndex = 0; slotIndex < BOX_SIZE; slotIndex++) {
-        const offset = STORAGE_BOXES_OFFSET + (((boxIndex * BOX_SIZE) + slotIndex) * BOX_MON_SIZE);
-        const mon = parseStoredMon(storageBytes.subarray(offset, offset + BOX_MON_SIZE), 'box', slotIndex, boxIndex);
-        if (mon) boxes.push(mon);
-      }
-    }
-  }
-
-  return {
-    coins,
-    slot: chosen.slot,
-    counter: chosen.counter,
-    currentBox,
-    party,
-    boxes,
-  };
+  return buildParsedEmeraldSave(block1.data, block2.data, storageBytes, chosen.slot, chosen.counter);
 }
 
 export function parseEmeraldCoins(saveBuffer: ArrayBuffer): ParsedEmeraldCoins | null {
@@ -513,6 +541,74 @@ function findMgbaSavedataExtdata(memBlockBytes: Uint8Array): { offset: number; s
   return null;
 }
 
+function getMgbaStateMemoryViews(stateBytes: Uint8Array): {
+  memBlockDataOffset: number;
+  memBlockBytes: Uint8Array;
+  iwramBytes: Uint8Array;
+  ewramBytes: Uint8Array;
+} | null {
+  const memBlock = findRaStateMemBlock(stateBytes);
+  if (!memBlock) return null;
+
+  const memBlockBytes = stateBytes.subarray(memBlock.dataOffset, memBlock.dataOffset + memBlock.size);
+  if (!isMgbaGbaState(memBlockBytes)) return null;
+  if (memBlockBytes.length < GBA_STATE_EWRAM_OFFSET + GBA_STATE_EWRAM_SIZE) return null;
+
+  return {
+    memBlockDataOffset: memBlock.dataOffset,
+    memBlockBytes,
+    iwramBytes: memBlockBytes.subarray(GBA_STATE_IWRAM_OFFSET, GBA_STATE_IWRAM_OFFSET + GBA_STATE_IWRAM_SIZE),
+    ewramBytes: memBlockBytes.subarray(GBA_STATE_EWRAM_OFFSET, GBA_STATE_EWRAM_OFFSET + GBA_STATE_EWRAM_SIZE),
+  };
+}
+
+function toEwramOffset(address: number): number | null {
+  if (address < GBA_BASE_EWRAM || address >= GBA_BASE_EWRAM + GBA_STATE_EWRAM_SIZE) {
+    return null;
+  }
+  return address - GBA_BASE_EWRAM;
+}
+
+function getEmeraldStateLayout(iwramBytes: Uint8Array): EmeraldStateLayout | null {
+  const saveBlock1Offset = toEwramOffset(readU32(iwramBytes, G_SAVEBLOCK1_PTR_IWRAM_OFFSET));
+  const saveBlock2Offset = toEwramOffset(readU32(iwramBytes, G_SAVEBLOCK2_PTR_IWRAM_OFFSET));
+  const pokemonStorageOffset = toEwramOffset(readU32(iwramBytes, G_POKEMON_STORAGE_PTR_IWRAM_OFFSET));
+  if (
+    saveBlock1Offset === null
+    || saveBlock2Offset === null
+    || pokemonStorageOffset === null
+  ) {
+    return null;
+  }
+
+  return {
+    saveBlock1Offset,
+    saveBlock2Offset,
+    pokemonStorageOffset,
+  };
+}
+
+export function parseEmeraldState(stateBuffer: ArrayBuffer): ParsedEmeraldSave | null {
+  const stateBytes = new Uint8Array(stateBuffer);
+  const memoryViews = getMgbaStateMemoryViews(stateBytes);
+  if (!memoryViews) return null;
+
+  const layout = getEmeraldStateLayout(memoryViews.iwramBytes);
+  if (!layout) return null;
+
+  const storageBytes = layout.pokemonStorageOffset + POKEMON_STORAGE_SIZE <= memoryViews.ewramBytes.length
+    ? memoryViews.ewramBytes.subarray(layout.pokemonStorageOffset, layout.pokemonStorageOffset + POKEMON_STORAGE_SIZE)
+    : null;
+
+  return buildParsedEmeraldSave(
+    memoryViews.ewramBytes.subarray(layout.saveBlock1Offset),
+    memoryViews.ewramBytes.subarray(layout.saveBlock2Offset),
+    storageBytes,
+    1,
+    0,
+  );
+}
+
 function chooseLatestSlot(parsedSlots: ParsedSlot[]): ParsedSlot | null {
   if (!parsedSlots.length) return null;
   if (parsedSlots.length === 1) return parsedSlots[0];
@@ -544,6 +640,25 @@ export function replaceEmeraldSaveInMgbaState(stateBuffer: ArrayBuffer, saveBuff
   if (!saveExtdata || saveExtdata.size !== saveBuffer.byteLength) return null;
 
   stateBytes.set(new Uint8Array(saveBuffer), memBlock.dataOffset + saveExtdata.offset);
+  return nextState;
+}
+
+export function updateEmeraldStateCoins(stateBuffer: ArrayBuffer, coins: number): ArrayBuffer | null {
+  const nextState = stateBuffer.slice(0);
+  const stateBytes = new Uint8Array(nextState);
+  const memoryViews = getMgbaStateMemoryViews(stateBytes);
+  if (!memoryViews) return null;
+
+  const layout = getEmeraldStateLayout(memoryViews.iwramBytes);
+  if (!layout) return null;
+  if (layout.saveBlock1Offset + COINS_OFFSET + 2 > memoryViews.ewramBytes.length) return null;
+  if (layout.saveBlock2Offset + ENCRYPTION_KEY_OFFSET + 4 > memoryViews.ewramBytes.length) return null;
+
+  const nextCoins = Math.max(0, Math.min(0xffff, Math.trunc(coins)));
+  const encryptionKey = readU32(memoryViews.ewramBytes, layout.saveBlock2Offset + ENCRYPTION_KEY_OFFSET);
+  const encryptedCoins = (nextCoins ^ (encryptionKey & 0xffff)) & 0xffff;
+  writeU16(memoryViews.ewramBytes, layout.saveBlock1Offset + COINS_OFFSET, encryptedCoins);
+
   return nextState;
 }
 
