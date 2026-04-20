@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
+import { withPublicBase } from '../utils/publicBase';
 
 const DB_NAME = 'pokettrpg-gamecorner';
 const STORE_NAME = 'runtime';
@@ -10,6 +11,7 @@ const REMOTE_ROM_URL_KEY = 'ttrpg.gameCornerRomUrl';
 const REMOTE_ROM_NAME_KEY = 'ttrpg.gameCornerRomName';
 const DEFAULT_REMOTE_ROM_URL = 'https://github.com/Rand-ludtke/pokettrpg/releases/download/v1.5.2/pokeemerald_modern.gba';
 const DEFAULT_REMOTE_ROM_NAME = 'pokeemerald_modern.gba';
+const DEFAULT_WEB_ROM_PATH = 'gamecorner/pokeemerald_modern.gba';
 
 export interface StoredRom {
   name: string;
@@ -49,6 +51,31 @@ function deriveRomNameFromUrl(url: string): string {
   }
 
   return 'game-corner.gba';
+}
+
+function getSuggestedWebRomUrl(): string {
+  if (typeof window === 'undefined') return withPublicBase(DEFAULT_WEB_ROM_PATH);
+  return new URL(withPublicBase(DEFAULT_WEB_ROM_PATH), window.location.origin).toString();
+}
+
+function parseUrl(value: string): URL | null {
+  try {
+    return typeof window !== 'undefined'
+      ? new URL(value, window.location.origin)
+      : new URL(value);
+  } catch {
+    return null;
+  }
+}
+
+function isCrossOriginUrl(value: string): boolean {
+  if (typeof window === 'undefined') return false;
+  const parsed = parseUrl(value);
+  return !!parsed && parsed.origin !== window.location.origin;
+}
+
+function getDefaultRemoteRomUrl(): string {
+  return isTauriApp() ? DEFAULT_REMOTE_ROM_URL : getSuggestedWebRomUrl();
 }
 
 function isBlankSaveBuffer(buffer: ArrayBuffer): boolean {
@@ -140,6 +167,12 @@ async function fetchConfiguredRemoteRom(): Promise<StoredRom | null> {
   const remoteUrl = getConfiguredRemoteRomUrl();
   if (!remoteUrl) return null;
 
+  if (!isTauriApp() && isCrossOriginUrl(remoteUrl)) {
+    throw new Error(
+      `Cross-origin ROM URLs are blocked in the web/PWA build. Host the .gba under this app and use ${getSuggestedWebRomUrl()} instead.`
+    );
+  }
+
   const response = await fetch(remoteUrl, { cache: 'no-store' });
   if (!response.ok) {
     throw new Error(`Failed to download configured ROM (${response.status}).`);
@@ -158,11 +191,19 @@ async function fetchConfiguredRemoteRom(): Promise<StoredRom | null> {
 }
 
 export function getConfiguredRemoteRomUrl(): string | null {
-  return getLocalStorageValue(REMOTE_ROM_URL_KEY) || DEFAULT_REMOTE_ROM_URL;
+  return getLocalStorageValue(REMOTE_ROM_URL_KEY) || getDefaultRemoteRomUrl();
 }
 
 export function getConfiguredRemoteRomName(): string | null {
   return getLocalStorageValue(REMOTE_ROM_NAME_KEY) || DEFAULT_REMOTE_ROM_NAME;
+}
+
+export function getSuggestedRemoteRomUrl(): string {
+  return getDefaultRemoteRomUrl();
+}
+
+export function isRemoteRomUrlSupportedOnWeb(url: string): boolean {
+  return !isCrossOriginUrl(url);
 }
 
 export function setConfiguredRemoteRom(name: string | null, url: string | null) {

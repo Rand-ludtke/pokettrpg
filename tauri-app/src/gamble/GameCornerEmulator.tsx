@@ -7,6 +7,8 @@ import {
 } from './emeraldSave';
 import {
   getConfiguredRemoteRomUrl,
+  getSuggestedRemoteRomUrl,
+  isRemoteRomUrlSupportedOnWeb,
   loadStoredRom,
   loadStoredSave,
   loadStoredState,
@@ -100,7 +102,7 @@ export function GameCornerEmulator({
   const [romReady, setRomReady] = useState(false);
   const [activeControls, setActiveControls] = useState<Record<string, boolean>>({});
   const [romImportDir, setRomImportDir] = useState<string | null>(null);
-  const [remoteRomUrl, setRemoteRomUrl] = useState('');
+  const [remoteRomUrl, setRemoteRomUrl] = useState(() => getConfiguredRemoteRomUrl() || getSuggestedRemoteRomUrl());
   const [remoteRomLoading, setRemoteRomLoading] = useState(false);
 
   const hostSrc = useMemo(() => `${withPublicBase('emulatorjs-host.html')}?session=${bootNonce}`, [bootNonce]);
@@ -403,6 +405,11 @@ export function GameCornerEmulator({
     const nextUrl = remoteRomUrl.trim();
     if (!nextUrl) return;
 
+    if (!(window as Window & { __TAURI__?: unknown }).__TAURI__ && !isRemoteRomUrlSupportedOnWeb(nextUrl)) {
+      setError(`Cross-origin ROM URLs are blocked in the web/PWA build. Host the .gba under this app and use ${getSuggestedRemoteRomUrl()} instead.`);
+      return;
+    }
+
     setRemoteRomLoading(true);
     try {
       setConfiguredRemoteRom(null, nextUrl);
@@ -456,7 +463,7 @@ export function GameCornerEmulator({
             {romImportDir ? (
               <p>Drop a compiled .gba into {romImportDir}. The desktop app will import it automatically on next open.</p>
             ) : (
-              <p>Select a locally built .gba once, or use the prefilled ROM URL so the PWA can download and cache the hosted build automatically.</p>
+              <p>Select a locally built .gba once, or host the compiled ROM under this app so the web and PWA builds can download and cache it without cross-origin failures.</p>
             )}
           </div>
           <label className="emulator-file-picker">
@@ -473,7 +480,7 @@ export function GameCornerEmulator({
               <input
                 type="url"
                 value={remoteRomUrl}
-                placeholder="https://example.com/pokeemerald_modern.gba"
+                placeholder={getSuggestedRemoteRomUrl()}
                 onChange={(event) => setRemoteRomUrl(event.target.value)}
               />
               <button
@@ -484,7 +491,7 @@ export function GameCornerEmulator({
               >
                 {remoteRomLoading ? 'Downloading ROM...' : 'Download ROM From URL'}
               </button>
-              <p>For web and PWA installs, this downloads the ROM once, starts it immediately, and reuses the cached copy on later launches.</p>
+              <p>For web and PWA installs, the ROM URL must be same-origin with this app. After the first successful download, the cached copy is reused on later launches.</p>
             </div>
           ) : null}
         </div>

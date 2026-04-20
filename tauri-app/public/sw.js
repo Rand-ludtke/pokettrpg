@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pokettrpg-pwa-v8';
+const CACHE_NAME = 'pokettrpg-pwa-v9';
 const scope = self?.registration?.scope || '/';
 const base = scope.endsWith('/') ? scope : `${scope}/`;
 const CORE_ASSETS = [
@@ -6,6 +6,8 @@ const CORE_ASSETS = [
   `${base}index.html`,
   `${base}manifest.webmanifest`,
   `${base}pwa-icon.svg`,
+  `${base}emulatorjs-host.html`,
+  `${base}gamecorner-bootstrap.json`,
 ];
 
 self.addEventListener('install', event => {
@@ -21,10 +23,34 @@ self.addEventListener('activate', event => {
   );
 });
 
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const isNavigation = event.request.mode === 'navigate';
   const url = new URL(event.request.url);
+
+  // Leave cross-origin requests alone so the browser reports real network and
+  // CORS failures instead of our synthetic Offline 503 fallback.
+  if (url.origin !== self.location.origin) return;
+
+  // The hidden EmulatorJS host is loaded in an iframe with a cache-busting
+  // query string. Let that request hit the network directly so the PWA
+  // offline fallback never replaces it with the generic "Offline" page.
+  if (url.origin === self.location.origin && url.pathname.endsWith('/emulatorjs-host.html')) {
+    event.respondWith(
+      fetch(event.request).catch(() =>
+        caches.match(`${base}emulatorjs-host.html`).then(
+          cached => cached || new Response('Offline', { status: 503, statusText: 'Service Unavailable' }),
+        ),
+      ),
+    );
+    return;
+  }
 
   // Compatibility shim for older cached bundles that still request root-level gamecorner assets.
   if (url.origin === self.location.origin && url.pathname.startsWith('/gamecorner/')) {
