@@ -406,6 +406,9 @@ export function GameCornerEmulator({
     if (!nextUrl) return;
 
     if (!(window as Window & { __TAURI__?: unknown }).__TAURI__ && !isRemoteRomUrlSupportedOnWeb(nextUrl)) {
+      const suggestedUrl = getSuggestedRemoteRomUrl();
+      setConfiguredRemoteRom(null, suggestedUrl);
+      setRemoteRomUrl(suggestedUrl);
       setError(`Cross-origin ROM URLs are blocked in the web/PWA build. Host the .gba under this app and use ${getSuggestedRemoteRomUrl()} instead.`);
       return;
     }

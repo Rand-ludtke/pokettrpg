@@ -74,6 +74,18 @@ function isCrossOriginUrl(value: string): boolean {
   return !!parsed && parsed.origin !== window.location.origin;
 }
 
+function normalizeConfiguredRemoteRomUrl(value: string | null): string {
+  const fallbackUrl = getDefaultRemoteRomUrl();
+  if (!value) return fallbackUrl;
+
+  if (!isTauriApp() && isCrossOriginUrl(value)) {
+    setLocalStorageValue(REMOTE_ROM_URL_KEY, fallbackUrl);
+    return fallbackUrl;
+  }
+
+  return value;
+}
+
 function getDefaultRemoteRomUrl(): string {
   return isTauriApp() ? DEFAULT_REMOTE_ROM_URL : getSuggestedWebRomUrl();
 }
@@ -191,7 +203,7 @@ async function fetchConfiguredRemoteRom(): Promise<StoredRom | null> {
 }
 
 export function getConfiguredRemoteRomUrl(): string | null {
-  return getLocalStorageValue(REMOTE_ROM_URL_KEY) || getDefaultRemoteRomUrl();
+  return normalizeConfiguredRemoteRomUrl(getLocalStorageValue(REMOTE_ROM_URL_KEY));
 }
 
 export function getConfiguredRemoteRomName(): string | null {
