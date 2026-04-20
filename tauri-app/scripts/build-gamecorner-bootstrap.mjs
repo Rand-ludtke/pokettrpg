@@ -12,6 +12,19 @@ const MGBA_GBA_STATE_VERSION = 0x0000000a;
 const MGBA_EXTDATA_HEADER_SIZE = 16;
 const MGBA_EXTDATA_SAVEDATA = 2;
 
+function getMeaningfulBufferError(label, buffer) {
+  if (!buffer.length) {
+    return `${label} is empty.`;
+  }
+  if (isUniformBuffer(buffer, 0xff)) {
+    return `${label} is all 0xFF and is not usable.`;
+  }
+  if (isUniformBuffer(buffer, 0x00)) {
+    return `${label} is all 0x00 and is not usable.`;
+  }
+  return null;
+}
+
 function parseArgs(argv) {
   const args = {
     out: 'public/gamecorner-bootstrap.json',
@@ -89,14 +102,9 @@ function isUniformBuffer(buffer, value) {
 }
 
 function assertMeaningfulBuffer(label, buffer) {
-  if (!buffer.length) {
-    throw new Error(`${label} is empty.`);
-  }
-  if (isUniformBuffer(buffer, 0xff)) {
-    throw new Error(`${label} is all 0xFF and is not usable.`);
-  }
-  if (isUniformBuffer(buffer, 0x00)) {
-    throw new Error(`${label} is all 0x00 and is not usable.`);
+  const error = getMeaningfulBufferError(label, buffer);
+  if (error) {
+    throw new Error(error);
   }
 }
 
@@ -222,12 +230,24 @@ function main() {
     };
   }
 
-  assertMeaningfulBuffer('Save file', save.bytes);
+  if (save) {
+    const saveError = getMeaningfulBufferError('Save file', save.bytes);
+    if (saveError) {
+      if (!state) {
+        throw new Error(saveError);
+      }
+      save = null;
+    }
+  }
+
+  if (!save && !state) {
+    throw new Error('No usable save or state data was provided.');
+  }
 
   const payload = {
     version: 1,
     description: args.description,
-    saveGzipBase64: toGzipBase64(save.bytes),
+    saveGzipBase64: save ? toGzipBase64(save.bytes) : null,
     stateGzipBase64: state ? toGzipBase64(state.bytes) : null,
   };
 
@@ -235,8 +255,8 @@ function main() {
 
   console.log(JSON.stringify({
     out: writtenPath,
-    savePath: save.filePath,
-    saveBytes: save.bytes.length,
+    savePath: save?.filePath ?? null,
+    saveBytes: save?.bytes.length ?? 0,
     saveDerivedFromState: !args.save,
     statePath: state?.filePath ?? null,
     stateBytes: state?.bytes.length ?? 0,

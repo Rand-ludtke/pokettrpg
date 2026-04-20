@@ -4,9 +4,6 @@ import {
   extractEmeraldSaveFromMgbaState,
   parseEmeraldState,
   parseEmeraldSave,
-  replaceEmeraldSaveInMgbaState,
-  updateEmeraldStateCoins,
-  updateEmeraldSaveCoins,
 } from './emeraldSave';
 import {
   loadStoredRom,
@@ -89,6 +86,7 @@ export function GameCornerEmulator({
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const restoreCommandTimerRef = useRef<number | null>(null);
+  const stateCaptureTimerRef = useRef<number | null>(null);
   const [storedRom, setStoredRom] = useState<StoredRom | null>(null);
   const [pendingSave, setPendingSave] = useState<ArrayBuffer | null>(null);
   const [pendingState, setPendingState] = useState<ArrayBuffer | null>(null);
@@ -107,6 +105,32 @@ export function GameCornerEmulator({
       window.clearTimeout(restoreCommandTimerRef.current);
       restoreCommandTimerRef.current = null;
     }
+  }
+
+  function clearStateCaptureTimer() {
+    if (stateCaptureTimerRef.current !== null) {
+      window.clearTimeout(stateCaptureTimerRef.current);
+      stateCaptureTimerRef.current = null;
+    }
+  }
+
+  function requestStateCapture(reason: string) {
+    iframeRef.current?.contentWindow?.postMessage(
+      {
+        type: 'ejs:capture-state',
+        reason,
+      },
+      '*',
+    );
+  }
+
+  function scheduleStateCapture(reason: string, delayMs = 750) {
+    clearStateCaptureTimer();
+    if (!emulatorReady) return;
+
+    stateCaptureTimerRef.current = window.setTimeout(() => {
+      requestStateCapture(reason);
+    }, delayMs);
   }
 
   function scheduleBundledStateRestore() {
@@ -136,11 +160,17 @@ export function GameCornerEmulator({
   }
 
   function setControlPressed(alias: EmulatorControlAlias, pressed: boolean) {
+    if (pressed) {
+      clearStateCaptureTimer();
+    }
     setActiveControls((current) => {
       if (!!current[alias] === pressed) return current;
       return { ...current, [alias]: pressed };
     });
     sendControlInput(alias, pressed);
+    if (!pressed) {
+      scheduleStateCapture(`control-release:${alias}`);
+    }
   }
 
   function releaseAllControls() {
@@ -208,6 +238,13 @@ export function GameCornerEmulator({
         return;
       }
 
+      if (data.type === 'ejs:set-coins-result') {
+        if (!data.ok) {
+          console.warn('[GameCornerEmulator] live coin patch failed', data);
+        }
+        return;
+      }
+
       if (data.type === 'ejs:error') {
         clearRestoreCommandTimer();
         setEmulatorReady(false);
@@ -240,6 +277,8 @@ export function GameCornerEmulator({
     window.addEventListener('message', onMessage);
     return () => {
       clearRestoreCommandTimer();
+      requestStateCapture('component-unmount');
+      clearStateCaptureTimer();
       releaseAllControls();
       window.removeEventListener('message', onMessage);
     };
@@ -285,29 +324,13 @@ export function GameCornerEmulator({
     const parsed = parseEmeraldState(pendingState);
     if (!parsed || parsed.coins === appCoins) return;
 
-    const currentSave = getMeaningfulSaveFromState(pendingState);
-    const updatedSave = currentSave ? updateEmeraldSaveCoins(currentSave, appCoins) : null;
-    const updatedState = updatedSave
-      ? replaceEmeraldSaveInMgbaState(pendingState, updatedSave)
-      : updateEmeraldStateCoins(pendingState, appCoins);
-    if (!updatedState) return;
-
-    setPendingState(updatedState);
-    persistState(updatedState).catch(console.error);
-    if (updatedSave) {
-      setPendingSave(updatedSave);
-      persistSave(updatedSave).catch(console.error);
-    }
-
-    const stateBuffer = updatedState.slice(0);
     iframeRef.current.contentWindow.postMessage(
       {
-        type: 'ejs:load-state',
-        reason: 'coin-writeback',
-        stateBuffer,
+        type: 'ejs:set-coins',
+        reason: 'coin-writeback-live',
+        coins: appCoins,
       },
       '*',
-      [stateBuffer],
     );
   }, [appCoins, coinWritebackVersion, emulatorReady, pendingState]);
 

@@ -11,7 +11,7 @@ import {
   type MoveEntry,
   type MoveIndex,
 } from '../data/adapter';
-import { appendBattlePokemonToPc, loadImportedSignatures, persistImportedSignatures } from '../data/pcStorage';
+import { appendBattlePokemonToPc, loadImportedSignatures, loadPcBoxes, persistImportedSignatures } from '../data/pcStorage';
 import type { BattlePokemon, Move } from '../types';
 import type { ParsedEmeraldMon, ParsedEmeraldSave } from './emeraldSave';
 
@@ -27,6 +27,10 @@ interface SyncContext {
   moveLookup: Map<string, Move>;
   itemLookup: Map<number, string>;
 }
+
+type ImportTrackedBattlePokemon = BattlePokemon & {
+  sourceSignature?: string;
+};
 
 export interface ImportedGameCornerPokemonResult {
   importedCount: number;
@@ -126,28 +130,40 @@ function buildBattlePokemonFromParsedMon(mon: ParsedEmeraldMon, context: SyncCon
   const moves = buildMoves(mon, context.moveLookup);
   if (moves.length) pokemon.moves = moves;
 
-  return prepareBattle(pokemon);
+  const prepared = prepareBattle(pokemon) as ImportTrackedBattlePokemon;
+  prepared.sourceSignature = mon.signature;
+  return prepared;
 }
 
 export async function importParsedEmeraldSaveToPc(parsed: ParsedEmeraldSave): Promise<ImportedGameCornerPokemonResult> {
   const context = await getSyncContext();
   const importedSignatures = loadImportedSignatures();
+  const existingPcPokemon = loadPcBoxes()
+    .flat()
+    .filter((pokemon): pokemon is ImportTrackedBattlePokemon => Boolean(pokemon));
+  const existingSourceSignatures = new Set(
+    existingPcPokemon
+      .map((pokemon) => pokemon.sourceSignature)
+      .filter((signature): signature is string => typeof signature === 'string' && signature.length > 0),
+  );
   const candidates = [...parsed.party, ...parsed.boxes];
   const queued: Array<{ signature: string; pokemon: BattlePokemon }> = [];
   let duplicateCount = 0;
   let unsupportedCount = 0;
 
   for (const mon of candidates) {
-    if (importedSignatures.has(mon.signature)) {
-      duplicateCount += 1;
-      continue;
-    }
-
     const built = buildBattlePokemonFromParsedMon(mon, context);
     if (!built) {
       unsupportedCount += 1;
       continue;
     }
+
+    if (existingSourceSignatures.has(mon.signature)) {
+      duplicateCount += 1;
+      continue;
+    }
+
+    existingSourceSignatures.add(mon.signature);
 
     queued.push({ signature: mon.signature, pokemon: built });
   }
