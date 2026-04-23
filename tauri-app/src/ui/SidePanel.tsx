@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { withPublicBase } from '../utils/publicBase';
-import { BattlePokemon } from '../types';
+import { BattlePokemon, Pokemon } from '../types';
 import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, saveCustomSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, resyncSpriteCatalog, getFusionApiBases, IFD_CDN_BASE, cacheIfdSprite, nameToDexNum, dexNumToName, type PokemonSpriteOption } from '../data/adapter';
 import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
 import { FusionCreator } from './FusionCreator';
@@ -937,7 +937,11 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     if (!dex) return;
     const speciesId = overrides.species || resolveSpeciesName();
     const nextLevel = overrides.level ?? selected.level;
-    const p0 = toPokemon(speciesId, dex.pokedex, nextLevel);
+    const speciesChanged = normalizeName(speciesId) !== normalizeName(resolveSpeciesName());
+    const isFusionEdit = !!(selected as any).fusion && !speciesChanged;
+    const p0 = isFusionEdit
+      ? ({ ...(selected as any), level: nextLevel } as Pokemon)
+      : toPokemon(speciesId, dex.pokedex, nextLevel);
     if (!p0) return;
     p0.name = overrides.name ?? selected.name;
     p0.species = speciesId;
@@ -953,7 +957,6 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     p0.moves = mapMoves(moveNames, dex.moves);
     if ((selected as any).cosmeticForm) (p0 as any).cosmeticForm = (selected as any).cosmeticForm;
     const bp = prepareBattle(p0);
-    const speciesChanged = normalizeName(speciesId) !== normalizeName(resolveSpeciesName());
     onReplaceSelected && onReplaceSelected(withVisualState(bp, !speciesChanged));
   };
 

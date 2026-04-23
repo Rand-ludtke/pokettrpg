@@ -223,9 +223,9 @@ function normalizeBaseStats(raw: any): any {
 }
 
 /**
- * Patch Sage and Insurgence regional Pokedex, moves, abilities, and items into the PS
+ * Patch regional/custom Pokedex, moves, abilities, and items into the PS
  * BattlePokedex / BattleMovedex / BattleAbilities / BattleItems globals so tooltips
- * can look up base stats and other data for custom species.
+ * can look up base stats and other data for fangame species and moves.
  */
 async function patchSageAndInsurgenceDexEntries(): Promise<void> {
   const fetchOptionalJson = async (path: string) => {
@@ -239,7 +239,10 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
   };
 
   const [sagePokedex, sageMoves, sageAbilities, sageItems,
-         insPokedex, insAbilities, insItems] = await Promise.all([
+         insPokedex, insAbilities, insItems,
+         uraniumPokedex, uraniumMoves, uraniumAbilities,
+         infinityPokedex, infinityMoves, infinityAbilities,
+         mariomonPokedex, mariomonMoves, mariomonAbilities] = await Promise.all([
     fetchOptionalJson(withPublicBase('data/sage/generated/pokedex.sage.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/moves.custom.sage.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/abilities.custom.sage.json')),
@@ -247,6 +250,15 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
     fetchOptionalJson(withPublicBase('data/insurgence/generated/pokedex.insurgence.json')),
     fetchOptionalJson(withPublicBase('data/insurgence/generated/abilities.custom.insurgence.json')),
     fetchOptionalJson(withPublicBase('data/insurgence/generated/items.custom.insurgence.json')),
+    fetchOptionalJson(withPublicBase('data/uranium/generated/pokedex.uranium.json')),
+    fetchOptionalJson(withPublicBase('data/uranium/generated/moves.custom.uranium.json')),
+    fetchOptionalJson(withPublicBase('data/uranium/generated/abilities.custom.uranium.json')),
+    fetchOptionalJson(withPublicBase('data/infinity/generated/pokedex.infinity.json')),
+    fetchOptionalJson(withPublicBase('data/infinity/generated/moves.custom.infinity.json')),
+    fetchOptionalJson(withPublicBase('data/infinity/generated/abilities.custom.infinity.json')),
+    fetchOptionalJson(withPublicBase('data/mariomon/generated/pokedex.mariomon.json')),
+    fetchOptionalJson(withPublicBase('data/mariomon/generated/moves.custom.mariomon.json')),
+    fetchOptionalJson(withPublicBase('data/mariomon/generated/abilities.custom.mariomon.json')),
   ]);
 
   const battleDex = ((window as any).BattlePokedex = (window as any).BattlePokedex || {});
@@ -281,11 +293,20 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
 
   applied += mergeEntries(sagePokedex, battleDex, 'Sage dex', true);
   applied += mergeEntries(insPokedex, battleDex, 'Insurgence dex', true);
+  applied += mergeEntries(uraniumPokedex, battleDex, 'Uranium dex', true);
+  applied += mergeEntries(infinityPokedex, battleDex, 'Infinity dex', true);
+  applied += mergeEntries(mariomonPokedex, battleDex, 'Mariomon dex', true);
   applied += mergeEntries(sageMoves, battleMovedex, 'Sage moves');
+  applied += mergeEntries(uraniumMoves, battleMovedex, 'Uranium moves');
+  applied += mergeEntries(infinityMoves, battleMovedex, 'Infinity moves');
+  applied += mergeEntries(mariomonMoves, battleMovedex, 'Mariomon moves');
   applied += mergeEntries(sageAbilities, battleAbilities, 'Sage abilities');
   applied += mergeEntries(sageItems, battleItems, 'Sage items');
   applied += mergeEntries(insAbilities, battleAbilities, 'Insurgence abilities');
   applied += mergeEntries(insItems, battleItems, 'Insurgence items');
+  applied += mergeEntries(uraniumAbilities, battleAbilities, 'Uranium abilities');
+  applied += mergeEntries(infinityAbilities, battleAbilities, 'Infinity abilities');
+  applied += mergeEntries(mariomonAbilities, battleAbilities, 'Mariomon abilities');
 
   // Keep Dex data pointers in sync for tooltip/species lookups
   if ((window as any).Dex?.data) {
@@ -296,7 +317,7 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
   }
 
   if (applied > 0) {
-    console.log(`[PS Loader] Patched Sage/Insurgence custom entries: ${applied} total`);
+    console.log(`[PS Loader] Patched regional custom entries: ${applied} total`);
   }
 }
 
