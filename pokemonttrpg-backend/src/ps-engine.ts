@@ -21,13 +21,32 @@ import {
 	StatStages,
 	NonVolatileStatusId,
 } from "./types";
+import customMoves from "../data/moves";
 
 // Import Pokemon Showdown simulator
 const ps = require("pokemon-showdown");
 const { BattleStream, getPlayerStreams, Teams, PRNG, Dex } = ps;
 
-// ── Inject custom fangame types (Nuclear, Cosmic) into the PS Dex ──
-(function injectCustomTypes() {
+const customAbilityPatches = {
+	fullforce: {
+		name: "Full Force",
+		shortDesc: "Variable-power moves used by this Pokemon always use their maximum Base Power.",
+		desc: "Variable-power moves used by this Pokemon always use their maximum Base Power.",
+		flags: {},
+		isNonstandard: "Custom",
+		num: -20001,
+		rating: 3,
+		onBasePowerPriority: 23,
+		onBasePower(this: any, basePower: number, _pokemon: unknown, _target: unknown, move: { id?: string }) {
+			const maxBasePower = move?.id === 'return' || move?.id === 'frustration' ? 102 : 0;
+			if (!maxBasePower || !basePower || basePower >= maxBasePower) return;
+			return this.chainModify([maxBasePower, basePower]);
+		},
+	},
+};
+
+// ── Inject custom fangame types and Dex data used by the PS simulator ──
+(function injectCustomDexEntries() {
 	const tc = Dex.data.TypeChart;
 	// Nuclear type (Uranium fangame)
 	tc.nuclear = {
@@ -47,8 +66,12 @@ const { BattleStream, getPlayerStreams, Teams, PRNG, Dex } = ps;
 	if (tc.fairy) tc.fairy.damageTaken.Cosmic = 1;
 	if (tc.normal) tc.normal.damageTaken.Cosmic = 1;
 	if (tc.psychic) tc.psychic.damageTaken.Cosmic = 2;
-	// Clear cached type lookups so Dex re-reads
+	Object.assign(Dex.data.Moves, customMoves);
+	Object.assign(Dex.data.Abilities, customAbilityPatches);
+	// Clear cached lookups so Dex re-reads custom data
 	if (Dex.types?.cache) Dex.types.cache = new Map();
+	if (Dex.moves?.cache) Dex.moves.cache = new Map();
+	if (Dex.abilities?.cache) Dex.abilities.cache = new Map();
 })();
 
 function canonicalizeMoveId(value: unknown): string {
@@ -206,7 +229,7 @@ export class PSEngine {
 			species: mon.name,
 			item: mon.item || "",
 			ability: mon.ability || "",
-			moves: mon.moves.map((m) => m.name || m.id),
+			moves: mon.moves.map((m) => canonicalizeMoveId(m.name || m.id) || String(m.name || m.id || '')),
 			nature: (mon as any).nature || "Hardy",
 			evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0, ...(mon as any).evs },
 			ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31, ...(mon as any).ivs },
