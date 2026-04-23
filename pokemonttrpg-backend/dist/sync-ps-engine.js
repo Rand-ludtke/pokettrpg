@@ -10,6 +10,47 @@ exports.SyncPSEngine = void 0;
 // Import Pokemon Showdown simulator
 const ps = require("pokemon-showdown");
 const { Battle: PSBattle, Teams, PRNG, Dex } = ps;
+const customMovesData = require("../data/moves.js");
+
+const customMoves = customMovesData.default || customMovesData;
+const customAbilityPatches = {
+    fullforce: {
+        name: "Full Force",
+        shortDesc: "Variable-power moves used by this Pokemon always use their maximum Base Power.",
+        desc: "Variable-power moves used by this Pokemon always use their maximum Base Power.",
+        flags: {},
+        isNonstandard: "Custom",
+        num: -20001,
+        rating: 3,
+        onBasePowerPriority: 23,
+        onBasePower(basePower, _pokemon, _target, move) {
+            const maxBasePower = move?.id === 'return' || move?.id === 'frustration' ? 102 : 0;
+            if (!maxBasePower || !basePower || basePower >= maxBasePower)
+                return;
+            return this.chainModify([maxBasePower, basePower]);
+        },
+    },
+};
+
+(function injectCustomDexEntries() {
+    Object.assign(Dex.data.Moves, customMoves);
+    Object.assign(Dex.data.Abilities, customAbilityPatches);
+    if (Dex.moves?.cache)
+        Dex.moves.cache = new Map();
+    if (Dex.abilities?.cache)
+        Dex.abilities.cache = new Map();
+})();
+
+function canonicalizeMoveId(value) {
+    const moveId = String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!moveId)
+        return '';
+    if (/^(return|frustration)\d+$/.test(moveId))
+        return moveId.replace(/\d+$/, '');
+    if (/^hiddenpower(?:[a-z]+|\d+)$/.test(moveId))
+        return 'hiddenpower';
+    return moveId;
+}
 /**
  * SyncPSEngine provides a synchronous interface to Pokemon Showdown's battle simulation.
  * It uses PS's Battle class directly (not the stream) for synchronous operation.
@@ -226,7 +267,7 @@ class SyncPSEngine {
             species: mon.species || mon.name,
             item: mon.item || "",
             ability: mon.ability || "",
-            moves: mon.moves.map((m) => m.name || m.id),
+            moves: mon.moves.map((m) => canonicalizeMoveId(m.name || m.id) || String(m.name || m.id || '')),
             nature: mon.nature || "Hardy",
             evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0, ...mon.evs },
             ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31, ...mon.ivs },
@@ -780,10 +821,10 @@ class SyncPSEngine {
             console.warn(`[SyncPSEngine] findMoveIndex: no active pokemon at slot ${slotIndex} for ${side}, defaulting to move 1`);
             return 1;
         }
-        const normalizedMoveId = moveId.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const normalizedMoveId = canonicalizeMoveId(moveId);
         for (let i = 0; i < activePokemon.moves.length; i++) {
             const move = activePokemon.moves[i];
-            const moveNormalized = (move || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+            const moveNormalized = canonicalizeMoveId(move || "");
             if (moveNormalized === normalizedMoveId) {
                 return i + 1;
             }
@@ -794,7 +835,7 @@ class SyncPSEngine {
             const reqMoves = request.active[slotIndex].moves;
             for (let i = 0; i < reqMoves.length; i++) {
                 const m = reqMoves[i];
-                const mId = (m.id || m.name || m.move || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+                const mId = canonicalizeMoveId(m.id || m.name || m.move || "");
                 if (mId === normalizedMoveId) {
                     return i + 1;
                 }
