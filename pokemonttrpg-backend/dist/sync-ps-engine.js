@@ -267,7 +267,10 @@ class SyncPSEngine {
             species: mon.species || mon.name,
             item: mon.item || "",
             ability: mon.ability || "",
-            moves: mon.moves.map((m) => canonicalizeMoveId(m.name || m.id) || String(m.name || m.id || '')),
+            moves: mon.moves.map((m) => {
+                const rawMove = typeof m === "string" ? m : (m?.name || m?.id || "");
+                return canonicalizeMoveId(rawMove) || String(rawMove || "");
+            }),
             nature: mon.nature || "Hardy",
             evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0, ...mon.evs },
             ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31, ...mon.ivs },
@@ -785,6 +788,26 @@ class SyncPSEngine {
             if (!moveAction.moveId || moveAction.moveId === "default") {
                 return "default";
             }
+            const normalizedMoveId = canonicalizeMoveId(moveAction.moveId);
+            const providedMoveIndex = Number.isInteger(moveAction.moveIndex) ? moveAction.moveIndex : -1;
+            if (providedMoveIndex >= 0) {
+                const indexedMoveId = this.getMoveIdAtIndex(side, slotIndex, providedMoveIndex);
+                if (!indexedMoveId || indexedMoveId === normalizedMoveId) {
+                    let choice = `move ${providedMoveIndex + 1}`;
+                    if (typeof moveAction.targetLoc === "number" && Number.isFinite(moveAction.targetLoc) && moveAction.targetLoc !== 0) {
+                        choice += ` ${moveAction.targetLoc}`;
+                    }
+                    if (moveAction.mega)
+                        choice += " mega";
+                    if (moveAction.zmove)
+                        choice += " zmove";
+                    if (moveAction.dynamax)
+                        choice += " dynamax";
+                    if (moveAction.terastallize)
+                        choice += " terastallize";
+                    return choice;
+                }
+            }
             const moveIndex = this.findMoveIndex(moveAction.moveId, side, slotIndex);
             let choice = `move ${moveIndex}`;
             if (typeof moveAction.targetLoc === "number" && Number.isFinite(moveAction.targetLoc) && moveAction.targetLoc !== 0) {
@@ -822,6 +845,14 @@ class SyncPSEngine {
             return 1;
         }
         const normalizedMoveId = canonicalizeMoveId(moveId);
+        const moveSlots = activePokemon.moveSlots || activePokemon.baseMoveSlots || [];
+        for (let i = 0; i < moveSlots.length; i++) {
+            const slot = moveSlots[i];
+            const slotMoveId = canonicalizeMoveId(slot?.id || slot?.move || slot?.name || "");
+            if (slotMoveId === normalizedMoveId) {
+                return i + 1;
+            }
+        }
         for (let i = 0; i < activePokemon.moves.length; i++) {
             const move = activePokemon.moves[i];
             const moveNormalized = canonicalizeMoveId(move || "");
@@ -843,6 +874,26 @@ class SyncPSEngine {
         }
         console.warn(`[SyncPSEngine] findMoveIndex: moveId '${moveId}' not found in slot ${slotIndex} for ${side}, moves=[${activePokemon.moves.join(',')}], defaulting to move 1`);
         return 1;
+    }
+    getMoveIdAtIndex(side, slotIndex = 0, moveIndex = -1) {
+        if (!this.battle || moveIndex < 0)
+            return "";
+        const psSide = this.battle.sides.find((s) => s.id === side);
+        if (!psSide)
+            return "";
+        const activePokemon = psSide.active[slotIndex];
+        const moveSlots = activePokemon?.moveSlots || activePokemon?.baseMoveSlots || [];
+        const slotMove = moveSlots[moveIndex];
+        const slotMoveId = canonicalizeMoveId(slotMove?.id || slotMove?.move || slotMove?.name || "");
+        if (slotMoveId)
+            return slotMoveId;
+        const activeMove = activePokemon?.moves?.[moveIndex];
+        const activeMoveId = canonicalizeMoveId(activeMove || "");
+        if (activeMoveId)
+            return activeMoveId;
+        const request = side === "p1" ? this.battle.p1Request : this.battle.p2Request;
+        const requestMove = request?.active?.[slotIndex]?.moves?.[moveIndex];
+        return canonicalizeMoveId(requestMove?.id || requestMove?.name || requestMove?.move || "");
     }
     applyStartingHP(players) {
         if (!this.battle || !players) return;

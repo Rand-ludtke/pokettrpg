@@ -3742,7 +3742,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     if (!client || !roomId || !mySide) return;
     
     // Check if this is a force-switch scenario (fainted Pokemon)
-    const currentRequest = requestRef.current;
+    const currentRequest = request ?? requestRef.current;
     const isForceSwitchScenario = !!currentRequest?.forceSwitch?.some((f: boolean) => f);
     
     // Prevent sending if already waiting for opponent (but allow force-switch scenarios)
@@ -3962,7 +3962,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           console.warn('[PSBattlePanel] Invalid move choice:', choiceString);
           return;
         }
-        const activeMoves = requestRef.current?.active?.[0]?.moves || [];
+        const activeMoves = currentRequest?.active?.[0]?.moves || [];
         const selectedMove = activeMoves[moveIndex];
         const moveId = isStruggle ? 'struggle' : (selectedMove?.id || toID(selectedMove?.name || selectedMove?.move || ''));
 
@@ -4057,8 +4057,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     // Save the current request before entering waiting state so we can restore on cancel
     // Save for both move and switch actions so cancel always shows the move selection UI
-    if (shouldWait && (actionTypeResolved === 'move' || actionTypeResolved === 'switch') && requestRef.current) {
-      lastMoveRequestRef.current = requestRef.current;
+    if (shouldWait && (actionTypeResolved === 'move' || actionTypeResolved === 'switch') && currentRequest) {
+      lastMoveRequestRef.current = currentRequest;
     }
     
     // Track when we started waiting
@@ -4068,7 +4068,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     
     // Show waiting state but keep request/choices for tooltips and cancel UI
     setWaitingForOpponent(shouldWait);
-  }, [client, roomId, mySide, myPlayerId, waitingForOpponent, currentTurn, currentRqid, moveBoosts, choices]);
+  }, [client, roomId, mySide, myPlayerId, waitingForOpponent, currentTurn, currentRqid, moveBoosts, choices, request]);
 
   const cancelWaiting = useCallback(() => {
     const turn = latestPromptTurnRef.current;
