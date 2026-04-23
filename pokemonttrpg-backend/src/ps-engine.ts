@@ -51,6 +51,14 @@ const { BattleStream, getPlayerStreams, Teams, PRNG, Dex } = ps;
 	if (Dex.types?.cache) Dex.types.cache = new Map();
 })();
 
+function canonicalizeMoveId(value: unknown): string {
+	const moveId = String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+	if (!moveId) return '';
+	if (/^(return|frustration)\d+$/.test(moveId)) return moveId.replace(/\d+$/, '');
+	if (/^hiddenpower(?:[a-z]+|\d+)$/.test(moveId)) return 'hiddenpower';
+	return moveId;
+}
+
 interface PSRequest {
 	rqid?: number;
 	teamPreview?: boolean;
@@ -550,13 +558,13 @@ export class PSEngine {
 	private findMoveIndex(moveId: string, request: PSRequest | null): number {
 		if (!request?.active?.[0]?.moves) return 1;
 
-		const normalizedMoveId = moveId.toLowerCase().replace(/[^a-z0-9]/g, "");
+		const normalizedMoveId = canonicalizeMoveId(moveId);
 		const moves = request.active[0].moves;
 
 		for (let i = 0; i < moves.length; i++) {
 			const m = moves[i];
-			const mNormalized = (m.id || m.name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
-			if (mNormalized === normalizedMoveId || m.name === moveId) {
+			const mNormalized = canonicalizeMoveId(m.id || m.name || "");
+			if (mNormalized === normalizedMoveId || canonicalizeMoveId(m.name) === normalizedMoveId) {
 				return i + 1; // 1-based
 			}
 		}

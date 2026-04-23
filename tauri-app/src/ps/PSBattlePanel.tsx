@@ -258,6 +258,14 @@ function derivePokemonId(poke: any): string | undefined {
   return undefined;
 }
 
+function canonicalizeMoveId(value: unknown): string {
+  const moveId = toID(String(value || ''));
+  if (!moveId) return '';
+  if (/^(return|frustration)\d+$/.test(moveId)) return moveId.replace(/\d+$/, '');
+  if (/^hiddenpower(?:[a-z]+|\d+)$/.test(moveId)) return 'hiddenpower';
+  return moveId;
+}
+
 // Find matching Pokemon in state team by name/species/id
 function findMatchingStatePoke(poke: any, stateTeam: any[]): any | undefined {
   if (!stateTeam?.length) return undefined;
@@ -3812,7 +3820,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           type: 'move',
           slotIndex: choiceIndex,
           moveIndex,
-          moveId: isStruggle ? 'struggle' : (selectedMove?.id || toID(selectedMove?.name || selectedMove?.move || '')),
+          moveId: isStruggle ? 'struggle' : canonicalizeMoveId(selectedMove?.id || selectedMove?.name || selectedMove?.move || ''),
           targetLoc,
           mega: resolvedChoice.includes('mega'),
           zmove: resolvedChoice.includes('zmove'),
@@ -4211,13 +4219,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             </small>
           </button>
         ) : paddedMoves.map((move: any, i: number) => {
-          const moveId = move.id || toID(move.name || move.move);
+          const rawMoveId = move.id || toID(move.name || move.move);
+          const moveId = canonicalizeMoveId(rawMoveId || move.name || move.move || '');
           const moveName = move.name || move.move || moveId;
           
           // Get full move data from multiple sources
-          const fullMove = fullMoveData.find((m: any) => toID(m.id) === moveId || toID(m.name) === moveId);
+          const fullMove = fullMoveData.find((m: any) => {
+            const candidateId = canonicalizeMoveId(m.id || m.name || m.move || '');
+            return candidateId === moveId;
+          });
           // Get move from BattleMovedex (has type, power, accuracy, description)
-          const dexMove = moveDex[moveId] || getDex()?.moves?.get?.(moveId);
+          const dexMove = moveDex[rawMoveId] || moveDex[moveId] || getDex()?.moves?.get?.(rawMoveId) || getDex()?.moves?.get?.(moveId);
           
           // PP: Server sends pp/maxpp - use server value if it looks real, else fallback to dex
           let pp = move.pp ?? 10;

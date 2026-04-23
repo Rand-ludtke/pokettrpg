@@ -232,7 +232,15 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
     try {
       const res = await fetch(path);
       if (!res.ok) return null;
-      return await res.json();
+      const text = await res.text();
+      if (!text.trim()) return null;
+      try {
+        return JSON.parse(text);
+      } catch {
+        const moduleMatch = text.match(/^\s*export\s+default\s+([\s\S]+?)\s*;?\s*$/);
+        if (!moduleMatch) return null;
+        return JSON.parse(moduleMatch[1]);
+      }
     } catch {
       return null;
     }
