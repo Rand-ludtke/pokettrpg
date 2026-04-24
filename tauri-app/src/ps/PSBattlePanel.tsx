@@ -2411,18 +2411,38 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
                   activeName,
                   activeIndex,
                 });
+                const statePlayers = Array.isArray(result?.state?.players) ? result.state.players : [];
+                const myStatePlayer = myPlayerId
+                  ? statePlayers.find((player: any) => player?.id === myPlayerId || player?.name === myPlayerId)
+                  : statePlayers[mySideLocal === 'p1' ? 0 : 1];
+                const stateTeam = Array.isArray(myStatePlayer?.team) ? myStatePlayer.team : [];
+                const stateActivePokemon =
+                  stateTeam.find((pokemon: any, idx: number) => {
+                    if (idx === myStatePlayer?.activeIndex) return true;
+                    const candidates = [
+                      pokemon?.id,
+                      pokemon?.pokemonId,
+                      pokemon?.name,
+                      pokemon?.species,
+                      pokemon?.nickname,
+                    ].filter(Boolean);
+                    return candidates.some((candidate: any) => toID(candidate) === toID(activeName));
+                  }) || null;
+                const moveSource = Array.isArray(stateActivePokemon?.moves) && stateActivePokemon.moves.length > 0
+                  ? stateActivePokemon.moves
+                  : (activePokemon.moves || []);
                 // Preserve trapped status from original active request
                 const originalActive = currentRequest.active?.[0] || {};
                 const rebuiltActive = [{
                   id: desiredActiveId,
                   pokemonId: desiredActiveId,
-                  moves: (activePokemon.moves || []).map((m: any) => ({
-                    id: m.id || m.name?.toLowerCase().replace(/\s+/g, ''),
-                    name: m.name,
-                    pp: m.pp ?? 32,
-                    maxpp: m.maxpp ?? 32,
-                    target: m.target || 'normal',
-                    disabled: m.disabled || false,
+                  moves: moveSource.map((m: any) => ({
+                    id: typeof m === 'string' ? toID(m) : (m.id || m.name?.toLowerCase().replace(/\s+/g, '')),
+                    name: typeof m === 'string' ? m : m.name,
+                    pp: typeof m === 'string' ? 32 : (m.pp ?? 32),
+                    maxpp: typeof m === 'string' ? 32 : (m.maxpp ?? 32),
+                    target: typeof m === 'string' ? 'normal' : (m.target || 'normal'),
+                    disabled: typeof m === 'string' ? false : (m.disabled || false),
                   })),
                   canSwitch: !originalActive.trapped,
                   trapped: originalActive.trapped || false,
