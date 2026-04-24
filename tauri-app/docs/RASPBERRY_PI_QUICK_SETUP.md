@@ -59,23 +59,15 @@ Run in **Git Bash on this PC** (`192.168.1.17`):
 
 ```bash
 cd /d/GitHub/pokettrpg
-rsync -av --delete --progress \
-  --exclude '.git' \
-  --exclude 'node_modules' \
-  --exclude '.venv' \
-  --exclude 'dist' \
-  --exclude 'target' \
-  --exclude '.fusion-sprites-local' \
-  --exclude 'OneTrainer' \
-  --exclude '.hf_cache' \
-  /d/GitHub/pokettrpg/ \
-  randl@192.168.1.251:/home/randl/pokettrpg/
+rsync -av --delete --progress /d/GitHub/pokettrpg/pokemonttrpg-backend/ randl@192.168.1.251:/home/randl/pokettrpg/pokemonttrpg-backend/
 ssh randl@192.168.1.251 "cd ~/pokettrpg/pokemonttrpg-backend && npm ci && npm run build && sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
 rsync -av --progress \
   "/d/GitHub/pokettrpg/.fusion-sprites-local/" \
   randl@192.168.1.251:"/home/randl/pokettrpg/.fusion-sprites-local/"
 ssh randl@192.168.1.251 "sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
 ```
+
+The trailing slashes on the backend `rsync` command matter. Without them, `rsync` creates a nested `pokemonttrpg-backend/pokemonttrpg-backend` directory and systemd keeps running the stale outer copy.
 
 Then on **Pi**:
 
