@@ -7,12 +7,43 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SyncPSEngine = void 0;
+const fs = require("fs");
+const path = require("path");
 // Import Pokemon Showdown simulator
 const ps = require("pokemon-showdown");
 const { Battle: PSBattle, Teams, PRNG, Dex } = ps;
 const customMovesData = require("../data/moves.js");
 
 const customMoves = customMovesData.default || customMovesData;
+
+function loadCustomDexPayload() {
+    const candidates = [
+        path.resolve(__dirname, "../data/customdex.json"),
+        path.resolve(process.cwd(), "data/customdex.json"),
+        path.resolve(__dirname, "../../tauri-app/public/data/more-pokemon/generated/wylin-customs.generated.json"),
+        path.resolve(__dirname, "../../more pokemon/wylin-customs.generated.json"),
+    ];
+    for (const candidate of candidates) {
+        try {
+            if (!fs.existsSync(candidate))
+                continue;
+            const parsed = JSON.parse(fs.readFileSync(candidate, "utf-8"));
+            const species = parsed?.species || parsed?.dex || {};
+            const moves = parsed?.moves || {};
+            const abilities = parsed?.abilities || {};
+            const items = parsed?.items || {};
+            if (Object.keys(species).length || Object.keys(moves).length || Object.keys(abilities).length || Object.keys(items).length) {
+                console.log(`[SyncPSEngine] Loaded custom dex payload from ${candidate}`);
+                return { species, moves, abilities, items };
+            }
+        }
+        catch (error) {
+            console.warn(`[SyncPSEngine] Failed to load custom dex payload from ${candidate}: ${error?.message || error}`);
+        }
+    }
+    return { species: {}, moves: {}, abilities: {}, items: {} };
+}
+
 const customAbilityPatches = {
     fullforce: {
         name: "Full Force",
@@ -33,12 +64,28 @@ const customAbilityPatches = {
 };
 
 (function injectCustomDexEntries() {
+    const customDex = loadCustomDexPayload();
+    Object.assign(Dex.data.Pokedex, customDex.species || {});
+    for (const [speciesId, speciesData] of Object.entries(customDex.species || {})) {
+        if (!Dex.data.FormatsData[speciesId])
+            Dex.data.FormatsData[speciesId] = { tier: "Illegal" };
+        const battleOnlyId = String(speciesData?.battleOnly || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (battleOnlyId && !Dex.data.FormatsData[battleOnlyId])
+            Dex.data.FormatsData[battleOnlyId] = { tier: "Illegal" };
+    }
     Object.assign(Dex.data.Moves, customMoves);
+    Object.assign(Dex.data.Moves, customDex.moves || {});
     Object.assign(Dex.data.Abilities, customAbilityPatches);
+    Object.assign(Dex.data.Abilities, customDex.abilities || {});
+    Object.assign(Dex.data.Items, customDex.items || {});
+    if (Dex.species?.cache)
+        Dex.species.cache = new Map();
     if (Dex.moves?.cache)
         Dex.moves.cache = new Map();
     if (Dex.abilities?.cache)
         Dex.abilities.cache = new Map();
+    if (Dex.items?.cache)
+        Dex.items.cache = new Map();
 })();
 
 function canonicalizeMoveId(value) {

@@ -377,6 +377,9 @@ const DEFAULT_FUSION_SUBDIRS = [
     "Other",
     "sprites",
 ];
+// Recursively discover directories that contain head-XXXX-XXXX bucket dirs.
+// This finds sprites in nested structures like generated/sage-sdxl/<date>/head-XXXX-XXXX/
+// as well as top-level head-XXXX buckets.
 function discoverSpriteRoots(dir, maxDepth = 4, depth = 0) {
     const roots = [];
     if (depth > maxDepth || !dir || !fs_1.default.existsSync(dir))
@@ -391,8 +394,10 @@ function discoverSpriteRoots(dir, maxDepth = 4, depth = 0) {
                 hasHeadBucket = true;
             }
         }
+        // If this dir contains head-* buckets, it's a sprite root
         if (hasHeadBucket)
             roots.push(dir);
+        // Recurse into non-head subdirs to find nested sprite roots
         for (const entry of entries) {
             if (!entry.isDirectory() || /^head-/.test(entry.name))
                 continue;
@@ -407,11 +412,13 @@ function discoverSpriteRoots(dir, maxDepth = 4, depth = 0) {
 function buildFusionExtraDirs(root, configured) {
     const discovered = [];
     if (root && fs_1.default.existsSync(root)) {
+        // Add well-known subdirectories
         for (const rel of DEFAULT_FUSION_SUBDIRS) {
             const abs = path_1.default.resolve(root, rel);
             if (fs_1.default.existsSync(abs))
                 discovered.push(abs);
         }
+        // Recursively discover all directories that contain head-* buckets
         discovered.push(...discoverSpriteRoots(root));
     }
     return Array.from(new Set([...configured, ...discovered]));
@@ -895,14 +902,14 @@ function loadCustomDex() {
         if (fs_1.default.existsSync(CUSTOM_DEX_FILE)) {
             const json = JSON.parse(fs_1.default.readFileSync(CUSTOM_DEX_FILE, "utf-8"));
             // Ensure shape
-            return { species: json.species ?? {}, moves: json.moves ?? {}, abilities: json.abilities ?? {} };
+            return { species: json.species ?? {}, moves: json.moves ?? {}, abilities: json.abilities ?? {}, items: json.items ?? {} };
         }
     }
     catch { }
-    return { species: {}, moves: {}, abilities: {} };
+    return { species: {}, moves: {}, abilities: {}, items: {} };
 }
 function saveCustomDex(dex) {
-    const payload = { species: dex.species ?? {}, moves: dex.moves ?? {}, abilities: dex.abilities ?? {} };
+    const payload = { species: dex.species ?? {}, moves: dex.moves ?? {}, abilities: dex.abilities ?? {}, items: dex.items ?? {} };
     fs_1.default.writeFileSync(CUSTOM_DEX_FILE, JSON.stringify(payload, null, 2));
 }
 function loadCustomSprites() {
@@ -920,8 +927,8 @@ function saveCustomSprites(sprites) {
     fs_1.default.writeFileSync(CUSTOM_SPRITES_FILE, JSON.stringify(payload, null, 2));
 }
 function diffDex(serverDex, clientDex) {
-    const missingOnClient = { species: {}, moves: {}, abilities: {} };
-    const missingOnServer = { species: {}, moves: {}, abilities: {} };
+    const missingOnClient = { species: {}, moves: {}, abilities: {}, items: {} };
+    const missingOnServer = { species: {}, moves: {}, abilities: {}, items: {} };
     // Server -> Client (what client lacks)
     for (const [id, s] of Object.entries(serverDex.species ?? {})) {
         if (!clientDex.species || !clientDex.species[id])
@@ -935,6 +942,10 @@ function diffDex(serverDex, clientDex) {
         if (!clientDex.abilities || !clientDex.abilities[id])
             missingOnClient.abilities[id] = a;
     }
+    for (const [id, item] of Object.entries(serverDex.items ?? {})) {
+        if (!clientDex.items || !clientDex.items[id])
+            missingOnClient.items[id] = item;
+    }
     // Client -> Server (what server lacks)
     for (const [id, s] of Object.entries(clientDex.species ?? {})) {
         if (!serverDex.species || !serverDex.species[id])
@@ -947,6 +958,10 @@ function diffDex(serverDex, clientDex) {
     for (const [id, a] of Object.entries(clientDex.abilities ?? {})) {
         if (!serverDex.abilities || !serverDex.abilities[id])
             missingOnServer.abilities[id] = a;
+    }
+    for (const [id, item] of Object.entries(clientDex.items ?? {})) {
+        if (!serverDex.items || !serverDex.items[id])
+            missingOnServer.items[id] = item;
     }
     return { missingOnClient, missingOnServer };
 }
@@ -1014,10 +1029,12 @@ app.post("/api/customdex/upload", (req, res) => {
     let addedSpecies = 0;
     let addedMoves = 0;
     let addedAbilities = 0;
+    let addedItems = 0;
     let addedSprites = 0;
     serverDex.species = serverDex.species || {};
     serverDex.moves = serverDex.moves || {};
     serverDex.abilities = serverDex.abilities || {};
+    serverDex.items = serverDex.items || {};
     for (const [id, s] of Object.entries(incoming.species ?? {})) {
         if (!serverDex.species[id]) {
             serverDex.species[id] = s;
@@ -1034,6 +1051,12 @@ app.post("/api/customdex/upload", (req, res) => {
         if (!serverDex.abilities[id]) {
             serverDex.abilities[id] = a;
             addedAbilities++;
+        }
+    }
+    for (const [id, item] of Object.entries(incoming.items ?? {})) {
+        if (!serverDex.items[id]) {
+            serverDex.items[id] = item;
+            addedItems++;
         }
     }
     for (const [id, slots] of Object.entries(incoming.sprites || {})) {
@@ -1093,7 +1116,7 @@ app.post("/api/customdex/upload", (req, res) => {
             }
         }
     }
-    res.json({ ok: true, added: { species: addedSpecies, moves: addedMoves, abilities: addedAbilities, sprites: addedSprites } });
+    res.json({ ok: true, added: { species: addedSpecies, moves: addedMoves, abilities: addedAbilities, items: addedItems, sprites: addedSprites } });
 });
 app.get("/api/rooms/:id", (req, res) => {
     const room = rooms.get(req.params.id);
@@ -1637,6 +1660,8 @@ function beginBattle(room, players, seed, rules) {
         if (USE_PS_ENGINE) {
             console.log(`[Server] Using Pokemon Showdown battle engine with rules:`, JSON.stringify(rules));
             // True Boss mode: keep doubles so each challenger gets an active slot.
+            // The boss side naturally sends out as many Pokemon as it has (1 if team size is 1,
+            // or 2 in doubles). The key is that ALL challengers must have an active slot.
             const engineRules = rules;
             if (rules?.trueBoss && rules?.playerFormat?.match(/^\d+v1$/)) {
                 console.log(`[Server] True Boss mode: keeping ${rules.playerFormat} doubles format (each challenger gets 1 active slot)`);
@@ -2285,8 +2310,19 @@ function emitForceSwitchPrompts(room, state, needsSwitch) {
             continue;
         }
         // Fallback: Build request manually if PS request not available
+        // Determine how many active slots need switching (doubles/triples have >1)
+        const fallbackForceSwitch = [];
+        const isDoubles = room.bossMode || room.teamBattleMode;
+        const activeSlotCount = isDoubles ? 2 : 1;
+        for (let s = 0; s < activeSlotCount; s++) {
+            const poke = player.team[s];
+            fallbackForceSwitch.push(!poke || poke.currentHP <= 0);
+        }
+        // At least one must be true (we got here because a switch is needed)
+        if (!fallbackForceSwitch.some(Boolean))
+            fallbackForceSwitch[0] = true;
         const switchRequest = {
-            forceSwitch: [true], // Single slot
+            forceSwitch: fallbackForceSwitch,
             side: {
                 id: sideId,
                 name: player.name,
@@ -2577,12 +2613,12 @@ function computeNeedsSwitch(state, engine) {
             continue;
         }
         const active = pl.team[pl.activeIndex];
-        // If the active Pokemon has HP > 0, no switch is needed.
+        // If the active Pokemon has HP > 0, no switch is needed (primary singles fallback).
         // The engine's activeRequest can retain a stale forceSwitch after commitDecisions
         // auto-resolved the faint switch, so trust state over engine request here.
         if (active && active.currentHP > 0)
             continue;
-        // Fallback: check our state mirror (primarily singles/custom mirror paths)
+        // Fallback: check our state mirror — if active fainted and bench exists, switch needed
         if (active && active.currentHP <= 0 && pl.team.some((m, idx) => idx !== pl.activeIndex && m.currentHP > 0)) {
             out.push(pl.id);
         }
@@ -2628,58 +2664,9 @@ function startForceSwitchTimer(room) {
     room.forceSwitchTimer = setTimeout(() => {
         if (!room.engine || !room.forceSwitchNeeded || room.forceSwitchNeeded.size === 0)
             return;
-        console.log(`[ForceSwitch] Timer fired. Remaining: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
-        // Auto-switch remaining players to first healthy bench
-        for (const pid of Array.from(room.forceSwitchNeeded)) {
-            // Skip phantom entries - player's active Pokemon is alive, no switch needed
-            const timerState = room.engine.getState();
-            const timerPl = timerState.players.find(p => p.id === pid);
-            const timerActive = timerPl?.team[timerPl?.activeIndex ?? -1];
-            if (timerActive && timerActive.currentHP > 0) {
-                console.log(`[ForceSwitch] Timer: Removing phantom entry for ${pid} (active HP=${timerActive.currentHP})`);
-                room.forceSwitchNeeded.delete(pid);
-                continue;
-            }
-            let benchIndex = -1;
-            // Prefer PS request's side.pokemon for accurate faint/active status
-            const psReq = room.engine.getRequest(pid);
-            if (psReq?.side?.pokemon) {
-                benchIndex = psReq.side.pokemon.findIndex((p) => !p.active && !String(p.condition || '').includes('fnt'));
-                console.log(`[ForceSwitch] Auto-switch ${pid}: PS request found benchIndex=${benchIndex}`);
-            }
-            // Fallback to state mirror
-            if (benchIndex < 0) {
-                const state = room.engine.getState();
-                const pl = state.players.find(p => p.id === pid);
-                if (pl) {
-                    benchIndex = pl.team.findIndex((m, idx) => idx !== pl.activeIndex && m.currentHP > 0);
-                    console.log(`[ForceSwitch] Auto-switch ${pid}: state mirror benchIndex=${benchIndex}, activeIndex=${pl.activeIndex}`);
-                }
-            }
-            if (benchIndex >= 0) {
-                const res = room.engine.forceSwitch(pid, benchIndex);
-                room.replay.push({ turn: res.state.turn, events: res.events, anim: res.anim, phase: "force-switch", auto: true });
-                room.forceSwitchNeeded.delete(pid);
-            }
-            else {
-                console.warn(`[ForceSwitch] Auto-switch ${pid}: no valid bench Pokemon found, skipping`);
-                room.forceSwitchNeeded.delete(pid);
-            }
-        }
-        io.to(room.id).emit("battleUpdate", { result: { state: room.engine.getState(), events: [], anim: [] }, needsSwitch: Array.from(room.forceSwitchNeeded ?? []) });
-        if (room.forceSwitchNeeded.size === 0) {
-            room.phase = "normal";
-            io.to(room.id).emit("phase", { phase: room.phase });
-            clearForceSwitchTimer(room);
-            // Clear prompt dedup so the next emitMovePrompts isn't blocked
-            room.lastPromptByPlayer = {};
-            // Emit new move prompts so players can choose their next action
-            const freshState = room.engine.getState();
-            emitMovePrompts(room, freshState);
-        }
-        else {
-            // Extend time for any still-required (optional). For simplicity, clear deadline and keep old until manual switches.
-        }
+        console.log(`[ForceSwitch] Timer fired (auto-switch DISABLED). Remaining: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
+        // Auto-switch is disabled — players must manually choose their replacement.
+        // Just log and keep waiting; the server will re-prompt periodically.
     }, FORCE_SWITCH_TIMEOUT_MS);
 }
 function clearForceSwitchTimer(room) {
@@ -3250,7 +3237,32 @@ io.on("connection", (socket) => {
             const forceSwitchPlayer = forceSwitchState.players.find(p => p.id === data.playerId);
             const switchChoices = data.action.choices;
             const isMultiSlot = Array.isArray(switchChoices) && switchChoices.length >= 1;
-            if (forceSwitchPlayer) {
+            const isAutoPass = Array.isArray(switchChoices) && switchChoices.length === 0;
+            if (isAutoPass) {
+                // Auto-pass: no bench pokemon available, tell engine to pass all force-switch slots
+                console.log(`[ForceSwitch] Auto-pass for ${data.playerId} (empty choices array)`);
+                let res = room.engine.forceSwitch(data.playerId, 0, []);
+                if (Array.isArray(res.events)) {
+                    res = { ...res, events: deduplicateSwitchLines(res.events) };
+                }
+                room.replay.push({ turn: res.state.turn, events: res.events, anim: res.anim, phase: "force-switch" });
+                room.forceSwitchNeeded.delete(data.playerId);
+                // Broadcast and check completion (same as normal path below)
+                {
+                    const s = room.engine.getState();
+                    io.to(room.id).emit("battleUpdate", { result: res, needsSwitch: Array.from(room.forceSwitchNeeded), deadline: room.forceSwitchDeadline ?? null, rooms: { trick: s.field.room, magic: s.field.magicRoom, wonder: s.field.wonderRoom } });
+                }
+                if (room.forceSwitchNeeded.size === 0) {
+                    room.phase = "normal";
+                    io.to(room.id).emit("phase", { phase: room.phase });
+                    clearForceSwitchTimer(room);
+                    room.lastPromptByPlayer = {};
+                    const freshState = room.engine.getState();
+                    emitMovePrompts(room, freshState);
+                }
+                return;
+            }
+            else if (forceSwitchPlayer) {
                 if (isMultiSlot) {
                     // Validate each choice in multi-slot forceSwitch
                     const usedIndices = new Set();
@@ -3461,14 +3473,15 @@ io.on("connection", (socket) => {
                 processedAction = {
                     type: "multi-choice",
                     actorPlayerId: data.playerId,
-                    choices: mcChoices.map((c) => {
+                    choices: mcChoices.map((c, idx) => {
+                        const slot = typeof c.slotIndex === 'number' ? c.slotIndex : idx;
                         if (c.type === "move") {
-                            return { type: "move", moveId: c.moveId, moveIndex: c.moveIndex, targetLoc: c.targetLoc, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
+                            return { type: "move", slotIndex: slot, moveId: c.moveId, moveIndex: c.moveIndex, targetLoc: c.targetLoc, mega: !!c.mega, zmove: !!c.zmove, dynamax: !!c.dynamax, terastallize: !!c.terastallize };
                         }
                         if (c.type === "switch") {
-                            return { type: "switch", toIndex: c.toIndex ?? c.switchTo };
+                            return { type: "switch", slotIndex: slot, toIndex: c.toIndex ?? c.switchTo };
                         }
-                        return { type: "move", moveId: "default" };
+                        return { type: "move", slotIndex: slot, moveId: "default" };
                     }),
                 };
                 console.log(`[Server] Processed multi-choice action with ${mcChoices.length} choices`);

@@ -1003,14 +1003,14 @@ function loadCustomDex(): ExternalDexData {
     if (fs.existsSync(CUSTOM_DEX_FILE)) {
       const json = JSON.parse(fs.readFileSync(CUSTOM_DEX_FILE, "utf-8"));
       // Ensure shape
-      return { species: json.species ?? {}, moves: json.moves ?? {}, abilities: json.abilities ?? {} } as ExternalDexData;
+      return { species: json.species ?? {}, moves: json.moves ?? {}, abilities: json.abilities ?? {}, items: json.items ?? {} } as ExternalDexData;
     }
   } catch {}
-  return { species: {}, moves: {}, abilities: {} };
+  return { species: {}, moves: {}, abilities: {}, items: {} };
 }
 
 function saveCustomDex(dex: ExternalDexData) {
-  const payload = { species: dex.species ?? {}, moves: dex.moves ?? {}, abilities: dex.abilities ?? {} };
+  const payload = { species: dex.species ?? {}, moves: dex.moves ?? {}, abilities: dex.abilities ?? {}, items: dex.items ?? {} };
   fs.writeFileSync(CUSTOM_DEX_FILE, JSON.stringify(payload, null, 2));
 }
 
@@ -1030,8 +1030,8 @@ function saveCustomSprites(sprites: CustomSpritesData) {
 }
 
 function diffDex(serverDex: ExternalDexData, clientDex: ExternalDexData) {
-  const missingOnClient = { species: {} as Record<string, any>, moves: {} as Record<string, any>, abilities: {} as Record<string, any> };
-  const missingOnServer = { species: {} as Record<string, any>, moves: {} as Record<string, any>, abilities: {} as Record<string, any> };
+  const missingOnClient = { species: {} as Record<string, any>, moves: {} as Record<string, any>, abilities: {} as Record<string, any>, items: {} as Record<string, any> };
+  const missingOnServer = { species: {} as Record<string, any>, moves: {} as Record<string, any>, abilities: {} as Record<string, any>, items: {} as Record<string, any> };
 
   // Server -> Client (what client lacks)
   for (const [id, s] of Object.entries(serverDex.species ?? {})) {
@@ -1043,6 +1043,9 @@ function diffDex(serverDex: ExternalDexData, clientDex: ExternalDexData) {
   for (const [id, a] of Object.entries(serverDex.abilities ?? {})) {
     if (!clientDex.abilities || !clientDex.abilities[id]) missingOnClient.abilities[id] = a;
   }
+  for (const [id, item] of Object.entries(serverDex.items ?? {})) {
+    if (!clientDex.items || !clientDex.items[id]) missingOnClient.items[id] = item;
+  }
 
   // Client -> Server (what server lacks)
   for (const [id, s] of Object.entries(clientDex.species ?? {})) {
@@ -1053,6 +1056,9 @@ function diffDex(serverDex: ExternalDexData, clientDex: ExternalDexData) {
   }
   for (const [id, a] of Object.entries(clientDex.abilities ?? {})) {
     if (!serverDex.abilities || !serverDex.abilities[id]) missingOnServer.abilities[id] = a;
+  }
+  for (const [id, item] of Object.entries(clientDex.items ?? {})) {
+    if (!serverDex.items || !serverDex.items[id]) missingOnServer.items[id] = item;
   }
 
   return { missingOnClient, missingOnServer };
@@ -1127,10 +1133,12 @@ app.post("/api/customdex/upload", (req: Request, res: Response) => {
   let addedSpecies = 0;
   let addedMoves = 0;
   let addedAbilities = 0;
+  let addedItems = 0;
   let addedSprites = 0;
   serverDex.species = serverDex.species || {};
   serverDex.moves = serverDex.moves || {};
   serverDex.abilities = serverDex.abilities || {};
+  serverDex.items = serverDex.items || {};
   for (const [id, s] of Object.entries(incoming.species ?? {})) {
     if (!serverDex.species[id]) {
       serverDex.species[id] = s as any;
@@ -1147,6 +1155,12 @@ app.post("/api/customdex/upload", (req: Request, res: Response) => {
     if (!serverDex.abilities[id]) {
       serverDex.abilities[id] = a as any;
       addedAbilities++;
+    }
+  }
+  for (const [id, item] of Object.entries(incoming.items ?? {})) {
+    if (!serverDex.items[id]) {
+      serverDex.items[id] = item as any;
+      addedItems++;
     }
   }
   for (const [id, slots] of Object.entries(incoming.sprites || {})) {
@@ -1206,7 +1220,7 @@ app.post("/api/customdex/upload", (req: Request, res: Response) => {
     }
   }
 
-  res.json({ ok: true, added: { species: addedSpecies, moves: addedMoves, abilities: addedAbilities, sprites: addedSprites } });
+  res.json({ ok: true, added: { species: addedSpecies, moves: addedMoves, abilities: addedAbilities, items: addedItems, sprites: addedSprites } });
 });
 
 app.get("/api/rooms/:id", (req: Request, res: Response) => {

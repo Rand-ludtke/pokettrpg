@@ -22,14 +22,15 @@ type ExternalDex = {
   species: Record<string, { id: string; name: string; types: string[]; baseStats: Record<string, number>; moves: string[] }>;
   moves: Record<string, { id: string; name: string; type: string; category: string; basePower: number; accuracy?: number | true; priority?: number }>;
   abilities: Record<string, { id: string; name: string; desc?: string; shortDesc?: string }>;
+  items?: Record<string, any>;
 };
 
 type CustomSprites = Record<string, Partial<Record<SpriteSlot, string>>>;
 type ExternalDexPayload = ExternalDex & { sprites: CustomSprites; items?: Record<string, any> };
 
 type SyncDiff = {
-  missingOnClient: { species: Record<string, any>; moves: Record<string, any>; abilities: Record<string, any>; sprites: CustomSprites };
-  missingOnServer: { species: Record<string, any>; moves: Record<string, any>; abilities: Record<string, any>; sprites: CustomSprites };
+  missingOnClient: { species: Record<string, any>; moves: Record<string, any>; abilities: Record<string, any>; items?: Record<string, any>; sprites: CustomSprites };
+  missingOnServer: { species: Record<string, any>; moves: Record<string, any>; abilities: Record<string, any>; items?: Record<string, any>; sprites: CustomSprites };
 };
 
 function countSpriteSlots(sprites?: CustomSprites): number {
@@ -141,6 +142,7 @@ export function CustomsImportExport() {
     const sprites = getCustomSprites();
     const customMoves = getCustomMoves();
     const customAbilities = getCustomAbilities();
+    const customItems = getCustomItems();
     const showdown = await loadShowdownDex();
     const usedMoves = new Set<string>();
     const usedAbilities = new Set<string>();
@@ -189,7 +191,7 @@ export function CustomsImportExport() {
         ...(ab.shortDesc ? { shortDesc: ab.shortDesc } : {}),
       };
     }
-    return { species, moves, abilities, sprites };
+    return { species, moves, abilities, items: customItems, sprites };
   }, []);
 
   const exportExternalDexFile = useCallback(async () => {
@@ -243,18 +245,20 @@ export function CustomsImportExport() {
       });
       if (!res.ok) throw new Error(`Server responded ${res.status}`);
       const payload = await res.json();
-      const missingOnClient = payload?.missingOnClient || { species: {}, moves: {}, abilities: {}, sprites: {} };
-      const missingOnServer = payload?.missingOnServer || { species: {}, moves: {}, abilities: {}, sprites: {} };
+      const missingOnClient = payload?.missingOnClient || { species: {}, moves: {}, abilities: {}, items: {}, sprites: {} };
+      const missingOnServer = payload?.missingOnServer || { species: {}, moves: {}, abilities: {}, items: {}, sprites: {} };
       setDiff({ missingOnClient, missingOnServer });
       const addedClientSpecies = Object.keys(missingOnClient.species || {}).length;
       const addedClientMoves = Object.keys(missingOnClient.moves || {}).length;
       const addedClientAbilities = Object.keys(missingOnClient.abilities || {}).length;
+      const addedClientItems = Object.keys(missingOnClient.items || {}).length;
       const addedClientSprites = countSpriteSlots(missingOnClient.sprites || {});
       const addedServerSpecies = Object.keys(missingOnServer.species || {}).length;
       const addedServerMoves = Object.keys(missingOnServer.moves || {}).length;
       const addedServerAbilities = Object.keys(missingOnServer.abilities || {}).length;
+      const addedServerItems = Object.keys(missingOnServer.items || {}).length;
       const addedServerSprites = countSpriteSlots(missingOnServer.sprites || {});
-      setOk(`Sync complete. Server → You: ${addedClientSpecies} species, ${addedClientMoves} moves, ${addedClientAbilities} abilities, ${addedClientSprites} sprites. You → Server: ${addedServerSpecies} species, ${addedServerMoves} moves, ${addedServerAbilities} abilities, ${addedServerSprites} sprites.`);
+      setOk(`Sync complete. Server -> You: ${addedClientSpecies} species, ${addedClientMoves} moves, ${addedClientAbilities} abilities, ${addedClientItems} items, ${addedClientSprites} sprites. You -> Server: ${addedServerSpecies} species, ${addedServerMoves} moves, ${addedServerAbilities} abilities, ${addedServerItems} items, ${addedServerSprites} sprites.`);
     } catch (e: any) {
       setError(e?.message || 'Sync failed');
     } finally {
@@ -262,7 +266,7 @@ export function CustomsImportExport() {
     }
   }, [buildExternalDex, client, serverUrl]);
 
-  const mergeIntoLocal = useCallback((missing: { species: Record<string, any>; moves: Record<string, any>; abilities?: Record<string, any>; sprites?: CustomSprites }) => {
+  const mergeIntoLocal = useCallback((missing: { species: Record<string, any>; moves: Record<string, any>; abilities?: Record<string, any>; items?: Record<string, any>; sprites?: CustomSprites }) => {
     try {
       const species = missing?.species || {};
       let inserted = 0;
@@ -295,6 +299,13 @@ export function CustomsImportExport() {
         saveCustomAbility(id, ability as any);
         insertedAbilities++;
       }
+      const items = missing?.items || {};
+      let insertedItems = 0;
+      for (const [id, item] of Object.entries(items)) {
+        if (!item) continue;
+        saveCustomItem(id, item as any);
+        insertedItems++;
+      }
       const sprites = missing?.sprites || {};
       let spriteSlots = 0;
       for (const [id, slots] of Object.entries(sprites)) {
@@ -308,7 +319,7 @@ export function CustomsImportExport() {
         }
       }
       try { localStorage.setItem('ttrpg.customsReloadPending', '1'); } catch {}
-      setOk(`Imported ${inserted} species, ${insertedMoves} moves, ${insertedAbilities} abilities, and ${spriteSlots} sprites to local storage. Reload to apply.`);
+      setOk(`Imported ${inserted} species, ${insertedMoves} moves, ${insertedAbilities} abilities, ${insertedItems} items, and ${spriteSlots} sprites to local storage. Reload to apply.`);
     } catch (e: any) {
       setError(e?.message || 'Failed merging into local');
     }
@@ -316,7 +327,7 @@ export function CustomsImportExport() {
 
   const importMissingFromServer = useCallback(() => {
     if (!diff) { setError('Run Sync first'); return; }
-    mergeIntoLocal(diff.missingOnClient || { species: {}, moves: {}, abilities: {}, sprites: {} });
+    mergeIntoLocal(diff.missingOnClient || { species: {}, moves: {}, abilities: {}, items: {}, sprites: {} });
   }, [diff, mergeIntoLocal]);
 
   const uploadMissingToServer = useCallback(async () => {
@@ -329,6 +340,7 @@ export function CustomsImportExport() {
         species: diff.missingOnServer?.species || {},
         moves: diff.missingOnServer?.moves || {},
         abilities: diff.missingOnServer?.abilities || {},
+        items: diff.missingOnServer?.items || {},
         sprites: diff.missingOnServer?.sprites || {},
       };
       const res = await fetch(resolveApi(base, '/api/customdex/upload'), {
@@ -341,8 +353,9 @@ export function CustomsImportExport() {
       const addedS = Number(json?.added?.species ?? Object.keys(payload.species).length);
       const addedM = Number(json?.added?.moves ?? Object.keys(payload.moves).length);
       const addedA = Number(json?.added?.abilities ?? Object.keys(payload.abilities).length);
+      const addedI = Number(json?.added?.items ?? Object.keys(payload.items).length);
       const addedSprites = Number(json?.added?.sprites ?? countSpriteSlots(payload.sprites));
-      setOk(`Uploaded to server: ${addedS} species, ${addedM} moves, ${addedA} abilities, ${addedSprites} sprites.`);
+      setOk(`Uploaded to server: ${addedS} species, ${addedM} moves, ${addedA} abilities, ${addedI} items, ${addedSprites} sprites.`);
     } catch (e: any) {
       setError(e?.message || 'Upload failed');
     }
@@ -364,14 +377,16 @@ export function CustomsImportExport() {
       });
       if (!syncRes.ok) throw new Error(`Server responded ${syncRes.status}`);
       const payload = await syncRes.json();
-      const missingOnClient = payload?.missingOnClient || { species: {}, moves: {}, abilities: {}, sprites: {} };
-      const missingOnServer = payload?.missingOnServer || { species: {}, moves: {}, abilities: {}, sprites: {} };
+      const missingOnClient = payload?.missingOnClient || { species: {}, moves: {}, abilities: {}, items: {}, sprites: {} };
+      const missingOnServer = payload?.missingOnServer || { species: {}, moves: {}, abilities: {}, items: {}, sprites: {} };
       let importedCount = 0;
       let importedMoves = 0;
       let importedAbilities = 0;
+      let importedItems = 0;
       let uploadedSpecies = 0;
       let uploadedMoves = 0;
       let uploadedAbilities = 0;
+      let uploadedItems = 0;
       let importedSprites = 0;
       let uploadedSprites = 0;
 
@@ -416,6 +431,16 @@ export function CustomsImportExport() {
         try { localStorage.setItem('ttrpg.customsReloadPending', '1'); } catch {}
       }
 
+      const itemsCount = Object.keys(missingOnClient?.items || {}).length;
+      if (itemsCount > 0) {
+        for (const [id, item] of Object.entries(missingOnClient.items || {})) {
+          if (!item) continue;
+          saveCustomItem(id, item as any);
+          importedItems++;
+        }
+        try { localStorage.setItem('ttrpg.customsReloadPending', '1'); } catch {}
+      }
+
       const spriteCount = countSpriteSlots(missingOnClient?.sprites || {});
       if (spriteCount > 0) {
         for (const [id, slots] of Object.entries(missingOnClient.sprites || {})) {
@@ -435,12 +460,14 @@ export function CustomsImportExport() {
       const serverSpeciesCount = Object.keys(missingOnServer?.species || {}).length;
       const serverMovesCount = Object.keys(missingOnServer?.moves || {}).length;
       const serverAbilitiesCount = Object.keys(missingOnServer?.abilities || {}).length;
+      const serverItemsCount = Object.keys(missingOnServer?.items || {}).length;
       const serverSpriteCount = countSpriteSlots(missingOnServer?.sprites || {});
-      if (serverSpeciesCount > 0 || serverMovesCount > 0 || serverAbilitiesCount > 0 || serverSpriteCount > 0) {
+      if (serverSpeciesCount > 0 || serverMovesCount > 0 || serverAbilitiesCount > 0 || serverItemsCount > 0 || serverSpriteCount > 0) {
         const uploadPayload = {
           species: missingOnServer?.species || {},
           moves: missingOnServer?.moves || {},
           abilities: missingOnServer?.abilities || {},
+          items: missingOnServer?.items || {},
           sprites: missingOnServer?.sprites || {},
         };
         const uploadRes = await fetch(resolveApi(base, '/api/customdex/upload'), {
@@ -453,17 +480,18 @@ export function CustomsImportExport() {
           uploadedSpecies = Number(uploadJson?.added?.species ?? serverSpeciesCount);
           uploadedMoves = Number(uploadJson?.added?.moves ?? serverMovesCount);
           uploadedAbilities = Number(uploadJson?.added?.abilities ?? serverAbilitiesCount);
+          uploadedItems = Number(uploadJson?.added?.items ?? serverItemsCount);
           uploadedSprites = Number(uploadJson?.added?.sprites ?? serverSpriteCount);
         }
       }
 
       setDiff({ missingOnClient, missingOnServer });
       const messages: string[] = [];
-      if (importedCount > 0 || importedMoves > 0 || importedAbilities > 0 || importedSprites > 0) {
-        messages.push(`Imported ${importedCount} species, ${importedMoves} moves, ${importedAbilities} abilities, ${importedSprites} sprites from server`);
+      if (importedCount > 0 || importedMoves > 0 || importedAbilities > 0 || importedItems > 0 || importedSprites > 0) {
+        messages.push(`Imported ${importedCount} species, ${importedMoves} moves, ${importedAbilities} abilities, ${importedItems} items, ${importedSprites} sprites from server`);
       }
-      if (uploadedSpecies > 0 || uploadedMoves > 0 || uploadedAbilities > 0 || uploadedSprites > 0) {
-        messages.push(`Uploaded ${uploadedSpecies} species, ${uploadedMoves} moves, ${uploadedAbilities} abilities, ${uploadedSprites} sprites to server`);
+      if (uploadedSpecies > 0 || uploadedMoves > 0 || uploadedAbilities > 0 || uploadedItems > 0 || uploadedSprites > 0) {
+        messages.push(`Uploaded ${uploadedSpecies} species, ${uploadedMoves} moves, ${uploadedAbilities} abilities, ${uploadedItems} items, ${uploadedSprites} sprites to server`);
       }
       if (messages.length === 0) messages.push('Already in sync!');
       setOk(messages.join('. ') + (importedCount > 0 || importedSprites > 0 ? ' (Reload to apply)' : ''));
