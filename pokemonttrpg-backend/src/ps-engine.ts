@@ -45,8 +45,21 @@ const customAbilityPatches = {
 	},
 };
 
+function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
+	return Object.fromEntries(
+		Object.entries(rawMoves || {}).map(([moveId, moveData]) => {
+			const normalized = { ...(moveData || {}) };
+			if (typeof normalized.pp !== "number" || !Number.isFinite(normalized.pp) || normalized.pp <= 0) {
+				normalized.pp = 10;
+			}
+			return [moveId, normalized];
+		})
+	);
+}
+
 // ── Inject custom fangame types and Dex data used by the PS simulator ──
 (function injectCustomDexEntries() {
+	const normalizedCustomMoves = normalizeCustomMoveEntries(customMoves as Record<string, any>);
 	const tc = Dex.data.TypeChart;
 	// Nuclear type (Uranium fangame)
 	tc.nuclear = {
@@ -66,7 +79,7 @@ const customAbilityPatches = {
 	if (tc.fairy) tc.fairy.damageTaken.Cosmic = 1;
 	if (tc.normal) tc.normal.damageTaken.Cosmic = 1;
 	if (tc.psychic) tc.psychic.damageTaken.Cosmic = 2;
-	Object.assign(Dex.data.Moves, customMoves);
+	Object.assign(Dex.data.Moves, normalizedCustomMoves);
 	Object.assign(Dex.data.Abilities, customAbilityPatches);
 	// Clear cached lookups so Dex re-reads custom data
 	if (Dex.types?.cache) Dex.types.cache = new Map();

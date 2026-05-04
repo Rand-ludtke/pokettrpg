@@ -63,8 +63,20 @@ const customAbilityPatches = {
     },
 };
 
+function normalizeCustomMoveEntries(rawMoves) {
+    return Object.fromEntries(Object.entries(rawMoves || {}).map(([moveId, moveData]) => {
+        const normalized = { ...(moveData || {}) };
+        if (typeof normalized.pp !== "number" || !Number.isFinite(normalized.pp) || normalized.pp <= 0) {
+            normalized.pp = 10;
+        }
+        return [moveId, normalized];
+    }));
+}
+
 (function injectCustomDexEntries() {
     const customDex = loadCustomDexPayload();
+    const normalizedCustomMoves = normalizeCustomMoveEntries(customMoves);
+    const normalizedCustomDexMoves = normalizeCustomMoveEntries(customDex.moves || {});
     Object.assign(Dex.data.Pokedex, customDex.species || {});
     for (const [speciesId, speciesData] of Object.entries(customDex.species || {})) {
         if (!Dex.data.FormatsData[speciesId])
@@ -73,8 +85,8 @@ const customAbilityPatches = {
         if (battleOnlyId && !Dex.data.FormatsData[battleOnlyId])
             Dex.data.FormatsData[battleOnlyId] = { tier: "Illegal" };
     }
-    Object.assign(Dex.data.Moves, customMoves);
-    Object.assign(Dex.data.Moves, customDex.moves || {});
+    Object.assign(Dex.data.Moves, normalizedCustomMoves);
+    Object.assign(Dex.data.Moves, normalizedCustomDexMoves);
     Object.assign(Dex.data.Abilities, customAbilityPatches);
     Object.assign(Dex.data.Abilities, customDex.abilities || {});
     Object.assign(Dex.data.Items, customDex.items || {});
