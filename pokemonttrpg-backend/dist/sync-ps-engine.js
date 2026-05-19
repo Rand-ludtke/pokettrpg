@@ -30,12 +30,14 @@ function loadCustomDexPayload() {
     // Aggregate species/moves/abilities/items across all fan-game / custom datasets.
     const aggregated = { species: {}, moves: {}, abilities: {}, items: {} };
 
-    // (1) Primary unified customdex.json sources (optional)
+    // (1) Primary unified customdex.json sources (optional). Later entries take
+    // precedence so the canonical tauri-app dataset wins over any stale legacy
+    // copy under "more pokemon/".
     const primaryCandidates = [
         path.resolve(__dirname, "../data/customdex.json"),
         path.resolve(process.cwd(), "data/customdex.json"),
-        path.resolve(__dirname, "../../tauri-app/public/data/more-pokemon/generated/wylin-customs.generated.json"),
         path.resolve(__dirname, "../../more pokemon/wylin-customs.generated.json"),
+        path.resolve(__dirname, "../../tauri-app/public/data/more-pokemon/generated/wylin-customs.generated.json"),
     ];
     for (const candidate of primaryCandidates) {
         const parsed = loadJsonSafe(candidate);
