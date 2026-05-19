@@ -1672,7 +1672,7 @@ function beginBattle(room, players, seed, rules) {
             if (fmt === 'doubles')
                 psFormat = 'gen9doublescustomgame';
             else if (fmt === 'triples')
-                psFormat = 'gen5triplescustomgame';
+                psFormat = 'gen9triplescustomgame';
             else if (fmt === 'ffa')
                 psFormat = 'gen9freeforallcustomgame';
             // Boss/team playerFormat will override inside the engine constructor

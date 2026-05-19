@@ -16,32 +16,81 @@ const customMovesData = require("../data/moves.js");
 
 const customMoves = customMovesData.default || customMovesData;
 
+function loadJsonSafe(filePath) {
+    try {
+        if (!fs.existsSync(filePath)) return null;
+        return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    } catch (error) {
+        console.warn(`[SyncPSEngine] Failed to read ${filePath}: ${error?.message || error}`);
+        return null;
+    }
+}
+
 function loadCustomDexPayload() {
-    const candidates = [
+    // Aggregate species/moves/abilities/items across all fan-game / custom datasets.
+    const aggregated = { species: {}, moves: {}, abilities: {}, items: {} };
+
+    // (1) Primary unified customdex.json sources (optional)
+    const primaryCandidates = [
         path.resolve(__dirname, "../data/customdex.json"),
         path.resolve(process.cwd(), "data/customdex.json"),
         path.resolve(__dirname, "../../tauri-app/public/data/more-pokemon/generated/wylin-customs.generated.json"),
         path.resolve(__dirname, "../../more pokemon/wylin-customs.generated.json"),
     ];
-    for (const candidate of candidates) {
-        try {
-            if (!fs.existsSync(candidate))
-                continue;
-            const parsed = JSON.parse(fs.readFileSync(candidate, "utf-8"));
-            const species = parsed?.species || parsed?.dex || {};
-            const moves = parsed?.moves || {};
-            const abilities = parsed?.abilities || {};
-            const items = parsed?.items || {};
-            if (Object.keys(species).length || Object.keys(moves).length || Object.keys(abilities).length || Object.keys(items).length) {
-                console.log(`[SyncPSEngine] Loaded custom dex payload from ${candidate}`);
-                return { species, moves, abilities, items };
+    for (const candidate of primaryCandidates) {
+        const parsed = loadJsonSafe(candidate);
+        if (!parsed) continue;
+        const species = parsed.species || parsed.dex || {};
+        const moves = parsed.moves || {};
+        const abilities = parsed.abilities || {};
+        const items = parsed.items || {};
+        if (!Object.keys(species).length && !Object.keys(moves).length && !Object.keys(abilities).length && !Object.keys(items).length) continue;
+        Object.assign(aggregated.species, species);
+        Object.assign(aggregated.moves, moves);
+        Object.assign(aggregated.abilities, abilities);
+        Object.assign(aggregated.items, items);
+        console.log(`[SyncPSEngine] Loaded custom dex payload from ${candidate} (species:${Object.keys(species).length} moves:${Object.keys(moves).length} abilities:${Object.keys(abilities).length})`);
+    }
+
+    // (2) Per fan-game custom data: moves / abilities / pokedex split across files.
+    // Each entry is a directory under tauri-app/public/data/<game>/generated/.
+    const fanGameDirs = ["infinity", "uranium", "mariomon", "insurgence", "sage"];
+    const baseRoots = [
+        path.resolve(__dirname, "../../tauri-app/public/data"),
+        path.resolve(process.cwd(), "tauri-app/public/data"),
+    ];
+    for (const root of baseRoots) {
+        if (!fs.existsSync(root)) continue;
+        for (const game of fanGameDirs) {
+            const genDir = path.join(root, game, "generated");
+            if (!fs.existsSync(genDir)) continue;
+            const movesFile = path.join(genDir, `moves.custom.${game}.json`);
+            const abilitiesFile = path.join(genDir, `abilities.custom.${game}.json`);
+            const pokedexFile = path.join(genDir, `pokedex.${game}.json`);
+            const moves = loadJsonSafe(movesFile);
+            const abilities = loadJsonSafe(abilitiesFile);
+            const pokedex = loadJsonSafe(pokedexFile);
+            let movesCount = 0, abilitiesCount = 0, speciesCount = 0;
+            if (moves && typeof moves === "object") {
+                Object.assign(aggregated.moves, moves);
+                movesCount = Object.keys(moves).length;
+            }
+            if (abilities && typeof abilities === "object") {
+                Object.assign(aggregated.abilities, abilities);
+                abilitiesCount = Object.keys(abilities).length;
+            }
+            if (pokedex && typeof pokedex === "object") {
+                Object.assign(aggregated.species, pokedex);
+                speciesCount = Object.keys(pokedex).length;
+            }
+            if (movesCount || abilitiesCount || speciesCount) {
+                console.log(`[SyncPSEngine] Loaded ${game} custom data (species:${speciesCount} moves:${movesCount} abilities:${abilitiesCount})`);
             }
         }
-        catch (error) {
-            console.warn(`[SyncPSEngine] Failed to load custom dex payload from ${candidate}: ${error?.message || error}`);
-        }
+        break; // Found a working root; do not load duplicates from another.
     }
-    return { species: {}, moves: {}, abilities: {}, items: {} };
+
+    return aggregated;
 }
 
 const customAbilityPatches = {
@@ -98,6 +147,28 @@ function normalizeCustomMoveEntries(rawMoves) {
         Dex.abilities.cache = new Map();
     if (Dex.items?.cache)
         Dex.items.cache = new Map();
+
+    // Register a custom Gen 9 triples format so 3v1 boss / triples battles use
+    // modern data (gen 6+ moves, fairy type, modern items/abilities) instead of
+    // the stock gen5triplescustomgame which silently fails on Gen 6+ content.
+    try {
+        if (Dex.data.Rulesets && !Dex.data.Rulesets["gen9triplescustomgame"]) {
+            Dex.data.Rulesets["gen9triplescustomgame"] = {
+                effectType: "Format",
+                name: "[Gen 9] Triples Custom Game",
+                mod: "gen9",
+                gameType: "triples",
+                searchShow: false,
+                debug: true,
+                ruleset: ["Team Preview", "Cancel Mod", "Max Team Size = 24", "Max Move Count = 24", "Max Level = 9999", "Default Level = 100"],
+            };
+            if (Dex.formats?.rulesetCache) Dex.formats.rulesetCache = new Map();
+            if (Dex.formats?.formatsListCache) Dex.formats.formatsListCache = null;
+            console.log("[SyncPSEngine] Registered custom format gen9triplescustomgame");
+        }
+    } catch (err) {
+        console.warn("[SyncPSEngine] Failed to register gen9triplescustomgame:", err?.message || err);
+    }
 })();
 
 function canonicalizeMoveId(value) {
@@ -133,7 +204,7 @@ class SyncPSEngine {
         if (playerFormat === '2v1' || playerFormat === '2v2-teams') {
             this.format = 'gen9doublescustomgame';
         } else if (playerFormat === '3v1' || playerFormat === '3v3-teams') {
-            this.format = 'gen5triplescustomgame';
+            this.format = 'gen9triplescustomgame';
         } else if (playerFormat === '4ffa') {
             this.format = 'gen9freeforallcustomgame';
         }
@@ -165,12 +236,22 @@ class SyncPSEngine {
         const p1Avatar = players[0].trainerSprite || players[0].avatar || "acetrainer";
         const p2Avatar = players[1].trainerSprite || players[1].avatar || "acetrainer";
         // Create the battle directly (synchronous)
-        this.battle = new PSBattle({
-            formatid: this.format,
-            seed: seedArray,
-            p1: { name: players[0].name, avatar: p1Avatar, team: p1Team },
-            p2: { name: players[1].name, avatar: p2Avatar, team: p2Team },
-        });
+        try {
+            this.battle = new PSBattle({
+                formatid: this.format,
+                seed: seedArray,
+                p1: { name: players[0].name, avatar: p1Avatar, team: p1Team },
+                p2: { name: players[1].name, avatar: p2Avatar, team: p2Team },
+            });
+        } catch (err) {
+            console.error(`[SyncPSEngine] PSBattle constructor failed for format ${this.format}:`, err?.stack || err?.message || err);
+            console.error(`[SyncPSEngine] p1 team length=${players[0]?.team?.length} p2 team length=${players[1]?.team?.length}`);
+            try {
+                console.error(`[SyncPSEngine] p1 packed: ${p1Team?.slice(0, 500)}`);
+                console.error(`[SyncPSEngine] p2 packed: ${p2Team?.slice(0, 500)}`);
+            } catch {}
+            throw err;
+        }
         // Initialize our state mirror
         this.state = {
             turn: 0,

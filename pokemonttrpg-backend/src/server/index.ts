@@ -1788,7 +1788,7 @@ function beginBattle(room: Room, players: Player[], seed?: number, rules?: any) 
     let psFormat: string | undefined;
     const fmt = engineRules?.format;
     if (fmt === 'doubles') psFormat = 'gen9doublescustomgame';
-    else if (fmt === 'triples') psFormat = 'gen5triplescustomgame';
+    else if (fmt === 'triples') psFormat = 'gen9triplescustomgame';
     else if (fmt === 'ffa') psFormat = 'gen9freeforallcustomgame';
     // Boss/team playerFormat will override inside the engine constructor
     room.engine = new SyncPSEngine({ seed: battleSeed, rules: engineRules, format: psFormat });
