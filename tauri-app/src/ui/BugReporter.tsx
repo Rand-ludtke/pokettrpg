@@ -126,7 +126,7 @@ async function takeScreenshot(): Promise<string | undefined> {
 /* ---------- submit to server ---------- */
 async function submitReport(report: BugReport): Promise<boolean> {
   try {
-    const base = localStorage.getItem('ttrpg.apiBase') || 'https://pokettrpg.duckdns.org';
+    const base = localStorage.getItem('ttrpg.apiBase') || 'https://47-218-210-137.nip.io';
     const resp = await fetch(`${base}/api/bug-report`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

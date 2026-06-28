@@ -136,7 +136,7 @@ async function uploadFusionSpriteToBackend(headNum: number, bodyNum: number, dat
     localStorage.getItem('ttrpg.fusionApiBase'),
     'http://localhost:3000',
     localStorage.getItem('ttrpg.apiBase'),
-    'https://pokettrpg.duckdns.org',
+    'https://47-218-210-137.nip.io',
   ].filter(Boolean) as string[];
 
   for (const base of bases) {

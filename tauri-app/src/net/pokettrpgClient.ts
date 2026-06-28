@@ -299,7 +299,7 @@ class Emitter {
   }
 }
 
-const DEFAULT_API_BASE = 'https://pokettrpg.duckdns.org';
+const DEFAULT_API_BASE = 'https://47-218-210-137.nip.io';
 const LOBBY_ROOM_ID = 'global-lobby';
 
 function isTauriApp(): boolean {
