@@ -487,11 +487,19 @@ const DEFAULT_DATA_BASE = withPublicBase('vendor/showdown/data').replace(/\/+$/,
 const DEFAULT_SPRITE_BASE = withPublicBase('vendor/showdown/sprites').replace(/\/+$/, '');
 /** Custom/regional sprites shipped at public/sprites/ (Wylin, Sage, etc.) */
 const CUSTOM_SPRITE_BASE = withPublicBase('sprites').replace(/\/+$/, '');
+const LEGACY_DUCKDNS_BASE = 'https://pokettrpg.duckdns.org';
+const LEGACY_DUCKDNS_HTTP_BASE = 'http://pokettrpg.duckdns.org';
+const STABLE_HTTPS_BASE = 'https://47-218-210-137.nip.io';
+const STABLE_HTTP_BASE = 'http://47-218-210-137.nip.io';
 
 function normalizeBaseUrl(base: string | null | undefined): string {
   const value = String(base || '').trim();
   if (!value) return '';
-  return value.replace(/\/+$/, '');
+  return value
+    .replace(new RegExp(`^${LEGACY_DUCKDNS_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`, 'i'), STABLE_HTTPS_BASE)
+    .replace(new RegExp(`^${LEGACY_DUCKDNS_HTTP_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:3000(?=/|$)`, 'i'), `${STABLE_HTTP_BASE}:3000`)
+    .replace(new RegExp(`^${LEGACY_DUCKDNS_HTTP_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`, 'i'), STABLE_HTTP_BASE)
+    .replace(/\/+$/, '');
 }
 
 /** Default backend URL for sprite index / BaseSprites (mirrored from fusion API). */
@@ -2795,7 +2803,11 @@ function normalizeBase(raw: string | null | undefined): string | null {
   if (!raw) return null;
   const trimmed = String(raw).trim();
   if (!trimmed) return null;
-  return trimmed.replace(/\/+$/, '');
+  return trimmed
+    .replace(/^https:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, STABLE_HTTPS_BASE)
+    .replace(/^http:\/\/pokettrpg\.duckdns\.org:3000(?=\/|$)/i, `${STABLE_HTTP_BASE}:3000`)
+    .replace(/^http:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, STABLE_HTTP_BASE)
+    .replace(/\/+$/, '');
 }
 
 export function getFusionApiBases(): string[] {

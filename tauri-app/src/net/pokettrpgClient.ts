@@ -253,6 +253,11 @@ function normalizeApiBase(raw: string | null | undefined): string {
   }
   try {
     const url = new URL(value);
+    if (url.hostname.toLowerCase() === LEGACY_DUCKDNS_HOST) {
+      url.protocol = 'https:';
+      url.hostname = '47-218-210-137.nip.io';
+      url.port = '';
+    }
     let pathname = url.pathname.replace(/\/+$/, '');
     // Users often paste endpoint URLs ending in /api; normalize to server root.
     if (/\/api$/i.test(pathname)) pathname = pathname.replace(/\/api$/i, '');
@@ -300,6 +305,7 @@ class Emitter {
 }
 
 const DEFAULT_API_BASE = 'https://47-218-210-137.nip.io';
+const LEGACY_DUCKDNS_HOST = 'pokettrpg.duckdns.org';
 const LOBBY_ROOM_ID = 'global-lobby';
 
 function isTauriApp(): boolean {
@@ -359,6 +365,9 @@ export class PoketTRPGClient {
       }
     }
     this.apiBase = normalizeApiBase(storedBase);
+    if (storedBase && typeof window !== 'undefined' && this.apiBase !== storedBase.trim().replace(/\/+$/, '')) {
+      try { window.localStorage?.setItem('ttrpg.apiBase', this.apiBase); } catch {}
+    }
     const { endpoint, path } = computeSocketConfig(this.apiBase);
     this.socketEndpoint = endpoint;
     this.socketPath = path;

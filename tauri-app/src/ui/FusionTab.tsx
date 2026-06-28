@@ -132,12 +132,18 @@ function buildSpeciesSearchText(name: string, key?: string): string {
 
 /** Upload a painted fusion sprite data URL to the backend */
 async function uploadFusionSpriteToBackend(headNum: number, bodyNum: number, dataUrl: string) {
+  const normalizeBase = (value: string) => value
+    .trim()
+    .replace(/^https:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, 'https://47-218-210-137.nip.io')
+    .replace(/^http:\/\/pokettrpg\.duckdns\.org:3000(?=\/|$)/i, 'http://47-218-210-137.nip.io:3000')
+    .replace(/^http:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, 'http://47-218-210-137.nip.io')
+    .replace(/\/+$/, '');
   const bases = [
     localStorage.getItem('ttrpg.fusionApiBase'),
     'http://localhost:3000',
     localStorage.getItem('ttrpg.apiBase'),
     'https://47-218-210-137.nip.io',
-  ].filter(Boolean) as string[];
+  ].filter(Boolean).map(v => normalizeBase(String(v))) as string[];
 
   for (const base of bases) {
     try {
