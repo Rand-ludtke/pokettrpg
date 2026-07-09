@@ -592,7 +592,12 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                 const burnMult = status === 'brn' && cat === 'Physical' ? 0.5 : 1;
                 const mult = moveMult[idx] ?? 1;
                 const effPower = isDamaging ? Math.max(0, Math.floor(base * stab * terrMult * weathMult * burnMult * mult)) : null;
-                const dice = effPower != null ? diceFromPower(effPower) : null;
+                const stageDiceShift = cat === 'Physical' ? stages.atk : (cat === 'Special' ? stages.spAtk : 0);
+                const baseDiceIdx = effPower != null ? diceIndexFor(effPower) : -1;
+                const baseDiceStr = baseDiceIdx >= 0 ? diceAtIdx(baseDiceIdx) : null;
+                const boostedDiceIdx = baseDiceIdx >= 0 ? Math.max(0, baseDiceIdx + stageDiceShift) : -1;
+                const dice = boostedDiceIdx >= 0 ? diceAtIdx(boostedDiceIdx) : null;
+                const diceDisplay = dice && stageDiceShift !== 0 && baseDiceStr !== dice ? `${baseDiceStr} → ${dice}` : (dice ?? '—');
                 const atkModVal = cat === 'Physical' ? netAtk : (cat === 'Special' ? netSpA : 0);
                 const atkModText = cat === 'Physical' ? `• Mod ${fmtSign(netAtk)}` : (cat === 'Special' ? `• Mod ${fmtSign(netSpA)}` : '');
                 const accVal = (m as any).accuracy;
@@ -607,7 +612,7 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                     <div>
                       <div><strong>{m.name}</strong> <span className="dim">({(m as any).type}{cat ? ` • ${cat}` : ''})</span></div>
                       <div className="dim" style={{fontSize:'0.9em'}}>
-                        Power {basePow >= 0 ? basePow : '—'}{hasStab ? ` → STAB ${stabPow}` : ''} • Dice {dice ?? '—'} • Acc {accVal === true ? '∞' : (accVal ?? '—')}
+                        Power {basePow >= 0 ? basePow : '—'}{hasStab ? ` → STAB ${stabPow}` : ''} • Dice {diceDisplay} • Acc {accVal === true ? '∞' : (accVal ?? '—')}
                         {isDamaging && (<>
                           {' '}• Cond {formatMult(terrMult * weathMult * burnMult)} • Eff {effPower} {atkModText}
                           {' '}• Atk Check: {atkCheck} • Clash {fmtSign(cBonus)}
@@ -928,7 +933,8 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
               </table>
               <p className="dim">From 100+: every 20 extra stat → +1 Atk/Guard/Speed. Def = 1 − that bonus.</p>
               <hr/>
-              <p><strong>Stat Stages</strong>: ×(2+n)/2 for n ≥ 0, or ×2/(2+|n|) for n &lt; 0. Clamp n ∈ [−6, +6].</p>
+              <p><strong>Offensive Stat Stages (Atk / SpA)</strong>: each <strong>+1 stage</strong> = <strong>+1 flat modifier</strong> + <strong>+1 die step up the ladder</strong> (1d4→1d6→1d8→1d10→1d12→1d20→…). Each −1 stage = −1 modifier + −1 die step (min 1d4). The Moves panel updates automatically. Def/SpD stages affect the flat modifier only.</p>
+              <p><em>Speed stages</em>: ×(2+n)/2 for n ≥ 0, or ×2/(2+|n|) for n &lt; 0.</p>
               <p><strong>Paralysis</strong>: Speed × 0.5; <strong>Burn</strong>: Physical damage × 0.5.</p>
             </div>
           )}
@@ -1209,6 +1215,39 @@ function diceFromPower(power: number): string | null {
   const step = Math.floor((above % 120) / 20);
   const d20count = 2 + cycle;
   return `${d20count}d20${SUB[Math.min(step, 5)]}`;
+}
+
+// Get index in the dice ladder for a given power (mirrors diceFromPower thresholds)
+function diceIndexFor(power: number): number {
+  if (power < 0) return -1;
+  if (power < 30) return 0;
+  if (power < 50) return 1;
+  if (power < 70) return 2;
+  if (power < 90) return 3;
+  if (power < 110) return 4;
+  if (power < 130) return 5;
+  if (power < 150) return 6;
+  if (power < 170) return 7;
+  if (power < 190) return 8;
+  if (power < 210) return 9;
+  if (power < 230) return 10;
+  const above = power - 230;
+  const cycle = Math.floor(above / 120);
+  const step = Math.floor((above % 120) / 20);
+  return 11 + cycle * 6 + step;
+}
+
+// Get the dice string at a given index in the dice ladder
+function diceAtIdx(idx: number): string {
+  if (idx <= 0) return '1d4';
+  const BASE = ['1d4', '1d6', '1d8', '1d10', '1d12', '1d20', '1d20 + 1d4', '1d20 + 1d6', '1d20 + 1d8', '1d20 + 1d10', '1d20 + 1d12'];
+  if (idx < BASE.length) return BASE[idx];
+  const above = idx - 11;
+  const cycle = Math.floor(above / 6);
+  const step = above % 6;
+  const d20count = 2 + cycle;
+  const SUB = ['', ' + 1d4', ' + 1d6', ' + 1d8', ' + 1d10', ' + 1d12'];
+  return `${d20count}d20${SUB[step]}`;
 }
 
 function formatMult(n: number): string {
