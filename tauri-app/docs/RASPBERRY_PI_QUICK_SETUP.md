@@ -60,7 +60,7 @@ Run in **Git Bash on this PC** (`192.168.1.17`):
 ```bash
 cd /d/GitHub/pokettrpg
 rsync -av --delete --progress /d/GitHub/pokettrpg/pokemonttrpg-backend/ randl@192.168.1.251:/home/randl/pokettrpg/pokemonttrpg-backend/
-ssh randl@192.168.1.251 "cd ~/pokettrpg/pokemonttrpg-backend && npm ci && npm run build && sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
+ssh randl@192.168.1.251 "cd ~/pokettrpg/pokemonttrpg-backend && npm ci && sudo systemctl restart pokettrpg-backend && sudo systemctl status pokettrpg-backend --no-pager"
 rsync -av --progress \
   "/d/GitHub/pokettrpg/.fusion-sprites-local/" \
   randl@192.168.1.251:"/home/randl/pokettrpg/.fusion-sprites-local/"
@@ -68,6 +68,8 @@ ssh randl@192.168.1.251 "sudo systemctl restart pokettrpg-backend && sudo system
 ```
 
 The trailing slashes on the backend `rsync` command matter. Without them, `rsync` creates a nested `pokemonttrpg-backend/pokemonttrpg-backend` directory and systemd keeps running the stale outer copy.
+
+**Note:** `npm run build` is intentionally skipped on the Pi. The `dist/` folder is pre-compiled locally and rsync'd directly. Several source files (`engine.ts`, `sync-ps-engine.ts`, `fusion-sync.ts`, `fusion-gen.ts`) are gitignored build artifacts not present in the repo, so `tsc` will fail on the Pi. Always build locally, then rsync including `dist/`.
 
 Then on **Pi**:
 
