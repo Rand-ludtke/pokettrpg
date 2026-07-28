@@ -583,10 +583,9 @@ export class PoketTRPGClient {
       });
       endpoint = upgraded;
     }
-    const preferPollingOnly = isGithubPagesRuntime();
     const socket = io(endpoint, {
-      transports: preferPollingOnly ? ['polling'] : ['websocket', 'polling'],
-      upgrade: !preferPollingOnly,
+      transports: ['websocket', 'polling'],
+      upgrade: true,
       path,
       forceNew: true,
       withCredentials: false,
