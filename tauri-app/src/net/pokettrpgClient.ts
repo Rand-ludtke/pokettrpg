@@ -255,9 +255,9 @@ function normalizeApiBase(raw: string | null | undefined): string {
     const url = new URL(value);
     const hostname = url.hostname.toLowerCase();
     if (hostname === LEGACY_DUCKDNS_HOST || hostname === LEGACY_NIPIO_HOST) {
-      url.protocol = 'http:';
-      url.hostname = '2600:1702:6261:5300::d51';
-      url.port = '3000';
+      url.protocol = 'https:';
+      url.hostname = '47-218-210-137.nip.io';
+      url.port = '';
     }
     let pathname = url.pathname.replace(/\/+$/, '');
     // Users often paste endpoint URLs ending in /api; normalize to server root.
@@ -305,7 +305,7 @@ class Emitter {
   }
 }
 
-const DEFAULT_API_BASE = 'http://[2600:1702:6261:5300::d51]:3000';
+const DEFAULT_API_BASE = 'https://47-218-210-137.nip.io';
 const LEGACY_DUCKDNS_HOST = 'pokettrpg.duckdns.org';
 const LEGACY_NIPIO_HOST = '47-218-210-137.nip.io';
 const LOBBY_ROOM_ID = 'global-lobby';
