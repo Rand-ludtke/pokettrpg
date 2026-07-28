@@ -489,8 +489,8 @@ const DEFAULT_SPRITE_BASE = withPublicBase('vendor/showdown/sprites').replace(/\
 const CUSTOM_SPRITE_BASE = withPublicBase('sprites').replace(/\/+$/, '');
 const LEGACY_DUCKDNS_BASE = 'https://pokettrpg.duckdns.org';
 const LEGACY_DUCKDNS_HTTP_BASE = 'http://pokettrpg.duckdns.org';
-const STABLE_HTTPS_BASE = 'https://47-218-210-137.nip.io';
-const STABLE_HTTP_BASE = 'http://47-218-210-137.nip.io';
+const STABLE_HTTPS_BASE = 'http://[2600:1702:6261:5300::d51]:3000';
+const STABLE_HTTP_BASE = 'http://[2600:1702:6261:5300::d51]:3000';
 
 function normalizeBaseUrl(base: string | null | undefined): string {
   const value = String(base || '').trim();
@@ -503,7 +503,7 @@ function normalizeBaseUrl(base: string | null | undefined): string {
 }
 
 /** Default backend URL for sprite index / BaseSprites (mirrored from fusion API). */
-const DEFAULT_BACKEND_SPRITE_BASE = 'https://47-218-210-137.nip.io/sprites';
+const DEFAULT_BACKEND_SPRITE_BASE = 'http://[2600:1702:6261:5300::d51]:3000/sprites';
 
 // ── Infinite Fusion Dex CDN (community sprite source) ──
 export const IFD_CDN_BASE = 'https://ifd-spaces.sfo2.cdn.digitaloceanspaces.com';
@@ -2196,7 +2196,7 @@ function uploadSpriteToBackend(id: string, slot: SpriteSlot, dataUrl: string) {
   if (!dataUrl || !dataUrl.startsWith('data:image/')) return;
   const bases = [
     (() => { try { return localStorage.getItem('ttrpg.apiBase'); } catch { return null; } })(),
-    'https://47-218-210-137.nip.io',
+    'http://[2600:1702:6261:5300::d51]:3000',
   ].filter(Boolean) as string[];
   // Try each base; stop on first success
   (async () => {
@@ -2786,8 +2786,8 @@ function uploadIfdSpriteToBackend(headNum: number, bodyNum: number, dataUrl: str
   }
 }
 
-const DEFAULT_FUSION_API_BASE = 'https://47-218-210-137.nip.io';
-const EXTERNAL_HTTP_FUSION_API = 'http://47-218-210-137.nip.io:3000';
+const DEFAULT_FUSION_API_BASE = 'http://[2600:1702:6261:5300::d51]:3000';
+const EXTERNAL_HTTP_FUSION_API = 'http://[2600:1702:6261:5300::d51]:3000';
 const LOCAL_FUSION_API_BASES = ['http://127.0.0.1:3000', 'http://localhost:3000'];
 const gFusionEnsurePromises = new Map<string, Promise<string | null>>();
 
