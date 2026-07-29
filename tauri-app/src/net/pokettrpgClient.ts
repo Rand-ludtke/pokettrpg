@@ -254,11 +254,16 @@ function normalizeApiBase(raw: string | null | undefined): string {
   try {
     const url = new URL(value);
     const hostname = url.hostname.toLowerCase();
-    if (hostname === LEGACY_DUCKDNS_HOST || hostname === LEGACY_NIPIO_HOST) {
+    if (
+      hostname === LEGACY_NIPIO_HOST ||
+      hostname === LEGACY_NIPIO_HOST_2 ||
+      hostname === LEGACY_DUCKDNS_HOST
+    ) {
       url.protocol = 'https:';
-      url.hostname = '47-218-210-137.nip.io';
+      url.hostname = CURRENT_HOST;
       url.port = '';
     }
+
     let pathname = url.pathname.replace(/\/+$/, '');
     // Users often paste endpoint URLs ending in /api; normalize to server root.
     if (/\/api$/i.test(pathname)) pathname = pathname.replace(/\/api$/i, '');
@@ -305,9 +310,12 @@ class Emitter {
   }
 }
 
-const DEFAULT_API_BASE = 'https://47-218-210-137.nip.io';
+const DEFAULT_API_BASE = 'https://pokettrpg-app.pokemondnd.xyz';
 const LEGACY_DUCKDNS_HOST = 'pokettrpg.duckdns.org';
 const LEGACY_NIPIO_HOST = '47-218-210-137.nip.io';
+const LEGACY_NIPIO_HOST_2 = '108-92-243-110.nip.io';
+const CURRENT_HOST = 'pokettrpg-app.pokemondnd.xyz';
+
 const LOBBY_ROOM_ID = 'global-lobby';
 
 function isTauriApp(): boolean {
