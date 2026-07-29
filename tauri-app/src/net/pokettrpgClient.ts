@@ -592,12 +592,18 @@ export class PoketTRPGClient {
       endpoint = upgraded;
     }
     const socket = io(endpoint, {
-      transports: ['websocket', 'polling'],
-      upgrade: true,
+      // Cloudflare Tunnel (and similar proxies) can fall back to a degraded
+      // HTTP/2-only transport when UDP/QUIC is blocked on the network, which
+      // corrupts raw WebSocket frames ("Invalid frame header" / RSV1 errors).
+      // HTTP long-polling works reliably in all cases, so we use that
+      // exclusively and disable the websocket upgrade attempt entirely.
+      transports: ['polling'],
+      upgrade: false,
       path,
       forceNew: true,
       withCredentials: false,
     });
+
     this.socket = socket;
 
     // Track round-trip latency from Socket.io engine pings
