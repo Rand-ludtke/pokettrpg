@@ -20,6 +20,7 @@ import { RulesTab } from './RulesTab';
 import { NotesTab } from './NotesTab';
 import { ContestTab } from './ContestTab';
 import { GambleTab } from '../gamble/GambleTab';
+import { RogueModeGame } from './RogueModeGame';
 import { getClient, RoomSummary } from '../net/pokettrpgClient';
 import { BugReporter } from './BugReporter';
 import { PC_BOX_SIZE, PC_MAX_BOXES, PC_BOXES_STORAGE_KEY, readPcBoxesState } from '../data/pcStorage';
@@ -27,7 +28,7 @@ import { PC_BOX_SIZE, PC_MAX_BOXES, PC_BOXES_STORAGE_KEY, readPcBoxesState } fro
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
-type Tab = 'pc' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | 'notes' | 'contest' | 'gamble' | { kind: 'psbattle'; id: string; title: string };
+type Tab = 'pc' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | 'notes' | 'contest' | 'gamble' | 'rogue' | { kind: 'psbattle'; id: string; title: string };
 
 export function App() {
   const [tab, setTab] = useState<Tab>('pc');
@@ -448,6 +449,7 @@ export function App() {
           <button className={tab === 'rules' ? 'active' : ''} onClick={() => setTab('rules')}>Rules</button>
           <button className={tab === 'badges' ? 'active' : ''} onClick={() => setTab('badges')}>Badges</button>
           <button className={tab === 'gamble' ? 'active' : ''} onClick={() => setTab('gamble')}>Gamble???</button>
+          <button className={tab === 'rogue' ? 'active' : ''} onClick={() => setTab('rogue')}>Rogue Mode</button>
           {extraTabs.map(t => (
             <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
               <button className={(typeof tab === 'object' && (tab as any).id === t.id) ? 'active' : ''} onClick={() => setTab(t)}>{t.title}</button>
@@ -861,6 +863,10 @@ export function App() {
       )}
       {tab === 'notes' && (
         <NotesTab />
+      )}
+
+      {tab === 'rogue' && (
+        <RogueModeGame />
       )}
 
       {Object.values(mountedBattles).map(b => (
