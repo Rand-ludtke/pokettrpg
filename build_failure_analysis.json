@@ -1,0 +1,56 @@
+{
+  "run_30670554751": {
+    "commit_sha": "1711e74",
+    "title": "feat: Hyper-Battle Daemon v3 comprehensive testing + battle subsystem\u2026",
+    "workflow_run": 174,
+    "status": "failure",
+    "total_duration": "45s",
+    "build_duration": "35s",
+    "annotations": {
+      "total_errors": 8,
+      "warnings": 1,
+      "error_details": [
+        {
+          "type": "exit_code_error",
+          "message": "Process completed with exit code 1."
+        },
+        {
+          "type": "syntax_error",
+          "count": 7,
+          "message": "',' expected."
+        },
+        {
+          "type": "git_error",
+          "message": "The process '/usr/bin/git' failed with exit code 128"
+        }
+      ]
+    }
+  },
+  "run_30598593270": {
+    "commit_sha": "69296d9",
+    "title": "feat: add PathwaysArena game mode, Pokeathlon BattleTooltip, and back\u2026",
+    "workflow_run": 173,
+    "status": "failure",
+    "total_duration": "1m 32s",
+    "build_duration": "1m 27s",
+    "annotations": {
+      "total_errors": 8,
+      "warnings": 1,
+      "error_details": [
+        {
+          "type": "exit_code_error",
+          "message": "Process completed with exit code 1."
+        },
+        {
+          "type": "syntax_error",
+          "count": 7,
+          "message": "',' expected."
+        },
+        {
+          "type": "git_error",
+          "message": "The process '/usr/bin/git' failed with exit code 128"
+        }
+      ]
+    }
+  }
+}

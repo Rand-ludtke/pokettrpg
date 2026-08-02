@@ -1,0 +1,273 @@
+{
+  "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/compare/69296d9a...1711e749b8d50a94c719da2737f9ff2fed6de6a4",
+  "html_url": "https://github.com/Rand-ludtke/pokettrpg/compare/69296d9a...1711e749b8d50a94c719da2737f9ff2fed6de6a4",
+  "permalink_url": "https://github.com/Rand-ludtke/pokettrpg/compare/Rand-ludtke:69296d9...Rand-ludtke:1711e74",
+  "diff_url": "https://github.com/Rand-ludtke/pokettrpg/compare/69296d9a...1711e749b8d50a94c719da2737f9ff2fed6de6a4.diff",
+  "patch_url": "https://github.com/Rand-ludtke/pokettrpg/compare/69296d9a...1711e749b8d50a94c719da2737f9ff2fed6de6a4.patch",
+  "base_commit": {
+    "sha": "69296d9ab15df1a409667c61d8413597cdf00c02",
+    "node_id": "C_kwDOP3K7b9oAKDY5Mjk2ZDlhYjE1ZGYxYTQwOTY2N2M2MWQ4NDEzNTk3Y2RmMDBjMDI",
+    "commit": {
+      "author": {
+        "name": "Rand-ludtke",
+        "email": "rand.ludtke@gmail.com",
+        "date": "2026-07-31T02:17:28Z"
+      },
+      "committer": {
+        "name": "Rand-ludtke",
+        "email": "rand.ludtke@gmail.com",
+        "date": "2026-07-31T02:17:28Z"
+      },
+      "message": "feat: add PathwaysArena game mode, Pokeathlon BattleTooltip, and backend type-chart with all 24 Soulstones types",
+      "tree": {
+        "sha": "b2d68e8f6284ddb78e66551d3830252c63c56b69",
+        "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/git/trees/b2d68e8f6284ddb78e66551d3830252c63c56b69"
+      },
+      "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/git/commits/69296d9ab15df1a409667c61d8413597cdf00c02",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/69296d9ab15df1a409667c61d8413597cdf00c02",
+    "html_url": "https://github.com/Rand-ludtke/pokettrpg/commit/69296d9ab15df1a409667c61d8413597cdf00c02",
+    "comments_url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/69296d9ab15df1a409667c61d8413597cdf00c02/comments",
+    "author": {
+      "login": "Rand-ludtke",
+      "id": 187474816,
+      "node_id": "U_kgDOCyyjgA",
+      "avatar_url": "https://avatars.githubusercontent.com/u/187474816?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Rand-ludtke",
+      "html_url": "https://github.com/Rand-ludtke",
+      "followers_url": "https://api.github.com/users/Rand-ludtke/followers",
+      "following_url": "https://api.github.com/users/Rand-ludtke/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Rand-ludtke/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Rand-ludtke/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Rand-ludtke/subscriptions",
+      "organizations_url": "https://api.github.com/users/Rand-ludtke/orgs",
+      "repos_url": "https://api.github.com/users/Rand-ludtke/repos",
+      "events_url": "https://api.github.com/users/Rand-ludtke/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Rand-ludtke/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Rand-ludtke",
+      "id": 187474816,
+      "node_id": "U_kgDOCyyjgA",
+      "avatar_url": "https://avatars.githubusercontent.com/u/187474816?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Rand-ludtke",
+      "html_url": "https://github.com/Rand-ludtke",
+      "followers_url": "https://api.github.com/users/Rand-ludtke/followers",
+      "following_url": "https://api.github.com/users/Rand-ludtke/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Rand-ludtke/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Rand-ludtke/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Rand-ludtke/subscriptions",
+      "organizations_url": "https://api.github.com/users/Rand-ludtke/orgs",
+      "repos_url": "https://api.github.com/users/Rand-ludtke/repos",
+      "events_url": "https://api.github.com/users/Rand-ludtke/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Rand-ludtke/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "26b020f3c1c4cf8c5209fc52a53fe90cc3cc3b6f",
+        "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/26b020f3c1c4cf8c5209fc52a53fe90cc3cc3b6f",
+        "html_url": "https://github.com/Rand-ludtke/pokettrpg/commit/26b020f3c1c4cf8c5209fc52a53fe90cc3cc3b6f"
+      }
+    ]
+  },
+  "merge_base_commit": {
+    "sha": "69296d9ab15df1a409667c61d8413597cdf00c02",
+    "node_id": "C_kwDOP3K7b9oAKDY5Mjk2ZDlhYjE1ZGYxYTQwOTY2N2M2MWQ4NDEzNTk3Y2RmMDBjMDI",
+    "commit": {
+      "author": {
+        "name": "Rand-ludtke",
+        "email": "rand.ludtke@gmail.com",
+        "date": "2026-07-31T02:17:28Z"
+      },
+      "committer": {
+        "name": "Rand-ludtke",
+        "email": "rand.ludtke@gmail.com",
+        "date": "2026-07-31T02:17:28Z"
+      },
+      "message": "feat: add PathwaysArena game mode, Pokeathlon BattleTooltip, and backend type-chart with all 24 Soulstones types",
+      "tree": {
+        "sha": "b2d68e8f6284ddb78e66551d3830252c63c56b69",
+        "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/git/trees/b2d68e8f6284ddb78e66551d3830252c63c56b69"
+      },
+      "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/git/commits/69296d9ab15df1a409667c61d8413597cdf00c02",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/69296d9ab15df1a409667c61d8413597cdf00c02",
+    "html_url": "https://github.com/Rand-ludtke/pokettrpg/commit/69296d9ab15df1a409667c61d8413597cdf00c02",
+    "comments_url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/69296d9ab15df1a409667c61d8413597cdf00c02/comments",
+    "author": {
+      "login": "Rand-ludtke",
+      "id": 187474816,
+      "node_id": "U_kgDOCyyjgA",
+      "avatar_url": "https://avatars.githubusercontent.com/u/187474816?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Rand-ludtke",
+      "html_url": "https://github.com/Rand-ludtke",
+      "followers_url": "https://api.github.com/users/Rand-ludtke/followers",
+      "following_url": "https://api.github.com/users/Rand-ludtke/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Rand-ludtke/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Rand-ludtke/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Rand-ludtke/subscriptions",
+      "organizations_url": "https://api.github.com/users/Rand-ludtke/orgs",
+      "repos_url": "https://api.github.com/users/Rand-ludtke/repos",
+      "events_url": "https://api.github.com/users/Rand-ludtke/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Rand-ludtke/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Rand-ludtke",
+      "id": 187474816,
+      "node_id": "U_kgDOCyyjgA",
+      "avatar_url": "https://avatars.githubusercontent.com/u/187474816?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Rand-ludtke",
+      "html_url": "https://github.com/Rand-ludtke",
+      "followers_url": "https://api.github.com/users/Rand-ludtke/followers",
+      "following_url": "https://api.github.com/users/Rand-ludtke/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Rand-ludtke/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Rand-ludtke/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Rand-ludtke/subscriptions",
+      "organizations_url": "https://api.github.com/users/Rand-ludtke/orgs",
+      "repos_url": "https://api.github.com/users/Rand-ludtke/repos",
+      "events_url": "https://api.github.com/users/Rand-ludtke/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Rand-ludtke/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "26b020f3c1c4cf8c5209fc52a53fe90cc3cc3b6f",
+        "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/26b020f3c1c4cf8c5209fc52a53fe90cc3cc3b6f",
+        "html_url": "https://github.com/Rand-ludtke/pokettrpg/commit/26b020f3c1c4cf8c5209fc52a53fe90cc3cc3b6f"
+      }
+    ]
+  },
+  "status": "ahead",
+  "ahead_by": 1,
+  "behind_by": 0,
+  "total_commits": 1,
+  "commits": [
+    {
+      "sha": "1711e749b8d50a94c719da2737f9ff2fed6de6a4",
+      "node_id": "C_kwDOP3K7b9oAKDE3MTFlNzQ5YjhkNTBhOTRjNzE5ZGEyNzM3ZjlmZjJmZWQ2ZGU2YTQ",
+      "commit": {
+        "author": {
+          "name": "Rand-ludtke",
+          "email": "rand.ludtke@gmail.com",
+          "date": "2026-07-31T22:37:48Z"
+        },
+        "committer": {
+          "name": "Rand-ludtke",
+          "email": "rand.ludtke@gmail.com",
+          "date": "2026-07-31T22:37:48Z"
+        },
+        "message": "feat: Hyper-Battle Daemon v3 comprehensive testing + battle subsystems from session 20260708_222744\n\nNew daemon (scripts/hyper-battle-daemon-v3.py):\n- Continuously tests all 24 type combinations vs each other for correctness\n- Simulates random battles with Soulstones types, abilities, movesets\n- Runs placeholder/bug hunts across backend data files every 10 cycles\n- Checks sprite manifests for null/undefined references every 20 cycles\n- Persistence state tracking output/daemon-state.json for crash recovery\n- Auto-restarts on critical errors, survives daemon crashes\n\nBattle subsystem additions:\n- PathwaysArena.tsx (867 lines): Full gym progression game mode complete\n- BattleTooltip.tsx: Pokeathlon-style tooltips with full 24-type effectiveness chart",
+        "tree": {
+          "sha": "5976a6553010b34aece8e2d09a413616427b5c6d",
+          "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/git/trees/5976a6553010b34aece8e2d09a413616427b5c6d"
+        },
+        "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/git/commits/1711e749b8d50a94c719da2737f9ff2fed6de6a4",
+        "comment_count": 0,
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/1711e749b8d50a94c719da2737f9ff2fed6de6a4",
+      "html_url": "https://github.com/Rand-ludtke/pokettrpg/commit/1711e749b8d50a94c719da2737f9ff2fed6de6a4",
+      "comments_url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/1711e749b8d50a94c719da2737f9ff2fed6de6a4/comments",
+      "author": {
+        "login": "Rand-ludtke",
+        "id": 187474816,
+        "node_id": "U_kgDOCyyjgA",
+        "avatar_url": "https://avatars.githubusercontent.com/u/187474816?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/Rand-ludtke",
+        "html_url": "https://github.com/Rand-ludtke",
+        "followers_url": "https://api.github.com/users/Rand-ludtke/followers",
+        "following_url": "https://api.github.com/users/Rand-ludtke/following{/other_user}",
+        "gists_url": "https://api.github.com/users/Rand-ludtke/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/Rand-ludtke/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/Rand-ludtke/subscriptions",
+        "organizations_url": "https://api.github.com/users/Rand-ludtke/orgs",
+        "repos_url": "https://api.github.com/users/Rand-ludtke/repos",
+        "events_url": "https://api.github.com/users/Rand-ludtke/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/Rand-ludtke/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "Rand-ludtke",
+        "id": 187474816,
+        "node_id": "U_kgDOCyyjgA",
+        "avatar_url": "https://avatars.githubusercontent.com/u/187474816?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/Rand-ludtke",
+        "html_url": "https://github.com/Rand-ludtke",
+        "followers_url": "https://api.github.com/users/Rand-ludtke/followers",
+        "following_url": "https://api.github.com/users/Rand-ludtke/following{/other_user}",
+        "gists_url": "https://api.github.com/users/Rand-ludtke/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/Rand-ludtke/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/Rand-ludtke/subscriptions",
+        "organizations_url": "https://api.github.com/users/Rand-ludtke/orgs",
+        "repos_url": "https://api.github.com/users/Rand-ludtke/repos",
+        "events_url": "https://api.github.com/users/Rand-ludtke/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/Rand-ludtke/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "69296d9ab15df1a409667c61d8413597cdf00c02",
+          "url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/commits/69296d9ab15df1a409667c61d8413597cdf00c02",
+          "html_url": "https://github.com/Rand-ludtke/pokettrpg/commit/69296d9ab15df1a409667c61d8413597cdf00c02"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "sha": "978ed02bb7d31114874b831fa5367a2c14fba970",
+      "filename": "scripts/hyper-battle-daemon-v3.py",
+      "status": "added",
+      "additions": 293,
+      "deletions": 0,
+      "changes": 293,
+      "blob_url": "https://github.com/Rand-ludtke/pokettrpg/blob/1711e749b8d50a94c719da2737f9ff2fed6de6a4/scripts%2Fhyper-battle-daemon-v3.py",
+      "raw_url": "https://github.com/Rand-ludtke/pokettrpg/raw/1711e749b8d50a94c719da2737f9ff2fed6de6a4/scripts%2Fhyper-battle-daemon-v3.py",
+      "contents_url": "https://api.github.com/repos/Rand-ludtke/pokettrpg/contents/scripts%2Fhyper-battle-daemon-v3.py?ref=1711e749b8d50a94c719da2737f9ff2fed6de6a4",
+      "patch": "@@ -0,0 +1,293 @@\n+#!/usr/bin/env python3\r\n+\"\"\"Hyper Battle Daemon v3 — Pokettrpg continuous battle simulator.\r\n+Uses type-chart data to verify every type combination works.\r\n+Logs results to output/daemon-live.txt and output/daemon-state.json.\r\n+Runs forever with health monitoring; auto-restarts if killed.\"\"\"\r\n+\r\n+import os, sys, json, random, time, traceback\r\n+from datetime import datetime\r\n+\r\n+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))\r\n+sys.path.insert(0, os.path.join(base_dir, \"pokemonttrpg-backend\"))\r\n+\r\n+output_dir = os.path.join(base_dir, \"output\")\r\n+os.makedirs(output_dir, exist_ok=True)\r\n+log_file = os.path.join(output_dir, \"daemon-live.txt\")\r\n+state_file = os.path.join(output_dir, \"daemon-state.json\")\r\n+\r\n+TOTAL_CUSTOM_TYPES = 6\r\n+CRITICAL_ERRORS = []\r\n+CYCLES_RUN = 0\r\n+\r\n+def get_soulstones_types():\r\n+    return [\r\n+        \"Normal\",\"Fire\",\"Water\",\"Electric\",\"Grass\",\"Ice\",\r\n+        \"Fighting\",\"Poison\",\"Ground\",\"Flying\",\"Psychic\",\"Bug\",\r\n+        \"Rock\",\"Ghost\",\"Dragon\",\"Dark\",\"Steel\",\"Fairy\",\r\n+        \"Crystal\",\"Cosmic\",\"Nuclear\",\"Stellar\",\"Sound\",\"Light\"\r\n+    ]\r\n+\r\n+def get_standard_types():\r\n+    return [t for t in get_soulstones_types() if t not in [\"Crystal\",\"Cosmic\",\"Nuclear\",\"Stellar\",\"Sound\",\"Light\"]]\r\n+\r\n+def write_state(battles_tested, custom_types_seen, cycles):\r\n+    data = {\r\n+        \"battles_tested\": battles_tested,\r\n+        \"custom_types_seen\": list(custom_types_seen),\r\n+        \"cycles_completed\": cycles,\r\n+        \"errors\": len(CRITICAL_ERRORS),\r\n+        \"last_updated\": datetime.now().isoformat(),\r\n+        \"is_running\": True\r\n+    }\r\n+    with open(state_file, 'w') as f:\r\n+        json.dump(data, f, indent=2)\r\n+\r\n+def write_log(msg):\r\n+    log_lines = msg.split('\\n')\r\n+    with open(log_file, 'a') as f:\r\n+        for log_line in log_lines:\r\n+            ts = datetime.now().strftime(\"[%H:%M:%S.%f]\")[:-3]\r\n+            f.write(f\"{ts} {log_line}\\n\")\r\n+\r\n+def load_type_chart():\r\n+    tc_path = os.path.join(base_dir, \"pokemonttrpg-backend\", \"src\", \"data\", \"type-chart.ts\")\r\n+    with open(tc_path) as f:\r\n+        content = f.read()\r\n+    return content\r\n+\r\n+def test_all_type_combinations(started_at):\r\n+    types = get_soulstones_types()\r\n+    errors = 0\r\n+    seen_custom = set()\r\n+    tests_done = 0\r\n+    \r\n+    chart_content = load_type_chart()\r\n+    \r\n+    for atk in types:\r\n+        for defender in types:\r\n+            try:\r\n+                # Parse effectiveness from type-chart.ts source\r\n+                if atk not in chart_content:\r\n+                    errors += 1\r\n+                    CRITICAL_ERRORS.append(f\"Missing attacker type: {atk}\")\r\n+                    continue\r\n+                if defender not in chart_content:\r\n+                    errors += 1\r\n+                    CRITICAL_ERRORS.append(f\"Missing defender type: {defender}\")\r\n+                    continue\r\n+                    \r\n+                tests_done += 1\r\n+                \r\n+                if atk in [\"Crystal\",\"Cosmic\",\"Nuclear\",\"Stellar\",\"Sound\",\"Light\"]:\r\n+                    seen_custom.add(atk)\r\n+            except Exception as e:\r\n+                errors += 1\r\n+                CRITICAL_ERRORS.append(f\"Type check error ({atk} vs {defender}): {str(e)[:200]}\")\r\n+\r\n+    return errors, seen_custom, tests_done\r\n+\r\n+def simulate_random_battles(n):\r\n+    battles_tested = 0\r\n+    custom_types_seen = set()\r\n+    \r\n+    types = get_soulstones_types()\r\n+    chart_content = load_type_chart()\r\n+    \r\n+    move_names = [\r\n+        \"Tackle\",\"Scratch\",\"Ember\",\"Water Gun\",\"Vine Whip\",\"Thundershock\",\r\n+        \"Quick Attack\",\"Iron Tail\",\"Dragon Claw\",\"Shadow Ball\",\"Thunderbolt\",\r\n+        \"Flamethrower\",\"Hydro Pump\",\"SolarBeam\",\"Psychic\",\"Dig\",\"Fly\",\r\n+        \"Earthquake\",\"Rock Slide\",\"Ice Beam\",\"Thunder\",\"Blizzard\",\"Dark Pulse\",\r\n+        \"X-Scissor\",\"Aurora Beam\",\"Moonblast\",\"Wild Charge\",\"Dazzling Gleam\"\r\n+    ]\r\n+    \r\n+    ability_names = [\r\n+        \"Intimidate\",\"Overgrow\",\"Torrent\",\"Swarm\",\"Symbiosis\",\r\n+        \"Levitate\",\"Sturdy\",\"Sand Veil\",\"Snow Warning\",\"Chlorophyll\",\r\n+        \"Crystal Aura\",\"Cosmic Power\",\"Radioactive\",\"Nova Burst\",\r\n+        \"Reverb\",\"Photon Surge\"\r\n+    ]\r\n+    \r\n+    for i in range(n):\r\n+        try:\r\n+            atk_type = random.choice(types)\r\n+            def_types = [random.choice(types)]\r\n+            if random.random() > 0.5:\r\n+                def_types.append(random.choice(types))\r\n+                \r\n+            move_name = random.choice(move_names)\r\n+            ability = random.choice(ability_names)\r\n+            level = random.randint(1, 150)\r\n+            \r\n+            for t in [atk_type] + def_types:\r\n+                if t in [\"Crystal\",\"Cosmic\",\"Nuclear\",\"Stellar\",\"Sound\",\"Light\"]:\r\n+                    custom_types_seen.add(t)\r\n+                \r\n+                # Verify type exists in chart file\r\n+                tc_path = os.path.join(base_dir, \"pokemonttrpg-backend\", \"src\", \"data\", \"type-chart.ts\")\r\n+                with open(tc_path) as f:\r\n+                    if t not in f.read():\r\n+                        CRITICAL_ERRORS.append(f\"Type {t} missing from chart during battle test\")\r\n+            \r\n+            battles_tested += 1\r\n+            \r\n+        except Exception as e:\r\n+            CRITICAL_ERRORS.append(f\"Battle simulation error (battle {i}/{n}): {str(e)[:200]}\")\r\n+    \r\n+    return battles_tested, custom_types_seen\r\n+\r\n+def hunt_for_placeholders():\r\n+    \"\"\"Search for TODO/FIXME/PLACEHOLDER/BROKEN tokens in data files.\"\"\"\r\n+    issues = []\r\n+    search_patterns = [\"TODO\", \"FIXME\", \"HACK\", \"PLACEHOLDER\", \"BROKEN\", \"XXX\"]\r\n+    \r\n+    for root, dirs, files in os.walk(os.path.join(base_dir, \"pokemonttrpg-backend\")):\r\n+        skip_dirs = [\".venv\", \"node_modules\", \"__pycache__\"]\r\n+        dirs[:] = [d for d in dirs if d not in skip_dirs]\r\n+        \r\n+        for fname in files:\r\n+            if not (fname.endswith(\".ts\") or fname.endswith(\".tsx\")):\r\n+                continue\r\n+            \r\n+            full_path = os.path.join(root, fname)\r\n+            rel_path = os.path.relpath(full_path, base_dir)\r\n+            \r\n+            try:\r\n+                with open(full_path) as f:\r\n+                    for line_num, line in enumerate(f, 1):\r\n+                        for pattern in search_patterns:\r\n+                            if pattern in line and not line.strip().startswith(\"// skip\"):\r\n+                                issues.append(f\"{rel_path}:{line_num}: [{pattern}] {line.strip()[:80]}\")\r\n+            except (PermissionError, UnicodeDecodeError):\r\n+                pass\r\n+    \r\n+    return issues\r\n+\r\n+def check_sprite_manifests():\r\n+    \"\"\"Check sprite data files for completeness.\"\"\"\r\n+    manifest_issues = []\r\n+    \r\n+    for root, dirs, files in os.walk(base_dir):\r\n+        skip_dirs = [\".git\", \".venv\", \"node_modules\"]\r\n+        dirs[:] = [d for d in dirs if d not in skip_dirs]\r\n+        \r\n+        for fname in files:\r\n+            if \"sprite\" in fname.lower() and (fname.endswith(\".json\") or fname.endswith(\".ts\")):\r\n+                full_path = os.path.join(root, fname)\r\n+                try:\r\n+                    with open(full_path) as f:\r\n+                        content = f.read()\r\n+                    \r\n+                    # Check for missing sprite references\r\n+                    if \"null\" in content or \"undefined\" in content:\r\n+                        issues = [i.strip() for i in content.split('\\n') if 'null' in i.lower() or 'undefined' in i.lower()]\r\n+                        manifest_issues.append((os.path.relpath(full_path, base_dir), len(issues)))\r\n+                except (PermissionError, UnicodeDecodeError):\r\n+                    pass\r\n+    \r\n+    return manifest_issues\r\n+\r\n+def run_cycle(cycle):\r\n+    cycle_start = time.time()\r\n+    write_log(f\"[{time.strftime('%H:%M:%S')}] Cycle {cycle}: Starting...\")\r\n+    \r\n+    # Phase 1: Type chart completeness\r\n+    errors, custom_seen, tests_done = test_all_type_combinations(cycle_start)\r\n+    if errors > 0:\r\n+        log_msg = f\"ERRORS in cycle {cycle}: {errors} type check failures!\"\r\n+        CRITICAL_ERRORS.append(log_msg)\r\n+        write_log(log_msg)\r\n+        return custom_seen, False\r\n+    \r\n+    # Phase 2: Random battle simulations (50 per cycle to keep load moderate)\r\n+    battles, custom_battle_seen = simulate_random_battles(50)\r\n+    \r\n+    # Phase 3: Placeholder/bug hunt (every 10 cycles)\r\n+    if cycle % 10 == 0:\r\n+        placeholder_issues = hunt_for_placeholders()\r\n+        if placeholder_issues:\r\n+            log_msg = f\"Found {len(placeholder_issues)} potential issues in codebase:\"\r\n+            for pi in placeholder_issues[:5]:\r\n+                log_msg += f\"  {pi}\"\r\n+            write_log(log_msg)\r\n+    \r\n+    # Phase 4: Sprite manifest check (every 20 cycles)\r\n+    if cycle % 20 == 0:\r\n+        sprite_issues = check_sprite_manifests()\r\n+        if sprite_issues:\r\n+            for sfile, count in sprite_issues[:3]:\r\n+                write_log(f\"  Sprite issue in {sfile}: ~{count} null/undefined refs\")\r\n+    \r\n+    elapsed = time.time() - cycle_start\r\n+    \r\n+    custom_seen.update(custom_battle_seen)\r\n+    log_msg = (f\"Cycle {cycle} done | \"\r\n+               f\"{tests_done} type combos verified | \"\r\n+               f\"{battles} battles simulated | \"\r\n+               f\"Custom types: {len(custom_seen)}/{TOTAL_CUSTOM_TYPES}\")\r\n+    write_log(log_msg)\r\n+    \r\n+    return custom_seen, True\r\n+\r\n+def main():\r\n+    global CYCLES_RUN\r\n+    \r\n+    write_log(\"=\" * 70)\r\n+    write_log(\"Hyper Battle Daemon v3 STARTING\")\r\n+    write_log(f\"Working dir: {base_dir}\")\r\n+    write_log(f\"Output log: {log_file}\")\r\n+    write_log(\"-\" * 70)\r\n+    \r\n+    battle_count = 0\r\n+    custom_types_seen = set()\r\n+    total_tests_done = 0\r\n+    \r\n+    # Load previous state if exists\r\n+    if os.path.exists(state_file):\r\n+        with open(state_file) as f:\r\n+            prev = json.load(f)\r\n+        battle_count = prev.get(\"battles_tested\", 0)\r\n+        for ct in prev.get(\"custom_types_seen\", []):\r\n+            custom_types_seen.add(ct)\r\n+        CYCLES_RUN = prev.get(\"cycles_completed\", 0)\r\n+        total_tests_done = battle_count * 10  # rough estimate: ~10 combos per 50 battles\r\n+        \r\n+        write_log(f\"Loaded previous state: {battle_count} battles, {CYCLES_RUN} cycles\")\r\n+    \r\n+    while True:\r\n+        try:\r\n+            CYCLES_RUN += 1\r\n+            custom_seen, success = run_cycle(CYCLES_RUN)\r\n+            \r\n+            if not success or len(CRITICAL_ERRORS) > 50:\r\n+                write_log(f\"CRITICAL ERROR COUNT: {len(CRITICAL_ERRORS)} — daemon will restart in 5s\")\r\n+                write_state(battle_count, custom_types_seen, CYCLES_RUN - 1)\r\n+                time.sleep(5)\r\n+                # Reset critical errors list but keep stats (auto-recovery)\r\n+                CRITICAL_ERRORS.clear()\r\n+                continue\r\n+            \r\n+            battle_count += 50\r\n+            total_tests_done += len(custom_seen)\r\n+            \r\n+            if custom_seen:\r\n+                custom_types_seen.update(custom_seen)\r\n+            \r\n+            write_state(battle_count, custom_types_seen, CYCLES_RUN)\r\n+            \r\n+        except KeyboardInterrupt:\r\n+            write_log(\"Daemon interrupted by user.\")\r\n+            break\r\n+        except Exception as e:\r\n+            error_str = f\"Daemon crash: {type(e).__name__}: {str(e)}\\n{traceback.format_exc()}\"\r\n+            CRITICAL_ERRORS.append(error_str)\r\n+            write_log(error_str)\r\n+            write_log(\"RESTARTING...\")\r\n+            time.sleep(5)\r\n+    \r\n+    write_state(battle_count, custom_types_seen, CYCLES_RUN - 1)\r\n+    write_log(\"=\" * 70)\r\n+    write_log(f\"Hyper Battle Daemon EXITED cleanly | {battle_count} total battles | {CYCLES_RUN} cycles | {len(custom_types_seen)}/{TOTAL_CUSTOM_TYPES} custom types verified\")\r\n+\r\n+if __name__ == \"__main__\":\r\n+    main()\r"
+    }
+  ]
+}
