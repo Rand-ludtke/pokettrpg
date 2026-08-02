@@ -104,12 +104,12 @@ export async function loadSoulstones(): Promise<DexIndex> {
   }
 
   // Second pass: add forme variants that weren't caught above.
-  for (const key of Object.keys(pokeathlonDek).sort((a: string, b: string) => {
-    const na = Number((pokeathlonDek as Record<string, PokedexEntry>)[a]?.num);
-    const nb = Number((pokeathlonDek as Record<string, PokedexEntry>)[b]?.num);
+  for (const key of Object.keys(pokeathlonDex).sort((a: string, b: string) => {
+    const na = Number((pokeathlonDex as Record<string, PokedexEntry>)[a]?.num);
+    const nb = Number((pokeathlonDex as Record<string, PokedexEntry>)[b]?.num);
     return (Number.isFinite(na) ? na : 0) - (Number.isFinite(nb) ? nb : 0);
   })) {
-    const entry = pokeathlonDek[key] as PokedexEntry;
+    const entry = pokeathlonDex[key] as PokedexEntry;
     if (!entry || !Array.isArray(entry.types)) continue;
 
     const isSoulstone = hasSoulstoneType(entry.types);
@@ -118,11 +118,11 @@ export async function loadSoulstones(): Promise<DexIndex> {
 
     const canonicalName = String(entry.baseSpecies || entry.name || key).toLowerCase().replace(/[^a-z0-9]/g, '');
     // Skip entries whose *unique* name (name field after stripping base species) differs from the first — these are forme variants.
-    if (output[canonicalName] && output[canonicalName].nombre !== entry.name) {
+    if (output[canonicalName] && output[canonicalName].name !== entry.name) {
       // Forma variant: add with forme key instead.
       const formeKey = normalizeName(key + '-' + String(String(entry.name).replace(/\s+/g, '-')));
       if (!Object.keys(output).includes(formeKey)) {
-        output[formeKey] = normalisePokearthEntry(entry, formeKey, key + '-forme');
+        output[formeKey] = normalisePokeathlonEntry(entry, formeKey, key + '-forme');
       }
     }
   }
@@ -139,7 +139,7 @@ function normalizeName(id: string): string {
  * The shapes are already very similar; we just rename a few fields and add
  * metadata so the PokédexTab can display them.
 */
-function normalisePokearthEntry(
+function normalisePokeathlonEntry(
   entry: PokedexEntry,
   dexKey: string,
   rawKey: string,
