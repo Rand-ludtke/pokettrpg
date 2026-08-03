@@ -1,7 +1,7 @@
 //pokeathlonsouls.ts — loadSoulstones() fetches the Pokeathlon pokedex.js at boot, categorises species by soulstone / custom flags, normalises into DexShape.
 import { SOULSTONE_TYPE_NAMES } from './soulstones';
 
-const SOULSTONE_TYPES = new Set(SOULSTONE_TYPE_NAMES);
+const SOULSTONE_TYPES: Set<string> = new Set(SOULSTONE_TYPE_NAMES);
 const STANDARD_TYPES = new Set([
   'Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison',
   'Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark',
@@ -36,6 +36,7 @@ export interface PokedexRawEntry {
   otherFormes?: string[];
   formeOrder?: string[];
   eggGroups?: string[];
+  forme?: string;
   genderRatio?: {M:number;F:number};
 }
 
@@ -74,7 +75,7 @@ function normaliseEntry(raw: PokedexRawEntry, dexKey: string): any {
   const ab = (raw.abilities ?? {});
   const af: Record<string,string> = {};
   for (const [k,v] of Object.entries(ab)) {
-    af[k] = typeof v === 'string' ? v : Array.isArray(v) ? String(v[0]) : '';
+    af[k] = typeof v === 'string' ? v : Array.isArray(v) && (v as unknown[]).length > 0 ? String((v as unknown[])[0]) : '';
   }
 
   return {

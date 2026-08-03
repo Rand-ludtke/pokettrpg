@@ -5,7 +5,6 @@
 // gym-leader-type bosses every 5 floors, final boss at floor 31, and full UI with sidebar-style layout.
 
 import React, { useState, useEffect, useCallback } from 'react';
-import type { DexIndex } from '../types/pokemon';
 import { loadShowdownDex } from '../data/adapter';
 
 // ──────────────────────────────── TYPES ─────────────────────────────────────
@@ -75,7 +74,7 @@ const TYPE_CHART: Record<string, Partial<Record<string,number>>> = {
 
 function getEffectiveness(attackerType:string, defenderTypes:string[]): number {
   let mult=1; const c=TYPE_CHART[attackerType];
-  for (const dt of defenderTypes) mult*=(c&&c[dt]??1); return mult;
+  for (const dt of defenderTypes) mult*=((c&&c[dt])??1); return mult;
 }
 
 // ──────────────── MOVE DATABASE ─────────────────────────────────────────────
@@ -141,7 +140,7 @@ function createBattleMon(zoneType:ZoneType, level:number, isBoss=false): BattleM
   return {
     speciesKey:`rog-${zoneType}-${isBoss?'boss-':'r '}${Math.random().toString(36).slice(2,7)}`,
     displayName:`${zoneType} #${level}`, types:chosen, level,
-    maxHp:calcMaxHp(40+Math.floor(Math.random()*30),level,isBoss|false), currentHp:0,
+    maxHp:calcMaxHp(40+Math.floor(Math.random()*30),level,isBoss||false), currentHp:0,
     baseAtk: Math.floor((15+Math.random()*50+bonus)*level/45),
     baseDef: Math.floor((15+Math.random()*35+bonus*0.7)*level/45),
     baseSpa: Math.floor((20+Math.random()*40+bonus)*level/45),

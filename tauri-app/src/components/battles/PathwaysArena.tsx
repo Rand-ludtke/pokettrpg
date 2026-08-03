@@ -244,15 +244,15 @@ function executeMove(
 }
 
 function runPlayerTurn(team: Team, opponents: Team, log: BattleLogEntry[], moveName: string): [Team, Team, BattleLogEntry[]] {
-  const active = [...team];
-  const enemyActive = [...opponents];
+  const active = team.pokemon.map(p => ({ ...p }));
+  const enemyActive = opponents.pokemon.map(p => ({ ...p }));
 
   // Skip fainted pokemon to find active index
-  const pIdx = active.findIndex(p => p.currentHP > 0);
-  if (pIdx < 0) return [active, enemyActive, [{ msg: 'You have no live Pokémon!', type: 'system' }]];
+  const pIdx = active.findIndex((p: BattlePokemon) => p.currentHP > 0);
+  if (pIdx < 0) return [{ ...team, pokemon: active }, { ...opponents, pokemon: enemyActive }, [{ msg: 'You have no live Pokémon!', type: 'system' }]] as [Team, Team, BattleLogEntry[]];
 
-  const eIdx = enemyActive.findIndex(p => p.currentHP > 0);
-  if (eIdx < 0) return [active, enemyActive, [{ msg: 'Opponents fainted!', type: 'win' }]];
+  const eIdx = enemyActive.findIndex((p: BattlePokemon) => p.currentHP > 0);
+  if (eIdx < 0) return [{ ...team }, { ...opponents }, [{ msg: 'Opponents fainted!', type: 'win' }]] as [Team, Team, BattleLogEntry[]];
 
   const attacker = active[pIdx];
   const defenderTypes = enemyActive[eIdx].types;
@@ -271,7 +271,7 @@ function runPlayerTurn(team: Team, opponents: Team, log: BattleLogEntry[], moveN
 
   // Check if all enemies are down
   if (enemyActive.every(p => p.currentHP <= 0)) {
-    return [active, enemyActive, [...log, { msg: `🏆 You won the battle! All opponents fainted!`, type: 'win' }]];
+    return [{ pokemon: active }, { pokemon: enemyActive }, [...log, { msg: `🏆 You won the battle! All opponents fainted!`, type: 'win' }]];
   }
 
   // Enemy counter-attack
@@ -296,10 +296,10 @@ function runPlayerTurn(team: Team, opponents: Team, log: BattleLogEntry[], moveN
   // Check if all player pokemon are down
   const anyPlayerAlive = active.some(p => p.currentHP > 0);
   if (!anyPlayerAlive) {
-    return [active, enemyActive, [...log, { msg: `💀 Your team fainted! Game Over.`, type: 'lose' }]];
+    return [{ pokemon: active }, { pokemon: enemyActive }, [...log, { msg: `💀 Your team fainted! Game Over.`, type: 'lose' }]];
   }
 
-  return [active, enemyActive, log];
+  return [{ pokemon: active }, { pokemon: enemyActive }, log];
 }
 
 // ============================================================
@@ -467,8 +467,8 @@ const BATTLE_SCREEN = ({ team, opponents, log, onPlayerAction, availableMoves }:
   onPlayerAction: (moveName: string) => void;
   availableMoves: string[];
 }) => {
-  const activePlayer = team.find(p => p.currentHP > 0);
-  const activeEnemy = opponents.find(p => p.currentHP > 0);
+  const activePlayer = team.pokemon.find((p: BattlePokemon) => p.currentHP > 0);
+  const activeEnemy = opponents.pokemon.find((p: BattlePokemon) => p.currentHP > 0);
   const finished = log.some(l => l.type === 'win' || l.type === 'lose');
 
   return (
@@ -477,7 +477,7 @@ const BATTLE_SCREEN = ({ team, opponents, log, onPlayerAction, availableMoves }:
 
       {/* Player side */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        {team.map(p => (
+        {team.pokemon.map((p: BattlePokemon) => (
           <div key={p.id} style={{
             padding: 8, background: p.currentHP > 0 ? '#16213e' : '#3d0f0f',
             borderRadius: 6, border: activePlayer?.id === p.id ? '2px solid gold' : '1px solid #444',
@@ -495,7 +495,7 @@ const BATTLE_SCREEN = ({ team, opponents, log, onPlayerAction, availableMoves }:
 
       {/* Enemy side */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        {opponents.map(p => (
+        {opponents.pokemon.map((p: BattlePokemon) => (
           <div key={p.id} style={{
             padding: 8, background: p.currentHP > 0 ? '#30475e' : '#3d0f0f',
             borderRadius: 6, border: activeEnemy?.id === p.id ? '2px solid #ff4444' : '1px solid #444',
@@ -554,7 +554,7 @@ const VICTORY_SCREEN = ({ badges, onContinue }: { badges: number; onContinue: ()
         <span key={i} style={{ fontSize: 24 }}>🏅</span>
       ))}
     </div>
-    <button onClick={onContinue} style={{ ...btnStyle(20), fontSize: 20, background: '#ffd700', color: '#333', marginTop: 20 }}>
+    <button onClick={onContinue} style={{ ...btnStyle(20, '#ffd700'), fontSize: 20, background: '#ffd700', color: '#333', marginTop: 20 }}>
       Play Again ↺
     </button>
   </div>
@@ -564,7 +564,7 @@ const GAME_OVER_SCREEN = ({ onRestart }: { onRestart: () => void }) => (
   <div style={{ textAlign: 'center', padding: 60, background: '#5a1a1a', borderRadius: 10 }}>
     <h1>💀 GAME OVER 💀</h1>
     <p style={{ fontSize: 20 }}>Your entire team fainted. Better luck next time!</p>
-    <button onClick={onRestart} style={{ ...btnStyle(20), fontSize: 20, background: '#ffd700', color: '#333', marginTop: 20 }}>
+    <button onClick={onRestart} style={{ ...btnStyle(20, '#ffd700'), fontSize: 20, background: '#ffd700', color: '#333', marginTop: 20 }}>
       Try Again ↺
     </button>
   </div>
@@ -819,7 +819,7 @@ export const PathwaysArena: React.FC = () => {
                     return { ...prev, opponents: generateGymTeam(GYM_ORDER[0]! as GymLeaderDef), // use as template enemy
                       team: { pokemon: newTeam }, mode: 'battle',
                       discoveredStarters: [...prev.discoveredStarters, enc.name],
-                      log: [...prev.log, { msg: `Caught a ${enc.types.join('/')}-${type} wild! ${enc.name} is now in your team. It may appear as starter!`, type: 'item' }] };
+                      log: [...prev.log, { msg: `Caught a ${enc.types.join('/')}-${enc.name} wild! ${enc.name} is now in your team. It may appear as starter!`, type: 'item' }] };
                   }
                   return { ...prev, opponents: generateGymTeam(GYM_ORDER[0]!), team: { pokemon: newTeam }, mode: 'battle',
                     log: [...prev.log, { msg: `Caught a wild ${enc.name}! Added to your team.`, type: 'item' }] };

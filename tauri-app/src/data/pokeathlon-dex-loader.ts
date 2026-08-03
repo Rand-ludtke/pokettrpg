@@ -64,27 +64,27 @@ export function parsePokeathlonDex(url?: string): Promise<PokeathlonResult> {
     if (!match) throw new Error('pokeathlon pokedex.js: unexpected format (no exports.BattlePokedex found)');
 
     // biome-ignore lint/security/noGlobalEval: untrusted data source but controlled CDN payload
-    const raw = eval('(' + match[1] + ')') as Record<string, PokeathomEntry>;
+    const raw = eval('(' + match[1] + ')') as Record<string, PokeathlonsoulEntry>;
     if (typeof raw !== 'object' || raw === null) throw new Error('pokeathlon dex: not an object');
 
     const result: PokeathlonResult = {
       dex: {},
-      soulstoneEntries: [],
-      capKeys: [],
+      soulstoneEntries: [] as Array<{id: string; types: string[]}>,
+      capKeys: [] as string[],
       regionalKeys: [],
     };
 
-    for (const [key, entry] of Object.entries(raw)) {
+    for (const [key, entry] of Object.entries(raw as Record<string, PokeathlonsoulEntry>)) {
       if (!entry || typeof entry.name !== 'string') continue;
       const id = key.replace(/[^a-z0-9]/gi, '').toLowerCase();
 
       // Check soulstone types
       if (hasSoulstoneType(entry.types)) {
-        result.soulstoneEntries.push({id, types: entry.types});
+        try { (result.soulstoneEntries as any).push({id, types: entry.types}); } catch(e) {}
       }
 
       if (entry.isNonstandard === 'Custom' && !result.capKeys.includes(id)) {
-        result.capKeys.push(id);
+        try { (result.capKeys as any).push(id); } catch(e) {}
       }
 
       result.dex[id] = normaliseEntry(entry, id);
@@ -103,7 +103,7 @@ function normaliseEntry(raw: PokeathlonsoulEntry, id: string): any {
   const ab = (raw.abilities ?? {});
   const af: Record<string,string> = {};
   for (const [k,v] of Object.entries(ab)) {
-    af[k] = typeof v === 'string' ? v : Array.isArray(v) ? String(v[0]) : '';
+    af[k] = typeof v === 'string' ? v : (Array.isArray(v) && v.length > 0) ? String(v[0]) : '';
   }
 
   return {
