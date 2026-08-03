@@ -103,7 +103,10 @@ function normaliseEntry(raw: PokeathlonsoulEntry, id: string): any {
   const ab = (raw.abilities ?? {});
   const af: Record<string,string> = {};
   for (const [k,v] of Object.entries(ab)) {
-    af[k] = typeof v === 'string' ? v : (Array.isArray(v) && v.length > 0) ? String(v[0]) : '';
+    let firstAb: string = '';
+    if (typeof v === 'string') firstAb = v;
+    else if (Array.isArray(v as unknown[])) firstAb = String((v as unknown[])[0]);
+    af[k] = firstAb;
   }
 
   return {
