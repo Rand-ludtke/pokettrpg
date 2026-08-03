@@ -6,6 +6,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { loadShowdownDex } from '../data/adapter';
+import { getClient } from '../net/pokettrpgClient';
+import { withPublicBase } from '../utils/publicBase';
 
 // ──────────────────────────────── TYPES ─────────────────────────────────────
 
@@ -50,6 +52,42 @@ const TYPE_COLORS: Record<string,string> = {
   Rock:'#b6a136',Ghost:'#735797',Dragon:'#6f35fc',Dark:'#705746',Steel:'#b7b7ce',Fairy:'#d685ad',
   Crystal:'#a0d2eb',Cosmic:'#c491e9',Nuclear:'#4caf50',Stellar:'#fbc531',Sound:'#ff66aa',Light:'#fffacd',
 };
+
+const DEFAULT_TRAINER_SPRITE = 'acetrainer';
+
+interface ShopItem { id:string; name:string; price:number; description:string; effect:'heal'|'boost'|'utility'; }
+interface ShopInfo { name:string; leader:string; shopName:string; items: ShopItem[]; }
+const SHOP_MAP: Record<ZoneType, ShopInfo> = {
+  Crystal:{ name:'Crystal City', leader:'Astra', shopName:'Crystal Market', items:[{ id:'crystal-potion', name:'Crystal Potion', price:35, description:'Restores 35% health', effect:'heal' }, { id:'focus-amber', name:'Focus Amber', price:45, description:'Boosts offense for one battle', effect:'boost' }, { id:'travel-lamp', name:'Travel Lamp', price:55, description:'Utility item for deeper routes', effect:'utility' }] },
+  Cosmic:{ name:'Nova Crossing', leader:'Veyra', shopName:'Cosmic Emporium', items:[{ id:'star-bandage', name:'Star Bandage', price:38, description:'Heals the team slightly', effect:'heal' }, { id:'signal-boost', name:'Signal Boost', price:52, description:'Raises Attack and SpA', effect:'boost' }, { id:'warp-socket', name:'Warp Socket', price:60, description:'Route utility upgrade', effect:'utility' }] },
+  Nuclear:{ name:'Reactor Town', leader:'Brann', shopName:'Fusion Forge', items:[{ id:'radiant-mix', name:'Radiant Mix', price:42, description:'Heavy healing', effect:'heal' }, { id:'plasma-core', name:'Plasma Core', price:58, description:'Boost to battle pressure', effect:'boost' }, { id:'reactor-key', name:'Reactor Key', price:65, description:'Utility relic for the route', effect:'utility' }] },
+  Stellar:{ name:'Stellar Reach', leader:'Selene', shopName:'Celestial Bazaar', items:[{ id:'moon-tea', name:'Moon Tea', price:40, description:'Restore HP and morale', effect:'heal' }, { id:'orbit-cloak', name:'Orbit Cloak', price:54, description:'Raises defense', effect:'boost' }, { id:'star-map', name:'Star Map', price:75, description:'Exploration utility', effect:'utility' }] },
+  Light:{ name:'Sunspire City', leader:'Ilya', shopName:'Sunspire Arcade', items:[{ id:'radiant-elixir', name:'Radiant Elixir', price:46, description:'Restores maximum health', effect:'heal' }, { id:'glow-crest', name:'Glow Crest', price:62, description:'Boosts all stats lightly', effect:'boost' }, { id:'sacred-lens', name:'Sacred Lens', price:80, description:'Rare utility relic', effect:'utility' }] },
+  Sound:{ name:'Echo Metro', leader:'Kora', shopName:'Echo Bodega', items:[{ id:'rhythm-potion', name:'Rhythm Potion', price:36, description:'Quick recovery brew', effect:'heal' }, { id:'echo-amp', name:'Echo Amp', price:57, description:'Increases special attack', effect:'boost' }, { id:'sound-jewel', name:'Sound Jewel', price:72, description:'Utility prize from the city', effect:'utility' }] },
+};
+
+function sanitizeTrainerSpriteId(raw: unknown): string {
+  if (raw === null || raw === undefined) return '';
+  const value = typeof raw === 'string' ? raw : String(raw);
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  const withoutFragment = trimmed.split('#')[0].split('?')[0];
+  const candidate = withoutFragment.replace(/\\/g, '/').split('/').pop() || withoutFragment;
+  const cleaned = candidate.replace(/\.png$/i, '').replace(/[\s_]+/g, '-').replace(/[^a-z0-9-]/gi, '').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+  if (!cleaned || ['pending', 'random', 'default', 'unknown'].includes(cleaned)) return '';
+  return cleaned.includes('ace-trainer') ? cleaned.replace(/ace-trainer/g, 'acetrainer') : cleaned;
+}
+
+function getTrainerSpriteValue(): string {
+  const client = getClient();
+  const fromClient = sanitizeTrainerSpriteId(client.getTrainerSprite());
+  if (fromClient) return fromClient;
+  if (typeof window !== 'undefined') {
+    const stored = sanitizeTrainerSpriteId(window.localStorage?.getItem('ttrpg.trainerSprite'));
+    if (stored) return stored;
+  }
+  return DEFAULT_TRAINER_SPRITE;
+}
 
 // ──────────── TYPE EFFECTIVENESS CHART (from + beside PathwaysArena) ─────────
 
@@ -253,21 +291,44 @@ export const RogueModeGame: React.FC = () => {
   const [badgeCount, setBadgeCount] = useState(0);
   const [xpTotal,    setXpTotal]    = useState(0);
   const [battleLog,  setBattleLog]  = useState<LogEntry[]>([]);
+  const [playerCoins, setPlayerCoins] = useState(180);
+  const [inventory, setInventory] = useState<Record<string, number>>({ potion: 2, booster: 1 });
+  const [shopOpen, setShopOpen] = useState(false);
+  const [trainerSprite, setTrainerSprite] = useState<string>(() => getTrainerSpriteValue());
 
-  // zone lookup helper
   const currentZone: ZoneInfo|null = (()=>{
     for (const z of ZONES)if(floor>=z.floorStart&&floor<=z.floorEnd)return z;
     return null;
   })();
+  const activeTown = currentZone ? SHOP_MAP[currentZone.type] : null;
+
+  useEffect(() => {
+    const client = getClient();
+    const syncTrainerSprite = () => setTrainerSprite(getTrainerSpriteValue());
+    syncTrainerSprite();
+    client.on('trainerSpriteChanged', syncTrainerSprite);
+    return () => client.off('trainerSpriteChanged', syncTrainerSprite);
+  }, []);
 
   // XP threshold for a given level (cumulative from lvl 5)
   const xpThresholdFor = (l:number):number=>{let s=0;for(let i=5;i<l;i++)s+=15+i*3;return s;};
 
   /* ── transitions ──────────────────────────────────────────────────────── */
 
+  const buyItem = useCallback((item: ShopItem) => {
+    if (!activeTown) return;
+    if (playerCoins < item.price) {
+      setBattleLog((previous) => [...previous, { msg: `Not enough coins for ${item.name}.`, type: 'system' }]);
+      return;
+    }
+    setPlayerCoins((previous) => previous - item.price);
+    setInventory((previous) => ({ ...previous, [item.id]: (previous[item.id] ?? 0) + 1 }));
+    setBattleLog((previous) => [...previous, { msg: `Bought ${item.name} in ${activeTown.shopName}.`, type: 'item' }]);
+  }, [activeTown, playerCoins]);
+
   const startNewGame = useCallback(()=>{
     setFloor(1);setPhase('exploring');setPlayerTeam([]);setEnemyTeam([]);
-    setBadgeCount(0);setXpTotal(0);
+    setBadgeCount(0);setXpTotal(0);setPlayerCoins(180);setInventory({ potion: 2, booster: 1 });setShopOpen(false);
     setBattleLog([{msg:'Welcome to RogueMode! Choose your starter.',type:'system'}]);
   },[]);
 
@@ -459,41 +520,112 @@ export const RogueModeGame: React.FC = () => {
 
       {/* ══ EXPLORING (post-starter) ══ */}
       {phase==='exploring'&&currentZone&&playerTeam.length>0&&(
-        <div style={{padding:20,background:'#fff',borderRadius:10}}>
-          <h3>📍 Floor {floor}: {currentZone.name}</h3>
-          <p>Zone:<strong>{currentZone.type}</strong> │ Levels:{currentZone.floorStart}–{currentZone.floorEnd}{isBossFloor?' ⚔️ Boss ahead!':''}</p>
+        <div style={{display:'flex',gap:20,alignItems:'flex-start'}}>
+          <div style={{flex:1,background:'linear-gradient(180deg,#18243d 0%,#111a2b 100%)',borderRadius:18,padding:20,border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 16px 30px rgba(0,0,0,0.28)'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+              <div>
+                <div style={{fontSize:12,color:'#a7bce8',letterSpacing:'0.12em',textTransform:'uppercase'}}>Floor {floor}</div>
+                <h3 style={{margin:'6px 0 0',fontSize:30,color:'#f8fbff'}}>{currentZone.name}</h3>
+              </div>
+              <div style={{padding:'8px 12px',background:currentZone.zoneColor,borderRadius:999,color:'#111827',fontWeight:800}}>{currentZone.type}</div>
+            </div>
 
-          {/* team sidebar row */}
-          <div style={{display:'flex',gap:8,marginBottom:12,flexWrap:'wrap'}}>
-            {playerTeam.map((m,i)=>(<span key={i} style={{padding:'4px 8px',borderRadius:4,fontSize:13,color:'#fff',background:TYPE_COLORS[m.types[0]]||'#888'}}>{m.displayName} Lv.{m.level} ({m.currentHp}/{m.maxHp})</span>))}
+            <div style={{display:'flex',gap:10,marginTop:18,flexWrap:'wrap'}}>
+              {playerTeam.map((monster,index)=>(<span key={index} style={{padding:'6px 10px',borderRadius:8,background:TYPE_COLORS[monster.types[0]]||'#666',color:'#fff',fontWeight:700,fontSize:13}}>{monster.displayName} Lv.{monster.level} ({monster.currentHp}/{monster.maxHp})</span>))}
+            </div>
+
+            <div style={{display:'flex',gap:12,marginTop:18,flexWrap:'wrap'}}>
+              <button onClick={startNewGame} style={{padding:'10px 16px',border:'none',borderRadius:10,background:'#4b5d8a',color:'#fff',cursor:'pointer',fontWeight:700}}>↺ New Game</button>
+              {floor>=FINAL_BOSS_FLOOR-1 ? (
+                <button onClick={startBattle} style={{padding:'12px 20px',border:'none',borderRadius:10,background:'#d9534f',color:'#fff',cursor:'pointer',fontWeight:800}}>⚔️ Face Final Boss!</button>
+              ) : isBossFloor ? (
+                <button onClick={startBattle} style={{padding:'12px 20px',border:'none',borderRadius:10,background:'#d9534f',color:'#fff',cursor:'pointer',fontWeight:800}}>⚔️ Fight Gym Leader</button>
+              ) : (
+                <button onClick={startBattle} style={{padding:'12px 20px',border:'none',borderRadius:10,background:'#3792ff',color:'#fff',cursor:'pointer',fontWeight:800}}>🔍 Search Floor</button>
+              )}
+              {floor<FINAL_BOSS_FLOOR-1&&(<button onClick={advanceFloor} style={{padding:'10px 16px',border:'none',borderRadius:10,background:'#2dc36d',color:'#fff',cursor:'pointer',fontWeight:700}}>→ Next Floor</button>)}
+            </div>
+
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:14,marginTop:20}}>
+              <div style={{padding:16,background:'rgba(255,255,255,0.04)',borderRadius:12,border:'1px solid rgba(255,255,255,0.08)'}}>
+                <div style={{fontSize:12,letterSpacing:'0.12em',color:'#99b4e6',textTransform:'uppercase'}}>Run Status</div>
+                <div style={{marginTop:8,color:'#f3f7ff',fontSize:14,lineHeight:1.7}}>
+                  <div>XP: <strong>{xpTotal}</strong></div>
+                  <div>Badges: <strong>{badgeCount}</strong></div>
+                  <div>Coins: <strong>{playerCoins}</strong></div>
+                </div>
+              </div>
+              <div style={{padding:16,background:'rgba(255,255,255,0.04)',borderRadius:12,border:'1px solid rgba(255,255,255,0.08)'}}>
+                <div style={{fontSize:12,letterSpacing:'0.12em',color:'#99b4e6',textTransform:'uppercase'}}>Gym Tier</div>
+                <div style={{marginTop:8,color:'#f3f7ff',fontSize:14,lineHeight:1.7}}>
+                  <div>{activeTown ? `${activeTown.name} • ${activeTown.leader}` : 'Route'}</div>
+                  <div>{isBossFloor ? 'Boss challenge active' : 'Wild encounters active'}</div>
+                </div>
+              </div>
+            </div>
+
+            {battleLog.length>0&&(
+              <div style={{marginTop:20,padding:12,background:'rgba(0,0,0,0.18)',borderRadius:10,border:'1px solid rgba(255,255,255,0.08)'}}>
+                {battleLog.slice(-8).map((logEntry,index)=>(<div key={index} style={{color:logEntry.type==='system'?'#b8c3eb':logEntry.type==='item'?'#ffd76a':'#eaf2ff',fontSize:13,padding:'2px 0'}}>{logEntry.msg}</div>))}
+              </div>
+            )}
           </div>
-          <p style={{color:'#555'}}>XP: {xpTotal}</p>
 
-          {/* buttons */}
-          <div style={{display:'flex',gap:12,marginTop:16,flexWrap:'wrap'}}>
-            <button onClick={startNewGame} style={{padding:'10px 16px',border:'none',borderRadius:6,background:'#555',color:'#fff',cursor:'pointer'}}>↺ New Game</button>
-            
-            {floor>=FINAL_BOSS_FLOOR-1
-              ?<button onClick={startBattle} style={{padding:'12px 24px',border:'none',borderRadius:8,background:'#d9534f',color:'#fff',cursor:'pointer',fontWeight:'bold'}}>⚔️ Face Final Boss!</button>
-              :isBossFloor&&(floor%5===0)
-                ?<button onClick={startBattle} style={{padding:'12px 24px',border:'none',borderRadius:8,background:'#d9534f',color:'#fff',cursor:'pointer',fontWeight:'bold'}}>⚔️ Fight Boss!</button>
-              :<button onClick={startBattle} style={{padding:'12px 24px',border:'none',borderRadius:8,background:'#2196F3',color:'#fff',cursor:'pointer',fontWeight:'bold'}}>🔍 Search Floor</button>}
+          <div style={{width:320,display:'flex',flexDirection:'column',gap:16}}>
+            <div style={{background:'linear-gradient(180deg,#161c2a 0%,#101827 100%)',borderRadius:18,padding:18,border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 16px 30px rgba(0,0,0,0.2)'}}>
+              <div style={{display:'flex',alignItems:'center',gap:12}}>
+                <div style={{width:80,height:80,borderRadius:16,background:'rgba(255,255,255,0.05)',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden',border:'1px solid rgba(255,255,255,0.08)'}}>
+                  <img src={withPublicBase(`vendor/showdown/sprites/trainers/${trainerSprite}.png`)} alt="Trainer" onError={(event)=>{ const image = event.currentTarget as HTMLImageElement; image.src = withPublicBase(`vendor/showdown/sprites/trainers/${DEFAULT_TRAINER_SPRITE}.png`); }} style={{width:72,height:72,imageRendering:'pixelated',objectFit:'contain'}} />
+                </div>
+                <div>
+                  <div style={{fontSize:11,color:'#9fb4d9',textTransform:'uppercase',letterSpacing:'0.12em'}}>Trainer</div>
+                  <div style={{fontSize:22,fontWeight:800,color:'#fff',marginTop:2}}>You</div>
+                  <div style={{fontSize:12,color:'#c0d0fa'}}>Sprite: {trainerSprite}</div>
+                </div>
+              </div>
+            </div>
 
-            {floor<FINAL_BOSS_FLOOR-1&&(<button onClick={advanceFloor} style={{padding:'10px 16px',border:'none',borderRadius:6,background:'#5cb85c',color:'#fff'}}>→ Next Floor</button>)}
-          </div>
+            <div style={{background:'linear-gradient(180deg,#111827 0%,#1b273d 100%)',borderRadius:18,padding:18,border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 16px 30px rgba(0,0,0,0.18)'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div>
+                  <div style={{fontSize:11,color:'#9fb4d9',textTransform:'uppercase',letterSpacing:'0.12em'}}>Town Shop</div>
+                  <div style={{fontSize:18,fontWeight:800,color:'#fff',marginTop:4}}>{activeTown ? activeTown.shopName : 'No shop'}</div>
+                </div>
+                <button onClick={()=>setShopOpen((value)=>!value)} style={{padding:'8px 10px',border:'none',borderRadius:8,background:'#ffd76a',color:'#121212',fontWeight:800,cursor:'pointer'}}>{shopOpen ? 'Hide' : 'Open'}</button>
+              </div>
 
-          {/* badge progress */}
-          <div style={{marginTop:20}}>
-            <h4>SoulStone Bosses Defeated ({badgeCount}/{SOULSTONE_TYPES.length+1}):</h4>
-            <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
-              {SOULSTONE_TYPES.map((zt,i)=>(<span key={zt} style={{padding:'4px 10px',borderRadius:4,background:i<badgeCount?'#4caf50':'#ccc',color:'#fff',fontSize:13}}>{i+1}:{zt[0]}</span>))}
+              {activeTown && shopOpen && (
+                <div style={{marginTop:14,display:'flex',flexDirection:'column',gap:10}}>
+                  <div style={{padding:10,borderRadius:10,background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',color:'#dfe9ff'}}>
+                    <strong>{activeTown.name}</strong> • Gym leader <strong>{activeTown.leader}</strong>
+                  </div>
+                  {activeTown.items.map((item)=>(
+                    <div key={item.id} style={{padding:12,borderRadius:10,background:'rgba(14,22,36,0.9)',border:'1px solid rgba(255,255,255,0.08)'}}>
+                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8}}>
+                        <div>
+                          <div style={{fontWeight:700,color:'#fff'}}>{item.name}</div>
+                          <div style={{fontSize:12,color:'#b8c3eb',marginTop:4}}>{item.description}</div>
+                        </div>
+                        <button onClick={()=>buyItem(item)} disabled={playerCoins < item.price} style={{padding:'8px 10px',border:'none',borderRadius:8,background:playerCoins >= item.price ? '#68d391' : '#6b7280',color:'#0c1017',fontWeight:800,cursor:playerCoins >= item.price ? 'pointer' : 'not-allowed'}}>{item.price}¢</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div style={{background:'linear-gradient(180deg,#111827 0%,#182c34 100%)',borderRadius:18,padding:18,border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 16px 30px rgba(0,0,0,0.18)'}}>
+              <div style={{fontSize:11,color:'#9fb4d9',textTransform:'uppercase',letterSpacing:'0.12em'}}>Inventory</div>
+              <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
+                {Object.entries(inventory).map(([key,count])=>(
+                  <div key={key} style={{display:'flex',justifyContent:'space-between',padding:'8px 10px',background:'rgba(255,255,255,0.04)',borderRadius:8,color:'#eef4ff'}}>
+                    <span>{key}</span>
+                    <strong>x{count}</strong>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-
-          {/* floor log */}
-          {battleLog.length>0&&(<div style={{marginTop:20,padding:10,background:'rgba(0,0,0,0.05)',borderRadius:6}}>
-            {battleLog.slice(-8).map((l,i)=>(<div key={i} style={{color:l.type==='system'?'#888':'#333',fontSize:13,padding:'2px 0'}}>{l.msg}</div>))}
-          </div>)}
         </div>)}
 
       {/* ══ BATTLE ══ */}

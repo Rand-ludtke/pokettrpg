@@ -50,10 +50,21 @@ def write_log(msg):
             f.write(f"{ts} {log_line}\n")
 
 def load_type_chart():
-    tc_path = os.path.join(base_dir, "pokemonttrpg-backend", "src", "data", "type-chart.ts")
-    with open(tc_path) as f:
-        content = f.read()
-    return content
+    """Read the actual custom type injection point used by the backend.
+
+    The backend injects custom types directly in src/ps-engine.ts, and there is
+    no committed src/data/type-chart.ts file in this repo. Validating the actual
+    injection site keeps the daemon aligned with the real runtime behavior.
+    """
+    tc_candidates = [
+        os.path.join(base_dir, "pokemonttrpg-backend", "src", "ps-engine.ts"),
+        os.path.join(base_dir, "pokemonttrpg-backend", "src", "data", "type-chart.ts"),
+    ]
+    for tc_path in tc_candidates:
+        if os.path.exists(tc_path):
+            with open(tc_path, encoding="utf-8") as f:
+                return f.read()
+    raise FileNotFoundError("No backend type chart source file found for custom type validation")
 
 def test_all_type_combinations(started_at):
     types = get_soulstones_types()
@@ -123,11 +134,10 @@ def simulate_random_battles(n):
                 if t in ["Crystal","Cosmic","Nuclear","Stellar","Sound","Light"]:
                     custom_types_seen.add(t)
                 
-                # Verify type exists in chart file
-                tc_path = os.path.join(base_dir, "pokemonttrpg-backend", "src", "data", "type-chart.ts")
-                with open(tc_path) as f:
-                    if t not in f.read():
-                        CRITICAL_ERRORS.append(f"Type {t} missing from chart during battle test")
+                # Verify type exists in the real custom-type injection source
+                chart_content = load_type_chart()
+                if t not in chart_content:
+                    CRITICAL_ERRORS.append(f"Type {t} missing from chart during battle test")
             
             battles_tested += 1
             
