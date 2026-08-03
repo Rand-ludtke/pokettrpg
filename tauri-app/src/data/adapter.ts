@@ -1,6 +1,7 @@
 import { BattlePokemon, Pokemon } from '../types';
 import { calculateHp } from '../rules';
 import { withPublicBase } from '../utils/publicBase';
+import { parsePokeathlonDex } from './pokeathlon-dex-loader';
 
 export type DexSpecies = {
   name: string;
@@ -707,13 +708,19 @@ export async function loadShowdownDex(options?: { base?: string }) {
     }
   };
   // prefer JSON if present for faster parse
-  const [pokedex, moves, abilities, items, learnsets, aliases] = await Promise.all([
+  const [pokedex, moves, abilities, items, learnsets, aliases, pokeathlonDex] = await Promise.all([
     loadShowdownDataJson<DexIndex>('pokedex.json', { base: options?.base, required: true }),
     loadShowdownDataJson<MoveIndex>('moves.json', { base: options?.base, required: true }),
     loadShowdownDataJson<AbilityIndex>('abilities.json', { base: options?.base, defaultValue: {} as AbilityIndex }),
     loadShowdownDataJson<ItemIndex>('items.json', { base: options?.base, defaultValue: {} as ItemIndex }),
     loadShowdownDataJson<LearnsetsIndex>('learnsets.json', { base: options?.base, defaultValue: {} as LearnsetsIndex }),
     Promise.resolve({} as AliasesIndex),
+    parsePokeathlonDex('https://play.pokeathlon.com/data/pokedex.js?0.6962044376777488').catch(() => ({
+      dex: {} as DexIndex,
+      soulstoneEntries: [],
+      capKeys: [],
+      regionalKeys: [],
+    })),
   ]);
 
   const [sagePokedex, sageLearnsets, sageMoves, sageAbilities, sageItems] = await Promise.all([
@@ -805,6 +812,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumDex || {}) as DexIndex),
     ...((infinityDex || {}) as DexIndex),
     ...((mariomonDex || {}) as DexIndex),
+    ...((pokeathlonDex?.dex || {}) as DexIndex),
   } as DexIndex;
   const mergedBaseLearnsets = {
     ...(learnsets as LearnsetsIndex),
@@ -854,6 +862,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
   addSourceTags((uraniumDex || {}) as Record<string, any>, 'uranium');
   addSourceTags((infinityDex || {}) as Record<string, any>, 'infinity');
   addSourceTags((mariomonDex || {}) as Record<string, any>, 'mariomon');
+  addSourceTags((pokeathlonDex?.dex || {}) as Record<string, any>, 'pokeathlon');
 
   // Build Pokeathlon fangame sprite source map for sprite resolution
   const fangameSpriteMap = new Map<string, string>();
@@ -2621,12 +2630,11 @@ let gDexMapsBuilt = false;
 
 /** Ensure dex number maps are built (idempotent). Call after loadShowdownDex(). */
 export function buildDexNumMaps(dex: DexIndex): void {
-  if (gDexMapsBuilt) return;
   gNumToName = {};
   gNameToNum = {};
   for (const [key, entry] of Object.entries(dex)) {
-    const num = (entry as any).num as number | undefined;
-    if (num == null || num === 0) continue;
+    const num = Number((entry as any).num);
+    if (!Number.isFinite(num) || num === 0) continue;
     const name = normalizeName(entry.name || key);
     if (!gNumToName[num]) gNumToName[num] = name;
     gNameToNum[name] = num;

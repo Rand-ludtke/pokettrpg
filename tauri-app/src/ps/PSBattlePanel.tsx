@@ -636,8 +636,11 @@ function getPokemonIconStyle(species: string | undefined): React.CSSProperties {
       num = iconIndexes[speciesId];
     }
     
-    // Clamp to valid range
-    if (num < 0 || num > 1500) num = 0;
+    // Allow custom dex entries that exceed the base 1500 range. The PS icon sheet
+    // is still used when available, but oversized custom dex numbers are valid and
+    // should not be flattened to zero during lookup.
+    if (!Number.isFinite(num) || num < 0) num = 0;
+    if (num > 50000) num = 0;
     
     // Calculate position in sprite sheet (12 icons per row, each 40x30)
     const top = Math.floor(num / 12) * 30;
