@@ -24,8 +24,9 @@ function isCustomSpecies(e: unknown): e is Record<string, unknown> {
   if (!e || typeof e !== 'object') return false;
   const obj = e as Record<string, unknown>;
   const num = Number(obj.num);
+  const typesArr = Array.isArray(obj.types) ? (obj.types as unknown[]) : [];
   // Species with num >= 2500 that don't have a standard primary type are custom/brand-new.
-  return Number.isFinite(num) && num >= 2500 && !STANDARD_TYPES.has(String(obj.types?.[0] || ''));
+  return Number.isFinite(num) && num >= 2500 && !STANDARD_TYPES.has(String(typesArr[0] || ''));
 }
 
 type PokedexEntry = Record<string, unknown> & {
@@ -146,7 +147,7 @@ function normalisePokeathlonEntry(
 ): DexSpecies {
   const s = entry as any; // Pokeathlon uses the same field names as showdown except some small renames.
 
-  return {
+  const result: any = {
     name: String(s.name || rawKey),
     baseSpecies: String(s.baseSpecies || s.name || rawKey),
     types: Array.isArray(s.types) ? [...s.types] : ['Normal'],
@@ -181,9 +182,10 @@ function normalisePokeathlonEntry(
     // Pokeathlon source tags (exposed internally).
     _pokeathlonSource: 'pokedex.js',
     _pokeathlonRawKey: rawKey,
-    _soulstoneTypes: hasSoulstoneType(s.types) ? s.types.filter(t => SOULSTONE_TYPES.includes(t)) : [],
+    _soulstoneTypes: hasSoulstoneType(s.types) ? s.types.filter((t: string) => SOULSTONE_TYPES.includes(t as typeof SOULSTONE_TYPES[number])) : [],
     _customSpecies: isCustomSpecies(entry),
   };
+  return result as DexSpecies;
 }
 
 export type DexIndex = Record<string, DexSpecies>;

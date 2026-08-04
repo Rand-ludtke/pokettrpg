@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "sync:sage-data": "node scripts/sync-sage-data.mjs",
+    "fetch:pokeathlon": "node scripts/fetch-pokeathlon-dex.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:tauri": "tsc -b && vite build --mode tauri",

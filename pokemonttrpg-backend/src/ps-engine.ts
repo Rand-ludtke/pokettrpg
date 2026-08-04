@@ -71,6 +71,26 @@ function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
 		isNonstandard: "Custom",
 		damageTaken: { Bug:0, Cosmic:0, Dark:0, Dragon:0, Electric:0, Fairy:0, Fighting:0, Fire:3, Flying:0, Ghost:0, Grass:0, Ground:0, Ice:0, Normal:2, Nuclear:1, Poison:0, Psychic:0, Rock:0, Steel:0, Stellar:0, Water:0 },
 	};
+	// Crystal type (Soulstones)
+	tc.crystal = {
+		isNonstandard: "Custom",
+		damageTaken: { Bug:0, Cosmic:0, Dark:0, Dragon:0, Electric:0, Fairy:0, Fighting:1, Fire:0, Flying:0, Ghost:0, Grass:0, Ground:0, Ice:2, Normal:0, Nuclear:0, Poison:0, Psychic:0, Rock:2, Sound:1, Steel:2, Stellar:0, Water:0, Light:0 },
+	};
+	// Stellar type (Soulstones)
+	tc.stellar = {
+		isNonstandard: "Custom",
+		damageTaken: { Bug:0, Cosmic:0, Crystal:0, Dark:1, Dragon:1, Electric:0, Fairy:0, Fighting:0, Fire:0, Flying:0, Ghost:2, Grass:0, Ground:0, Ice:0, Normal:0, Nuclear:0, Poison:0, Psychic:2, Rock:0, Sound:0, Steel:0, Water:0, Light:0 },
+	};
+	// Sound type (Soulstones)
+	tc.sound = {
+		isNonstandard: "Custom",
+		damageTaken: { Bug:0, Cosmic:0, Crystal:0, Dark:0, Dragon:0, Electric:0, Fairy:0, Fighting:1, Fire:0, Flying:0, Ghost:2, Grass:0, Ground:0, Ice:0, Normal:0, Nuclear:0, Poison:0, Psychic:0, Rock:2, Steel:2, Stellar:0, Water:0, Light:0 },
+	};
+	// Light type (Soulstones)
+	tc.light = {
+		isNonstandard: "Custom",
+		damageTaken: { Bug:2, Cosmic:0, Crystal:0, Dark:1, Dragon:0, Electric:0, Fairy:0, Fighting:0, Fire:0, Flying:0, Ghost:2, Grass:0, Ground:0, Ice:0, Normal:0, Nuclear:0, Poison:0, Psychic:0, Rock:0, Sound:0, Steel:0, Stellar:0, Water:0 },
+	};
 	// Add Nuclear/Cosmic to existing types' damageTaken
 	const seFromNuclear = ["bug","dark","dragon","electric","fairy","fighting","fire","flying","ghost","grass","ground","ice","normal","poison","psychic","rock","water"];
 	for (const t of seFromNuclear) { if (tc[t]) tc[t].damageTaken.Nuclear = 1; }
@@ -79,6 +99,25 @@ function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
 	if (tc.fairy) tc.fairy.damageTaken.Cosmic = 1;
 	if (tc.normal) tc.normal.damageTaken.Cosmic = 1;
 	if (tc.psychic) tc.psychic.damageTaken.Cosmic = 2;
+	// Crystal SE on Ice/Rock/Steel (shatters them); resisted by Fighting (blunt force breaks it)
+	if (tc.ice) tc.ice.damageTaken.Crystal = 1;
+	if (tc.rock) tc.rock.damageTaken.Crystal = 1;
+	if (tc.steel) tc.steel.damageTaken.Crystal = 1;
+	if (tc.fighting) tc.fighting.damageTaken.Crystal = 2;
+	// Stellar SE on Psychic/Ghost (cosmic energy pierces the ethereal); resisted by Dark/Dragon
+	if (tc.psychic) tc.psychic.damageTaken.Stellar = 1;
+	if (tc.ghost) tc.ghost.damageTaken.Stellar = 1;
+	if (tc.dark) tc.dark.damageTaken.Stellar = 2;
+	if (tc.dragon) tc.dragon.damageTaken.Stellar = 2;
+	// Sound SE on Rock/Steel (resonance shatters); resisted by Fighting; immune for Ghost is inverted (Ghost weak here)
+	if (tc.rock) tc.rock.damageTaken.Sound = 1;
+	if (tc.steel) tc.steel.damageTaken.Sound = 1;
+	if (tc.ghost) tc.ghost.damageTaken.Sound = 1;
+	if (tc.fighting) tc.fighting.damageTaken.Sound = 2;
+	// Light SE on Dark/Ghost (illuminates); resisted by Bug
+	if (tc.dark) tc.dark.damageTaken.Light = 1;
+	if (tc.ghost) tc.ghost.damageTaken.Light = 1;
+	if (tc.bug) tc.bug.damageTaken.Light = 2;
 	Object.assign(Dex.data.Moves, normalizedCustomMoves);
 	Object.assign(Dex.data.Abilities, customAbilityPatches);
 	// Clear cached lookups so Dex re-reads custom data

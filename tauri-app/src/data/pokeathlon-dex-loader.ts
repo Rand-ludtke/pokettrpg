@@ -29,7 +29,7 @@ import { SOULSTONE_TYPES } from './soulstones';
 // ---------------------------------------------------------------------------
 
 /** Lower-case set of soulstone type names for fast membership test. */
-const SOULSTONE_TYPE_SET = new Set(SOULSTONE_TYPES.map(t => t.toLowerCase()));
+const SOULSTONE_TYPE_SET = new Set(SOULSTONE_TYPES.map((t: string) => t.toLowerCase()));
 
 /** Raw BattlePokedex entry as emitted by pokeathlon. */
 interface RawPokeEntry {
