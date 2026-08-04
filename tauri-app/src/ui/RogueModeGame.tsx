@@ -1,14 +1,62 @@
 // RogueModeGame.tsx — PokeRogue-style dungeon-crawl mode built on the REAL merged Pokedex
 // (base Showdown dex + Sage/Insurgence/Wylin/Uranium/Infinity/Mariomon/Pokeathlon-Soulstones,
-// 4000+ species total). Starts with a single starter, allows full backtracking through every
-// previously-visited route to re-search for wild Pokemon/items, and features a full 8-gym
-// bracket (2 leader variants per type for variety) plus an Elite Four and Champion gauntlet,
-// all using real dex species/sprites/types instead of procedurally-generated placeholder mons.
+// 4000+ species total). Starts with a chosen starter from ANY generation, allows full
+// backtracking through every previously-visited route, features a persistent recurring
+// rival, seed-based deterministic run generation, true permadeath, and a PokeRogue/mainline
+// -style battle arena + overworld route visual. The entire run is persisted to localStorage
+// so switching app tabs never resets progress — it resumes exactly where you left off.
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { loadShowdownDex, spriteUrl, iconUrl, type DexIndex, type DexSpecies } from '../data/adapter';
 import { getClient } from '../net/pokettrpgClient';
 import { withPublicBase } from '../utils/publicBase';
+
+// ──────────────────────────────── SEEDED RNG ─────────────────────────────────
+// Deterministic PRNG so a given seed always reproduces the same map layout,
+// gym-order, rival identity, leader variants and wild encounters (PokeRogue-style
+// run variation via seeds). Battle-turn randomness (miss chance, AI move choice)
+// intentionally still uses Math.random so battles themselves stay unpredictable.
+
+function xmur3(str: string): () => number {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function () {
+    h = Math.imul(h ^ (h >>> 16), 2246822519);
+    h = Math.imul(h ^ (h >>> 13), 3266489917);
+    h = (h ^= h >>> 16) >>> 0;
+    return h;
+  };
+}
+function mulberry32(a: number): () => number {
+  return function () {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function createRng(seed: string): () => number {
+  const seedFn = xmur3(seed || 'pokerogue');
+  return mulberry32(seedFn());
+}
+function randomSeedString(): string {
+  return Math.random().toString(36).slice(2, 10);
+}
+function shuffle<T>(arr: T[], rng: () => number): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pickRandom<T>(arr: T[], rng: () => number = Math.random): T | undefined {
+  if (!arr.length) return undefined;
+  return arr[Math.floor(rng() * arr.length)];
+}
 
 // ──────────────────────────────── TYPES ─────────────────────────────────────
 
@@ -17,21 +65,20 @@ interface RogueMon {
   displayName: string;
   types: string[];
   level: number;
+  /** Raw base stats from the dex — preserved so level-ups can recompute real stats. */
+  base: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
+  /** Difficulty multiplier applied on top of base stats (trainer/boss mons hit harder). */
+  mult: number;
   currentHp: number;
   maxHp: number;
-  baseAtk: number;
-  baseDef: number;
-  baseSpa: number;
-  baseSpd: number;
-  baseSpe: number;
+  atk: number; def: number; spa: number; spd: number; spe: number;
   moves: string[];
 }
 interface LogEntry { msg: string; type: 'action' | 'damage' | 'heal' | 'win' | 'lose' | 'system' | 'item'; }
 type GamePhase = 'loading' | 'main_menu' | 'starter_select' | 'exploring' | 'battle' | 'victory' | 'game_over';
 type NodeKind = 'route' | 'town' | 'rival' | 'gym' | 'elite4' | 'champion';
 
-interface GymLeaderDef { name: string; type: string; badge: string; }
-interface RivalDef { name: string; dialogue: string; }
+interface GymLeaderDef { name: string; type: string; badge: string; sprite: string; }
 
 interface MapNode {
   id: string;
@@ -40,15 +87,56 @@ interface MapNode {
   type: string; // primary theme type for this node (route encounters / gym specialty)
   levelLo: number;
   levelHi: number;
+  bg: string; // background image key (gen6bgs)
   gymDef?: GymLeaderDef;
-  rivalDef?: RivalDef;
+  rivalOccurrence?: number; // 1-based count of which rival appearance this is
   cleared?: boolean;
 }
 
 interface ShopItem { id: string; name: string; price: number; description: string; effect: 'heal' | 'boost' | 'utility'; }
 interface ShopInfo { name: string; leader: string; shopName: string; items: ShopItem[]; }
+interface RivalInfo { name: string; sprite: string; }
 
-// ──────────────────────── TYPE COLOR PALETTE ─────────────────────────────────
+// ──────────────────── PERSISTENT RUN STORAGE (survives tab switches) ────────
+
+const RUN_STORAGE_KEY = 'ttrpg.rogueRun.v3';
+const RUN_STORAGE_VERSION = 3;
+
+interface PersistedRun {
+  version: number;
+  seed: string;
+  phase: GamePhase;
+  mapNodes: MapNode[];
+  currentIndex: number;
+  maxReached: number;
+  playerTeam: RogueMon[];
+  enemyTeam: RogueMon[];
+  badgeCount: number;
+  xpTotal: number;
+  playerCoins: number;
+  inventory: Record<string, number>;
+  battleLog: LogEntry[];
+  battleContext: 'wild' | 'trainer';
+  rival: RivalInfo | null;
+}
+
+function loadPersistedRun(): PersistedRun | null {
+  try {
+    const raw = window.localStorage?.getItem(RUN_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedRun;
+    if (!parsed || parsed.version !== RUN_STORAGE_VERSION) return null;
+    return parsed;
+  } catch { return null; }
+}
+function savePersistedRun(run: PersistedRun): void {
+  try { window.localStorage?.setItem(RUN_STORAGE_KEY, JSON.stringify(run)); } catch {}
+}
+function clearPersistedRun(): void {
+  try { window.localStorage?.removeItem(RUN_STORAGE_KEY); } catch {}
+}
+
+// ──────────────────── TYPE COLOR PALETTE ─────────────────────────────────
 
 const TYPE_COLORS: Record<string, string> = {
   Normal: '#a8a77a', Fire: '#ee8130', Water: '#6390f0', Electric: '#f7d02c', Grass: '#7ac74c', Ice: '#96d9d6',
@@ -80,6 +168,13 @@ function getTrainerSpriteValue(): string {
     if (stored) return stored;
   }
   return DEFAULT_TRAINER_SPRITE;
+}
+
+function trainerPortraitUrl(spriteId: string): string {
+  return withPublicBase(`vendor/showdown/sprites/trainers/${spriteId}.png`);
+}
+function battleBgUrl(bg: string): string {
+  return withPublicBase(`vendor/showdown/sprites/gen6bgs/${bg}.jpg`);
 }
 
 // ──────────── FULL TYPE EFFECTIVENESS CHART (18 standard + 6 soulstone) ─────
@@ -195,33 +290,48 @@ function pickMovesForTypes(types: string[]): string[] {
   return out.slice(0, 4);
 }
 
-// ──────────────────── GYM / ELITE FOUR / CHAMPION DEFINITIONS ────────────────
+// ──────────────────── GYM / ELITE FOUR / CHAMPION / RIVAL DEFINITIONS ────────
 
 const GYM_TYPES = ['Rock', 'Fire', 'Water', 'Electric', 'Grass', 'Psychic', 'Ice', 'Dragon'];
 const ELITE_FOUR_TYPES = ['Ghost', 'Dark', 'Fighting', 'Steel'];
 
-// 2 leader variants per gym type for variety — one is randomly picked per new run.
-const GYM_LEADER_POOL: Record<string, { name: string; badge: string }[]> = {
-  Rock: [{ name: 'Boulder Baron Cole', badge: 'Boulder Badge' }, { name: 'Quarry Queen Thea', badge: 'Boulder Badge' }],
-  Fire: [{ name: 'Ember Master Ryu', badge: 'Flame Badge' }, { name: 'Blaze Captain Nia', badge: 'Flame Badge' }],
-  Water: [{ name: 'Tide Warden Mika', badge: 'Wave Badge' }, { name: 'Current Captain Dez', badge: 'Wave Badge' }],
-  Electric: [{ name: 'Volt Ace Jax', badge: 'Bolt Badge' }, { name: 'Circuit Sage Amy', badge: 'Bolt Badge' }],
-  Grass: [{ name: 'Bloom Keeper Fen', badge: 'Leaf Badge' }, { name: 'Thicket Guard Lio', badge: 'Leaf Badge' }],
-  Psychic: [{ name: 'Mind Seer Yuna', badge: 'Mind Badge' }, { name: 'Oracle Wren', badge: 'Mind Badge' }],
-  Ice: [{ name: 'Frost Warden Kai', badge: 'Frost Badge' }, { name: 'Glacier Queen Sol', badge: 'Frost Badge' }],
-  Dragon: [{ name: 'Wyrm Lord Drex', badge: 'Dragon Badge' }, { name: 'Skyfang Rho', badge: 'Dragon Badge' }],
+// 2 leader variants per gym type for variety — one is randomly picked per new run (seeded).
+// Sprites are verified-existing files in vendor/showdown/sprites/trainers/.
+const GYM_LEADER_POOL: Record<string, { name: string; badge: string; sprite: string }[]> = {
+  Rock: [{ name: 'Roxanne', badge: 'Boulder Badge', sprite: 'roxanne' }, { name: 'Roark', badge: 'Boulder Badge', sprite: 'roark' }],
+  Fire: [{ name: 'Blaine', badge: 'Flame Badge', sprite: 'blaine' }, { name: 'Flannery', badge: 'Flame Badge', sprite: 'flannery' }],
+  Water: [{ name: 'Misty', badge: 'Wave Badge', sprite: 'misty' }, { name: 'Juan', badge: 'Wave Badge', sprite: 'juan' }],
+  Electric: [{ name: 'Lt. Surge', badge: 'Bolt Badge', sprite: 'ltsurge' }, { name: 'Wattson', badge: 'Bolt Badge', sprite: 'wattson' }],
+  Grass: [{ name: 'Erika', badge: 'Leaf Badge', sprite: 'erika' }, { name: 'Gardenia', badge: 'Leaf Badge', sprite: 'gardenia' }],
+  Psychic: [{ name: 'Sabrina', badge: 'Mind Badge', sprite: 'sabrina' }, { name: 'Olympia', badge: 'Mind Badge', sprite: 'olympia' }],
+  Ice: [{ name: 'Pryce', badge: 'Frost Badge', sprite: 'pryce' }, { name: 'Brycen', badge: 'Frost Badge', sprite: 'brycen' }],
+  Dragon: [{ name: 'Clair', badge: 'Dragon Badge', sprite: 'clair' }, { name: 'Drayden', badge: 'Dragon Badge', sprite: 'drayden' }],
 };
 
-const ELITE_FOUR_LEADERS: { type: string; name: string }[] = [
-  { type: 'Ghost', name: 'Elite Four • Specter Mora' },
-  { type: 'Dark', name: 'Elite Four • Shade Korrin' },
-  { type: 'Fighting', name: 'Elite Four • Brawn Talis' },
-  { type: 'Steel', name: 'Elite Four • Forge Adair' },
+const ELITE_FOUR_LEADERS: { type: string; name: string; sprite: string }[] = [
+  { type: 'Ghost', name: 'Elite Four • Koga', sprite: 'koga' },
+  { type: 'Dark', name: 'Elite Four • Karen', sprite: 'karen' },
+  { type: 'Fighting', name: 'Elite Four • Bruno', sprite: 'bruno' },
+  { type: 'Steel', name: 'Elite Four • Will', sprite: 'will' },
 ];
 
-const CHAMPION_NAME = 'Champion Astra';
+const CHAMPION_NAME = 'Champion Cynthia';
+const CHAMPION_SPRITE = 'cynthia';
 
-const RIVAL_NAMES = ['Rival Ash', 'Rival Koa', 'Rival Vex', 'Rival Juno'];
+// Persistent recurring rival — one is chosen (seeded) per run and grows stronger every time
+// they reappear, instead of being a random one-off encounter type.
+const RIVAL_POOL: RivalInfo[] = [
+  { name: 'Rival Hilbert', sprite: 'hilbert' },
+  { name: 'Rival Hilda', sprite: 'hilda' },
+  { name: 'Rival Calem', sprite: 'calem' },
+  { name: 'Rival Serena', sprite: 'serena' },
+  { name: 'Rival Elio', sprite: 'elio' },
+  { name: 'Rival Selene', sprite: 'selene' },
+  { name: 'Rival Brendan', sprite: 'brendan' },
+  { name: 'Rival May', sprite: 'may' },
+  { name: 'Rival Silver', sprite: 'silver' },
+  { name: 'Rival Gloria', sprite: 'gloria' },
+];
 
 const SHOP_MAP: Record<string, ShopInfo> = {
   Rock: { name: 'Quarry Town', leader: 'Gym Leader', shopName: 'Boulder Bazaar', items: [{ id: 'potion', name: 'Potion', price: 25, description: 'Restores 30% health', effect: 'heal' }, { id: 'boost', name: 'Focus Sash', price: 40, description: 'Boosts offense for one battle', effect: 'boost' }, { id: 'utility', name: 'Escape Rope', price: 30, description: 'Utility item', effect: 'utility' }] },
@@ -255,15 +365,31 @@ function buildSpeciesPool(dex: DexIndex): SpeciesPool {
   return { byType, all };
 }
 
-function pickRandom<T>(arr: T[]): T | undefined {
-  if (!arr.length) return undefined;
-  return arr[Math.floor(Math.random() * arr.length)];
+function pickSpeciesOfType(pool: SpeciesPool, type: string, rng: () => number): string | undefined {
+  const bucket = pool.byType[type];
+  if (bucket && bucket.length) return pickRandom(bucket, rng);
+  return pickRandom(pool.all, rng);
 }
 
-function pickSpeciesOfType(pool: SpeciesPool, type: string): string | undefined {
-  const bucket = pool.byType[type];
-  if (bucket && bucket.length) return pickRandom(bucket);
-  return pickRandom(pool.all);
+// Background image chosen per node type — mimics a mainline battle backdrop that fits the theme.
+const TYPE_BG: Record<string, string[]> = {
+  Rock: ['bg-earthycave', 'bg-dampcave'],
+  Fire: ['bg-desert', 'bg-orasdesert'],
+  Water: ['bg-orassea', 'bg-deepsea', 'bg-beach'],
+  Electric: ['bg-city', 'bg-darkcity'],
+  Grass: ['bg-forest', 'bg-meadow', 'bg-darkmeadow'],
+  Psychic: ['bg-library'],
+  Ice: ['bg-icecave'],
+  Dragon: ['bg-skypillar'],
+  Ghost: ['bg-elite4drake'],
+  Dark: ['bg-elite4drake'],
+  Fighting: ['bg-elite4drake'],
+  Steel: ['bg-elite4drake'],
+  Normal: ['bg-meadow', 'bg-darkbeach'],
+};
+function bgFor(type: string, rng: () => number): string {
+  const arr = TYPE_BG[type] || TYPE_BG.Normal;
+  return arr[Math.floor(rng() * arr.length)] || 'bg-meadow';
 }
 
 function statAt(base: number, level: number): number {
@@ -273,30 +399,54 @@ function hpAt(base: number, level: number): number {
   return Math.floor(((2 * base + 31) * level) / 100) + level + 10;
 }
 
+/** Compute all level-adjusted battle stats from raw base stats + difficulty multiplier. */
+function computeMonStats(base: RogueMon['base'], level: number, mult: number) {
+  return {
+    maxHp: Math.max(1, Math.floor(hpAt(base.hp, level) * mult)),
+    atk: Math.max(1, Math.floor(statAt(base.atk, level) * mult)),
+    def: Math.max(1, Math.floor(statAt(base.def, level) * mult)),
+    spa: Math.max(1, Math.floor(statAt(base.spa, level) * mult)),
+    spd: Math.max(1, Math.floor(statAt(base.spd, level) * mult)),
+    spe: Math.max(1, Math.floor(statAt(base.spe, level) * mult)),
+  };
+}
+
 function buildRogueMon(key: string, entry: DexSpecies, level: number, isBoss = false): RogueMon {
   const bs = entry.baseStats;
+  const base = { hp: bs.hp || 1, atk: bs.atk || 1, def: bs.def || 1, spa: bs.spa || 1, spd: bs.spd || 1, spe: bs.spe || 1 };
   const mult = isBoss ? 1.15 : 1;
-  const maxHp = Math.max(1, Math.floor(hpAt(bs.hp, level) * mult));
+  const stats = computeMonStats(base, level, mult);
   return {
     speciesId: key,
     displayName: entry.name || key,
     types: entry.types,
     level,
-    currentHp: maxHp,
-    maxHp,
-    baseAtk: Math.floor(statAt(bs.atk, level) * mult),
-    baseDef: Math.floor(statAt(bs.def, level) * mult),
-    baseSpa: Math.floor(statAt(bs.spa, level) * mult),
-    baseSpd: Math.floor(statAt(bs.spd, level) * mult),
-    baseSpe: Math.floor(statAt(bs.spe, level) * mult),
+    base,
+    mult,
+    currentHp: stats.maxHp,
+    maxHp: stats.maxHp,
+    atk: stats.atk, def: stats.def, spa: stats.spa, spd: stats.spd, spe: stats.spe,
     moves: pickMovesForTypes(entry.types),
   };
 }
 
-function execMove(attacker: RogueMon, defenderTypes: string[], moveName: string): { damage: number; label: string; miss: boolean } {
+/** Recompute a RogueMon's real battle stats for a new level, preserving current HP % (fixes
+ *  the bug where leveling up only changed the displayed number with no real stat gain). */
+function recomputeLevel(mon: RogueMon, newLevel: number): RogueMon {
+  const frac = mon.maxHp > 0 ? mon.currentHp / mon.maxHp : 1;
+  const stats = computeMonStats(mon.base, newLevel, mon.mult);
+  return {
+    ...mon,
+    level: newLevel,
+    maxHp: stats.maxHp, atk: stats.atk, def: stats.def, spa: stats.spa, spd: stats.spd, spe: stats.spe,
+    currentHp: Math.max(1, Math.round(stats.maxHp * frac)),
+  };
+}
+
+function execMove(attacker: RogueMon, defender: RogueMon, moveName: string): { damage: number; label: string; miss: boolean } {
   const mv = MOVES_DB[moveName];
   if (!mv) return { damage: 0, label: '', miss: false };
-  const eff = getEffectiveness(mv.type, defenderTypes);
+  const eff = getEffectiveness(mv.type, defender.types);
   let label: string;
   if (eff > 1) label = `✨${Math.round(eff * 100)}%`;
   else if (eff === 0) label = '🚫 No Effect!';
@@ -304,140 +454,269 @@ function execMove(attacker: RogueMon, defenderTypes: string[], moveName: string)
   else label = '';
   if (Math.random() < 0.08) return { damage: 0, label: '💨 Missed!', miss: true };
   if (mv.category === 'status') return { damage: 0, label: '', miss: false };
-  const atkSt = mv.category === 'physical' ? attacker.baseAtk : attacker.baseSpa;
-  const defSt = Math.max(attacker.baseDef * 0.8, 1);
+  const atkSt = mv.category === 'physical' ? attacker.atk : attacker.spa;
+  const defSt = Math.max((mv.category === 'physical' ? defender.def : defender.spd) * 0.8, 1);
   const baseDmg = ((2 * attacker.level / 5 + 2) * mv.power * atkSt / (defSt * 50)) + 2;
   return { damage: Math.max(1, Math.floor(baseDmg * eff)), label, miss: false };
 }
 
-// ──────────────────────── MAP GENERATION (backtrack-capable) ─────────────────
+// ──────────────────────── MAP GENERATION (seeded, backtrack-capable) ─────────
 
-function buildMapNodes(): MapNode[] {
+function buildMapNodes(rng: () => number): MapNode[] {
   const nodes: MapNode[] = [];
-  GYM_TYPES.forEach((type, i) => {
+  const gymOrder = shuffle(GYM_TYPES, rng);
+  let rivalCount = 0;
+  gymOrder.forEach((type, i) => {
     const lo = 6 + i * 10;
     const hi = lo + 8;
-    nodes.push({ id: `route_${i}`, kind: 'route', name: `${type} Route`, type, levelLo: lo, levelHi: hi });
+    nodes.push({ id: `route_${i}`, kind: 'route', name: `${type} Route`, type, levelLo: lo, levelHi: hi, bg: bgFor(type, rng) });
     if (i % 2 === 1) {
-      nodes.push({ id: `rival_${i}`, kind: 'rival', name: `${RIVAL_NAMES[Math.floor(i / 2) % RIVAL_NAMES.length]} Appears!`, type, levelLo: lo + 2, levelHi: hi + 2 });
+      rivalCount++;
+      nodes.push({ id: `rival_${i}`, kind: 'rival', name: 'Rival Battle', type, levelLo: lo + 2, levelHi: hi + 2, bg: bgFor('Normal', rng), rivalOccurrence: rivalCount });
     }
-    const leaderChoice = pickRandom(GYM_LEADER_POOL[type]) || GYM_LEADER_POOL[type][0];
+    const leaderChoice = pickRandom(GYM_LEADER_POOL[type], rng) || GYM_LEADER_POOL[type][0];
     nodes.push({
-      id: `gym_${i}`, kind: 'gym', name: `${type} Gym`, type, levelLo: hi + 4, levelHi: hi + 8,
-      gymDef: { name: leaderChoice.name, type, badge: leaderChoice.badge },
+      id: `gym_${i}`, kind: 'gym', name: `${type} Gym`, type, levelLo: hi + 4, levelHi: hi + 8, bg: bgFor(type, rng),
+      gymDef: { name: leaderChoice.name, type, badge: leaderChoice.badge, sprite: leaderChoice.sprite },
     });
-    nodes.push({ id: `town_${i}`, kind: 'town', name: SHOP_MAP[type]?.name || `${type} Town`, type, levelLo: hi, levelHi: hi });
+    nodes.push({ id: `town_${i}`, kind: 'town', name: SHOP_MAP[type]?.name || `${type} Town`, type, levelLo: hi, levelHi: hi, bg: 'bg-aquacordetown' });
   });
-  ELITE_FOUR_TYPES.forEach((type, i) => {
+  const elite4Order = shuffle(ELITE_FOUR_LEADERS, rng);
+  elite4Order.forEach((leader, i) => {
     nodes.push({
-      id: `elite4_${i}`, kind: 'elite4', name: ELITE_FOUR_LEADERS[i].name, type,
-      levelLo: 88 + i * 3, levelHi: 92 + i * 3,
-      gymDef: { name: ELITE_FOUR_LEADERS[i].name, type, badge: 'Elite Emblem' },
+      id: `elite4_${i}`, kind: 'elite4', name: leader.name, type: leader.type,
+      levelLo: 88 + i * 3, levelHi: 92 + i * 3, bg: 'bg-elite4drake',
+      gymDef: { name: leader.name, type: leader.type, badge: 'Elite Emblem', sprite: leader.sprite },
     });
   });
   nodes.push({
-    id: 'champion', kind: 'champion', name: CHAMPION_NAME, type: 'Normal', levelLo: 100, levelHi: 105,
-    gymDef: { name: CHAMPION_NAME, type: 'Normal', badge: 'Champion Crown' },
+    id: 'champion', kind: 'champion', name: CHAMPION_NAME, type: 'Normal', levelLo: 100, levelHi: 105, bg: 'bg-leaderwallace',
+    gymDef: { name: CHAMPION_NAME, type: 'Normal', badge: 'Champion Crown', sprite: CHAMPION_SPRITE },
   });
   return nodes;
 }
 
-function generateTrainerTeam(pool: SpeciesPool, dex: DexIndex, type: string, levelLo: number, levelHi: number, size: number): RogueMon[] {
+function generateTrainerTeam(pool: SpeciesPool, dex: DexIndex, type: string, levelLo: number, levelHi: number, size: number, rng: () => number): RogueMon[] {
   const team: RogueMon[] = [];
   for (let i = 0; i < size; i++) {
-    const key = pickSpeciesOfType(pool, type);
+    const key = pickSpeciesOfType(pool, type, rng);
     if (!key || !dex[key]) continue;
-    const level = levelLo + Math.floor(Math.random() * Math.max(1, levelHi - levelLo));
+    const level = levelLo + Math.floor(rng() * Math.max(1, levelHi - levelLo));
     team.push(buildRogueMon(key, dex[key], level, true));
   }
   return team;
 }
 
-function generateChampionTeam(pool: SpeciesPool, dex: DexIndex, levelLo: number, levelHi: number): RogueMon[] {
+/** Type-diverse team generator used for the Champion and the recurring Rival. */
+function generateDiverseTeam(pool: SpeciesPool, dex: DexIndex, levelLo: number, levelHi: number, size: number, rng: () => number): RogueMon[] {
   const usedTypes = new Set<string>();
   const team: RogueMon[] = [];
-  const shuffledTypes = [...GYM_TYPES, ...ELITE_FOUR_TYPES].sort(() => Math.random() - 0.5);
+  const shuffledTypes = shuffle([...GYM_TYPES, ...ELITE_FOUR_TYPES], rng);
   for (const type of shuffledTypes) {
-    if (team.length >= 6) break;
+    if (team.length >= size) break;
     if (usedTypes.has(type)) continue;
     usedTypes.add(type);
-    const key = pickSpeciesOfType(pool, type);
+    const key = pickSpeciesOfType(pool, type, rng);
     if (!key || !dex[key]) continue;
-    const level = levelLo + Math.floor(Math.random() * Math.max(1, levelHi - levelLo));
+    const level = levelLo + Math.floor(rng() * Math.max(1, levelHi - levelLo));
     team.push(buildRogueMon(key, dex[key], level, true));
   }
   return team;
 }
 
-// ──────────────────────── STARTER DATA (real dex species) ────────────────────
+// ──────────────────────── STARTER DATA (full generational roster) ────────────
 
-const STARTER_KEYS = ['charmander', 'squirtle', 'bulbasaur'];
+const STARTER_GENS: { gen: number; label: string; keys: string[] }[] = [
+  { gen: 1, label: 'Kanto', keys: ['bulbasaur', 'charmander', 'squirtle'] },
+  { gen: 2, label: 'Johto', keys: ['chikorita', 'cyndaquil', 'totodile'] },
+  { gen: 3, label: 'Hoenn', keys: ['treecko', 'torchic', 'mudkip'] },
+  { gen: 4, label: 'Sinnoh', keys: ['turtwig', 'chimchar', 'piplup'] },
+  { gen: 5, label: 'Unova', keys: ['snivy', 'tepig', 'oshawott'] },
+  { gen: 6, label: 'Kalos', keys: ['chespin', 'fennekin', 'froakie'] },
+  { gen: 7, label: 'Alola', keys: ['rowlet', 'litten', 'popplio'] },
+  { gen: 8, label: 'Galar', keys: ['grookey', 'scorbunny', 'sobble'] },
+  { gen: 9, label: 'Paldea', keys: ['sprigatito', 'fuecoco', 'quaxly'] },
+];
 
-// ════════════════════ BATTLE SCREEN SUB-COMPONENT ═════════════════════════
+// ════════════════════ HP BAR / STATUS BOX (mainline-style HUD) ══════════════
 
-interface BattleScreenProps {
-  team: RogueMon[]; enemies: RogueMon[]; log: LogEntry[]; onUseMove: (m: string) => void;
-}
-const MonCard: React.FC<{ mon: RogueMon; active: boolean; isEnemy?: boolean }> = ({ mon, active, isEnemy }) => {
-  const [src, setSrc] = useState(() => spriteUrl(mon.speciesId, false, { back: !isEnemy, forceStatic: true }));
-  useEffect(() => { setSrc(spriteUrl(mon.speciesId, false, { back: !isEnemy, forceStatic: true })); }, [mon.speciesId, isEnemy]);
+const HpBar: React.FC<{ mon: RogueMon; showNumbers?: boolean; align?: 'left' | 'right' }> = ({ mon, showNumbers, align = 'left' }) => {
+  const pct = mon.maxHp > 0 ? Math.max(0, Math.min(100, (mon.currentHp / mon.maxHp) * 100)) : 0;
+  const color = pct > 50 ? '#4caf50' : pct > 20 ? '#ffca28' : '#ff4444';
   return (
     <div style={{
-      padding: 8, background: mon.currentHp > 0 ? (isEnemy ? '#30475e' : '#16213e') : '#3d0f0f', borderRadius: 6,
-      border: active ? '2px solid gold' : '1px solid #444', opacity: mon.currentHp <= 0 ? 0.5 : 1, minWidth: 200,
-      display: 'flex', gap: 8, alignItems: 'center',
+      background: 'rgba(248,250,255,0.96)', borderRadius: 10, padding: '8px 12px', minWidth: 190,
+      boxShadow: '0 6px 14px rgba(0,0,0,0.35)', border: '2px solid #2b2b40', textAlign: align,
     }}>
-      <img
-        src={src}
-        onError={() => setSrc(iconUrl(mon.speciesId))}
-        alt={mon.displayName}
-        style={{ width: 48, height: 48, imageRendering: 'pixelated', objectFit: 'contain' }}
-      />
-      <div>
-        <div>{mon.displayName} Lv.{mon.level}</div>
-        <div style={{ color: TYPE_COLORS[mon.types[0]] || '#888', fontSize: 12 }}>{mon.types.join('/')}</div>
-        <div>HP:<span style={{ color: mon.currentHp > mon.maxHp * 0.2 ? '#4caf50' : '#ff4444' }}> {mon.currentHp}/{mon.maxHp}</span></div>
-        <div style={{ height: 6, width: 120, background: '#333', borderRadius: 4, marginTop: 2 }}>
-          <div style={{ height: '100%', width: `${(mon.currentHp / mon.maxHp) * 100}%`, background: mon.currentHp > mon.maxHp * 0.2 ? '#4caf50' : '#ff4444', borderRadius: 4 }} />
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: 13, color: '#222' }}>
+        <span>{mon.displayName}</span><span>Lv{mon.level}</span>
       </div>
+      <div style={{ height: 8, background: '#333', borderRadius: 5, marginTop: 4, overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${pct}%`, background: color, transition: 'width 400ms ease, background 400ms ease' }} />
+      </div>
+      {showNumbers && (
+        <div style={{ fontSize: 11, color: '#444', marginTop: 2, textAlign: 'right' }}>{mon.currentHp}/{mon.maxHp}</div>
+      )}
     </div>
   );
 };
 
-const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMove }) => {
+// ════════════════════ BATTLE SCENE (arena background, positioned sprites) ═══
+
+interface BattleScreenProps {
+  team: RogueMon[]; enemies: RogueMon[]; log: LogEntry[]; onUseMove: (m: string) => void;
+  bg: string; opponentName: string; opponentSprite: string | null; playerTrainerSprite: string;
+}
+
+const BattleSprite: React.FC<{ speciesId: string; back: boolean; size: number }> = ({ speciesId, back, size }) => {
+  const [src, setSrc] = useState(() => spriteUrl(speciesId, false, { back, forceStatic: true }));
+  useEffect(() => { setSrc(spriteUrl(speciesId, false, { back, forceStatic: true })); }, [speciesId, back]);
+  return (
+    <img
+      src={src}
+      onError={() => setSrc(iconUrl(speciesId))}
+      alt={speciesId}
+      style={{ width: size, height: size, imageRendering: 'pixelated', objectFit: 'contain', filter: 'drop-shadow(0 8px 10px rgba(0,0,0,0.45))' }}
+    />
+  );
+};
+
+const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMove, bg, opponentName, opponentSprite, playerTrainerSprite }) => {
   const finished = log.some(l => l.type === 'win' || l.type === 'lose');
-  const activePlayerIdx = team.findIndex(m => m.currentHp > 0);
-  const activeEnemyIdx = enemies.findIndex(m => m.currentHp > 0);
-  const activeMon = team[activePlayerIdx];
+  const activePlayer = team.find(m => m.currentHp > 0);
+  const activeEnemy = enemies.find(m => m.currentHp > 0);
+  const lastMsg = log[log.length - 1]?.msg || '';
 
   return (
-    <div style={{ padding: 20, background: '#1a1a2e', color: '#fff', borderRadius: 10, fontFamily: 'Arial,sans-serif' }}>
-      <h3 style={{ marginBottom: 12 }}>⚔️ Battle Active</h3>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        {team.map((p, i) => <MonCard key={i} mon={p} active={i === activePlayerIdx} />)}
+    <div>
+      <div style={{
+        position: 'relative', width: '100%', height: 440, borderRadius: 18, overflow: 'hidden',
+        border: '4px solid #23233a', boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+        backgroundImage: `linear-gradient(rgba(10,14,26,0.12), rgba(10,14,26,0.4)), url(${battleBgUrl(bg)})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+      }}>
+        {/* Opponent corner: portrait (if trainer) + name + HP box */}
+        {activeEnemy && (
+          <div style={{ position: 'absolute', top: 18, right: 28, textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+            {opponentSprite && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ color: '#fff', fontWeight: 800, textShadow: '0 2px 4px #000', fontSize: 14 }}>{opponentName}</span>
+                <img src={trainerPortraitUrl(opponentSprite)} alt={opponentName} style={{ width: 44, height: 44, imageRendering: 'pixelated' }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+              </div>
+            )}
+            <HpBar mon={activeEnemy} showNumbers={false} align="right" />
+          </div>
+        )}
+        {/* Opponent active sprite, front-facing, upper-mid-right */}
+        {activeEnemy && (
+          <div style={{ position: 'absolute', top: 90, right: 90 }}>
+            <BattleSprite speciesId={activeEnemy.speciesId} back={false} size={110} />
+          </div>
+        )}
+        {/* Enemy bench row */}
+        <div style={{ position: 'absolute', top: 20, left: 20, display: 'flex', gap: 4 }}>
+          {enemies.map((m, i) => (
+            <div key={i} title={m.displayName} style={{ width: 22, height: 22, borderRadius: '50%', background: m.currentHp > 0 ? (TYPE_COLORS[m.types[0]] || '#888') : '#333', opacity: m.currentHp > 0 ? 1 : 0.35, border: '2px solid #111' }} />
+          ))}
+        </div>
+
+        {/* Player active sprite, back-facing, lower-left */}
+        {activePlayer && (
+          <div style={{ position: 'absolute', bottom: 130, left: 60 }}>
+            <BattleSprite speciesId={activePlayer.speciesId} back size={130} />
+          </div>
+        )}
+        {/* Player HP box + trainer portrait, bottom-left-ish */}
+        {activePlayer && (
+          <div style={{ position: 'absolute', bottom: 100, right: 28, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+            <HpBar mon={activePlayer} showNumbers align="right" />
+          </div>
+        )}
+        {/* Player bench row */}
+        <div style={{ position: 'absolute', bottom: 14, left: 20, display: 'flex', gap: 4 }}>
+          {team.map((m, i) => (
+            <div key={i} title={m.displayName} style={{ width: 22, height: 22, borderRadius: '50%', background: m.currentHp > 0 ? (TYPE_COLORS[m.types[0]] || '#888') : '#333', opacity: m.currentHp > 0 ? 1 : 0.35, border: '2px solid #111' }} />
+          ))}
+        </div>
+        <div style={{ position: 'absolute', bottom: 14, right: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <img src={trainerPortraitUrl(playerTrainerSprite)} alt="You" style={{ width: 46, height: 46, imageRendering: 'pixelated' }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+        </div>
+
+        {/* Message / dialogue box */}
+        <div style={{
+          position: 'absolute', left: 0, right: 0, bottom: 0, minHeight: 76,
+          background: 'rgba(8,12,22,0.94)', borderTop: '3px solid #4a5578', padding: '10px 16px',
+        }}>
+          <div style={{ color: '#fff', fontSize: 15, fontWeight: 600, minHeight: 22 }}>{lastMsg}</div>
+          <div style={{ marginTop: 4, maxHeight: 40, overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse' }}>
+            {log.slice(-6, -1).reverse().map((entry, i) => (
+              <div key={i} style={{ color: '#9fb0d9', fontSize: 12 }}>{entry.msg}</div>
+            ))}
+          </div>
+        </div>
       </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        {enemies.map((e, i) => <MonCard key={i} mon={e} active={i === activeEnemyIdx} isEnemy />)}
-      </div>
-      <div style={{ padding: 8, background: '#0f3460', borderRadius: 6, maxHeight: 200, overflowY: 'auto' }}>
-        {log.slice(-15).map((entry, i) => (
-          <div key={i} style={{ padding: '2px 0', color: entry.type === 'win' ? '#4caf50' : entry.type === 'lose' ? '#ff4444' : entry.type === 'damage' ? '#ffd700' : '#ccc' }}>
-            {entry.msg}
-          </div>))}
-      </div>
-      {!finished && activeMon && (
-        <div style={{ marginTop: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {activeMon.moves.map(mv => {
+
+      {/* Move grid (docked, mainline-style 2x2) or Continue button */}
+      {!finished && activePlayer && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 14 }}>
+          {activePlayer.moves.map(mv => {
             const d = MOVES_DB[mv];
-            return <button key={mv} onClick={() => onUseMove(mv)} style={{
-              padding: '10px 16px', border: 'none', borderRadius: 6, background: d ? TYPE_COLORS[d.type] || '#555' : '#555',
-              color: '#fff', cursor: 'pointer', fontWeight: 'bold',
-            }}>{mv}</button>;
+            return (
+              <button key={mv} onClick={() => onUseMove(mv)} style={{
+                padding: '14px 16px', border: 'none', borderRadius: 10, background: d ? TYPE_COLORS[d.type] || '#555' : '#555',
+                color: '#fff', cursor: 'pointer', fontWeight: 800, fontSize: 15, boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+              }}>{mv}{d ? <span style={{ opacity: 0.75, fontWeight: 500, fontSize: 12 }}> ({d.type})</span> : null}</button>
+            );
           })}
-        </div>)}
-      {finished && (<button onClick={() => onUseMove('continue')} style={{ padding: '12px 24px', border: 'none', borderRadius: 8, background: '#ffd700', color: '#333', cursor: 'pointer', fontWeight: 'bold', marginTop: 16 }}>Continue →</button>)}
-    </div>);
+        </div>
+      )}
+      {finished && (
+        <button onClick={() => onUseMove('continue')} style={{ padding: '14px 28px', border: 'none', borderRadius: 10, background: '#ffd700', color: '#222', cursor: 'pointer', fontWeight: 800, marginTop: 14, fontSize: 16 }}>Continue →</button>
+      )}
+    </div>
+  );
+};
+
+// ════════════════════ OVERWORLD MAP / ROUTE PATH VISUAL ═════════════════════
+
+const NODE_ICON: Record<NodeKind, string> = { route: '🥾', town: '🏘️', rival: '⚔️', gym: '🥊', elite4: '🎖️', champion: '👑' };
+
+const MapPath: React.FC<{ nodes: MapNode[]; currentIndex: number; maxReached: number; onJump: (i: number) => void; playerTrainerSprite: string }> = ({ nodes, currentIndex, maxReached, onJump, playerTrainerSprite }) => {
+  return (
+    <div style={{ position: 'relative', overflowX: 'auto', padding: '28px 12px 12px', background: 'rgba(0,0,0,0.25)', borderRadius: 12 }}>
+      <div style={{ position: 'absolute', top: 46, left: 30, right: 30, height: 3, background: 'linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.25), rgba(255,255,255,0.05))', zIndex: 0 }} />
+      <div style={{ display: 'flex', gap: 22, position: 'relative', zIndex: 1, minWidth: 'max-content' }}>
+        {nodes.map((n, i) => {
+          const locked = i > maxReached;
+          const isCurrent = i === currentIndex;
+          return (
+            <div key={n.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, position: 'relative' }}>
+              {isCurrent && (
+                <img src={trainerPortraitUrl(playerTrainerSprite)} alt="you" style={{ position: 'absolute', top: -30, width: 28, height: 28, imageRendering: 'pixelated' }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+              )}
+              <button
+                disabled={locked}
+                onClick={() => onJump(i)}
+                title={n.name}
+                style={{
+                  width: 44, height: 44, borderRadius: '50%', cursor: locked ? 'not-allowed' : 'pointer',
+                  background: locked ? '#2a2a38' : (TYPE_COLORS[n.type] || '#555'),
+                  border: isCurrent ? '3px solid gold' : '2px solid rgba(255,255,255,0.25)',
+                  fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: isCurrent ? '0 0 0 4px rgba(255,215,0,0.25)' : '0 4px 8px rgba(0,0,0,0.3)',
+                  opacity: locked ? 0.45 : 1, position: 'relative',
+                }}
+              >
+                {NODE_ICON[n.kind]}
+                {n.cleared && <span style={{ position: 'absolute', bottom: -4, right: -4, fontSize: 13 }}>✅</span>}
+              </button>
+              <span style={{ fontSize: 10, color: locked ? '#666' : '#dfe7ff', maxWidth: 70, textAlign: 'center', lineHeight: 1.2 }}>{n.name}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 };
 
 // ════════════════════ ROGUEMODE MAIN COMPONENT ══════════════════════════════
@@ -461,7 +740,16 @@ export const RogueModeGame: React.FC = () => {
   const [trainerSprite, setTrainerSprite] = useState<string>(() => getTrainerSpriteValue());
   const [mapOpen, setMapOpen] = useState(false);
   const [battleContext, setBattleContext] = useState<'wild' | 'trainer'>('wild');
+  const [seed, setSeed] = useState<string>('');
+  const [seedInput, setSeedInput] = useState<string>('');
+  const [rival, setRival] = useState<RivalInfo | null>(null);
+  const [selectedGen, setSelectedGen] = useState<number>(1);
+  const [restoredRun, setRestoredRun] = useState(false);
 
+  const rngRef = useRef<() => number>(() => Math.random());
+  const hasHydratedRef = useRef(false);
+
+  // ── load dex, then attempt to restore a persisted run ───────────────────
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -470,9 +758,31 @@ export const RogueModeGame: React.FC = () => {
         if (cancelled) return;
         setDex(result.pokedex);
         setPool(buildSpeciesPool(result.pokedex));
-        setPhase('main_menu');
+
+        const saved = loadPersistedRun();
+        if (saved) {
+          rngRef.current = createRng(saved.seed);
+          setSeed(saved.seed);
+          setMapNodes(saved.mapNodes);
+          setCurrentIndex(saved.currentIndex);
+          setMaxReached(saved.maxReached);
+          setPlayerTeam(saved.playerTeam);
+          setEnemyTeam(saved.enemyTeam);
+          setBadgeCount(saved.badgeCount);
+          setXpTotal(saved.xpTotal);
+          setPlayerCoins(saved.playerCoins);
+          setInventory(saved.inventory);
+          setBattleLog(saved.battleLog);
+          setBattleContext(saved.battleContext);
+          setRival(saved.rival);
+          setPhase(saved.phase);
+          setRestoredRun(true);
+        } else {
+          setPhase('main_menu');
+        }
+        hasHydratedRef.current = true;
       } catch {
-        if (!cancelled) setPhase('main_menu');
+        if (!cancelled) { setPhase('main_menu'); hasHydratedRef.current = true; }
       }
     })();
     return () => { cancelled = true; };
@@ -485,6 +795,17 @@ export const RogueModeGame: React.FC = () => {
     client.on('trainerSpriteChanged', syncTrainerSprite);
     return () => client.off('trainerSpriteChanged', syncTrainerSprite);
   }, []);
+
+  // ── persist the run any time meaningful state changes (survives tab switches) ──
+  useEffect(() => {
+    if (!hasHydratedRef.current) return;
+    if (phase === 'loading' || phase === 'main_menu') return;
+    savePersistedRun({
+      version: RUN_STORAGE_VERSION,
+      seed, phase, mapNodes, currentIndex, maxReached, playerTeam, enemyTeam,
+      badgeCount, xpTotal, playerCoins, inventory, battleLog, battleContext, rival,
+    });
+  }, [phase, mapNodes, currentIndex, maxReached, playerTeam, enemyTeam, badgeCount, xpTotal, playerCoins, inventory, battleLog, battleContext, rival, seed]);
 
   const currentNode: MapNode | undefined = mapNodes[currentIndex];
   const activeTown = currentNode && currentNode.kind === 'town' ? SHOP_MAP[currentNode.type] : undefined;
@@ -501,8 +822,14 @@ export const RogueModeGame: React.FC = () => {
     setBattleLog(p => [...p, { msg: `Bought ${item.name}.`, type: 'item' }]);
   }, [playerCoins]);
 
-  const startNewGame = useCallback(() => {
-    const nodes = buildMapNodes();
+  const startNewGame = useCallback((seedOverride?: string) => {
+    clearPersistedRun();
+    const nextSeed = (seedOverride && seedOverride.trim()) || randomSeedString();
+    rngRef.current = createRng(nextSeed);
+    const nodes = buildMapNodes(rngRef.current);
+    const chosenRival = pickRandom(RIVAL_POOL, rngRef.current) || RIVAL_POOL[0];
+    setSeed(nextSeed);
+    setRival(chosenRival);
     setMapNodes(nodes);
     setCurrentIndex(0);
     setMaxReached(0);
@@ -514,8 +841,14 @@ export const RogueModeGame: React.FC = () => {
     setInventory({ potion: 2 });
     setShopOpen(false);
     setMapOpen(false);
-    setBattleLog([{ msg: 'Welcome to RogueMode! Choose your starter.', type: 'system' }]);
+    setRestoredRun(false);
+    setBattleLog([{ msg: `Welcome to RogueMode! Seed: ${nextSeed}. Choose your starter.`, type: 'system' }]);
     setPhase('starter_select');
+  }, []);
+
+  const abandonRun = useCallback(() => {
+    clearPersistedRun();
+    setPhase('main_menu');
   }, []);
 
   const pickStarter = useCallback((key: string) => {
@@ -523,15 +856,15 @@ export const RogueModeGame: React.FC = () => {
     const mon = buildRogueMon(key, dex[key], 5, false);
     setPlayerTeam([mon]);
     setPhase('exploring');
-    setBattleLog([{ msg: `You chose ${mon.displayName}! Let's explore.`, type: 'system' }]);
-  }, [dex]);
+    setBattleLog([{ msg: `You chose ${mon.displayName}! Let's explore. (Seed: ${seed})`, type: 'system' }]);
+  }, [dex, seed]);
 
   // ── wild encounter on a route node ──────────────────────────────────────
   const searchRoute = useCallback(() => {
     if (!pool || !dex || !currentNode || currentNode.kind !== 'route') return;
-    const key = pickSpeciesOfType(pool, currentNode.type);
+    const key = pickSpeciesOfType(pool, currentNode.type, rngRef.current);
     if (!key || !dex[key]) return;
-    const level = currentNode.levelLo + Math.floor(Math.random() * Math.max(1, currentNode.levelHi - currentNode.levelLo));
+    const level = currentNode.levelLo + Math.floor(rngRef.current() * Math.max(1, currentNode.levelHi - currentNode.levelLo));
     const wildMon = buildRogueMon(key, dex[key], level, false);
     setEnemyTeam([wildMon]);
     setBattleContext('wild');
@@ -543,16 +876,28 @@ export const RogueModeGame: React.FC = () => {
   const startTrainerBattle = useCallback(() => {
     if (!pool || !dex || !currentNode) return;
     if (currentNode.kind === 'town' || currentNode.kind === 'route') return;
-    const size = currentNode.kind === 'gym' ? 3 : currentNode.kind === 'rival' ? 2 : currentNode.kind === 'elite4' ? 4 : 6;
+
+    if (currentNode.kind === 'rival' && rival) {
+      const size = Math.min(6, 1 + (currentNode.rivalOccurrence || 1));
+      const team = generateDiverseTeam(pool, dex, currentNode.levelLo, currentNode.levelHi, size, rngRef.current);
+      if (!team.length) return;
+      setEnemyTeam(team);
+      setBattleContext('trainer');
+      setBattleLog(p => [...p, { msg: `${rival.name} challenges you!`, type: 'system' }]);
+      setPhase('battle');
+      return;
+    }
+
+    const size = currentNode.kind === 'gym' ? 3 : currentNode.kind === 'elite4' ? 4 : currentNode.kind === 'champion' ? 6 : 2;
     const team = currentNode.kind === 'champion'
-      ? generateChampionTeam(pool, dex, currentNode.levelLo, currentNode.levelHi)
-      : generateTrainerTeam(pool, dex, currentNode.type, currentNode.levelLo, currentNode.levelHi, size);
+      ? generateDiverseTeam(pool, dex, currentNode.levelLo, currentNode.levelHi, size, rngRef.current)
+      : generateTrainerTeam(pool, dex, currentNode.type, currentNode.levelLo, currentNode.levelHi, size, rngRef.current);
     if (!team.length) return;
     setEnemyTeam(team);
     setBattleContext('trainer');
     setBattleLog(p => [...p, { msg: `${currentNode.gymDef?.name || 'A trainer'} challenges you!`, type: 'system' }]);
     setPhase('battle');
-  }, [pool, dex, currentNode]);
+  }, [pool, dex, currentNode, rival]);
 
   const processAction = useCallback((action: string) => {
     if (phase !== 'battle') return;
@@ -567,17 +912,15 @@ export const RogueModeGame: React.FC = () => {
         const xep = enemyTeam.reduce((s, m) => s + Math.floor(15 + m.level * 3), 0);
         setXpTotal(p => p + xep);
         if (playerTeam.length > 0) {
-          const avgx = Math.floor(xep / playerTeam.length);
+          const avgXp = Math.floor(xep / playerTeam.length);
           setPlayerTeam(prev => prev.map(m => {
-            const nm = { ...m };
-            let t = avgx;
-            while (t > 0 && nm.level < 100 && avgx >= xpThresholdFor(nm.level)) {
-              nm.level++; t -= xpThresholdFor(nm.level);
+            let newLevel = m.level;
+            let remaining = avgXp;
+            while (remaining > 0 && newLevel < 100 && remaining >= xpThresholdFor(newLevel)) {
+              newLevel++;
+              remaining -= xpThresholdFor(newLevel);
             }
-            const pct = (m.currentHp / m.maxHp) || 1;
-            nm.maxHp = Math.floor(hpAt(m.maxHp, 1) > 0 ? nm.maxHp : nm.maxHp); // no-op guard
-            nm.currentHp = Math.floor(pct * nm.maxHp);
-            return nm;
+            return newLevel === m.level ? m : recomputeLevel(m, newLevel);
           }));
         }
 
@@ -590,13 +933,8 @@ export const RogueModeGame: React.FC = () => {
         setMaxReached(p => Math.max(p, nextIdx));
         setPhase('exploring');
       } else if (last.type === 'lose') {
-        if (battleContext === 'wild') {
-          // Losing a wild encounter just returns you to exploring (no game over on wild losses).
-          setPlayerTeam(p => p.map(m => ({ ...m, currentHp: Math.max(1, Math.floor(m.maxHp * 0.1)) })));
-          setPhase('exploring');
-        } else {
-          setPhase('game_over');
-        }
+        // True permadeath — ANY full team faint (wild or trainer) ends the run immediately.
+        setPhase('game_over');
       }
       return;
     }
@@ -611,14 +949,14 @@ export const RogueModeGame: React.FC = () => {
     if (eIdx < 0) return;
 
     const attacker = teamOut[pIdx];
-    const defTypes = [...foeOut[eIdx].types];
+    const defender = foeOut[eIdx];
 
     if (MOVES_DB[action]?.category === 'status') {
       const amt = Math.floor(attacker.maxHp * 0.5);
       attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + amt);
       logs.push({ msg: `${attacker.displayName} used ${action}! (+${amt} HP)`, type: 'heal' });
     } else {
-      const res = execMove(attacker, defTypes, action);
+      const res = execMove(attacker, defender, action);
       if (res.miss) { logs.push({ msg: `${attacker.displayName} used ${action} but missed!`, type: 'action' }); }
       else if (res.damage > 0) {
         foeOut[eIdx] = { ...foeOut[eIdx], currentHp: Math.max(0, foeOut[eIdx].currentHp - res.damage) };
@@ -636,7 +974,7 @@ export const RogueModeGame: React.FC = () => {
         if (ti < 0) return;
         const tgt = teamOut[ti];
         const mv = pickRandom(ea.moves) || 'Tackle';
-        const r2 = execMove(ea, [tgt.types[0]], mv);
+        const r2 = execMove(ea, tgt, mv);
         if (r2.miss) { logs.push({ msg: `${ea.displayName} missed!`, type: 'action' }); return; }
         teamOut[ti] = { ...teamOut[ti], currentHp: Math.max(0, tgt.currentHp - r2.damage) };
         logs.push({ msg: `${ea.displayName} used ${mv} on ${tgt.displayName}${r2.label ? ' ' + r2.label : ''} (-${r2.damage} HP)`, type: 'damage' });
@@ -646,7 +984,7 @@ export const RogueModeGame: React.FC = () => {
 
     if (!teamOut.some(m => m.currentHp > 0)) logs.push({ msg: '💀 Your team fainted!', type: 'lose' });
     setPlayerTeam(teamOut); setEnemyTeam(foeOut); setBattleLog(p => [...p, ...logs]);
-  }, [phase, playerTeam, enemyTeam, battleLog, currentIndex, currentNode, mapNodes, battleContext]);
+  }, [phase, playerTeam, enemyTeam, battleLog, currentIndex, currentNode, mapNodes]);
 
   // ── backtracking: jump to any previously-reached node ───────────────────
   const jumpToNode = useCallback((idx: number) => {
@@ -656,6 +994,12 @@ export const RogueModeGame: React.FC = () => {
   }, [maxReached]);
 
   const isBattleNodeCleared = currentNode?.cleared;
+
+  // Opponent portrait/name for the battle scene (trainer battles show a portrait; wild does not).
+  const battleOpponentName = currentNode?.kind === 'rival' && rival ? rival.name : (currentNode?.gymDef?.name || 'Wild Pokémon');
+  const battleOpponentSprite = battleContext === 'trainer'
+    ? (currentNode?.kind === 'rival' && rival ? rival.sprite : currentNode?.gymDef?.sprite || null)
+    : null;
 
   return (
     <div style={{ maxWidth: 1000, margin: 'auto', padding: 24, fontFamily: 'Arial,sans-serif', color: '#333' }}>
@@ -667,25 +1011,42 @@ export const RogueModeGame: React.FC = () => {
       )}
 
       {phase === 'main_menu' && (
-        <div style={{ textAlign: 'center', padding: 60, background: '#1a1a2e', borderRadius: 10 }}>
-          <h1 style={{ color: '#ffd700', fontSize: 36, marginBottom: 8 }}>⚡ ROGUE MODE ⚡</h1>
-          <p style={{ color: '#ccc', fontSize: 18, maxWidth: 600, margin: 'auto' }}>
+        <div style={{ textAlign: 'center', padding: 60, background: 'linear-gradient(180deg,#1a1a2e 0%, #0f1420 100%)', borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}>
+          <h1 style={{ color: '#ffd700', fontSize: 40, marginBottom: 8, textShadow: '0 4px 10px rgba(0,0,0,0.5)' }}>⚡ ROGUE MODE ⚡</h1>
+          <p style={{ color: '#ccc', fontSize: 18, maxWidth: 620, margin: 'auto' }}>
             A PokeRogue-style gauntlet drawing from the FULL merged Pokédex ({pool ? pool.all.length.toLocaleString() : '...'} species).
-            Start with a single partner, explore 8 gym routes with full backtracking, battle rivals, and take on the Elite Four and Champion.
+            Pick a starter from any generation, explore 8 gym routes with full backtracking, face a persistent rival who grows stronger, and take on the Elite Four and Champion. One loss ends the run — choose wisely.
           </p>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
             {GYM_TYPES.map(t => (<span key={t} style={{ padding: '4px 10px', background: TYPE_COLORS[t], borderRadius: 4, fontSize: 12, color: '#111' }}>{t} Gym</span>))}
           </div>
+          <div style={{ marginTop: 26, display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+            <input
+              value={seedInput}
+              onChange={(e) => setSeedInput(e.target.value)}
+              placeholder="Seed (optional — leave blank for random)"
+              style={{ padding: '10px 12px', borderRadius: 8, border: '1px solid #444', background: '#0f1420', color: '#eee', minWidth: 260 }}
+            />
+            <button onClick={() => setSeedInput(randomSeedString())} style={{ padding: '10px 14px', border: 'none', borderRadius: 8, background: '#4b5d8a', color: '#fff', cursor: 'pointer', fontWeight: 700 }}>🎲 Randomize</button>
+          </div>
           <br />
-          <button onClick={startNewGame} style={{ padding: '15px 30px', fontSize: 24, border: 'none', borderRadius: 8, background: '#ffd700', color: '#333', cursor: 'pointer', fontWeight: 'bold' }}>▶ New Run</button>
+          <button onClick={() => startNewGame(seedInput)} style={{ padding: '15px 30px', fontSize: 24, border: 'none', borderRadius: 8, background: '#ffd700', color: '#333', cursor: 'pointer', fontWeight: 'bold', marginTop: 10 }}>▶ New Run</button>
         </div>)}
 
       {phase === 'starter_select' && (
         <div style={{ textAlign: 'center', padding: 40, background: '#fff', borderRadius: 10 }}>
           <h2>🎮 Pick Your Starter</h2>
-          <p>Choose your single starting partner — build the rest of your team by capturing wild Pokémon along the way!</p>
+          <p>Choose your single starting partner from any region — build the rest of your team by capturing wild Pokémon along the way! Seed: <code>{seed}</code></p>
+          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
+            {STARTER_GENS.map(g => (
+              <button key={g.gen} onClick={() => setSelectedGen(g.gen)} style={{
+                padding: '6px 12px', borderRadius: 8, border: selectedGen === g.gen ? '2px solid #ffd700' : '1px solid #ccc',
+                background: selectedGen === g.gen ? '#333' : '#eee', color: selectedGen === g.gen ? '#ffd700' : '#333', cursor: 'pointer', fontWeight: 700, fontSize: 12,
+              }}>Gen {g.gen} • {g.label}</button>
+            ))}
+          </div>
           <div style={{ display: 'flex', gap: 15, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
-            {STARTER_KEYS.map(key => {
+            {(STARTER_GENS.find(g => g.gen === selectedGen)?.keys || []).map(key => {
               const entry = dex?.[key];
               if (!entry) return null;
               return (
@@ -703,10 +1064,17 @@ export const RogueModeGame: React.FC = () => {
           <div style={{ flex: 1, background: 'linear-gradient(180deg,#18243d 0%,#111a2b 100%)', borderRadius: 18, padding: 20, border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 30px rgba(0,0,0,0.28)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
               <div>
-                <div style={{ fontSize: 12, color: '#a7bce8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{currentNode.kind}</div>
+                <div style={{ fontSize: 12, color: '#a7bce8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{currentNode.kind} • Seed {seed}</div>
                 <h3 style={{ margin: '6px 0 0', fontSize: 28, color: '#f8fbff' }}>{currentNode.name}</h3>
+                {restoredRun && (
+                  <div onAnimationEnd={() => setRestoredRun(false)} style={{ marginTop: 4, fontSize: 11, color: '#8fd98f' }}>▶ Run resumed — your progress was saved.</div>
+                )}
               </div>
-              <div style={{ padding: '8px 12px', background: TYPE_COLORS[currentNode.type] || '#888', borderRadius: 999, color: '#111827', fontWeight: 800 }}>{currentNode.type}</div>
+
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div style={{ padding: '8px 12px', background: TYPE_COLORS[currentNode.type] || '#888', borderRadius: 999, color: '#111827', fontWeight: 800 }}>{currentNode.type}</div>
+                <button onClick={abandonRun} title="End this run and return to the main menu" style={{ padding: '8px 12px', border: '1px solid #a33', borderRadius: 999, background: 'transparent', color: '#ff8a8a', cursor: 'pointer', fontWeight: 700, fontSize: 12 }}>Abandon Run</button>
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: 10, marginTop: 18, flexWrap: 'wrap' }}>
@@ -720,7 +1088,7 @@ export const RogueModeGame: React.FC = () => {
                 <button onClick={searchRoute} style={{ padding: '12px 20px', border: 'none', borderRadius: 10, background: '#3792ff', color: '#fff', cursor: 'pointer', fontWeight: 800 }}>🔍 Search for Wild Pokémon</button>
               )}
               {(currentNode.kind === 'gym' || currentNode.kind === 'rival' || currentNode.kind === 'elite4' || currentNode.kind === 'champion') && !isBattleNodeCleared && (
-                <button onClick={startTrainerBattle} style={{ padding: '12px 20px', border: 'none', borderRadius: 10, background: '#d9534f', color: '#fff', cursor: 'pointer', fontWeight: 800 }}>⚔️ Challenge {currentNode.gymDef?.name}</button>
+                <button onClick={startTrainerBattle} style={{ padding: '12px 20px', border: 'none', borderRadius: 10, background: '#d9534f', color: '#fff', cursor: 'pointer', fontWeight: 800 }}>⚔️ Challenge {currentNode.kind === 'rival' && rival ? rival.name : currentNode.gymDef?.name}</button>
               )}
               {(currentNode.kind === 'gym' || currentNode.kind === 'rival' || currentNode.kind === 'elite4' || currentNode.kind === 'champion') && isBattleNodeCleared && (
                 <span style={{ padding: '12px 20px', borderRadius: 10, background: '#2dc36d', color: '#fff', fontWeight: 800 }}>✅ Already Defeated</span>
@@ -734,14 +1102,8 @@ export const RogueModeGame: React.FC = () => {
             </div>
 
             {mapOpen && (
-              <div style={{ marginTop: 18, padding: 14, background: 'rgba(0,0,0,0.25)', borderRadius: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {mapNodes.map((n, i) => (
-                  <button key={n.id} disabled={i > maxReached} onClick={() => jumpToNode(i)} style={{
-                    padding: '6px 10px', borderRadius: 8, border: i === currentIndex ? '2px solid gold' : '1px solid rgba(255,255,255,0.2)',
-                    background: i > maxReached ? '#333' : TYPE_COLORS[n.type] || '#555', color: i > maxReached ? '#777' : '#111', fontWeight: 700, fontSize: 12,
-                    cursor: i > maxReached ? 'not-allowed' : 'pointer', opacity: n.cleared ? 0.6 : 1,
-                  }}>{n.cleared ? '✓ ' : ''}{n.name}</button>
-                ))}
+              <div style={{ marginTop: 18 }}>
+                <MapPath nodes={mapNodes} currentIndex={currentIndex} maxReached={maxReached} onJump={jumpToNode} playerTrainerSprite={trainerSprite} />
               </div>
             )}
 
@@ -753,6 +1115,7 @@ export const RogueModeGame: React.FC = () => {
                   <div>Badges: <strong>{badgeCount}</strong> / {GYM_TYPES.length + ELITE_FOUR_TYPES.length}</div>
                   <div>Coins: <strong>{playerCoins}</strong></div>
                   <div>Team: <strong>{playerTeam.length}</strong> / 6</div>
+                  {rival && <div>Rival: <strong>{rival.name}</strong></div>}
                 </div>
               </div>
               {activeTown && (
@@ -789,7 +1152,7 @@ export const RogueModeGame: React.FC = () => {
             <div style={{ background: 'linear-gradient(180deg,#161c2a 0%,#101827 100%)', borderRadius: 18, padding: 18, border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 16px 30px rgba(0,0,0,0.2)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 80, height: 80, borderRadius: 16, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <img src={withPublicBase(`vendor/showdown/sprites/trainers/${trainerSprite}.png`)} alt="Trainer" onError={(event) => { const image = event.currentTarget as HTMLImageElement; image.src = withPublicBase(`vendor/showdown/sprites/trainers/${DEFAULT_TRAINER_SPRITE}.png`); }} style={{ width: 72, height: 72, imageRendering: 'pixelated', objectFit: 'contain' }} />
+                  <img src={trainerPortraitUrl(trainerSprite)} alt="Trainer" onError={(event) => { const image = event.currentTarget as HTMLImageElement; image.src = trainerPortraitUrl(DEFAULT_TRAINER_SPRITE); }} style={{ width: 72, height: 72, imageRendering: 'pixelated', objectFit: 'contain' }} />
                 </div>
                 <div>
                   <div style={{ fontSize: 11, color: '#9fb4d9', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Trainer</div>
@@ -823,19 +1186,25 @@ export const RogueModeGame: React.FC = () => {
           </div>
         </div>)}
 
-      {phase === 'battle' && (<BattleScreen team={playerTeam} enemies={enemyTeam} log={battleLog} onUseMove={processAction} />)}
+      {phase === 'battle' && currentNode && (
+        <BattleScreen
+          team={playerTeam} enemies={enemyTeam} log={battleLog} onUseMove={processAction}
+          bg={currentNode.bg} opponentName={battleOpponentName} opponentSprite={battleOpponentSprite}
+          playerTrainerSprite={trainerSprite}
+        />
+      )}
 
       {phase === 'victory' && (
         <div style={{ textAlign: 'center', padding: 60, background: '#2d5a27', borderRadius: 10 }}>
           <h1 style={{ color: '#ffd700' }}>🏆 CHAMPION! 🏆</h1>
-          <p>You defeated {CHAMPION_NAME} with {badgeCount} badges and {xpTotal} XP!</p>
-          <button onClick={startNewGame} style={{ padding: '15px 30px', border: 'none', borderRadius: 8, background: '#ffd700' }}>Play Again</button>
+          <p>You defeated {CHAMPION_NAME} with {badgeCount} badges and {xpTotal} XP! (Seed: {seed})</p>
+          <button onClick={() => startNewGame()} style={{ padding: '15px 30px', border: 'none', borderRadius: 8, background: '#ffd700' }}>Play Again</button>
         </div>)}
 
       {phase === 'game_over' && (
         <div style={{ textAlign: 'center', padding: 60, background: '#5a1a1a', borderRadius: 10 }}>
-          <h1>💀 GAME OVER 💀</h1><p>Your team fainted against {currentNode?.gymDef?.name || 'a trainer'}.</p>
-          <button onClick={startNewGame} style={{ padding: '15px 30px', border: 'none', borderRadius: 8, background: '#ffd700' }}>Try Again</button>
+          <h1>💀 GAME OVER 💀</h1><p>Your team fainted against {currentNode?.kind === 'rival' && rival ? rival.name : (currentNode?.gymDef?.name || 'a trainer')}. (Seed: {seed})</p>
+          <button onClick={() => startNewGame()} style={{ padding: '15px 30px', border: 'none', borderRadius: 8, background: '#ffd700' }}>Try Again</button>
         </div>)}
     </div>);
 };
