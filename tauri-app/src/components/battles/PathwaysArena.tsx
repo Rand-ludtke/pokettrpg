@@ -160,21 +160,21 @@ interface BattleState {
 }
 
 const MOVES_DB: Record<string, { power: number; type: string; pp: number; category: 'physical' | 'special' }> = {
-  Tackle:         { power: 40, type: 'Normal',     pp: 35,   category: 'physical' },
-  Scratch:        { power: 40, type: 'Normal',     pp: 35,   category: 'physical' },
-  Ember:          { power: 40, type: 'Fire',       pp: 25,   category: 'special' },
+  "Tackle":       { power: 40, type: 'Normal',     pp: 35,   category: 'physical' },
+  "Scratch":      { power: 40, type: 'Normal',     pp: 35,   category: 'physical' },
+  "Ember":        { power: 40, type: 'Fire',       pp: 25,   category: 'special' },
   "Water Gun":    { power: 40, type: 'Water',      pp: 25,   category: 'special' },
   "Vine Whip":    { power: 45, type: 'Grass',      pp: 25,   category: 'physical' },
-  Thundershock:   { power: 40, type: 'Electric',   pp: 30,   category: 'special' },
+  "Thundershock": { power: 40, type: 'Electric',   pp: 30,   category: 'special' },
   "Quick Attack": { power: 40, type: 'Normal',     pp: 30,   category: 'physical' },
   "Iron Tail":    { power: 100, type: 'Steel',     pp: 15,   category: 'physical' },
   "Dragon Claw":  { power: 80, type: 'Dragon',     pp: 15,   category: 'physical' },
   "Shadow Ball":  { power: 80, type: 'Ghost',      pp: 15,   category: 'special' },
-  Thunderbolt:    { power: 90, type: 'Electric',   pp: 15,   category: 'special' },
-  Flamethrower:   { power: 90, type: 'Fire',       pp: 15,   category: 'special' },
+  "Thunderbolt":  { power: 90, type: 'Electric',   pp: 15,   category: 'special' },
+  "Flamethrower": { power: 90, type: 'Fire',       pp: 15,   category: 'special' },
   "Hydro Pump":   { power: 110, type: 'Water',      pp: 5,    category: 'special' },
-  SolarBeam:      { power: 120, type: 'Grass',       pp: 5,    category: 'special' },
-  Psychic:        { power: 90, type: 'Psychic',    pp: 10,   category: 'special' },
+  "SolarBeam":    { power: 120, type: 'Grass',       pp: 5,    category: 'special' },
+  "Psychic":      { power: 90, type: 'Psychic',    pp: 10,   category: 'special' },
 };
 
 /** Pick the best available move against opponent based on effectiveness */
@@ -244,15 +244,15 @@ function executeMove(
 }
 
 function runPlayerTurn(team: Team, opponents: Team, log: BattleLogEntry[], moveName: string): [Team, Team, BattleLogEntry[]] {
-  const active = team.pokemon.map(p => ({ ...p }));
-  const enemyActive = opponents.pokemon.map(p => ({ ...p }));
+  const active = [...team.pokemon];
+  const enemyActive = [...opponents.pokemon];
 
   // Skip fainted pokemon to find active index
-  const pIdx = active.findIndex((p: BattlePokemon) => p.currentHP > 0);
-  if (pIdx < 0) return [{ ...team, pokemon: active }, { ...opponents, pokemon: enemyActive }, [{ msg: 'You have no live Pokémon!', type: 'system' }]] as [Team, Team, BattleLogEntry[]];
+  const pIdx = active.findIndex(p => p.currentHP > 0);
+  if (pIdx < 0) return [{ pokemon: active }, { pokemon: enemyActive }, [{ msg: 'You have no live Pokémon!', type: 'system' }]];
 
-  const eIdx = enemyActive.findIndex((p: BattlePokemon) => p.currentHP > 0);
-  if (eIdx < 0) return [{ ...team }, { ...opponents }, [{ msg: 'Opponents fainted!', type: 'win' }]] as [Team, Team, BattleLogEntry[]];
+  const eIdx = enemyActive.findIndex(p => p.currentHP > 0);
+  if (eIdx < 0) return [{ pokemon: active }, { pokemon: enemyActive }, [{ msg: 'Opponents fainted!', type: 'win' }]];
 
   const attacker = active[pIdx];
   const defenderTypes = enemyActive[eIdx].types;
@@ -467,8 +467,10 @@ const BATTLE_SCREEN = ({ team, opponents, log, onPlayerAction, availableMoves }:
   onPlayerAction: (moveName: string) => void;
   availableMoves: string[];
 }) => {
-  const activePlayer = team.pokemon.find((p: BattlePokemon) => p.currentHP > 0);
-  const activeEnemy = opponents.pokemon.find((p: BattlePokemon) => p.currentHP > 0);
+  const teamPkmn = team.pokemon;
+  const oppPkmn = opponents.pokemon;
+  const activePlayer = teamPkmn.find(p => p.currentHP > 0);
+  const activeEnemy = oppPkmn.find(p => p.currentHP > 0);
   const finished = log.some(l => l.type === 'win' || l.type === 'lose');
 
   return (
@@ -477,7 +479,7 @@ const BATTLE_SCREEN = ({ team, opponents, log, onPlayerAction, availableMoves }:
 
       {/* Player side */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        {team.pokemon.map((p: BattlePokemon) => (
+        {teamPkmn.map(p => (
           <div key={p.id} style={{
             padding: 8, background: p.currentHP > 0 ? '#16213e' : '#3d0f0f',
             borderRadius: 6, border: activePlayer?.id === p.id ? '2px solid gold' : '1px solid #444',
@@ -495,7 +497,7 @@ const BATTLE_SCREEN = ({ team, opponents, log, onPlayerAction, availableMoves }:
 
       {/* Enemy side */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
-        {opponents.pokemon.map((p: BattlePokemon) => (
+        {oppPkmn.map(p => (
           <div key={p.id} style={{
             padding: 8, background: p.currentHP > 0 ? '#30475e' : '#3d0f0f',
             borderRadius: 6, border: activeEnemy?.id === p.id ? '2px solid #ff4444' : '1px solid #444',
@@ -819,7 +821,7 @@ export const PathwaysArena: React.FC = () => {
                     return { ...prev, opponents: generateGymTeam(GYM_ORDER[0]! as GymLeaderDef), // use as template enemy
                       team: { pokemon: newTeam }, mode: 'battle',
                       discoveredStarters: [...prev.discoveredStarters, enc.name],
-                      log: [...prev.log, { msg: `Caught a ${enc.types.join('/')}-${enc.name} wild! ${enc.name} is now in your team. It may appear as starter!`, type: 'item' }] };
+                      log: [...prev.log, { msg: `Caught a ${enc.types.join('/')}-${enc.types[0]} wild! ${enc.name} is now in your team. It may appear as starter!`, type: 'item' }] };
                   }
                   return { ...prev, opponents: generateGymTeam(GYM_ORDER[0]!), team: { pokemon: newTeam }, mode: 'battle',
                     log: [...prev.log, { msg: `Caught a wild ${enc.name}! Added to your team.`, type: 'item' }] };

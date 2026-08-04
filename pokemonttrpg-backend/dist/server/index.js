@@ -1221,9 +1221,11 @@ const io = new socket_io_1.Server(server, {
     cors: { origin: "*" },
     pingInterval: 10000,
     pingTimeout: 5000,
-    perMessageDeflate: {
-        threshold: 256, // only compress payloads above 256 bytes
-    },
+    // perMessageDeflate disabled: Cloudflare Tunnel (and other proxies running in
+    // degraded HTTP/2-only transport mode when UDP/QUIC is blocked) can corrupt
+    // compressed WebSocket frames, causing browser-side "Invalid frame header"
+    // errors. Disabling compression avoids this entirely.
+    perMessageDeflate: false,
 });
 if (FUSION_SPRITES_DIR && fs_1.default.existsSync(FUSION_SPRITES_DIR)) {
     (0, fusion_sync_1.attachFusionWebSocket)(server, {

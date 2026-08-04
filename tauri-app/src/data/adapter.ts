@@ -1,7 +1,6 @@
 import { BattlePokemon, Pokemon } from '../types';
 import { calculateHp } from '../rules';
 import { withPublicBase } from '../utils/publicBase';
-import { parsePokeathlonDex } from './pokeathlon-dex-loader';
 
 export type DexSpecies = {
   name: string;
@@ -708,19 +707,13 @@ export async function loadShowdownDex(options?: { base?: string }) {
     }
   };
   // prefer JSON if present for faster parse
-  const [pokedex, moves, abilities, items, learnsets, aliases, pokeathlonDex] = await Promise.all([
+  const [pokedex, moves, abilities, items, learnsets, aliases] = await Promise.all([
     loadShowdownDataJson<DexIndex>('pokedex.json', { base: options?.base, required: true }),
     loadShowdownDataJson<MoveIndex>('moves.json', { base: options?.base, required: true }),
     loadShowdownDataJson<AbilityIndex>('abilities.json', { base: options?.base, defaultValue: {} as AbilityIndex }),
     loadShowdownDataJson<ItemIndex>('items.json', { base: options?.base, defaultValue: {} as ItemIndex }),
     loadShowdownDataJson<LearnsetsIndex>('learnsets.json', { base: options?.base, defaultValue: {} as LearnsetsIndex }),
     Promise.resolve({} as AliasesIndex),
-    parsePokeathlonDex('https://play.pokeathlon.com/data/pokedex.js?0.6962044376777488').catch(() => ({
-      dex: {} as DexIndex,
-      soulstoneEntries: [],
-      capKeys: [],
-      regionalKeys: [],
-    })),
   ]);
 
   const [sagePokedex, sageLearnsets, sageMoves, sageAbilities, sageItems] = await Promise.all([
@@ -759,6 +752,28 @@ export async function loadShowdownDex(options?: { base?: string }) {
     fetchOptionalJson(withPublicBase('data/mariomon/generated/moves.custom.mariomon.json')),
     fetchOptionalJson(withPublicBase('data/mariomon/generated/abilities.custom.mariomon.json')),
   ]);
+
+  // ── Pokeathlon DLC – load Soulstone CAP data ────────────────────────
+  const pokeathlonDexRaw = await (async () => {
+    try {
+      const resp = await fetch('https://play.pokeathlon.com/data/pokedex.js');
+      if (!resp.ok) return undefined;
+      const text = await resp.text();
+      const m = text.match(/exports\.BattlePokedex\s*=\s*(\{)/);
+      if (!m) return undefined;
+      let depth = 0, inStr: '' | "'" | '"' = '', i = m.index! + m[0].length - 1;
+      while (i < text.length) {
+        const ch = text[i];
+        if (inStr) { if (ch === '\\') { i += 2; continue; } if (ch === inStr) inStr = ''; i++; continue; }
+        if (ch === '"' || ch === "'") { inStr = ch; i++; continue; }
+        if (ch === '{') depth++;
+        if (ch === '}') { if (depth === 1) break; depth--; }
+        i++;
+      }
+      const body = text.slice(m.index! + m[0].length - 1, m.index! + m[0].length - 1 + (i - (m.index! + m[0].length - 1)));
+      return new Function(`return (${body})`)() as Record<string, any>;
+    } catch { return undefined; }
+  })();
 
   const wylinDex = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).dex : null) || {};
   const wylinLearnsets = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).learnsets : null) || {};
@@ -812,7 +827,18 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumDex || {}) as DexIndex),
     ...((infinityDex || {}) as DexIndex),
     ...((mariomonDex || {}) as DexIndex),
-    ...((pokeathlonDex?.dex || {}) as DexIndex),
+    // Inject only non-canonical pokeathlon entries (Soulstone, Custom)
+    ...(Array.isArray(pokeathlonDexRaw) ? [] : pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' ? (() => {
+      const injected: DexIndex = {};
+      for (const [id, entry] of Object.entries(pokeathlonDexRaw)) {
+        if (!entry || typeof entry !== 'object') continue;
+        // Only inject fangame entries — canon base showdown pokemon stay from pokedex above
+        if ((entry as any).isNonstandard === 'Custom' && typeof (entry as any).name === 'string') {
+          injected[normalizeName(id)] = entry as DexSpecies;
+        }
+      }
+      return injected;
+    })() : {}),
   } as DexIndex;
   const mergedBaseLearnsets = {
     ...(learnsets as LearnsetsIndex),
@@ -862,14 +888,26 @@ export async function loadShowdownDex(options?: { base?: string }) {
   addSourceTags((uraniumDex || {}) as Record<string, any>, 'uranium');
   addSourceTags((infinityDex || {}) as Record<string, any>, 'infinity');
   addSourceTags((mariomonDex || {}) as Record<string, any>, 'mariomon');
-  addSourceTags((pokeathlonDex?.dex || {}) as Record<string, any>, 'pokeathlon');
+  // Pokeathlon fangame entries carry the 'pokeathlon' tag
+  if (pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' && !Array.isArray(pokeathlonDexRaw)) {
+    addSourceTags(pokeathlonDexRaw as Record<string, any>, 'pokeathlon');
+  }
 
-  // Build Pokeathlon fangame sprite source map for sprite resolution
+  // Build Pokeathlon fangame sprite source map for sprite resolution (uranium/infinity/mariomon/pokeathlon)
   const fangameSpriteMap = new Map<string, string>();
   for (const [tag, dexObj] of [['uranium', uraniumDex], ['infinity', infinityDex], ['mariomon', mariomonDex]] as const) {
     if (dexObj) {
       for (const id of Object.keys(dexObj)) {
         fangameSpriteMap.set(normalizeName(id), tag);
+      }
+    }
+  }
+  // Add pokeathlon keys to sprite map for CDN-based sprite resolution
+  if (pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' && !Array.isArray(pokeathlonDexRaw)) {
+    for (const id of Object.keys(pokeathlonDexRaw)) {
+      const entry = (pokeathlonDexRaw as Record<string, any>)[id];
+      if (entry && typeof entry === 'object' && (entry as any).isNonstandard === 'Custom') {
+        fangameSpriteMap.set(normalizeName(id), 'pokeathlon');
       }
     }
   }
@@ -2630,11 +2668,12 @@ let gDexMapsBuilt = false;
 
 /** Ensure dex number maps are built (idempotent). Call after loadShowdownDex(). */
 export function buildDexNumMaps(dex: DexIndex): void {
+  if (gDexMapsBuilt) return;
   gNumToName = {};
   gNameToNum = {};
   for (const [key, entry] of Object.entries(dex)) {
-    const num = Number((entry as any).num);
-    if (!Number.isFinite(num) || num === 0) continue;
+    const num = (entry as any).num as number | undefined;
+    if (num == null || num === 0) continue;
     const name = normalizeName(entry.name || key);
     if (!gNumToName[num]) gNumToName[num] = name;
     gNameToNum[name] = num;

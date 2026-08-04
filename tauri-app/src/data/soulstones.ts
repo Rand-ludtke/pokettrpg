@@ -1,8 +1,8 @@
-import { BattlePokemon } from '../types';
+import { BattlePokemon, Pokemon } from '../types';
 import { calculateHp } from '../rules';
 
 // Soulstone types: Crystal, Cosmic, Nuclear, Stellar, Light, Sound
-const SOULSTONE_TYPES = ['Crystal', 'Cosmic', 'Nuclear', 'Stellar', 'Light', 'Sound'] as const;
+export const SOULSTONE_TYPES = ['Crystal', 'Cosmic', 'Nuclear', 'Stellar', 'Light', 'Sound'] as const;
 export type SoulstoneType = typeof SOULSTONE_TYPES[number];
 
 interface SoulstoneEntry {
