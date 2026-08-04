@@ -66,14 +66,64 @@ function pickRandom<T>(arr: T[], rng: () => number = Math.random): T | undefined
 
 interface Engine { dex: DexIndex; moves: MoveIndex; learnsets: LearnsetsIndex; }
 
+// Type-based fallback movepool — used ONLY for species with no resolvable real
+// learnset data (this covers ~99% of the custom Soulstones/Pokeathlon roster,
+// which ships with no learnset.json entries at all). Ensures every custom mon
+// still gets a sensible, on-type 4-move kit instead of degrading to Tackle-only,
+// while species with real learnset data (all base-game Pokémon) always use
+// their accurate level-up/TM movesets from resolveMovesForLevel below.
+const TYPE_FALLBACK_MOVES: Record<string, string[]> = {
+  Normal: ['bodyslam', 'quickattack', 'hyperbeam', 'facade'],
+  Fire: ['flamethrower', 'firepunch', 'ember', 'fireblast'],
+  Water: ['surf', 'watergun', 'hydropump', 'icebeam'],
+  Electric: ['thunderbolt', 'thundershock', 'voltswitch', 'wildcharge'],
+  Grass: ['energyball', 'gigadrain', 'leafblade', 'solarbeam'],
+  Ice: ['icebeam', 'icywind', 'blizzard', 'freezedry'],
+  Fighting: ['closecombat', 'brickbreak', 'focusblast', 'drainpunch'],
+  Poison: ['sludgebomb', 'poisonjab', 'toxic', 'acidspray'],
+  Ground: ['earthquake', 'bulldoze', 'dig', 'mudshot'],
+  Flying: ['airslash', 'bravebird', 'aircutter', 'gust'],
+  Psychic: ['psychic', 'psyshock', 'confusion', 'zenheadbutt'],
+  Bug: ['xscissor', 'bugbuzz', 'megahorn', 'bugbite'],
+  Rock: ['rockslide', 'stoneedge', 'rockthrow', 'rockblast'],
+  Ghost: ['shadowball', 'shadowclaw', 'lick', 'hex'],
+  Dragon: ['dragonclaw', 'dragonpulse', 'dragonbreath', 'outrage'],
+  Dark: ['darkpulse', 'crunch', 'bite', 'suckerpunch'],
+  Steel: ['ironhead', 'irontail', 'metalclaw', 'flashcannon'],
+  Fairy: ['moonblast', 'dazzlinggleam', 'playrough', 'drainingkiss'],
+  // Soulstone types get real-type-flavored proxy moves since these move ids don't
+  // exist in Showdown's moves.json; execMoveReal already understands custom types
+  // via their base power/category being resolved from the underlying real move.
+  Crystal: ['icebeam', 'rockslide', 'psychic', 'moonblast'],
+  Cosmic: ['psychic', 'dragonpulse', 'darkpulse', 'flashcannon'],
+  Nuclear: ['thunderbolt', 'sludgebomb', 'shadowball', 'facade'],
+  Stellar: ['shadowball', 'darkpulse', 'flamethrower', 'hydropump'],
+  Sound: ['bugbuzz', 'airslash', 'crunch', 'icywind'],
+  Light: ['dazzlinggleam', 'flashcannon', 'psychic', 'shadowball'],
+};
+
+function typeBasedFallbackMoves(types: string[], engine: Engine, rng: () => number): string[] {
+  const out: string[] = [];
+  const push = (id: string) => { if (id && engine.moves[id] && !out.includes(id)) out.push(id); };
+  for (const t of types) {
+    const pool = shuffle(TYPE_FALLBACK_MOVES[t] || [], rng);
+    for (const id of pool) { push(id); if (out.length >= 4) break; }
+    if (out.length >= 4) break;
+  }
+  push('tackle');
+  return out.slice(0, 4);
+}
+
 /**
  * Resolve up to 4 moves a species actually knows by the given level, using the
  * real Showdown learnset data (e.g. "9L6" = learned at level 6 in gen 9).
  * Picks the most-recently-learned moves first (mainline-accurate), instead of
  * the old random same-type movepool that could hand a level-5 Bulbasaur
- * Solar Beam. Falls back to Tackle if a species has no resolvable learnset.
+ * Solar Beam. Species with NO resolvable learnset (all custom Soulstones/
+ * Pokeathlon mons, which ship without learnset.json data) fall back to a
+ * curated on-type movepool instead of degrading to Tackle-only.
  */
-function resolveMovesForLevel(speciesKey: string, level: number, engine: Engine, rng: () => number): string[] {
+function resolveMovesForLevel(speciesKey: string, level: number, types: string[], engine: Engine, rng: () => number): string[] {
   const entry = engine.learnsets[speciesKey];
   const learnset = entry?.learnset || {};
   const candidates: { id: string; lvl: number }[] = [];
@@ -90,6 +140,7 @@ function resolveMovesForLevel(speciesKey: string, level: number, engine: Engine,
     }
     if (bestLvl >= 0) candidates.push({ id: moveId, lvl: bestLvl });
   }
+  if (candidates.length === 0) return typeBasedFallbackMoves(types, engine, rng);
   // Group by learn-level so we can prefer the most recently learned moves first,
   // randomizing the order *within* a level so repeat runs still feel varied.
   const grouped: Record<number, string[]> = {};
@@ -104,9 +155,10 @@ function resolveMovesForLevel(speciesKey: string, level: number, engine: Engine,
     }
     if (chosen.length >= 4) break;
   }
-  if (chosen.length === 0) chosen.push('tackle');
+  if (chosen.length === 0) return typeBasedFallbackMoves(types, engine, rng);
   return chosen;
 }
+
 
 // ──────────────────────────────── TYPES ─────────────────────────────────────
 
@@ -511,9 +563,10 @@ function buildRogueMon(key: string, entry: DexSpecies, level: number, engine: En
     currentHp: stats.maxHp,
     maxHp: stats.maxHp,
     atk: stats.atk, def: stats.def, spa: stats.spa, spd: stats.spd, spe: stats.spe,
-    moves: resolveMovesForLevel(key, level, engine, rng),
+    moves: resolveMovesForLevel(key, level, entry.types, engine, rng),
   };
 }
+
 
 /** Recompute a RogueMon's real battle stats for a new level, preserving current HP % (fixes
  *  the bug where leveling up only changed the displayed number with no real stat gain), and
@@ -526,9 +579,10 @@ function recomputeLevel(mon: RogueMon, newLevel: number, engine: Engine, rng: ()
     level: newLevel,
     maxHp: stats.maxHp, atk: stats.atk, def: stats.def, spa: stats.spa, spd: stats.spd, spe: stats.spe,
     currentHp: Math.max(1, Math.round(stats.maxHp * frac)),
-    moves: resolveMovesForLevel(mon.speciesId, newLevel, engine, rng),
+    moves: resolveMovesForLevel(mon.speciesId, newLevel, mon.types, engine, rng),
   };
 }
+
 
 // ──────────────────────── DYNAMIC, FAIR ENCOUNTER LEVELS ─────────────────────
 // Levels are derived from the player's CURRENT average team level rather than a
