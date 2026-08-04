@@ -30,6 +30,11 @@ import { PC_BOX_SIZE, PC_MAX_BOXES, PC_BOXES_STORAGE_KEY, readPcBoxesState } fro
 // Battle UI mode: 'ps' for Pokemon Showdown UI, 'simple' for custom SimpleBattleTab
 const BATTLE_UI_MODE: 'ps' | 'simple' = 'ps';
 
+// Temporarily hide the Rogue Mode (Beta) and PokeRogue tabs from the UI without
+// removing the underlying functionality/code. Flip to true to re-enable them.
+const SHOW_ROGUE_TABS = false;
+
+
 type Tab = 'pc' | 'battle' | 'lobby' | 'sheet' | 'rules' | 'badges' | 'fusion' | 'dex' | 'notes' | 'contest' | 'gamble' | 'rogue' | 'pokerogue' | { kind: 'psbattle'; id: string; title: string };
 
 
@@ -452,8 +457,12 @@ export function App() {
           <button className={tab === 'rules' ? 'active' : ''} onClick={() => setTab('rules')}>Rules</button>
           <button className={tab === 'badges' ? 'active' : ''} onClick={() => setTab('badges')}>Badges</button>
           <button className={tab === 'gamble' ? 'active' : ''} onClick={() => setTab('gamble')}>Gamble???</button>
-          <button className={tab === 'rogue' ? 'active' : ''} onClick={() => setTab('rogue')}>Rogue Mode (Beta)</button>
-          <button className={tab === 'pokerogue' ? 'active' : ''} onClick={() => setTab('pokerogue')}>PokeRogue</button>
+          {SHOW_ROGUE_TABS && (
+            <button className={tab === 'rogue' ? 'active' : ''} onClick={() => setTab('rogue')}>Rogue Mode (Beta)</button>
+          )}
+          {SHOW_ROGUE_TABS && (
+            <button className={tab === 'pokerogue' ? 'active' : ''} onClick={() => setTab('pokerogue')}>PokeRogue</button>
+          )}
 
 
           {extraTabs.map(t => (
