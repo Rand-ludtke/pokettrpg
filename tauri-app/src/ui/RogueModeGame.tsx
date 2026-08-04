@@ -74,7 +74,8 @@ interface RogueMon {
   atk: number; def: number; spa: number; spd: number; spe: number;
   moves: string[];
 }
-interface LogEntry { msg: string; type: 'action' | 'damage' | 'heal' | 'win' | 'lose' | 'system' | 'item'; }
+interface LogEntry { msg: string; type: 'action' | 'damage' | 'heal' | 'win' | 'lose' | 'system' | 'item' | 'catch'; }
+
 type GamePhase = 'loading' | 'main_menu' | 'starter_select' | 'exploring' | 'battle' | 'victory' | 'game_over';
 type NodeKind = 'route' | 'town' | 'rival' | 'gym' | 'elite4' | 'champion';
 
@@ -333,16 +334,20 @@ const RIVAL_POOL: RivalInfo[] = [
   { name: 'Rival Gloria', sprite: 'gloria' },
 ];
 
+// Every town sells Poké Balls — the core resource for building your team from wild encounters.
+const POKEBALL_ITEM: ShopItem = { id: 'pokeball', name: 'Poké Ball', price: 15, description: 'Throw to try to catch a weakened wild Pokémon', effect: 'utility' };
+
 const SHOP_MAP: Record<string, ShopInfo> = {
-  Rock: { name: 'Quarry Town', leader: 'Gym Leader', shopName: 'Boulder Bazaar', items: [{ id: 'potion', name: 'Potion', price: 25, description: 'Restores 30% health', effect: 'heal' }, { id: 'boost', name: 'Focus Sash', price: 40, description: 'Boosts offense for one battle', effect: 'boost' }, { id: 'utility', name: 'Escape Rope', price: 30, description: 'Utility item', effect: 'utility' }] },
-  Fire: { name: 'Ember City', leader: 'Gym Leader', shopName: 'Flame Market', items: [{ id: 'potion', name: 'Super Potion', price: 35, description: 'Restores 40% health', effect: 'heal' }, { id: 'boost', name: 'Charcoal', price: 45, description: 'Raises Attack and SpA', effect: 'boost' }, { id: 'utility', name: 'Fire Stone', price: 60, description: 'Utility relic', effect: 'utility' }] },
-  Water: { name: 'Tide Harbor', leader: 'Gym Leader', shopName: 'Wave Emporium', items: [{ id: 'potion', name: 'Fresh Water', price: 30, description: 'Heals the team slightly', effect: 'heal' }, { id: 'boost', name: 'Mystic Water', price: 50, description: 'Raises Sp. Atk', effect: 'boost' }, { id: 'utility', name: 'Dive Gear', price: 55, description: 'Route utility upgrade', effect: 'utility' }] },
-  Electric: { name: 'Volt Junction', leader: 'Gym Leader', shopName: 'Circuit Depot', items: [{ id: 'potion', name: 'Energy Root', price: 32, description: 'Heavy healing', effect: 'heal' }, { id: 'boost', name: 'Magnet', price: 48, description: 'Boosts electric power', effect: 'boost' }, { id: 'utility', name: 'Dynamo Battery', price: 58, description: 'Utility relic', effect: 'utility' }] },
-  Grass: { name: 'Bloom Village', leader: 'Gym Leader', shopName: 'Leaf Stand', items: [{ id: 'potion', name: 'Herbal Tea', price: 28, description: 'Restore HP and cure status', effect: 'heal' }, { id: 'boost', name: 'Miracle Seed', price: 42, description: 'Raises Defense', effect: 'boost' }, { id: 'utility', name: 'Seed Bag', price: 50, description: 'Exploration utility', effect: 'utility' }] },
-  Psychic: { name: 'Mindspire City', leader: 'Gym Leader', shopName: 'Oracle Arcade', items: [{ id: 'potion', name: 'Calm Elixir', price: 38, description: 'Restores max health', effect: 'heal' }, { id: 'boost', name: 'Twisted Spoon', price: 55, description: 'Boosts all stats lightly', effect: 'boost' }, { id: 'utility', name: 'Third Eye Lens', price: 70, description: 'Rare utility relic', effect: 'utility' }] },
-  Ice: { name: 'Frostpeak Town', leader: 'Gym Leader', shopName: 'Glacier Bodega', items: [{ id: 'potion', name: 'Thaw Potion', price: 34, description: 'Quick recovery brew', effect: 'heal' }, { id: 'boost', name: 'Never-Melt Ice', price: 52, description: 'Increases Sp. Def', effect: 'boost' }, { id: 'utility', name: 'Ice Pick', price: 65, description: 'Utility prize', effect: 'utility' }] },
-  Dragon: { name: 'Wyrmspire City', leader: 'Gym Leader', shopName: "Drake's Den", items: [{ id: 'potion', name: 'Dragon Balm', price: 45, description: 'Full team refresh', effect: 'heal' }, { id: 'boost', name: 'Dragon Fang', price: 65, description: 'Boosts Attack sharply', effect: 'boost' }, { id: 'utility', name: 'Wyrmscale', price: 80, description: 'Rare utility relic', effect: 'utility' }] },
+  Rock: { name: 'Quarry Town', leader: 'Gym Leader', shopName: 'Boulder Bazaar', items: [POKEBALL_ITEM, { id: 'potion', name: 'Potion', price: 25, description: 'Restores 30% health', effect: 'heal' }, { id: 'boost', name: 'Focus Sash', price: 40, description: 'Boosts offense for one battle', effect: 'boost' }, { id: 'utility', name: 'Escape Rope', price: 30, description: 'Utility item', effect: 'utility' }] },
+  Fire: { name: 'Ember City', leader: 'Gym Leader', shopName: 'Flame Market', items: [POKEBALL_ITEM, { id: 'potion', name: 'Super Potion', price: 35, description: 'Restores 40% health', effect: 'heal' }, { id: 'boost', name: 'Charcoal', price: 45, description: 'Raises Attack and SpA', effect: 'boost' }, { id: 'utility', name: 'Fire Stone', price: 60, description: 'Utility relic', effect: 'utility' }] },
+  Water: { name: 'Tide Harbor', leader: 'Gym Leader', shopName: 'Wave Emporium', items: [POKEBALL_ITEM, { id: 'potion', name: 'Fresh Water', price: 30, description: 'Heals the team slightly', effect: 'heal' }, { id: 'boost', name: 'Mystic Water', price: 50, description: 'Raises Sp. Atk', effect: 'boost' }, { id: 'utility', name: 'Dive Gear', price: 55, description: 'Route utility upgrade', effect: 'utility' }] },
+  Electric: { name: 'Volt Junction', leader: 'Gym Leader', shopName: 'Circuit Depot', items: [POKEBALL_ITEM, { id: 'potion', name: 'Energy Root', price: 32, description: 'Heavy healing', effect: 'heal' }, { id: 'boost', name: 'Magnet', price: 48, description: 'Boosts electric power', effect: 'boost' }, { id: 'utility', name: 'Dynamo Battery', price: 58, description: 'Utility relic', effect: 'utility' }] },
+  Grass: { name: 'Bloom Village', leader: 'Gym Leader', shopName: 'Leaf Stand', items: [POKEBALL_ITEM, { id: 'potion', name: 'Herbal Tea', price: 28, description: 'Restore HP and cure status', effect: 'heal' }, { id: 'boost', name: 'Miracle Seed', price: 42, description: 'Raises Defense', effect: 'boost' }, { id: 'utility', name: 'Seed Bag', price: 50, description: 'Exploration utility', effect: 'utility' }] },
+  Psychic: { name: 'Mindspire City', leader: 'Gym Leader', shopName: 'Oracle Arcade', items: [POKEBALL_ITEM, { id: 'potion', name: 'Calm Elixir', price: 38, description: 'Restores max health', effect: 'heal' }, { id: 'boost', name: 'Twisted Spoon', price: 55, description: 'Boosts all stats lightly', effect: 'boost' }, { id: 'utility', name: 'Third Eye Lens', price: 70, description: 'Rare utility relic', effect: 'utility' }] },
+  Ice: { name: 'Frostpeak Town', leader: 'Gym Leader', shopName: 'Glacier Bodega', items: [POKEBALL_ITEM, { id: 'potion', name: 'Thaw Potion', price: 34, description: 'Quick recovery brew', effect: 'heal' }, { id: 'boost', name: 'Never-Melt Ice', price: 52, description: 'Increases Sp. Def', effect: 'boost' }, { id: 'utility', name: 'Ice Pick', price: 65, description: 'Utility prize', effect: 'utility' }] },
+  Dragon: { name: 'Wyrmspire City', leader: 'Gym Leader', shopName: "Drake's Den", items: [POKEBALL_ITEM, { id: 'potion', name: 'Dragon Balm', price: 45, description: 'Full team refresh', effect: 'heal' }, { id: 'boost', name: 'Dragon Fang', price: 65, description: 'Boosts Attack sharply', effect: 'boost' }, { id: 'utility', name: 'Wyrmscale', price: 80, description: 'Rare utility relic', effect: 'utility' }] },
 };
+
 
 // ──────────────────────── DEX / SPECIES POOL HELPERS ─────────────────────────
 
@@ -566,7 +571,9 @@ const HpBar: React.FC<{ mon: RogueMon; showNumbers?: boolean; align?: 'left' | '
 interface BattleScreenProps {
   team: RogueMon[]; enemies: RogueMon[]; log: LogEntry[]; onUseMove: (m: string) => void;
   bg: string; opponentName: string; opponentSprite: string | null; playerTrainerSprite: string;
+  isWild: boolean; pokeballCount: number; teamFull: boolean; onCatch: () => void;
 }
+
 
 const BattleSprite: React.FC<{ speciesId: string; back: boolean; size: number }> = ({ speciesId, back, size }) => {
   const [src, setSrc] = useState(() => spriteUrl(speciesId, false, { back, forceStatic: true }));
@@ -581,11 +588,14 @@ const BattleSprite: React.FC<{ speciesId: string; back: boolean; size: number }>
   );
 };
 
-const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMove, bg, opponentName, opponentSprite, playerTrainerSprite }) => {
+const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMove, bg, opponentName, opponentSprite, playerTrainerSprite, isWild, pokeballCount, teamFull, onCatch }) => {
   const finished = log.some(l => l.type === 'win' || l.type === 'lose');
   const activePlayer = team.find(m => m.currentHp > 0);
   const activeEnemy = enemies.find(m => m.currentHp > 0);
   const lastMsg = log[log.length - 1]?.msg || '';
+  const caught = log.some(l => l.type === 'catch');
+  const canThrowBall = isWild && !finished && !caught && pokeballCount > 0 && !teamFull;
+
 
   return (
     <div>
@@ -670,12 +680,25 @@ const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMo
           })}
         </div>
       )}
+      {!finished && isWild && (
+        <button
+          onClick={onCatch}
+          disabled={!canThrowBall}
+          title={teamFull ? 'Your team is full (6/6) — cannot catch more right now' : pokeballCount <= 0 ? 'You have no Poké Balls — buy some in town' : 'Throw a Poké Ball to try to catch this Pokémon'}
+          style={{
+            width: '100%', marginTop: 10, padding: '12px 16px', border: 'none', borderRadius: 10,
+            background: canThrowBall ? '#e0304a' : '#555', color: '#fff', cursor: canThrowBall ? 'pointer' : 'not-allowed',
+            fontWeight: 800, fontSize: 15, opacity: canThrowBall ? 1 : 0.6,
+          }}
+        >🔴⚪ Throw Poké Ball ({pokeballCount})</button>
+      )}
       {finished && (
         <button onClick={() => onUseMove('continue')} style={{ padding: '14px 28px', border: 'none', borderRadius: 10, background: '#ffd700', color: '#222', cursor: 'pointer', fontWeight: 800, marginTop: 14, fontSize: 16 }}>Continue →</button>
       )}
     </div>
   );
 };
+
 
 // ════════════════════ OVERWORLD MAP / ROUTE PATH VISUAL ═════════════════════
 
@@ -986,12 +1009,63 @@ export const RogueModeGame: React.FC = () => {
     setPlayerTeam(teamOut); setEnemyTeam(foeOut); setBattleLog(p => [...p, ...logs]);
   }, [phase, playerTeam, enemyTeam, battleLog, currentIndex, currentNode, mapNodes]);
 
+  // ── attempt to catch the active wild Pokémon with a Poké Ball ───────────
+  // Catch chance scales with how low the wild mon's HP is (PokeRogue/mainline-style):
+  // full HP = base 30% chance, empty HP = up to 90% chance. Failing consumes the ball
+  // and costs a turn (the wild mon attacks back), matching mainline catch mechanics.
+  const attemptCatch = useCallback(() => {
+    if (battleContext !== 'wild') return;
+    if ((inventory.pokeball ?? 0) <= 0) {
+      setBattleLog(p => [...p, { msg: 'You have no Poké Balls left!', type: 'system' }]);
+      return;
+    }
+    if (playerTeam.length >= 6) {
+      setBattleLog(p => [...p, { msg: 'Your team is full — cannot catch more Pokémon right now.', type: 'system' }]);
+      return;
+    }
+    const target = enemyTeam.find(m => m.currentHp > 0);
+    if (!target) return;
+
+    setInventory(p => ({ ...p, pokeball: Math.max(0, (p.pokeball ?? 0) - 1) }));
+
+    const hpFrac = target.maxHp > 0 ? target.currentHp / target.maxHp : 1;
+    const catchChance = Math.min(0.9, 0.3 + (1 - hpFrac) * 0.6);
+    const success = Math.random() < catchChance;
+
+    if (success) {
+      setPlayerTeam(prev => [...prev, { ...target, currentHp: target.maxHp }]);
+      setEnemyTeam(prev => prev.map(m => (m === target ? { ...m, currentHp: 0 } : m)));
+      setBattleLog(p => [...p, { msg: `🔴⚪ Gotcha! ${target.displayName} was caught!`, type: 'catch' }, { msg: '✅ Catch successful!', type: 'win' }]);
+      return;
+    }
+
+    // Failed throw — wild mon breaks free and attacks back (costs a turn, mainline-style).
+    const logs: LogEntry[] = [{ msg: `Oh no! ${target.displayName} broke free!`, type: 'system' }];
+    let teamOut = playerTeam.map(m => ({ ...m }));
+    const ti = teamOut.findIndex(m => m.currentHp > 0);
+    if (ti >= 0) {
+      const tgt = teamOut[ti];
+      const mv = pickRandom(target.moves) || 'Tackle';
+      const r2 = execMove(target, tgt, mv);
+      if (r2.miss) {
+        logs.push({ msg: `${target.displayName} missed!`, type: 'action' });
+      } else {
+        teamOut[ti] = { ...teamOut[ti], currentHp: Math.max(0, tgt.currentHp - r2.damage) };
+        logs.push({ msg: `${target.displayName} used ${mv} on ${tgt.displayName}${r2.label ? ' ' + r2.label : ''} (-${r2.damage} HP)`, type: 'damage' });
+      }
+    }
+    if (!teamOut.some(m => m.currentHp > 0)) logs.push({ msg: '💀 Your team fainted!', type: 'lose' });
+    setPlayerTeam(teamOut);
+    setBattleLog(p => [...p, ...logs]);
+  }, [battleContext, inventory, playerTeam, enemyTeam]);
+
   // ── backtracking: jump to any previously-reached node ───────────────────
   const jumpToNode = useCallback((idx: number) => {
     if (idx > maxReached) return;
     setCurrentIndex(idx);
     setMapOpen(false);
   }, [maxReached]);
+
 
   const isBattleNodeCleared = currentNode?.cleared;
 
@@ -1191,8 +1265,11 @@ export const RogueModeGame: React.FC = () => {
           team={playerTeam} enemies={enemyTeam} log={battleLog} onUseMove={processAction}
           bg={currentNode.bg} opponentName={battleOpponentName} opponentSprite={battleOpponentSprite}
           playerTrainerSprite={trainerSprite}
+          isWild={battleContext === 'wild'} pokeballCount={inventory.pokeball ?? 0} teamFull={playerTeam.length >= 6}
+          onCatch={attemptCatch}
         />
       )}
+
 
       {phase === 'victory' && (
         <div style={{ textAlign: 'center', padding: 60, background: '#2d5a27', borderRadius: 10 }}>
