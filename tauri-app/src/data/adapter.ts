@@ -754,26 +754,12 @@ export async function loadShowdownDex(options?: { base?: string }) {
   ]);
 
   // ── Pokeathlon DLC – load Soulstone CAP data ────────────────────────
-  const pokeathlonDexRaw = await (async () => {
-    try {
-      const resp = await fetch('https://play.pokeathlon.com/data/pokedex.js');
-      if (!resp.ok) return undefined;
-      const text = await resp.text();
-      const m = text.match(/exports\.BattlePokedex\s*=\s*(\{)/);
-      if (!m) return undefined;
-      let depth = 0, inStr: '' | "'" | '"' = '', i = m.index! + m[0].length - 1;
-      while (i < text.length) {
-        const ch = text[i];
-        if (inStr) { if (ch === '\\') { i += 2; continue; } if (ch === inStr) inStr = ''; i++; continue; }
-        if (ch === '"' || ch === "'") { inStr = ch; i++; continue; }
-        if (ch === '{') depth++;
-        if (ch === '}') { if (depth === 1) break; depth--; }
-        i++;
-      }
-      const body = text.slice(m.index! + m[0].length - 1, m.index! + m[0].length - 1 + (i - (m.index! + m[0].length - 1)));
-      return new Function(`return (${body})`)() as Record<string, any>;
-    } catch { return undefined; }
-  })();
+  // Loaded from a pre-bundled static snapshot (public/data/pokeathlon/generated/pokedex.pokeathlon.json)
+  // instead of fetching https://play.pokeathlon.com/data/pokedex.js live: that endpoint sends no
+  // Access-Control-Allow-Origin header, so the fetch is always blocked by CORS in real browsers
+  // (verified directly against the live site). Refresh the snapshot with:
+  //   node tauri-app/scripts/fetch-pokeathlon-dex.mjs
+  const pokeathlonDexRaw = await fetchOptionalJson(withPublicBase('data/pokeathlon/generated/pokedex.pokeathlon.json'));
 
   const wylinDex = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).dex : null) || {};
   const wylinLearnsets = (wylinPack && typeof wylinPack === 'object' ? (wylinPack as any).learnsets : null) || {};
@@ -827,15 +813,13 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumDex || {}) as DexIndex),
     ...((infinityDex || {}) as DexIndex),
     ...((mariomonDex || {}) as DexIndex),
-    // Inject only non-canonical pokeathlon entries (Soulstone, Custom)
-    ...(Array.isArray(pokeathlonDexRaw) ? [] : pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' ? (() => {
+    // Bundled pokeathlon snapshot is pre-filtered to Custom fangame entries only
+    // (see scripts/fetch-pokeathlon-dex.mjs), so just normalize keys and merge directly.
+    ...(pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' && !Array.isArray(pokeathlonDexRaw) ? (() => {
       const injected: DexIndex = {};
-      for (const [id, entry] of Object.entries(pokeathlonDexRaw)) {
-        if (!entry || typeof entry !== 'object') continue;
-        // Only inject fangame entries — canon base showdown pokemon stay from pokedex above
-        if ((entry as any).isNonstandard === 'Custom' && typeof (entry as any).name === 'string') {
-          injected[normalizeName(id)] = entry as DexSpecies;
-        }
+      for (const [id, entry] of Object.entries(pokeathlonDexRaw as Record<string, any>)) {
+        if (!entry || typeof entry !== 'object' || typeof (entry as any).name !== 'string') continue;
+        injected[normalizeName(id)] = entry as DexSpecies;
       }
       return injected;
     })() : {}),
@@ -893,7 +877,21 @@ export async function loadShowdownDex(options?: { base?: string }) {
     addSourceTags(pokeathlonDexRaw as Record<string, any>, 'pokeathlon');
   }
 
-  // Build Pokeathlon fangame sprite source map for sprite resolution (uranium/infinity/mariomon/pokeathlon)
+  // Build Pokeathlon fangame sprite source map for sprite resolution.
+  // Pokeathlon's CDN hosts sprites in 7 distinct folders, one per fangame source:
+  // Infinite Fusion, Pokeathlon, Insurgence, Uranium, Infinity, Mariomon, Soulstones.
+  // Each entry's own `tags` array tells us which folder it actually lives in — we must
+  // NOT blanket-tag every injected entry as 'pokeathlon', or sprites for Soulstones/
+  // Uranium/Insurgence/etc. species will 404 (wrong folder + wrong extension).
+  // Priority order matches pokeathlon's own client.js sprite resolver exactly.
+  const FANGAME_TAG_PRIORITY = ['Infinite Fusion', 'Pokeathlon', 'Insurgence', 'Uranium', 'Infinity', 'Mariomon', 'Soulstones'] as const;
+  const fangameFolderForTags = (tags: unknown): string | null => {
+    if (!Array.isArray(tags)) return null;
+    for (const candidate of FANGAME_TAG_PRIORITY) {
+      if (tags.includes(candidate)) return normalizeName(candidate);
+    }
+    return null;
+  };
   const fangameSpriteMap = new Map<string, string>();
   for (const [tag, dexObj] of [['uranium', uraniumDex], ['infinity', infinityDex], ['mariomon', mariomonDex]] as const) {
     if (dexObj) {
@@ -902,13 +900,14 @@ export async function loadShowdownDex(options?: { base?: string }) {
       }
     }
   }
-  // Add pokeathlon keys to sprite map for CDN-based sprite resolution
+  // Add pokeathlon-sourced keys to the sprite map using their OWN tags to pick the
+  // correct CDN folder, instead of collapsing everything to a single 'pokeathlon' bucket.
   if (pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' && !Array.isArray(pokeathlonDexRaw)) {
     for (const id of Object.keys(pokeathlonDexRaw)) {
       const entry = (pokeathlonDexRaw as Record<string, any>)[id];
-      if (entry && typeof entry === 'object' && (entry as any).isNonstandard === 'Custom') {
-        fangameSpriteMap.set(normalizeName(id), 'pokeathlon');
-      }
+      if (!entry || typeof entry !== 'object' || (entry as any).isNonstandard !== 'Custom') continue;
+      const folder = fangameFolderForTags((entry as any).tags) || 'pokeathlon';
+      fangameSpriteMap.set(normalizeName(id), folder);
     }
   }
   gFangameSpriteSource = fangameSpriteMap;
@@ -1405,11 +1404,15 @@ export function spriteUrl(speciesId: string, shiny = false, options?: { base?: s
   // instead of ids[0] which may contain dashes (e.g. "blissey-egho" → "blisseyegho").
   const fgTag = gFangameSpriteSource.get(normalizeName(speciesId));
   if (fgTag) {
-    const fgExt = fgTag === 'uranium' ? 'gif' : 'png';
+    const fgFileName = normalizeName(speciesId);
+    if (fgTag === 'infinitefusion') {
+      // Infinite Fusion sprites have no front/back subfolder and no shiny variant.
+      return `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/${fgFileName}.png`;
+    }
+    const fgExt = (fgTag === 'uranium' || fgTag === 'pokeathlon') ? 'gif' : 'png';
     const fgDir = !!options?.back
       ? (shiny ? 'back-shiny' : 'back')
       : (shiny ? 'front-shiny' : 'front');
-    const fgFileName = normalizeName(speciesId);
     return `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/${fgDir}/${fgFileName}.${fgExt}`;
   }
   // Fall back to the first candidate file path
@@ -1963,20 +1966,33 @@ export async function listPokemonSpriteOptions(
   // Insert as the first option so the correct sprite is always selectable.
   const fgTag = gFangameSpriteSource.get(normalizeName(speciesName));
   if (fgTag) {
-    const fgExt = fgTag === 'uranium' ? 'gif' : 'png';
     // CDN filenames are fully normalized (no hyphens)
     const fgId = normalizeName(speciesName);
-    const fgFront = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/front/${fgId}.${fgExt}`;
-    const fgBack = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/back/${fgId}.${fgExt}`;
-    out.unshift({
-      id: `fangame:${fgTag}:${fgId}`,
-      label: `${fgTag.charAt(0).toUpperCase() + fgTag.slice(1)} • Base`,
-      spriteId: fgId,
-      set: 'gen5',
-      front: fgFront,
-      back: fgBack,
-      animated: fgExt === 'gif',
-    });
+    if (fgTag === 'infinitefusion') {
+      // Infinite Fusion sprites have no front/back subfolder and no shiny variant.
+      const fgFlatUrl = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/${fgId}.png`;
+      out.unshift({
+        id: `fangame:${fgTag}:${fgId}`,
+        label: 'Infinite Fusion • Base',
+        spriteId: fgId,
+        set: 'gen5',
+        front: fgFlatUrl,
+        animated: false,
+      });
+    } else {
+      const fgExt = (fgTag === 'uranium' || fgTag === 'pokeathlon') ? 'gif' : 'png';
+      const fgFront = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/front/${fgId}.${fgExt}`;
+      const fgBack = `https://play.pokeathlon.com/sprites/fangame-sprites/${fgTag}/back/${fgId}.${fgExt}`;
+      out.unshift({
+        id: `fangame:${fgTag}:${fgId}`,
+        label: `${fgTag.charAt(0).toUpperCase() + fgTag.slice(1)} • Base`,
+        spriteId: fgId,
+        set: 'gen5',
+        front: fgFront,
+        back: fgBack,
+        animated: fgExt === 'gif',
+      });
+    }
   }
 
   // De-duplicate by front URL while preserving order.
@@ -2094,13 +2110,20 @@ export function spriteUrlWithFallback(
   const fangameTag = gFangameSpriteSource.get(normalizeName(speciesId));
   if (fangameTag) {
     const pokeathlonBase = 'https://play.pokeathlon.com/sprites/fangame-sprites';
-    // Uranium/Pokeathlon use .gif; Infinity/Mariomon use .png
-    const fgExt = fangameTag === 'uranium' ? 'gif' : 'png';
-    for (const id of idList) {
-      const frontDir = shiny ? 'front-shiny' : 'front';
-      const backDir = shiny ? 'back-shiny' : 'back';
-      const dir = back ? backDir : frontDir;
-      candidates.push(`${pokeathlonBase}/${fangameTag}/${dir}/${id}.${fgExt}`);
+    if (fangameTag === 'infinitefusion') {
+      // Infinite Fusion sprites have no front/back subfolder and no shiny variant.
+      for (const id of idList) {
+        candidates.push(`${pokeathlonBase}/${fangameTag}/${id}.png`);
+      }
+    } else {
+      // Uranium/Pokeathlon use .gif; Insurgence/Infinity/Mariomon/Soulstones use .png
+      const fgExt = (fangameTag === 'uranium' || fangameTag === 'pokeathlon') ? 'gif' : 'png';
+      for (const id of idList) {
+        const frontDir = shiny ? 'front-shiny' : 'front';
+        const backDir = shiny ? 'back-shiny' : 'back';
+        const dir = back ? backDir : frontDir;
+        candidates.push(`${pokeathlonBase}/${fangameTag}/${dir}/${id}.${fgExt}`);
+      }
     }
   }
   // Try each ID across ALL bases before moving to the next ID.
