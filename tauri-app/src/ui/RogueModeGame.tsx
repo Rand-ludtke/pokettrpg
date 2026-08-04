@@ -1,21 +1,23 @@
 // RogueModeGame.tsx — PokeRogue-style dungeon-crawl mode built on the REAL merged Pokedex
 // (base Showdown dex + Sage/Insurgence/Wylin/Uranium/Infinity/Mariomon/Pokeathlon-Soulstones,
-// 4000+ species total). Starts with a chosen starter from ANY generation, allows full
-// backtracking through every previously-visited route, features a persistent recurring
-// rival, seed-based deterministic run generation, true permadeath, and a PokeRogue/mainline
-// -style battle arena + overworld route visual. The entire run is persisted to localStorage
-// so switching app tabs never resets progress — it resumes exactly where you left off.
+// 4000+ species total). Single starter (chosen from a "Starter Box" grid with a candy-based
+// unlock system persisted across runs), full backtracking, real level-up/TM learnset-derived
+// movesets (no more random type movepools), fair level-scaling tied to the player's current
+// team level, a real roster of official regional gym leaders / Elite Four / Champions, a
+// persistent recurring rival, seed-based deterministic run generation, true permadeath, a
+// PokeRogue/mainline-style battle arena + overworld map, and a working Poké Ball catch system.
+// The entire run is persisted to localStorage so switching app tabs never resets progress.
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { loadShowdownDex, spriteUrl, iconUrl, type DexIndex, type DexSpecies } from '../data/adapter';
+import { loadShowdownDex, spriteUrl, iconUrl, type DexIndex, type DexSpecies, type MoveIndex, type LearnsetsIndex } from '../data/adapter';
 import { getClient } from '../net/pokettrpgClient';
 import { withPublicBase } from '../utils/publicBase';
 
 // ──────────────────────────────── SEEDED RNG ─────────────────────────────────
 // Deterministic PRNG so a given seed always reproduces the same map layout,
-// gym-order, rival identity, leader variants and wild encounters (PokeRogue-style
-// run variation via seeds). Battle-turn randomness (miss chance, AI move choice)
-// intentionally still uses Math.random so battles themselves stay unpredictable.
+// gym-order, rival identity, leader variants, movesets and wild encounters
+// (PokeRogue-style run variation via seeds). Battle-turn randomness (miss chance,
+// AI move choice) intentionally still uses Math.random so battles stay unpredictable.
 
 function xmur3(str: string): () => number {
   let h = 1779033703 ^ str.length;
@@ -58,6 +60,54 @@ function pickRandom<T>(arr: T[], rng: () => number = Math.random): T | undefined
   return arr[Math.floor(rng() * arr.length)];
 }
 
+// ──────────────────────────────── ENGINE CONTEXT ─────────────────────────────
+// Bundles the loaded dex/moves/learnsets so battle-team generation can resolve
+// REAL level-up movesets instead of a synthetic per-type movepool.
+
+interface Engine { dex: DexIndex; moves: MoveIndex; learnsets: LearnsetsIndex; }
+
+/**
+ * Resolve up to 4 moves a species actually knows by the given level, using the
+ * real Showdown learnset data (e.g. "9L6" = learned at level 6 in gen 9).
+ * Picks the most-recently-learned moves first (mainline-accurate), instead of
+ * the old random same-type movepool that could hand a level-5 Bulbasaur
+ * Solar Beam. Falls back to Tackle if a species has no resolvable learnset.
+ */
+function resolveMovesForLevel(speciesKey: string, level: number, engine: Engine, rng: () => number): string[] {
+  const entry = engine.learnsets[speciesKey];
+  const learnset = entry?.learnset || {};
+  const candidates: { id: string; lvl: number }[] = [];
+  for (const [moveId, tags] of Object.entries(learnset)) {
+    if (!Array.isArray(tags)) continue;
+    if (!engine.moves[moveId]) continue; // skip moves we don't have data for
+    let bestLvl = -1;
+    for (const t of tags as unknown as string[]) {
+      const m = /^\d+L(\d+)$/.exec(String(t));
+      if (m) {
+        const lvl = parseInt(m[1], 10);
+        if (lvl <= level && lvl > bestLvl) bestLvl = lvl;
+      }
+    }
+    if (bestLvl >= 0) candidates.push({ id: moveId, lvl: bestLvl });
+  }
+  // Group by learn-level so we can prefer the most recently learned moves first,
+  // randomizing the order *within* a level so repeat runs still feel varied.
+  const grouped: Record<number, string[]> = {};
+  for (const c of candidates) { (grouped[c.lvl] = grouped[c.lvl] || []).push(c.id); }
+  const orderedLevels = Object.keys(grouped).map(Number).sort((a, b) => b - a);
+  const chosen: string[] = [];
+  for (const lvl of orderedLevels) {
+    const group = shuffle(grouped[lvl], rng);
+    for (const id of group) {
+      if (!chosen.includes(id)) chosen.push(id);
+      if (chosen.length >= 4) break;
+    }
+    if (chosen.length >= 4) break;
+  }
+  if (chosen.length === 0) chosen.push('tackle');
+  return chosen;
+}
+
 // ──────────────────────────────── TYPES ─────────────────────────────────────
 
 interface RogueMon {
@@ -72,6 +122,7 @@ interface RogueMon {
   currentHp: number;
   maxHp: number;
   atk: number; def: number; spa: number; spd: number; spe: number;
+  /** Move IDs (Showdown-style, e.g. "vinewhip") resolved from the real learnset at this level. */
   moves: string[];
 }
 interface LogEntry { msg: string; type: 'action' | 'damage' | 'heal' | 'win' | 'lose' | 'system' | 'item' | 'catch'; }
@@ -86,8 +137,6 @@ interface MapNode {
   kind: NodeKind;
   name: string;
   type: string; // primary theme type for this node (route encounters / gym specialty)
-  levelLo: number;
-  levelHi: number;
   bg: string; // background image key (gen6bgs)
   gymDef?: GymLeaderDef;
   rivalOccurrence?: number; // 1-based count of which rival appearance this is
@@ -100,8 +149,8 @@ interface RivalInfo { name: string; sprite: string; }
 
 // ──────────────────── PERSISTENT RUN STORAGE (survives tab switches) ────────
 
-const RUN_STORAGE_KEY = 'ttrpg.rogueRun.v3';
-const RUN_STORAGE_VERSION = 3;
+const RUN_STORAGE_KEY = 'ttrpg.rogueRun.v4';
+const RUN_STORAGE_VERSION = 4;
 
 interface PersistedRun {
   version: number;
@@ -119,6 +168,8 @@ interface PersistedRun {
   battleLog: LogEntry[];
   battleContext: 'wild' | 'trainer';
   rival: RivalInfo | null;
+  championName: string;
+  championSprite: string;
 }
 
 function loadPersistedRun(): PersistedRun | null {
@@ -135,6 +186,31 @@ function savePersistedRun(run: PersistedRun): void {
 }
 function clearPersistedRun(): void {
   try { window.localStorage?.removeItem(RUN_STORAGE_KEY); } catch {}
+}
+
+// ──────────────────── PERSISTENT META PROGRESSION (starter unlocks/candy) ────
+// Separate from the run save — survives across runs permanently, PokeRogue-style.
+
+const META_STORAGE_KEY = 'ttrpg.rogueMeta.v1';
+interface RogueMeta { candy: number; unlocked: string[]; }
+const DEFAULT_UNLOCKED = ['bulbasaur', 'charmander', 'squirtle'];
+
+function loadMeta(): RogueMeta {
+  try {
+    const raw = window.localStorage?.getItem(META_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.unlocked)) return { candy: Number(parsed.candy) || 0, unlocked: parsed.unlocked };
+    }
+  } catch {}
+  return { candy: 0, unlocked: [...DEFAULT_UNLOCKED] };
+}
+function saveMeta(meta: RogueMeta): void {
+  try { window.localStorage?.setItem(META_STORAGE_KEY, JSON.stringify(meta)); } catch {}
+}
+/** Candy cost to unlock a starter, scaled by generation (later gens cost more). */
+function unlockCost(gen: number): number {
+  return 20 + (gen - 1) * 10;
 }
 
 // ──────────────────── TYPE COLOR PALETTE ─────────────────────────────────
@@ -215,109 +291,114 @@ function getEffectiveness(attackerType: string, defenderTypes: string[]): number
   return mult;
 }
 
-// ──────────────────── MOVE LIBRARY + PER-TYPE MOVE POOLS ────────────────────
+// Status moves that restore HP — used since real move data doesn't carry "heal" semantics
+// in our simplified engine; whitelisting the common recovery moves keeps them useful.
+const HEAL_MOVE_IDS = new Set(['recover', 'roost', 'softboiled', 'milkdrink', 'synthesis', 'moonlight', 'morningsun', 'slackoff', 'shoreup', 'wish', 'rest', 'junglehealing', 'lifedew', 'strengthsap']);
 
-interface MoveDef { power: number; type: string; pp: number; category: 'physical' | 'special' | 'status'; }
-const MOVES_DB: Record<string, MoveDef> = {
-  Tackle: { power: 40, type: 'Normal', pp: 35, category: 'physical' }, Scratch: { power: 40, type: 'Normal', pp: 35, category: 'physical' },
-  Headbutt: { power: 70, type: 'Normal', pp: 15, category: 'physical' }, QuickAttack: { power: 40, type: 'Normal', pp: 30, category: 'physical' },
-  BodySlam: { power: 85, type: 'Normal', pp: 15, category: 'physical' },
-  ThunderPunch: { power: 75, type: 'Electric', pp: 15, category: 'physical' }, IcePunch: { power: 75, type: 'Ice', pp: 15, category: 'physical' },
-  FirePunch: { power: 75, type: 'Fire', pp: 15, category: 'physical' }, DragonClaw: { power: 80, type: 'Dragon', pp: 15, category: 'physical' },
-  DarkPulse: { power: 80, type: 'Dark', pp: 15, category: 'special' }, IronTail: { power: 100, type: 'Steel', pp: 15, category: 'physical' },
-  Ember: { power: 40, type: 'Fire', pp: 25, category: 'special' }, WaterGun: { power: 40, type: 'Water', pp: 25, category: 'special' },
-  VineWhip: { power: 45, type: 'Grass', pp: 25, category: 'physical' }, ThunderShock: { power: 40, type: 'Electric', pp: 30, category: 'special' },
-  Thunderbolt: { power: 90, type: 'Electric', pp: 15, category: 'special' }, Flamethrower: { power: 90, type: 'Fire', pp: 15, category: 'special' },
-  HydroPump: { power: 110, type: 'Water', pp: 5, category: 'special' }, SolarBeam: { power: 120, type: 'Grass', pp: 5, category: 'special' },
-  Psychic: { power: 90, type: 'Psychic', pp: 10, category: 'special' }, ShadowBall: { power: 80, type: 'Ghost', pp: 15, category: 'special' },
-  AuraSphere: { power: 80, type: 'Fighting', pp: 20, category: 'special' }, Moonblast: { power: 95, type: 'Fairy', pp: 15, category: 'special' },
-  FreezeDry: { power: 70, type: 'Ice', pp: 20, category: 'special' },
-  Earthquake: { power: 100, type: 'Ground', pp: 10, category: 'physical' }, Dig: { power: 60, type: 'Ground', pp: 10, category: 'physical' },
-  RockSlide: { power: 75, type: 'Rock', pp: 10, category: 'physical' }, RockThrow: { power: 50, type: 'Rock', pp: 15, category: 'physical' },
-  Lick: { power: 30, type: 'Ghost', pp: 30, category: 'physical' }, DragonBreath: { power: 60, type: 'Dragon', pp: 20, category: 'special' },
-  Bite: { power: 60, type: 'Dark', pp: 25, category: 'physical' }, MetalClaw: { power: 50, type: 'Steel', pp: 35, category: 'physical' },
-  DazzlingGleam: { power: 80, type: 'Fairy', pp: 10, category: 'special' }, XScissor: { power: 80, type: 'Bug', pp: 15, category: 'physical' },
-  BugBite: { power: 60, type: 'Bug', pp: 20, category: 'physical' }, AirSlash: { power: 75, type: 'Flying', pp: 15, category: 'special' },
-  Gust: { power: 40, type: 'Flying', pp: 35, category: 'special' }, Confusion: { power: 50, type: 'Psychic', pp: 25, category: 'special' },
-  SludgeBomb: { power: 90, type: 'Poison', pp: 10, category: 'special' }, PoisonSting: { power: 15, type: 'Poison', pp: 35, category: 'physical' },
-  CloseCombat: { power: 100, type: 'Fighting', pp: 5, category: 'physical' },
-  // SoulStone special moves
-  CrystalRay: { power: 85, type: 'Crystal', pp: 10, category: 'special' }, PrismShot: { power: 95, type: 'Crystal', pp: 5, category: 'special' },
-  CosmicBeam: { power: 90, type: 'Cosmic', pp: 10, category: 'special' }, Stardust: { power: 75, type: 'Cosmic', pp: 15, category: 'special' },
-  NuclearBlast: { power: 95, type: 'Nuclear', pp: 8, category: 'special' }, RadiationWave: { power: 80, type: 'Nuclear', pp: 12, category: 'special' },
-  StellarBeam: { power: 90, type: 'Stellar', pp: 10, category: 'special' }, CometPunch: { power: 65, type: 'Stellar', pp: 18, category: 'physical' },
-  LightBeam: { power: 90, type: 'Light', pp: 10, category: 'special' }, RadiantPulse: { power: 75, type: 'Light', pp: 14, category: 'special' },
-  SoundWave: { power: 80, type: 'Sound', pp: 12, category: 'special' }, EchoBlade: { power: 70, type: 'Sound', pp: 16, category: 'physical' },
-  Recover: { power: 0, type: 'Normal', pp: 10, category: 'status' },
-};
+/** Fallback move used only when a species has zero resolvable learnset data. */
+const FALLBACK_MOVE_ID = 'tackle';
 
-const TYPE_MOVE_POOL: Record<string, string[]> = {
-  Normal: ['Tackle', 'QuickAttack', 'BodySlam', 'Headbutt'],
-  Fire: ['Ember', 'Flamethrower', 'FirePunch'],
-  Water: ['WaterGun', 'HydroPump'],
-  Electric: ['ThunderShock', 'Thunderbolt', 'ThunderPunch'],
-  Grass: ['VineWhip', 'SolarBeam'],
-  Ice: ['IcePunch', 'FreezeDry'],
-  Fighting: ['AuraSphere', 'CloseCombat'],
-  Poison: ['SludgeBomb', 'PoisonSting'],
-  Ground: ['Earthquake', 'Dig'],
-  Flying: ['AirSlash', 'Gust'],
-  Psychic: ['Psychic', 'Confusion'],
-  Bug: ['XScissor', 'BugBite'],
-  Rock: ['RockSlide', 'RockThrow'],
-  Ghost: ['ShadowBall', 'Lick'],
-  Dragon: ['DragonClaw', 'DragonBreath'],
-  Dark: ['DarkPulse', 'Bite'],
-  Steel: ['IronTail', 'MetalClaw'],
-  Fairy: ['Moonblast', 'DazzlingGleam'],
-  Crystal: ['CrystalRay', 'PrismShot'],
-  Cosmic: ['CosmicBeam', 'Stardust'],
-  Nuclear: ['NuclearBlast', 'RadiationWave'],
-  Stellar: ['StellarBeam', 'CometPunch'],
-  Light: ['LightBeam', 'RadiantPulse'],
-  Sound: ['SoundWave', 'EchoBlade'],
-};
+function execMoveReal(attacker: RogueMon, defender: RogueMon, moveId: string, moves: MoveIndex): { damage: number; label: string; miss: boolean; heal: number; displayName: string } {
+  const mv = moves[moveId];
+  const displayName = mv?.name || moveId;
+  if (!mv) return { damage: 0, label: '', miss: false, heal: 0, displayName };
 
-function pickMovesForTypes(types: string[]): string[] {
-  const out: string[] = [];
-  const push = (m: string) => { if (m && !out.includes(m)) out.push(m); };
-  for (const t of types) {
-    const pool = TYPE_MOVE_POOL[t] || [];
-    for (const m of pool) { push(m); if (out.length >= 3) break; }
-    if (out.length >= 3) break;
+  if (HEAL_MOVE_IDS.has(moveId)) {
+    const heal = Math.floor(attacker.maxHp * 0.5);
+    return { damage: 0, label: '', miss: false, heal, displayName };
   }
-  push('Tackle');
-  push('QuickAttack');
-  return out.slice(0, 4);
+  if (mv.category === 'Status' || !mv.basePower) {
+    return { damage: 0, label: '', miss: false, heal: 0, displayName };
+  }
+
+  const eff = getEffectiveness(mv.type, defender.types);
+  let label: string;
+  if (eff > 1) label = `✨${Math.round(eff * 100)}%`;
+  else if (eff === 0) label = '🚫 No Effect!';
+  else if (eff < 1) label = '🛡️ not very effective…';
+  else label = '';
+
+  if (mv.accuracy !== true && typeof mv.accuracy === 'number') {
+    if (Math.random() * 100 > mv.accuracy) return { damage: 0, label: '💨 Missed!', miss: true, heal: 0, displayName };
+  }
+
+  const atkSt = mv.category === 'Physical' ? attacker.atk : attacker.spa;
+  const defSt = Math.max((mv.category === 'Physical' ? defender.def : defender.spd) * 0.8, 1);
+  const baseDmg = ((2 * attacker.level / 5 + 2) * mv.basePower * atkSt / (defSt * 50)) + 2;
+  return { damage: Math.max(1, Math.floor(baseDmg * eff)), label, miss: false, heal: 0, displayName };
 }
 
-// ──────────────────── GYM / ELITE FOUR / CHAMPION / RIVAL DEFINITIONS ────────
+// ──────────────────── REAL GYM LEADERS / ELITE FOUR / CHAMPIONS ─────────────
+// Actual official mainline-series gym leaders, Elite Four members and Champions,
+// grouped by their canon specialty type, drawn from across every generation —
+// PokeRogue-style "mix of real leaders" rather than invented placeholder names.
+// Sprites verified to exist in vendor/showdown/sprites/trainers/.
 
 const GYM_TYPES = ['Rock', 'Fire', 'Water', 'Electric', 'Grass', 'Psychic', 'Ice', 'Dragon'];
 const ELITE_FOUR_TYPES = ['Ghost', 'Dark', 'Fighting', 'Steel'];
 
-// 2 leader variants per gym type for variety — one is randomly picked per new run (seeded).
-// Sprites are verified-existing files in vendor/showdown/sprites/trainers/.
 const GYM_LEADER_POOL: Record<string, { name: string; badge: string; sprite: string }[]> = {
-  Rock: [{ name: 'Roxanne', badge: 'Boulder Badge', sprite: 'roxanne' }, { name: 'Roark', badge: 'Boulder Badge', sprite: 'roark' }],
-  Fire: [{ name: 'Blaine', badge: 'Flame Badge', sprite: 'blaine' }, { name: 'Flannery', badge: 'Flame Badge', sprite: 'flannery' }],
-  Water: [{ name: 'Misty', badge: 'Wave Badge', sprite: 'misty' }, { name: 'Juan', badge: 'Wave Badge', sprite: 'juan' }],
-  Electric: [{ name: 'Lt. Surge', badge: 'Bolt Badge', sprite: 'ltsurge' }, { name: 'Wattson', badge: 'Bolt Badge', sprite: 'wattson' }],
-  Grass: [{ name: 'Erika', badge: 'Leaf Badge', sprite: 'erika' }, { name: 'Gardenia', badge: 'Leaf Badge', sprite: 'gardenia' }],
-  Psychic: [{ name: 'Sabrina', badge: 'Mind Badge', sprite: 'sabrina' }, { name: 'Olympia', badge: 'Mind Badge', sprite: 'olympia' }],
-  Ice: [{ name: 'Pryce', badge: 'Frost Badge', sprite: 'pryce' }, { name: 'Brycen', badge: 'Frost Badge', sprite: 'brycen' }],
-  Dragon: [{ name: 'Clair', badge: 'Dragon Badge', sprite: 'clair' }, { name: 'Drayden', badge: 'Dragon Badge', sprite: 'drayden' }],
+  Rock: [
+    { name: 'Roxanne', badge: 'Stone Badge', sprite: 'roxanne' },
+    { name: 'Roark', badge: 'Coal Badge', sprite: 'roark' },
+    { name: 'Grant', badge: 'Cliff Badge', sprite: 'grant' },
+  ],
+  Fire: [
+    { name: 'Blaine', badge: 'Volcano Badge', sprite: 'blaine' },
+    { name: 'Flannery', badge: 'Heat Badge', sprite: 'flannery' },
+    { name: 'Kabu', badge: 'Fire Badge', sprite: 'kabu' },
+  ],
+  Water: [
+    { name: 'Misty', badge: 'Cascade Badge', sprite: 'misty' },
+    { name: 'Juan', badge: 'Rain Badge', sprite: 'juan' },
+    { name: 'Nessa', badge: 'Water Badge', sprite: 'nessa' },
+  ],
+  Electric: [
+    { name: 'Lt. Surge', badge: 'Thunder Badge', sprite: 'ltsurge' },
+    { name: 'Wattson', badge: 'Dynamo Badge', sprite: 'wattson' },
+    { name: 'Elesa', badge: 'Bolt Badge', sprite: 'elesa' },
+    { name: 'Iono', badge: 'Bolt Badge', sprite: 'iono' },
+  ],
+  Grass: [
+    { name: 'Erika', badge: 'Rainbow Badge', sprite: 'erika' },
+    { name: 'Gardenia', badge: 'Forest Badge', sprite: 'gardenia' },
+    { name: 'Milo', badge: 'Grass Badge', sprite: 'milo' },
+  ],
+  Psychic: [
+    { name: 'Sabrina', badge: 'Marsh Badge', sprite: 'sabrina' },
+    { name: 'Olympia', badge: 'Psychic Badge', sprite: 'olympia' },
+    { name: 'Tulip', badge: 'Psychic Badge', sprite: 'tulip' },
+  ],
+  Ice: [
+    { name: 'Pryce', badge: 'Glacier Badge', sprite: 'pryce' },
+    { name: 'Brycen', badge: 'Freeze Badge', sprite: 'brycen' },
+    { name: 'Melony', badge: 'Ice Badge', sprite: 'melony' },
+    { name: 'Grusha', badge: 'Ice Badge', sprite: 'grusha' },
+  ],
+  Dragon: [
+    { name: 'Clair', badge: 'Rising Badge', sprite: 'clair' },
+    { name: 'Drayden', badge: 'Legend Badge', sprite: 'drayden' },
+    { name: 'Raihan', badge: 'Dragon Badge', sprite: 'raihan' },
+  ],
 };
 
-const ELITE_FOUR_LEADERS: { type: string; name: string; sprite: string }[] = [
-  { type: 'Ghost', name: 'Elite Four • Koga', sprite: 'koga' },
-  { type: 'Dark', name: 'Elite Four • Karen', sprite: 'karen' },
-  { type: 'Fighting', name: 'Elite Four • Bruno', sprite: 'bruno' },
-  { type: 'Steel', name: 'Elite Four • Will', sprite: 'will' },
-];
+const ELITE_FOUR_POOL: Record<string, { name: string; sprite: string }[]> = {
+  Ghost: [{ name: 'Shauntal', sprite: 'shauntal' }],
+  Dark: [{ name: 'Karen', sprite: 'karen' }, { name: 'Grimsley', sprite: 'grimsley' }],
+  Fighting: [{ name: 'Bruno', sprite: 'bruno' }, { name: 'Marshal', sprite: 'marshal' }],
+  Steel: [{ name: 'Wikstrom', sprite: 'wikstrom' }],
+};
 
-const CHAMPION_NAME = 'Champion Cynthia';
-const CHAMPION_SPRITE = 'cynthia';
+const CHAMPION_POOL: { name: string; sprite: string }[] = [
+  { name: 'Champion Blue', sprite: 'blue' },
+  { name: 'Champion Steven', sprite: 'steven' },
+  { name: 'Champion Cynthia', sprite: 'cynthia' },
+  { name: 'Champion Alder', sprite: 'alder' },
+  { name: 'Champion Diantha', sprite: 'diantha' },
+  { name: 'Champion Kukui', sprite: 'kukui' },
+  { name: 'Champion Leon', sprite: 'leon' },
+  { name: 'Champion Geeta', sprite: 'geeta' },
+];
 
 // Persistent recurring rival — one is chosen (seeded) per run and grows stronger every time
 // they reappear, instead of being a random one-off encounter type.
@@ -347,7 +428,6 @@ const SHOP_MAP: Record<string, ShopInfo> = {
   Ice: { name: 'Frostpeak Town', leader: 'Gym Leader', shopName: 'Glacier Bodega', items: [POKEBALL_ITEM, { id: 'potion', name: 'Thaw Potion', price: 34, description: 'Quick recovery brew', effect: 'heal' }, { id: 'boost', name: 'Never-Melt Ice', price: 52, description: 'Increases Sp. Def', effect: 'boost' }, { id: 'utility', name: 'Ice Pick', price: 65, description: 'Utility prize', effect: 'utility' }] },
   Dragon: { name: 'Wyrmspire City', leader: 'Gym Leader', shopName: "Drake's Den", items: [POKEBALL_ITEM, { id: 'potion', name: 'Dragon Balm', price: 45, description: 'Full team refresh', effect: 'heal' }, { id: 'boost', name: 'Dragon Fang', price: 65, description: 'Boosts Attack sharply', effect: 'boost' }, { id: 'utility', name: 'Wyrmscale', price: 80, description: 'Rare utility relic', effect: 'utility' }] },
 };
-
 
 // ──────────────────────── DEX / SPECIES POOL HELPERS ─────────────────────────
 
@@ -416,7 +496,7 @@ function computeMonStats(base: RogueMon['base'], level: number, mult: number) {
   };
 }
 
-function buildRogueMon(key: string, entry: DexSpecies, level: number, isBoss = false): RogueMon {
+function buildRogueMon(key: string, entry: DexSpecies, level: number, engine: Engine, rng: () => number, isBoss = false): RogueMon {
   const bs = entry.baseStats;
   const base = { hp: bs.hp || 1, atk: bs.atk || 1, def: bs.def || 1, spa: bs.spa || 1, spd: bs.spd || 1, spe: bs.spe || 1 };
   const mult = isBoss ? 1.15 : 1;
@@ -431,13 +511,14 @@ function buildRogueMon(key: string, entry: DexSpecies, level: number, isBoss = f
     currentHp: stats.maxHp,
     maxHp: stats.maxHp,
     atk: stats.atk, def: stats.def, spa: stats.spa, spd: stats.spd, spe: stats.spe,
-    moves: pickMovesForTypes(entry.types),
+    moves: resolveMovesForLevel(key, level, engine, rng),
   };
 }
 
 /** Recompute a RogueMon's real battle stats for a new level, preserving current HP % (fixes
- *  the bug where leveling up only changed the displayed number with no real stat gain). */
-function recomputeLevel(mon: RogueMon, newLevel: number): RogueMon {
+ *  the bug where leveling up only changed the displayed number with no real stat gain), and
+ *  re-resolves its moveset from the real learnset so it learns new moves as it levels up. */
+function recomputeLevel(mon: RogueMon, newLevel: number, engine: Engine, rng: () => number): RogueMon {
   const frac = mon.maxHp > 0 ? mon.currentHp / mon.maxHp : 1;
   const stats = computeMonStats(mon.base, newLevel, mon.mult);
   return {
@@ -445,24 +526,32 @@ function recomputeLevel(mon: RogueMon, newLevel: number): RogueMon {
     level: newLevel,
     maxHp: stats.maxHp, atk: stats.atk, def: stats.def, spa: stats.spa, spd: stats.spd, spe: stats.spe,
     currentHp: Math.max(1, Math.round(stats.maxHp * frac)),
+    moves: resolveMovesForLevel(mon.speciesId, newLevel, engine, rng),
   };
 }
 
-function execMove(attacker: RogueMon, defender: RogueMon, moveName: string): { damage: number; label: string; miss: boolean } {
-  const mv = MOVES_DB[moveName];
-  if (!mv) return { damage: 0, label: '', miss: false };
-  const eff = getEffectiveness(mv.type, defender.types);
-  let label: string;
-  if (eff > 1) label = `✨${Math.round(eff * 100)}%`;
-  else if (eff === 0) label = '🚫 No Effect!';
-  else if (eff < 1) label = '🛡️ not very effective…';
-  else label = '';
-  if (Math.random() < 0.08) return { damage: 0, label: '💨 Missed!', miss: true };
-  if (mv.category === 'status') return { damage: 0, label: '', miss: false };
-  const atkSt = mv.category === 'physical' ? attacker.atk : attacker.spa;
-  const defSt = Math.max((mv.category === 'physical' ? defender.def : defender.spd) * 0.8, 1);
-  const baseDmg = ((2 * attacker.level / 5 + 2) * mv.power * atkSt / (defSt * 50)) + 2;
-  return { damage: Math.max(1, Math.floor(baseDmg * eff)), label, miss: false };
+// ──────────────────────── DYNAMIC, FAIR ENCOUNTER LEVELS ─────────────────────
+// Levels are derived from the player's CURRENT average team level rather than a
+// fixed table tied to map position — this is the direct fix for wild Pokémon
+// spawning far above the player (e.g. a level-13 wild mon vs a level-5 starter).
+
+function playerAverageLevel(team: RogueMon[]): number {
+  if (!team.length) return 5;
+  return Math.round(team.reduce((s, m) => s + m.level, 0) / team.length);
+}
+
+function encounterLevelRange(kind: 'wild' | 'rival' | 'gym' | 'elite4' | 'champion', avgLevel: number): [number, number] {
+  switch (kind) {
+    case 'wild': return [Math.max(2, avgLevel - 2), avgLevel + 1];
+    case 'rival': return [avgLevel, avgLevel + 3];
+    case 'gym': return [avgLevel + 2, avgLevel + 5];
+    case 'elite4': return [avgLevel + 3, avgLevel + 7];
+    case 'champion': return [avgLevel + 5, avgLevel + 9];
+  }
+}
+function rollEncounterLevel(kind: 'wild' | 'rival' | 'gym' | 'elite4' | 'champion', avgLevel: number, rng: () => number): number {
+  const [lo, hi] = encounterLevelRange(kind, avgLevel);
+  return lo + Math.floor(rng() * Math.max(1, hi - lo + 1));
 }
 
 // ──────────────────────── MAP GENERATION (seeded, backtrack-capable) ─────────
@@ -472,48 +561,46 @@ function buildMapNodes(rng: () => number): MapNode[] {
   const gymOrder = shuffle(GYM_TYPES, rng);
   let rivalCount = 0;
   gymOrder.forEach((type, i) => {
-    const lo = 6 + i * 10;
-    const hi = lo + 8;
-    nodes.push({ id: `route_${i}`, kind: 'route', name: `${type} Route`, type, levelLo: lo, levelHi: hi, bg: bgFor(type, rng) });
+    nodes.push({ id: `route_${i}`, kind: 'route', name: `${type} Route`, type, bg: bgFor(type, rng) });
     if (i % 2 === 1) {
       rivalCount++;
-      nodes.push({ id: `rival_${i}`, kind: 'rival', name: 'Rival Battle', type, levelLo: lo + 2, levelHi: hi + 2, bg: bgFor('Normal', rng), rivalOccurrence: rivalCount });
+      nodes.push({ id: `rival_${i}`, kind: 'rival', name: 'Rival Battle', type, bg: bgFor('Normal', rng), rivalOccurrence: rivalCount });
     }
     const leaderChoice = pickRandom(GYM_LEADER_POOL[type], rng) || GYM_LEADER_POOL[type][0];
     nodes.push({
-      id: `gym_${i}`, kind: 'gym', name: `${type} Gym`, type, levelLo: hi + 4, levelHi: hi + 8, bg: bgFor(type, rng),
+      id: `gym_${i}`, kind: 'gym', name: `${type} Gym`, type, bg: bgFor(type, rng),
       gymDef: { name: leaderChoice.name, type, badge: leaderChoice.badge, sprite: leaderChoice.sprite },
     });
-    nodes.push({ id: `town_${i}`, kind: 'town', name: SHOP_MAP[type]?.name || `${type} Town`, type, levelLo: hi, levelHi: hi, bg: 'bg-aquacordetown' });
+    nodes.push({ id: `town_${i}`, kind: 'town', name: SHOP_MAP[type]?.name || `${type} Town`, type, bg: 'bg-aquacordetown' });
   });
-  const elite4Order = shuffle(ELITE_FOUR_LEADERS, rng);
-  elite4Order.forEach((leader, i) => {
+  const elite4TypeOrder = shuffle(ELITE_FOUR_TYPES, rng);
+  elite4TypeOrder.forEach((type, i) => {
+    const leader = pickRandom(ELITE_FOUR_POOL[type], rng) || ELITE_FOUR_POOL[type][0];
     nodes.push({
-      id: `elite4_${i}`, kind: 'elite4', name: leader.name, type: leader.type,
-      levelLo: 88 + i * 3, levelHi: 92 + i * 3, bg: 'bg-elite4drake',
-      gymDef: { name: leader.name, type: leader.type, badge: 'Elite Emblem', sprite: leader.sprite },
+      id: `elite4_${i}`, kind: 'elite4', name: `Elite Four • ${leader.name}`, type, bg: 'bg-elite4drake',
+      gymDef: { name: `Elite Four • ${leader.name}`, type, badge: 'Elite Emblem', sprite: leader.sprite },
     });
   });
+  const champion = pickRandom(CHAMPION_POOL, rng) || CHAMPION_POOL[0];
   nodes.push({
-    id: 'champion', kind: 'champion', name: CHAMPION_NAME, type: 'Normal', levelLo: 100, levelHi: 105, bg: 'bg-leaderwallace',
-    gymDef: { name: CHAMPION_NAME, type: 'Normal', badge: 'Champion Crown', sprite: CHAMPION_SPRITE },
+    id: 'champion', kind: 'champion', name: champion.name, type: 'Normal', bg: 'bg-leaderwallace',
+    gymDef: { name: champion.name, type: 'Normal', badge: 'Champion Crown', sprite: champion.sprite },
   });
   return nodes;
 }
 
-function generateTrainerTeam(pool: SpeciesPool, dex: DexIndex, type: string, levelLo: number, levelHi: number, size: number, rng: () => number): RogueMon[] {
+function generateTrainerTeam(pool: SpeciesPool, engine: Engine, type: string, level: number, size: number, rng: () => number): RogueMon[] {
   const team: RogueMon[] = [];
   for (let i = 0; i < size; i++) {
     const key = pickSpeciesOfType(pool, type, rng);
-    if (!key || !dex[key]) continue;
-    const level = levelLo + Math.floor(rng() * Math.max(1, levelHi - levelLo));
-    team.push(buildRogueMon(key, dex[key], level, true));
+    if (!key || !engine.dex[key]) continue;
+    team.push(buildRogueMon(key, engine.dex[key], level, engine, rng, true));
   }
   return team;
 }
 
 /** Type-diverse team generator used for the Champion and the recurring Rival. */
-function generateDiverseTeam(pool: SpeciesPool, dex: DexIndex, levelLo: number, levelHi: number, size: number, rng: () => number): RogueMon[] {
+function generateDiverseTeam(pool: SpeciesPool, engine: Engine, level: number, size: number, rng: () => number): RogueMon[] {
   const usedTypes = new Set<string>();
   const team: RogueMon[] = [];
   const shuffledTypes = shuffle([...GYM_TYPES, ...ELITE_FOUR_TYPES], rng);
@@ -522,9 +609,8 @@ function generateDiverseTeam(pool: SpeciesPool, dex: DexIndex, levelLo: number, 
     if (usedTypes.has(type)) continue;
     usedTypes.add(type);
     const key = pickSpeciesOfType(pool, type, rng);
-    if (!key || !dex[key]) continue;
-    const level = levelLo + Math.floor(rng() * Math.max(1, levelHi - levelLo));
-    team.push(buildRogueMon(key, dex[key], level, true));
+    if (!key || !engine.dex[key]) continue;
+    team.push(buildRogueMon(key, engine.dex[key], level, engine, rng, true));
   }
   return team;
 }
@@ -572,8 +658,8 @@ interface BattleScreenProps {
   team: RogueMon[]; enemies: RogueMon[]; log: LogEntry[]; onUseMove: (m: string) => void;
   bg: string; opponentName: string; opponentSprite: string | null; playerTrainerSprite: string;
   isWild: boolean; pokeballCount: number; teamFull: boolean; onCatch: () => void;
+  moves: MoveIndex;
 }
-
 
 const BattleSprite: React.FC<{ speciesId: string; back: boolean; size: number }> = ({ speciesId, back, size }) => {
   const [src, setSrc] = useState(() => spriteUrl(speciesId, false, { back, forceStatic: true }));
@@ -588,14 +674,13 @@ const BattleSprite: React.FC<{ speciesId: string; back: boolean; size: number }>
   );
 };
 
-const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMove, bg, opponentName, opponentSprite, playerTrainerSprite, isWild, pokeballCount, teamFull, onCatch }) => {
+const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMove, bg, opponentName, opponentSprite, playerTrainerSprite, isWild, pokeballCount, teamFull, onCatch, moves }) => {
   const finished = log.some(l => l.type === 'win' || l.type === 'lose');
   const activePlayer = team.find(m => m.currentHp > 0);
   const activeEnemy = enemies.find(m => m.currentHp > 0);
   const lastMsg = log[log.length - 1]?.msg || '';
   const caught = log.some(l => l.type === 'catch');
   const canThrowBall = isWild && !finished && !caught && pokeballCount > 0 && !teamFull;
-
 
   return (
     <div>
@@ -605,7 +690,6 @@ const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMo
         backgroundImage: `linear-gradient(rgba(10,14,26,0.12), rgba(10,14,26,0.4)), url(${battleBgUrl(bg)})`,
         backgroundSize: 'cover', backgroundPosition: 'center',
       }}>
-        {/* Opponent corner: portrait (if trainer) + name + HP box */}
         {activeEnemy && (
           <div style={{ position: 'absolute', top: 18, right: 28, textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
             {opponentSprite && (
@@ -617,32 +701,27 @@ const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMo
             <HpBar mon={activeEnemy} showNumbers={false} align="right" />
           </div>
         )}
-        {/* Opponent active sprite, front-facing, upper-mid-right */}
         {activeEnemy && (
           <div style={{ position: 'absolute', top: 90, right: 90 }}>
             <BattleSprite speciesId={activeEnemy.speciesId} back={false} size={110} />
           </div>
         )}
-        {/* Enemy bench row */}
         <div style={{ position: 'absolute', top: 20, left: 20, display: 'flex', gap: 4 }}>
           {enemies.map((m, i) => (
             <div key={i} title={m.displayName} style={{ width: 22, height: 22, borderRadius: '50%', background: m.currentHp > 0 ? (TYPE_COLORS[m.types[0]] || '#888') : '#333', opacity: m.currentHp > 0 ? 1 : 0.35, border: '2px solid #111' }} />
           ))}
         </div>
 
-        {/* Player active sprite, back-facing, lower-left */}
         {activePlayer && (
           <div style={{ position: 'absolute', bottom: 130, left: 60 }}>
             <BattleSprite speciesId={activePlayer.speciesId} back size={130} />
           </div>
         )}
-        {/* Player HP box + trainer portrait, bottom-left-ish */}
         {activePlayer && (
           <div style={{ position: 'absolute', bottom: 100, right: 28, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
             <HpBar mon={activePlayer} showNumbers align="right" />
           </div>
         )}
-        {/* Player bench row */}
         <div style={{ position: 'absolute', bottom: 14, left: 20, display: 'flex', gap: 4 }}>
           {team.map((m, i) => (
             <div key={i} title={m.displayName} style={{ width: 22, height: 22, borderRadius: '50%', background: m.currentHp > 0 ? (TYPE_COLORS[m.types[0]] || '#888') : '#333', opacity: m.currentHp > 0 ? 1 : 0.35, border: '2px solid #111' }} />
@@ -652,7 +731,6 @@ const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMo
           <img src={trainerPortraitUrl(playerTrainerSprite)} alt="You" style={{ width: 46, height: 46, imageRendering: 'pixelated' }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
         </div>
 
-        {/* Message / dialogue box */}
         <div style={{
           position: 'absolute', left: 0, right: 0, bottom: 0, minHeight: 76,
           background: 'rgba(8,12,22,0.94)', borderTop: '3px solid #4a5578', padding: '10px 16px',
@@ -666,16 +744,15 @@ const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMo
         </div>
       </div>
 
-      {/* Move grid (docked, mainline-style 2x2) or Continue button */}
       {!finished && activePlayer && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 14 }}>
-          {activePlayer.moves.map(mv => {
-            const d = MOVES_DB[mv];
+          {activePlayer.moves.map(moveId => {
+            const d = moves[moveId];
             return (
-              <button key={mv} onClick={() => onUseMove(mv)} style={{
+              <button key={moveId} onClick={() => onUseMove(moveId)} style={{
                 padding: '14px 16px', border: 'none', borderRadius: 10, background: d ? TYPE_COLORS[d.type] || '#555' : '#555',
                 color: '#fff', cursor: 'pointer', fontWeight: 800, fontSize: 15, boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-              }}>{mv}{d ? <span style={{ opacity: 0.75, fontWeight: 500, fontSize: 12 }}> ({d.type})</span> : null}</button>
+              }}>{d?.name || moveId}{d ? <span style={{ opacity: 0.75, fontWeight: 500, fontSize: 12 }}> ({d.type})</span> : null}</button>
             );
           })}
         </div>
@@ -698,7 +775,6 @@ const BattleScreen: React.FC<BattleScreenProps> = ({ team, enemies, log, onUseMo
     </div>
   );
 };
-
 
 // ════════════════════ OVERWORLD MAP / ROUTE PATH VISUAL ═════════════════════
 
@@ -742,10 +818,65 @@ const MapPath: React.FC<{ nodes: MapNode[]; currentIndex: number; maxReached: nu
   );
 };
 
+// ════════════════════ STARTER BOX (grid, unlockable, candy-gated) ═══════════
+
+const StarterBox: React.FC<{
+  dex: DexIndex; meta: RogueMeta; onPick: (key: string) => void; onUnlock: (key: string, gen: number) => void;
+}> = ({ dex, meta, onPick, onUnlock }) => {
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <h2 style={{ margin: 0 }}>🎮 Starter Box</h2>
+        <div style={{ fontWeight: 800, color: '#7a5c00', background: '#ffe082', padding: '6px 14px', borderRadius: 999 }}>🍬 {meta.candy} Candy</div>
+      </div>
+      <p style={{ marginTop: 0, color: '#555' }}>Pick your single starting partner. Locked starters can be unlocked permanently with candy earned from completed runs (badges, Elite Four wins, and Champion victories).</p>
+      {STARTER_GENS.map(g => (
+        <div key={g.gen} style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>Gen {g.gen} • {g.label}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 10 }}>
+            {g.keys.map(key => {
+              const entry = dex[key];
+              if (!entry) return null;
+              const unlocked = meta.unlocked.includes(key);
+              const cost = unlockCost(g.gen);
+              return (
+                <div key={key} style={{
+                  position: 'relative', border: '2px solid #ddd', borderRadius: 10, padding: 8, textAlign: 'center',
+                  background: unlocked ? (TYPE_COLORS[entry.types[0]] || '#eee') : '#e8e8e8', cursor: unlocked ? 'pointer' : 'default',
+                }} onClick={() => unlocked && onPick(key)}>
+                  <img
+                    src={spriteUrl(key, false, { forceStatic: true })}
+                    alt={entry.name}
+                    style={{ width: 56, height: 56, imageRendering: 'pixelated', filter: unlocked ? 'none' : 'grayscale(1) brightness(0.6)' }}
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = iconUrl(key); }}
+                  />
+                  <div style={{ fontSize: 11, fontWeight: 700, color: unlocked ? '#fff' : '#666', marginTop: 4 }}>{entry.name}</div>
+                  {!unlocked && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onUnlock(key, g.gen); }}
+                      disabled={meta.candy < cost}
+                      style={{
+                        marginTop: 6, width: '100%', padding: '4px 6px', fontSize: 11, borderRadius: 6, border: 'none',
+                        background: meta.candy >= cost ? '#68d391' : '#bbb', color: '#0c1017', fontWeight: 800,
+                        cursor: meta.candy >= cost ? 'pointer' : 'not-allowed',
+                      }}
+                    >🔒 Unlock {cost}🍬</button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 // ════════════════════ ROGUEMODE MAIN COMPONENT ══════════════════════════════
 
 export const RogueModeGame: React.FC = () => {
   const [dex, setDex] = useState<DexIndex | null>(null);
+  const [engine, setEngine] = useState<Engine | null>(null);
   const [pool, setPool] = useState<SpeciesPool | null>(null);
   const [phase, setPhase] = useState<GamePhase>('loading');
   const [mapNodes, setMapNodes] = useState<MapNode[]>([]);
@@ -758,7 +889,7 @@ export const RogueModeGame: React.FC = () => {
   const [xpTotal, setXpTotal] = useState(0);
   const [battleLog, setBattleLog] = useState<LogEntry[]>([]);
   const [playerCoins, setPlayerCoins] = useState(200);
-  const [inventory, setInventory] = useState<Record<string, number>>({ potion: 2 });
+  const [inventory, setInventory] = useState<Record<string, number>>({ potion: 2, pokeball: 5 });
   const [shopOpen, setShopOpen] = useState(false);
   const [trainerSprite, setTrainerSprite] = useState<string>(() => getTrainerSpriteValue());
   const [mapOpen, setMapOpen] = useState(false);
@@ -766,13 +897,15 @@ export const RogueModeGame: React.FC = () => {
   const [seed, setSeed] = useState<string>('');
   const [seedInput, setSeedInput] = useState<string>('');
   const [rival, setRival] = useState<RivalInfo | null>(null);
-  const [selectedGen, setSelectedGen] = useState<number>(1);
   const [restoredRun, setRestoredRun] = useState(false);
+  const [meta, setMeta] = useState<RogueMeta>(() => loadMeta());
+  const [championName, setChampionName] = useState<string>(CHAMPION_POOL[0].name);
+  const [championSprite, setChampionSprite] = useState<string>(CHAMPION_POOL[0].sprite);
 
   const rngRef = useRef<() => number>(() => Math.random());
   const hasHydratedRef = useRef(false);
 
-  // ── load dex, then attempt to restore a persisted run ───────────────────
+  // ── load dex+moves+learnsets, then attempt to restore a persisted run ───
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -780,6 +913,7 @@ export const RogueModeGame: React.FC = () => {
         const result = await loadShowdownDex();
         if (cancelled) return;
         setDex(result.pokedex);
+        setEngine({ dex: result.pokedex, moves: result.moves, learnsets: result.learnsets });
         setPool(buildSpeciesPool(result.pokedex));
 
         const saved = loadPersistedRun();
@@ -798,6 +932,8 @@ export const RogueModeGame: React.FC = () => {
           setBattleLog(saved.battleLog);
           setBattleContext(saved.battleContext);
           setRival(saved.rival);
+          setChampionName(saved.championName || CHAMPION_POOL[0].name);
+          setChampionSprite(saved.championSprite || CHAMPION_POOL[0].sprite);
           setPhase(saved.phase);
           setRestoredRun(true);
         } else {
@@ -827,13 +963,32 @@ export const RogueModeGame: React.FC = () => {
       version: RUN_STORAGE_VERSION,
       seed, phase, mapNodes, currentIndex, maxReached, playerTeam, enemyTeam,
       badgeCount, xpTotal, playerCoins, inventory, battleLog, battleContext, rival,
+      championName, championSprite,
     });
-  }, [phase, mapNodes, currentIndex, maxReached, playerTeam, enemyTeam, badgeCount, xpTotal, playerCoins, inventory, battleLog, battleContext, rival, seed]);
+  }, [phase, mapNodes, currentIndex, maxReached, playerTeam, enemyTeam, badgeCount, xpTotal, playerCoins, inventory, battleLog, battleContext, rival, seed, championName, championSprite]);
 
   const currentNode: MapNode | undefined = mapNodes[currentIndex];
   const activeTown = currentNode && currentNode.kind === 'town' ? SHOP_MAP[currentNode.type] : undefined;
 
   const xpThresholdFor = (l: number): number => { let s = 0; for (let i = 5; i < l; i++) s += 15 + i * 3; return s; };
+
+  const awardCandy = useCallback((amount: number) => {
+    setMeta(prev => {
+      const next = { ...prev, candy: prev.candy + amount };
+      saveMeta(next);
+      return next;
+    });
+  }, []);
+
+  const unlockStarter = useCallback((key: string, gen: number) => {
+    const cost = unlockCost(gen);
+    setMeta(prev => {
+      if (prev.unlocked.includes(key) || prev.candy < cost) return prev;
+      const next = { candy: prev.candy - cost, unlocked: [...prev.unlocked, key] };
+      saveMeta(next);
+      return next;
+    });
+  }, []);
 
   const buyItem = useCallback((item: ShopItem) => {
     if (playerCoins < item.price) {
@@ -851,8 +1006,11 @@ export const RogueModeGame: React.FC = () => {
     rngRef.current = createRng(nextSeed);
     const nodes = buildMapNodes(rngRef.current);
     const chosenRival = pickRandom(RIVAL_POOL, rngRef.current) || RIVAL_POOL[0];
+    const championNode = nodes.find(n => n.kind === 'champion');
     setSeed(nextSeed);
     setRival(chosenRival);
+    setChampionName(championNode?.gymDef?.name || CHAMPION_POOL[0].name);
+    setChampionSprite(championNode?.gymDef?.sprite || CHAMPION_POOL[0].sprite);
     setMapNodes(nodes);
     setCurrentIndex(0);
     setMaxReached(0);
@@ -861,7 +1019,7 @@ export const RogueModeGame: React.FC = () => {
     setBadgeCount(0);
     setXpTotal(0);
     setPlayerCoins(200);
-    setInventory({ potion: 2 });
+    setInventory({ potion: 2, pokeball: 5 });
     setShopOpen(false);
     setMapOpen(false);
     setRestoredRun(false);
@@ -875,34 +1033,37 @@ export const RogueModeGame: React.FC = () => {
   }, []);
 
   const pickStarter = useCallback((key: string) => {
-    if (!dex || !dex[key]) return;
-    const mon = buildRogueMon(key, dex[key], 5, false);
+    if (!dex || !dex[key] || !engine) return;
+    const mon = buildRogueMon(key, dex[key], 5, engine, rngRef.current, false);
     setPlayerTeam([mon]);
     setPhase('exploring');
     setBattleLog([{ msg: `You chose ${mon.displayName}! Let's explore. (Seed: ${seed})`, type: 'system' }]);
-  }, [dex, seed]);
+  }, [dex, engine, seed]);
 
   // ── wild encounter on a route node ──────────────────────────────────────
   const searchRoute = useCallback(() => {
-    if (!pool || !dex || !currentNode || currentNode.kind !== 'route') return;
+    if (!pool || !dex || !engine || !currentNode || currentNode.kind !== 'route') return;
     const key = pickSpeciesOfType(pool, currentNode.type, rngRef.current);
     if (!key || !dex[key]) return;
-    const level = currentNode.levelLo + Math.floor(rngRef.current() * Math.max(1, currentNode.levelHi - currentNode.levelLo));
-    const wildMon = buildRogueMon(key, dex[key], level, false);
+    const avg = playerAverageLevel(playerTeam);
+    const level = rollEncounterLevel('wild', avg, rngRef.current);
+    const wildMon = buildRogueMon(key, dex[key], level, engine, rngRef.current, false);
     setEnemyTeam([wildMon]);
     setBattleContext('wild');
     setBattleLog(p => [...p, { msg: `A wild ${wildMon.displayName} appeared!`, type: 'system' }]);
     setPhase('battle');
-  }, [pool, dex, currentNode]);
+  }, [pool, dex, engine, currentNode, playerTeam]);
 
   // ── trainer/gym/rival/elite4/champion battle trigger ────────────────────
   const startTrainerBattle = useCallback(() => {
-    if (!pool || !dex || !currentNode) return;
+    if (!pool || !dex || !engine || !currentNode) return;
     if (currentNode.kind === 'town' || currentNode.kind === 'route') return;
+    const avg = playerAverageLevel(playerTeam);
 
     if (currentNode.kind === 'rival' && rival) {
       const size = Math.min(6, 1 + (currentNode.rivalOccurrence || 1));
-      const team = generateDiverseTeam(pool, dex, currentNode.levelLo, currentNode.levelHi, size, rngRef.current);
+      const level = rollEncounterLevel('rival', avg, rngRef.current);
+      const team = generateDiverseTeam(pool, engine, level, size, rngRef.current);
       if (!team.length) return;
       setEnemyTeam(team);
       setBattleContext('trainer');
@@ -911,26 +1072,29 @@ export const RogueModeGame: React.FC = () => {
       return;
     }
 
+    const kind = currentNode.kind === 'champion' ? 'champion' : currentNode.kind === 'elite4' ? 'elite4' : 'gym';
     const size = currentNode.kind === 'gym' ? 3 : currentNode.kind === 'elite4' ? 4 : currentNode.kind === 'champion' ? 6 : 2;
-    const team = currentNode.kind === 'champion'
-      ? generateDiverseTeam(pool, dex, currentNode.levelLo, currentNode.levelHi, size, rngRef.current)
-      : generateTrainerTeam(pool, dex, currentNode.type, currentNode.levelLo, currentNode.levelHi, size, rngRef.current);
+    const level = rollEncounterLevel(kind, avg, rngRef.current);
+    const team = currentNode.kind === 'champion' || currentNode.kind === 'elite4'
+      ? generateDiverseTeam(pool, engine, level, size, rngRef.current)
+      : generateTrainerTeam(pool, engine, currentNode.type, level, size, rngRef.current);
     if (!team.length) return;
     setEnemyTeam(team);
     setBattleContext('trainer');
     setBattleLog(p => [...p, { msg: `${currentNode.gymDef?.name || 'A trainer'} challenges you!`, type: 'system' }]);
     setPhase('battle');
-  }, [pool, dex, currentNode, rival]);
+  }, [pool, dex, engine, currentNode, rival, playerTeam]);
 
   const processAction = useCallback((action: string) => {
-    if (phase !== 'battle') return;
+    if (phase !== 'battle' || !engine) return;
 
     if (action === 'continue') {
       const last = battleLog[battleLog.length - 1];
       if (!last) return;
       if (last.type === 'win') {
         setMapNodes(prev => prev.map((n, i) => i === currentIndex ? { ...n, cleared: true } : n));
-        if (currentNode?.kind === 'gym' || currentNode?.kind === 'elite4') setBadgeCount(p => p + 1);
+        if (currentNode?.kind === 'gym') { setBadgeCount(p => p + 1); awardCandy(5); }
+        if (currentNode?.kind === 'elite4') awardCandy(10);
 
         const xep = enemyTeam.reduce((s, m) => s + Math.floor(15 + m.level * 3), 0);
         setXpTotal(p => p + xep);
@@ -943,11 +1107,11 @@ export const RogueModeGame: React.FC = () => {
               newLevel++;
               remaining -= xpThresholdFor(newLevel);
             }
-            return newLevel === m.level ? m : recomputeLevel(m, newLevel);
+            return newLevel === m.level ? m : recomputeLevel(m, newLevel, engine, rngRef.current);
           }));
         }
 
-        if (currentNode?.kind === 'champion') { setPhase('victory'); return; }
+        if (currentNode?.kind === 'champion') { awardCandy(50); setPhase('victory'); return; }
 
         // Heal 25% between advances, then move forward.
         setPlayerTeam(p => p.map(m => ({ ...m, currentHp: Math.min(m.maxHp, m.currentHp + Math.floor(m.maxHp * 0.25)) })));
@@ -974,18 +1138,18 @@ export const RogueModeGame: React.FC = () => {
     const attacker = teamOut[pIdx];
     const defender = foeOut[eIdx];
 
-    if (MOVES_DB[action]?.category === 'status') {
-      const amt = Math.floor(attacker.maxHp * 0.5);
-      attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + amt);
-      logs.push({ msg: `${attacker.displayName} used ${action}! (+${amt} HP)`, type: 'heal' });
+    const res = execMoveReal(attacker, defender, action, engine.moves);
+    if (res.heal > 0) {
+      attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + res.heal);
+      logs.push({ msg: `${attacker.displayName} used ${res.displayName}! (+${res.heal} HP)`, type: 'heal' });
+    } else if (res.miss) {
+      logs.push({ msg: `${attacker.displayName} used ${res.displayName} but missed!`, type: 'action' });
+    } else if (res.damage > 0) {
+      foeOut[eIdx] = { ...foeOut[eIdx], currentHp: Math.max(0, foeOut[eIdx].currentHp - res.damage) };
+      logs.push({ msg: `${attacker.displayName} used ${res.displayName}${res.label ? ' ' + res.label : ''} (-${res.damage} HP)`, type: 'damage' });
+      if (foeOut[eIdx].currentHp === 0) logs.push({ msg: `${foeOut[eIdx].displayName} fainted!`, type: 'action' });
     } else {
-      const res = execMove(attacker, defender, action);
-      if (res.miss) { logs.push({ msg: `${attacker.displayName} used ${action} but missed!`, type: 'action' }); }
-      else if (res.damage > 0) {
-        foeOut[eIdx] = { ...foeOut[eIdx], currentHp: Math.max(0, foeOut[eIdx].currentHp - res.damage) };
-        logs.push({ msg: `${attacker.displayName} used ${action}${res.label ? ' ' + res.label : ''} (-${res.damage} HP)`, type: 'damage' });
-        if (foeOut[eIdx].currentHp === 0) logs.push({ msg: `${foeOut[eIdx].displayName} fainted!`, type: 'action' });
-      }
+      logs.push({ msg: `${attacker.displayName} used ${res.displayName}!`, type: 'action' });
     }
 
     const allDead = foeOut.every(m => m.currentHp <= 0);
@@ -996,25 +1160,32 @@ export const RogueModeGame: React.FC = () => {
         const ti = teamOut.findIndex(m => m.currentHp > 0);
         if (ti < 0) return;
         const tgt = teamOut[ti];
-        const mv = pickRandom(ea.moves) || 'Tackle';
-        const r2 = execMove(ea, tgt, mv);
-        if (r2.miss) { logs.push({ msg: `${ea.displayName} missed!`, type: 'action' }); return; }
-        teamOut[ti] = { ...teamOut[ti], currentHp: Math.max(0, tgt.currentHp - r2.damage) };
-        logs.push({ msg: `${ea.displayName} used ${mv} on ${tgt.displayName}${r2.label ? ' ' + r2.label : ''} (-${r2.damage} HP)`, type: 'damage' });
+        const mv = pickRandom(ea.moves) || FALLBACK_MOVE_ID;
+        const r2 = execMoveReal(ea, tgt, mv, engine.moves);
+        if (r2.miss) { logs.push({ msg: `${ea.displayName} used ${r2.displayName} but missed!`, type: 'action' }); return; }
+        if (r2.damage > 0) {
+          teamOut[ti] = { ...teamOut[ti], currentHp: Math.max(0, tgt.currentHp - r2.damage) };
+          logs.push({ msg: `${ea.displayName} used ${r2.displayName} on ${tgt.displayName}${r2.label ? ' ' + r2.label : ''} (-${r2.damage} HP)`, type: 'damage' });
+        } else if (r2.heal > 0) {
+          ea.currentHp = Math.min(ea.maxHp, ea.currentHp + r2.heal);
+          logs.push({ msg: `${ea.displayName} used ${r2.displayName}!`, type: 'action' });
+        } else {
+          logs.push({ msg: `${ea.displayName} used ${r2.displayName}!`, type: 'action' });
+        }
       };
       foeOut.filter(e => e.currentHp > 0).forEach(attackBack);
     }
 
     if (!teamOut.some(m => m.currentHp > 0)) logs.push({ msg: '💀 Your team fainted!', type: 'lose' });
     setPlayerTeam(teamOut); setEnemyTeam(foeOut); setBattleLog(p => [...p, ...logs]);
-  }, [phase, playerTeam, enemyTeam, battleLog, currentIndex, currentNode, mapNodes]);
+  }, [phase, playerTeam, enemyTeam, battleLog, currentIndex, currentNode, mapNodes, engine, awardCandy]);
 
   // ── attempt to catch the active wild Pokémon with a Poké Ball ───────────
   // Catch chance scales with how low the wild mon's HP is (PokeRogue/mainline-style):
   // full HP = base 30% chance, empty HP = up to 90% chance. Failing consumes the ball
   // and costs a turn (the wild mon attacks back), matching mainline catch mechanics.
   const attemptCatch = useCallback(() => {
-    if (battleContext !== 'wild') return;
+    if (battleContext !== 'wild' || !engine) return;
     if ((inventory.pokeball ?? 0) <= 0) {
       setBattleLog(p => [...p, { msg: 'You have no Poké Balls left!', type: 'system' }]);
       return;
@@ -1039,25 +1210,24 @@ export const RogueModeGame: React.FC = () => {
       return;
     }
 
-    // Failed throw — wild mon breaks free and attacks back (costs a turn, mainline-style).
     const logs: LogEntry[] = [{ msg: `Oh no! ${target.displayName} broke free!`, type: 'system' }];
     let teamOut = playerTeam.map(m => ({ ...m }));
     const ti = teamOut.findIndex(m => m.currentHp > 0);
     if (ti >= 0) {
       const tgt = teamOut[ti];
-      const mv = pickRandom(target.moves) || 'Tackle';
-      const r2 = execMove(target, tgt, mv);
+      const mv = pickRandom(target.moves) || FALLBACK_MOVE_ID;
+      const r2 = execMoveReal(target, tgt, mv, engine.moves);
       if (r2.miss) {
-        logs.push({ msg: `${target.displayName} missed!`, type: 'action' });
-      } else {
+        logs.push({ msg: `${target.displayName} used ${r2.displayName} but missed!`, type: 'action' });
+      } else if (r2.damage > 0) {
         teamOut[ti] = { ...teamOut[ti], currentHp: Math.max(0, tgt.currentHp - r2.damage) };
-        logs.push({ msg: `${target.displayName} used ${mv} on ${tgt.displayName}${r2.label ? ' ' + r2.label : ''} (-${r2.damage} HP)`, type: 'damage' });
+        logs.push({ msg: `${target.displayName} used ${r2.displayName} on ${tgt.displayName}${r2.label ? ' ' + r2.label : ''} (-${r2.damage} HP)`, type: 'damage' });
       }
     }
     if (!teamOut.some(m => m.currentHp > 0)) logs.push({ msg: '💀 Your team fainted!', type: 'lose' });
     setPlayerTeam(teamOut);
     setBattleLog(p => [...p, ...logs]);
-  }, [battleContext, inventory, playerTeam, enemyTeam]);
+  }, [battleContext, inventory, playerTeam, enemyTeam, engine]);
 
   // ── backtracking: jump to any previously-reached node ───────────────────
   const jumpToNode = useCallback((idx: number) => {
@@ -1065,7 +1235,6 @@ export const RogueModeGame: React.FC = () => {
     setCurrentIndex(idx);
     setMapOpen(false);
   }, [maxReached]);
-
 
   const isBattleNodeCleared = currentNode?.cleared;
 
@@ -1088,12 +1257,13 @@ export const RogueModeGame: React.FC = () => {
         <div style={{ textAlign: 'center', padding: 60, background: 'linear-gradient(180deg,#1a1a2e 0%, #0f1420 100%)', borderRadius: 16, boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}>
           <h1 style={{ color: '#ffd700', fontSize: 40, marginBottom: 8, textShadow: '0 4px 10px rgba(0,0,0,0.5)' }}>⚡ ROGUE MODE ⚡</h1>
           <p style={{ color: '#ccc', fontSize: 18, maxWidth: 620, margin: 'auto' }}>
-            A PokeRogue-style gauntlet drawing from the FULL merged Pokédex ({pool ? pool.all.length.toLocaleString() : '...'} species).
-            Pick a starter from any generation, explore 8 gym routes with full backtracking, face a persistent rival who grows stronger, and take on the Elite Four and Champion. One loss ends the run — choose wisely.
+            A PokeRogue-style gauntlet drawing from the FULL merged Pokédex ({pool ? pool.all.length.toLocaleString() : '...'} species) with real official gym leaders, Elite Four and Champions.
+            Pick a starter from your Starter Box, explore 8 gym routes with full backtracking, face a persistent rival who grows stronger, and take on the Elite Four and Champion. One loss ends the run — choose wisely.
           </p>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
             {GYM_TYPES.map(t => (<span key={t} style={{ padding: '4px 10px', background: TYPE_COLORS[t], borderRadius: 4, fontSize: 12, color: '#111' }}>{t} Gym</span>))}
           </div>
+          <div style={{ marginTop: 12, color: '#8fd98f', fontWeight: 700 }}>🍬 Candy: {meta.candy}</div>
           <div style={{ marginTop: 26, display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
             <input
               value={seedInput}
@@ -1107,30 +1277,10 @@ export const RogueModeGame: React.FC = () => {
           <button onClick={() => startNewGame(seedInput)} style={{ padding: '15px 30px', fontSize: 24, border: 'none', borderRadius: 8, background: '#ffd700', color: '#333', cursor: 'pointer', fontWeight: 'bold', marginTop: 10 }}>▶ New Run</button>
         </div>)}
 
-      {phase === 'starter_select' && (
-        <div style={{ textAlign: 'center', padding: 40, background: '#fff', borderRadius: 10 }}>
-          <h2>🎮 Pick Your Starter</h2>
-          <p>Choose your single starting partner from any region — build the rest of your team by capturing wild Pokémon along the way! Seed: <code>{seed}</code></p>
-          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
-            {STARTER_GENS.map(g => (
-              <button key={g.gen} onClick={() => setSelectedGen(g.gen)} style={{
-                padding: '6px 12px', borderRadius: 8, border: selectedGen === g.gen ? '2px solid #ffd700' : '1px solid #ccc',
-                background: selectedGen === g.gen ? '#333' : '#eee', color: selectedGen === g.gen ? '#ffd700' : '#333', cursor: 'pointer', fontWeight: 700, fontSize: 12,
-              }}>Gen {g.gen} • {g.label}</button>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 15, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
-            {(STARTER_GENS.find(g => g.gen === selectedGen)?.keys || []).map(key => {
-              const entry = dex?.[key];
-              if (!entry) return null;
-              return (
-                <button key={key} onClick={() => pickStarter(key)} style={{ padding: '15px 20px', fontSize: 16, border: 'none', borderRadius: 8, background: TYPE_COLORS[entry.types[0]] || '#888', cursor: 'pointer', color: '#fff', fontWeight: 'bold', minWidth: 160, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                  <img src={spriteUrl(key, false, { forceStatic: true })} alt={entry.name} style={{ width: 64, height: 64, imageRendering: 'pixelated' }} onError={(e) => { (e.currentTarget as HTMLImageElement).src = iconUrl(key); }} />
-                  {entry.name} ({entry.types.join('/')})
-                </button>
-              );
-            })}
-          </div>
+      {phase === 'starter_select' && dex && (
+        <div style={{ padding: 30, background: '#fff', borderRadius: 10 }}>
+          <p style={{ textAlign: 'center', color: '#777' }}>Seed: <code>{seed}</code></p>
+          <StarterBox dex={dex} meta={meta} onPick={pickStarter} onUnlock={unlockStarter} />
         </div>)}
 
       {phase === 'exploring' && currentNode && (
@@ -1186,9 +1336,10 @@ export const RogueModeGame: React.FC = () => {
                 <div style={{ fontSize: 12, letterSpacing: '0.12em', color: '#99b4e6', textTransform: 'uppercase' }}>Run Status</div>
                 <div style={{ marginTop: 8, color: '#f3f7ff', fontSize: 14, lineHeight: 1.7 }}>
                   <div>XP: <strong>{xpTotal}</strong></div>
-                  <div>Badges: <strong>{badgeCount}</strong> / {GYM_TYPES.length + ELITE_FOUR_TYPES.length}</div>
+                  <div>Badges: <strong>{badgeCount}</strong> / {GYM_TYPES.length}</div>
                   <div>Coins: <strong>{playerCoins}</strong></div>
                   <div>Team: <strong>{playerTeam.length}</strong> / 6</div>
+                  <div>🍬 Candy: <strong>{meta.candy}</strong></div>
                   {rival && <div>Rival: <strong>{rival.name}</strong></div>}
                 </div>
               </div>
@@ -1260,21 +1411,21 @@ export const RogueModeGame: React.FC = () => {
           </div>
         </div>)}
 
-      {phase === 'battle' && currentNode && (
+      {phase === 'battle' && currentNode && engine && (
         <BattleScreen
           team={playerTeam} enemies={enemyTeam} log={battleLog} onUseMove={processAction}
           bg={currentNode.bg} opponentName={battleOpponentName} opponentSprite={battleOpponentSprite}
           playerTrainerSprite={trainerSprite}
           isWild={battleContext === 'wild'} pokeballCount={inventory.pokeball ?? 0} teamFull={playerTeam.length >= 6}
-          onCatch={attemptCatch}
+          onCatch={attemptCatch} moves={engine.moves}
         />
       )}
-
 
       {phase === 'victory' && (
         <div style={{ textAlign: 'center', padding: 60, background: '#2d5a27', borderRadius: 10 }}>
           <h1 style={{ color: '#ffd700' }}>🏆 CHAMPION! 🏆</h1>
-          <p>You defeated {CHAMPION_NAME} with {badgeCount} badges and {xpTotal} XP! (Seed: {seed})</p>
+          <p>You defeated {championName} with {badgeCount} badges and {xpTotal} XP! (Seed: {seed})</p>
+          <p style={{ color: '#8fd98f' }}>🍬 +50 Candy earned!</p>
           <button onClick={() => startNewGame()} style={{ padding: '15px 30px', border: 'none', borderRadius: 8, background: '#ffd700' }}>Play Again</button>
         </div>)}
 
