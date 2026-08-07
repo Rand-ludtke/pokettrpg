@@ -753,6 +753,12 @@ export async function loadShowdownDex(options?: { base?: string }) {
     fetchOptionalJson(withPublicBase('data/mariomon/generated/abilities.custom.mariomon.json')),
   ]);
 
+  // ── Soulstones Part 1 & PS2 data ───────────────────────────────────
+  const [soulstonePart1Dex, soulstonePS2Dex] = await Promise.all([
+    fetchOptionalJson(withPublicBase('data/soulstones-part1/generated/pokedex.soulstones-part1.json')),
+    fetchOptionalJson(withPublicBase('data/ss2-patch/generated/pokedex.ss2-soulstones.json')),
+  ]);
+
   // ── Pokeathlon DLC – load Soulstone CAP data ────────────────────────
   // Loaded from a pre-bundled static snapshot (public/data/pokeathlon/generated/pokedex.pokeathlon.json)
   // instead of fetching https://play.pokeathlon.com/data/pokedex.js live: that endpoint sends no
@@ -813,6 +819,9 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumDex || {}) as DexIndex),
     ...((infinityDex || {}) as DexIndex),
     ...((mariomonDex || {}) as DexIndex),
+    // Soulstones Part 1 & PS2
+    ...(soulstonePart1Dex && typeof soulstonePart1Dex === 'object' ? soulstonePart1Dex : {}),
+    ...(soulstonePS2Dex && typeof soulstonePS2Dex === 'object' ? soulstonePS2Dex : {}),
     // Bundled pokeathlon snapshot is pre-filtered to Custom fangame entries only
     // (see scripts/fetch-pokeathlon-dex.mjs), so just normalize keys and merge directly.
     ...(pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' && !Array.isArray(pokeathlonDexRaw) ? (() => {
@@ -832,6 +841,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumLearnsets || {}) as LearnsetsIndex),
     ...((infinityLearnsets || {}) as LearnsetsIndex),
     ...((mariomonLearnsets || {}) as LearnsetsIndex),
+    ...(soulstonePart1Dex && typeof soulstonePart1Dex === 'object' ? (soulstonePart1Dex as any).learnsets || {} : {}),
+    ...(soulstonePS2Dex && typeof soulstonePS2Dex === 'object' ? (soulstonePS2Dex as any).learnsets || {} : {}),
   } as LearnsetsIndex;
   const mergedBaseMoves = {
     ...(moves as MoveIndex),
@@ -840,6 +851,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumMoves || {}) as MoveIndex),
     ...((infinityMoves || {}) as MoveIndex),
     ...((mariomonMoves || {}) as MoveIndex),
+    ...(soulstonePart1Dex && typeof soulstonePart1Dex === 'object' ? (soulstonePart1Dex as any).moves || {} : {}),
+    ...(soulstonePS2Dex && typeof soulstonePS2Dex === 'object' ? (soulstonePS2Dex as any).moves || {} : {}),
   } as MoveIndex;
   const mergedBaseAbilities = {
     ...(abilities as AbilityIndex),
@@ -849,6 +862,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumAbilities || {}) as AbilityIndex),
     ...((infinityAbilities || {}) as AbilityIndex),
     ...((mariomonAbilities || {}) as AbilityIndex),
+    ...(soulstonePart1Dex && typeof soulstonePart1Dex === 'object' ? (soulstonePart1Dex as any).abilities || {} : {}),
+    ...(soulstonePS2Dex && typeof soulstonePS2Dex === 'object' ? (soulstonePS2Dex as any).abilities || {} : {}),
   } as AbilityIndex;
   const mergedBaseItems = {
     ...(items as ItemIndex),
@@ -872,6 +887,13 @@ export async function loadShowdownDex(options?: { base?: string }) {
   addSourceTags((uraniumDex || {}) as Record<string, any>, 'uranium');
   addSourceTags((infinityDex || {}) as Record<string, any>, 'infinity');
   addSourceTags((mariomonDex || {}) as Record<string, any>, 'mariomon');
+  // Soulstones Part 1 & PS2
+  if (soulstonePart1Dex && typeof soulstonePart1Dex === 'object') {
+    addSourceTags(soulstonePart1Dex as Record<string, any>, 'Soulstones Part 1');
+  }
+  if (soulstonePS2Dex && typeof soulstonePS2Dex === 'object') {
+    addSourceTags(soulstonePS2Dex as Record<string, any>, 'Soulstones PS2');
+  }
   // Pokeathlon fangame entries carry the 'pokeathlon' tag
   if (pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' && !Array.isArray(pokeathlonDexRaw)) {
     addSourceTags(pokeathlonDexRaw as Record<string, any>, 'pokeathlon');

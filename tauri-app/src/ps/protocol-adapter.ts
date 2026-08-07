@@ -34,6 +34,18 @@ export interface ServerPokemon {
   status?: string;
   boosts?: Record<string, number>;
   terastallized?: string;
+  // Fusion data for Infinite Fusion support
+  fusion?: {
+    headId: number;
+    bodyId: number;
+    headName: string;
+    bodyName: string;
+    thirdId?: number;
+    thirdName?: string;
+    triple?: boolean;
+    spriteFile?: string;
+    variants?: string[];
+  };
 }
 
 export interface ServerPlayer {
@@ -395,6 +407,18 @@ export function requestToPS(
       maxhp: maxHP,
       fainted: (poke.currentHP ?? maxHP) <= 0,
       status: poke.status || '',
+      // Fusion data for Infinite Fusion support
+      fusion: poke.fusion ? {
+        headId: poke.fusion.headId,
+        bodyId: poke.fusion.bodyId,
+        headName: poke.fusion.headName,
+        bodyName: poke.fusion.bodyName,
+        thirdId: poke.fusion.thirdId,
+        thirdName: poke.fusion.thirdName,
+        triple: poke.fusion.triple,
+        spriteFile: poke.fusion.spriteFile,
+        variants: poke.fusion.variants,
+      } : undefined,
     };
   });
   
