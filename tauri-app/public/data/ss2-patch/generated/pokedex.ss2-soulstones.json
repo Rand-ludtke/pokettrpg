@@ -33919,6 +33919,1643 @@
     "gen": 9,
     "doublesTier": "Illegal"
   },
+  "megasudowoodox": {
+    "name": "Mega Sudowoodo X",
+    "num": -60001,
+    "types": [
+      "Fighting",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 130,
+      "def": 130,
+      "spa": 100,
+      "spd": 40,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Tough Claws",
+      "H": "Tough Claws"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "megameowstic": {
+    "name": "Mega Meowstic",
+    "num": -60002,
+    "types": [
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "atk": 109,
+      "def": 70,
+      "spa": 134,
+      "spd": 109,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Funeralpyre",
+      "H": "Funeralpyre"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "megatsareenax": {
+    "name": "Mega Tsareena X",
+    "num": -60003,
+    "types": [
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 92,
+      "atk": 130,
+      "def": 118,
+      "spa": 113,
+      "spd": 45,
+      "spe": 112
+    },
+    "abilities": {
+      "0": "Lightaura",
+      "H": "Lightaura"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "megatsareenay": {
+    "name": "Mega Tsareena Y",
+    "num": -60004,
+    "types": [
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 92,
+      "atk": 130,
+      "def": 118,
+      "spa": 113,
+      "spd": 45,
+      "spe": 112
+    },
+    "abilities": {
+      "0": "Darkaura",
+      "H": "Darkaura"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "megaplusle": {
+    "name": "Mega Plusle",
+    "num": -60005,
+    "types": [
+      "Flying",
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 56,
+      "atk": 91,
+      "def": 61,
+      "spa": 136,
+      "spd": 119,
+      "spe": 71
+    },
+    "abilities": {
+      "0": "Deltastream",
+      "H": "Deltastream"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "megaminun": {
+    "name": "Mega Minun",
+    "num": -60006,
+    "types": [
+      "Ice",
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 127,
+      "def": 112,
+      "spa": 106,
+      "spd": 64,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Packedsnow",
+      "H": "Packedsnow"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "megapyukumuku": {
+    "name": "Mega Pyukumuku",
+    "num": -60007,
+    "types": [
+      "Bug",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 120,
+      "def": 115,
+      "spa": 35,
+      "spd": 30,
+      "spe": 115
+    },
+    "abilities": {
+      "0": "Hivebody",
+      "H": "Hivebody"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "megamawile": {
+    "name": "Mega Mawile",
+    "num": -60008,
+    "types": [
+      "Dark",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 110,
+      "def": 90,
+      "spa": 95,
+      "spd": 85,
+      "spe": 130
+    },
+    "abilities": {
+      "0": "Strongjaw",
+      "H": "Strongjaw"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shellsea": {
+    "name": "Shellsea",
+    "num": -60009,
+    "types": [
+      "Dragon",
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "atk": 40,
+      "def": 40,
+      "spa": 57,
+      "spd": 75,
+      "spe": 59
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Swift Swim",
+      "H": "Drizzle"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastrodra": {
+    "name": "Gastrodra",
+    "num": -60010,
+    "types": [
+      "Dragon",
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 50,
+      "def": 57,
+      "spa": 85,
+      "spd": 110,
+      "spe": 88
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Swift Swim",
+      "H": "Drizzle"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shew": {
+    "name": "Shew",
+    "num": -60011,
+    "types": [
+      "Dragon",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 60,
+      "def": 80,
+      "spa": 45,
+      "spd": 40,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Fortification",
+      "H": "Sheer Force"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gaxorus": {
+    "name": "Gaxorus",
+    "num": -60012,
+    "types": [
+      "Dragon",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 100,
+      "def": 120,
+      "spa": 55,
+      "spd": 55,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Fortification",
+      "H": "Sheer Force"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "sheino": {
+    "name": "Sheino",
+    "num": -60013,
+    "types": [
+      "Dragon",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 65,
+      "def": 60,
+      "spa": 75,
+      "spd": 40,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Hypercutter",
+      "H": "Intimidate"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastreigon": {
+    "name": "Gastreigon",
+    "num": -60014,
+    "types": [
+      "Dragon",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 100,
+      "def": 70,
+      "spa": 105,
+      "spd": 60,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Hypercutter",
+      "H": "Intimidate"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shommoo": {
+    "name": "Shommo-o",
+    "num": -60015,
+    "types": [
+      "Dragon",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 45,
+      "def": 80,
+      "spa": 30,
+      "spd": 50,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Marvelscale",
+      "H": "Impulsive"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastroo": {
+    "name": "Gastro-o",
+    "num": -60016,
+    "types": [
+      "Dragon",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 85,
+      "def": 100,
+      "spa": 50,
+      "spd": 80,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Marvelscale",
+      "H": "Impulsive"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "swallos": {
+    "name": "Swallos",
+    "num": -60017,
+    "types": [
+      "Dragon",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 37,
+      "def": 69,
+      "spa": 45,
+      "spd": 50,
+      "spe": 69
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Healer",
+      "H": "Regenerator"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastaria": {
+    "name": "Gastaria",
+    "num": -60018,
+    "types": [
+      "Dragon",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 58,
+      "def": 101,
+      "spa": 72,
+      "spd": 73,
+      "spe": 101
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Healer",
+      "H": "Regenerator"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shapinch": {
+    "name": "Shapinch",
+    "num": -60019,
+    "types": [
+      "Dragon",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 45,
+      "spa": 65,
+      "spd": 60,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Compound Eyes",
+      "H": "Skilllink"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastrogon": {
+    "name": "Gastrogon",
+    "num": -60020,
+    "types": [
+      "Dragon",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 57,
+      "atk": 100,
+      "def": 55,
+      "spa": 116,
+      "spd": 100,
+      "spe": 57
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Compound Eyes",
+      "H": "Skilllink"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shible": {
+    "name": "Shible",
+    "num": -60021,
+    "types": [
+      "Dragon",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "atk": 75,
+      "def": 59,
+      "spa": 57,
+      "spd": 40,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Sandrush",
+      "H": "Sand Stream"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastrochomp": {
+    "name": "Gastrochomp",
+    "num": -60022,
+    "types": [
+      "Dragon",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 110,
+      "def": 88,
+      "spa": 85,
+      "spd": 50,
+      "spe": 57
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Sandrush",
+      "H": "Sand Stream"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shapplin": {
+    "name": "Shapplin",
+    "num": -60023,
+    "types": [
+      "Dragon",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "atk": 62,
+      "def": 69,
+      "spa": 40,
+      "spd": 30,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Immunity",
+      "H": "Ripen"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastrapple": {
+    "name": "Gastrapple",
+    "num": -60024,
+    "types": [
+      "Dragon",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 85,
+      "def": 105,
+      "spa": 50,
+      "spd": 45,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Immunity",
+      "H": "Ripen"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "sheepy": {
+    "name": "Sheepy",
+    "num": -60025,
+    "types": [
+      "Dragon",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "atk": 30,
+      "def": 50,
+      "spa": 70,
+      "spd": 76,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Perishbody",
+      "H": "Speed Boost"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastrapult": {
+    "name": "Gastrapult",
+    "num": -60026,
+    "types": [
+      "Dragon",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 55,
+      "def": 60,
+      "spa": 110,
+      "spd": 115,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Perishbody",
+      "H": "Speed Boost"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shrelp": {
+    "name": "Shrelp",
+    "num": -60027,
+    "types": [
+      "Dragon",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 60,
+      "def": 55,
+      "spa": 60,
+      "spd": 45,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Poisontouch",
+      "H": "Sniper"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastralge": {
+    "name": "Gastralge",
+    "num": -60028,
+    "types": [
+      "Dragon",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 110,
+      "def": 90,
+      "spa": 70,
+      "spd": 60,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Poisontouch",
+      "H": "Sniper"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shyrunt": {
+    "name": "Shyrunt",
+    "num": -60029,
+    "types": [
+      "Dragon",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 86,
+      "def": 50,
+      "spa": 40,
+      "spd": 46,
+      "spe": 53
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Rough Skin",
+      "H": "Shellarmor"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastrantrum": {
+    "name": "Gastrantrum",
+    "num": -60030,
+    "types": [
+      "Dragon",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 130,
+      "def": 80,
+      "spa": 50,
+      "spd": 55,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Rough Skin",
+      "H": "Shellarmor"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shagon": {
+    "name": "Shagon",
+    "num": -60031,
+    "types": [
+      "Dragon",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 56,
+      "spa": 70,
+      "spd": 36,
+      "spe": 53
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Sheer Force",
+      "H": "Intimidate"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastramence": {
+    "name": "Gastramence",
+    "num": -60032,
+    "types": [
+      "Dragon",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 80,
+      "def": 70,
+      "spa": 110,
+      "spd": 55,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Sheer Force",
+      "H": "Intimidate"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "shibax": {
+    "name": "Shibax",
+    "num": -60033,
+    "types": [
+      "Dragon",
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 70,
+      "def": 56,
+      "spa": 60,
+      "spd": 36,
+      "spe": 53
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Icyveins",
+      "H": "Thermalexchange"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gascalibur": {
+    "name": "Gascalibur",
+    "num": -60034,
+    "types": [
+      "Dragon",
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 100,
+      "def": 70,
+      "spa": 90,
+      "spd": 55,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Icyveins",
+      "H": "Thermalexchange"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "ash": {
+    "name": "Ash",
+    "num": -60035,
+    "types": [
+      "Flying",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 50,
+      "def": 80,
+      "spa": 80,
+      "spd": 115,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Drought"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "fog": {
+    "name": "Fog",
+    "num": -60036,
+    "types": [
+      "Flying",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 50,
+      "def": 75,
+      "spa": 95,
+      "spd": 90,
+      "spe": 115
+    },
+    "abilities": {
+      "0": "Ethereal"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "chilling": {
+    "name": "Chilling",
+    "num": -60037,
+    "types": [
+      "Flying",
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "atk": 60,
+      "def": 60,
+      "spa": 70,
+      "spd": 100,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Snow Warning"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "dust": {
+    "name": "Dust",
+    "num": -60038,
+    "types": [
+      "Flying",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 50,
+      "def": 115,
+      "spa": 70,
+      "spd": 90,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Sand Stream"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "storm": {
+    "name": "Storm",
+    "num": -60039,
+    "types": [
+      "Flying",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 100,
+      "def": 65,
+      "spa": 65,
+      "spd": 100,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Drizzle"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "tornado": {
+    "name": "Tornado",
+    "num": -60040,
+    "types": [
+      "Flying",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 115,
+      "def": 70,
+      "spa": 100,
+      "spd": 50,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Deltastream"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "bow": {
+    "name": "Bow",
+    "num": -60041,
+    "types": [
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 60,
+      "def": 45,
+      "spa": 70,
+      "spd": 65,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Sharpshooter",
+      "1": "Skilllink",
+      "H": "Longreach"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "axe": {
+    "name": "Axe",
+    "num": -60042,
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 80,
+      "def": 48,
+      "spa": 70,
+      "spd": 35,
+      "spe": 37
+    },
+    "abilities": {
+      "0": "Rebellious",
+      "1": "Adaptability",
+      "H": "Sharpness"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "hammer": {
+    "name": "Hammer",
+    "num": -60043,
+    "types": [
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 60,
+      "def": 80,
+      "spa": 35,
+      "spd": 28,
+      "spe": 77
+    },
+    "abilities": {
+      "0": "Static",
+      "1": "Transistor",
+      "H": "Contrary"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "arsonist": {
+    "name": "Arsonist",
+    "num": -60044,
+    "types": [
+      "Psychic",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 62,
+      "atk": 38,
+      "def": 54,
+      "spa": 68,
+      "spd": 53,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Dishearten",
+      "1": "Telepathy",
+      "H": "Arsonist"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "zenmode": {
+    "name": "Zen Mode",
+    "num": -60045,
+    "types": [
+      "Rock",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 130,
+      "def": 130,
+      "spa": 15,
+      "spd": 20,
+      "spe": 135
+    },
+    "abilities": {},
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Gray",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "lynel": {
+    "name": "Lynel",
+    "num": -60046,
+    "types": [
+      "Fighting",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 170,
+      "def": 105,
+      "spa": 130,
+      "spd": 95,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Longreach",
+      "1": "Scrappy",
+      "H": "Frisk"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "metal": {
+    "name": "Metal",
+    "num": -60047,
+    "types": [
+      "Dark",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 105,
+      "def": 70,
+      "spa": 93,
+      "spd": 63,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Hustle",
+      "1": "Punkrock",
+      "H": "Dancer"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "rave": {
+    "name": "Rave",
+    "num": -60048,
+    "types": [
+      "Electric",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 85,
+      "def": 60,
+      "spa": 113,
+      "spd": 83,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Resonant",
+      "1": "Dazzling",
+      "H": "Dancer"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "world": {
+    "name": "World",
+    "num": -60049,
+    "types": [
+      "Fire",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 90,
+      "def": 65,
+      "spa": 93,
+      "spd": 88,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Serene Grace",
+      "1": "Quickfeet",
+      "H": "Dancer"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "rock": {
+    "name": "Rock",
+    "num": -60050,
+    "types": [
+      "Rock",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 29,
+      "def": 35,
+      "spa": 36,
+      "spd": 29,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Stamina",
+      "1": "Sandforce",
+      "H": "Solid Rock"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Brown",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "snow": {
+    "name": "Snow",
+    "num": -60051,
+    "types": [
+      "Ice",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 29,
+      "def": 35,
+      "spa": 36,
+      "spd": 29,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Packedsnow",
+      "1": "Stakeout",
+      "H": "Regenerator"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "toxicorb": {
+    "name": "Toxic Orb",
+    "num": -60052,
+    "types": [
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 25,
+      "def": 70,
+      "spa": 50,
+      "spd": 70,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Poison Point",
+      "1": "Vandal",
+      "H": "Insomnia"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Purple",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "frostorb": {
+    "name": "Frost Orb",
+    "num": -60053,
+    "types": [
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 25,
+      "def": 50,
+      "spa": 70,
+      "spd": 70,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Deepchill",
+      "1": "Vandal",
+      "H": "Unaware"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Blue",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "grassyform": {
+    "name": "Grassy Form",
+    "num": -60054,
+    "types": [
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 80,
+      "def": 95,
+      "spa": 10,
+      "spd": 80,
+      "spe": 95
+    },
+    "abilities": {},
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Green",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "electricform": {
+    "name": "Electric Form",
+    "num": -60055,
+    "types": [
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 20,
+      "def": 70,
+      "spa": 80,
+      "spd": 120,
+      "spe": 70
+    },
+    "abilities": {},
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Yellow",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "psychicform": {
+    "name": "Psychic Form",
+    "num": -60056,
+    "types": [
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 30,
+      "def": 110,
+      "spa": 30,
+      "spd": 80,
+      "spe": 110
+    },
+    "abilities": {},
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Purple",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "mistyform": {
+    "name": "Misty Form",
+    "num": -60057,
+    "types": [
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 20,
+      "def": 75,
+      "spa": 120,
+      "spd": 70,
+      "spe": 75
+    },
+    "abilities": {},
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Pink",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "anomaly": {
+    "name": "Anomaly",
+    "num": -60058,
+    "types": [
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 200,
+      "atk": 70,
+      "def": 125,
+      "spa": 10,
+      "spd": 70,
+      "spe": 125
+    },
+    "abilities": {
+      "0": "Antigravity",
+      "H": "Antigravity"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Black",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "origin": {
+    "name": "Origin",
+    "num": -60059,
+    "types": [
+      "Ghost",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 25,
+      "def": 125,
+      "spa": 75,
+      "spd": 100,
+      "spe": 125
+    },
+    "abilities": {
+      "0": "Filter"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "compelled": {
+    "name": "Compelled",
+    "num": -60060,
+    "types": [
+      "Steel",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 25,
+      "def": 125,
+      "spa": 75,
+      "spd": 100,
+      "spe": 125
+    },
+    "abilities": {
+      "0": "Filter"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "leviathan": {
+    "name": "Leviathan",
+    "num": -60061,
+    "types": [
+      "Dark",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 120,
+      "def": 120,
+      "spa": 120,
+      "spd": 120,
+      "spe": 120
+    },
+    "abilities": {
+      "0": "Shadowshield"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "cara": {
+    "name": "Cara",
+    "num": -60062,
+    "types": [
+      "Fire",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 120,
+      "def": 120,
+      "spa": 120,
+      "spd": 120,
+      "spe": 120
+    },
+    "abilities": {
+      "0": "Tormented"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "mindlinkprime": {
+    "name": "Mindlink Prime",
+    "num": -60063,
+    "types": [
+      "Steel",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 120,
+      "def": 120,
+      "spa": 120,
+      "spd": 120,
+      "spe": 120
+    },
+    "abilities": {
+      "0": "Sheer Force"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
   "eeveetemporal": {
     "num": 190,
     "name": "Eevee-Temporal",
@@ -33965,7 +35602,7 @@
   },
   "wurmpless2": {
     "name": "Wurmple (SS2)",
-    "num": -60001,
+    "num": -60064,
     "types": [
       "Bug",
       "Psychic"
@@ -33992,7 +35629,7 @@
   },
   "wurmple2ss2": {
     "name": "Wurmple (SS2)",
-    "num": -60002,
+    "num": -60065,
     "types": [
       "Bug",
       "Ice"
@@ -34124,7 +35761,7 @@
   },
   "regirockss2": {
     "name": "Regirock (SS2)",
-    "num": -60003,
+    "num": -60066,
     "types": [
       "Flying"
     ],
@@ -34150,7 +35787,7 @@
   },
   "regicess2": {
     "name": "Regice (SS2)",
-    "num": -60004,
+    "num": -60067,
     "types": [
       "Grass"
     ],
@@ -34176,7 +35813,7 @@
   },
   "registeelss2": {
     "name": "Registeel (SS2)",
-    "num": -60005,
+    "num": -60068,
     "types": [
       "Psychic"
     ],
@@ -34236,7 +35873,7 @@
   },
   "manaphy2ss2": {
     "name": "T.Manaphy (SS2)",
-    "num": -60006,
+    "num": -60069,
     "types": [
       "Fairy"
     ],
@@ -34262,7 +35899,7 @@
   },
   "darkraiss2": {
     "name": "Darkrai (SS2)",
-    "num": -60007,
+    "num": -60070,
     "types": [
       "Light"
     ],
@@ -34288,7 +35925,7 @@
   },
   "cresseliass2": {
     "name": "Cresselia (SS2)",
-    "num": -60008,
+    "num": -60071,
     "types": [
       "Poison"
     ],
@@ -38269,7 +39906,7 @@
   },
   "tapukokoss2": {
     "name": "Tapu Koko (SS2)",
-    "num": -60009,
+    "num": -60072,
     "types": [
       "Bug",
       "Ghost"
@@ -38296,7 +39933,7 @@
   },
   "tapuleless2": {
     "name": "Tapu Lele (SS2)",
-    "num": -60010,
+    "num": -60073,
     "types": [
       "Normal",
       "Ghost"
@@ -38323,7 +39960,7 @@
   },
   "tapubuluss2": {
     "name": "Tapu Bulu (SS2)",
-    "num": -60011,
+    "num": -60074,
     "types": [
       "Fire",
       "Ghost"
@@ -38350,7 +39987,7 @@
   },
   "tapufiniss2": {
     "name": "Tapu Fini (SS2)",
-    "num": -60012,
+    "num": -60075,
     "types": [
       "Poison",
       "Ghost"
@@ -40336,7 +41973,7 @@
   },
   "meltanss2": {
     "name": "Meltan (SS2)",
-    "num": -60013,
+    "num": -60076,
     "types": [
       "Ice",
       "Fairy"
@@ -40363,7 +42000,7 @@
   },
   "melmetalss2": {
     "name": "Melmetal (SS2)",
-    "num": -60014,
+    "num": -60077,
     "types": [
       "Ice",
       "Fairy"
@@ -42423,7 +44060,7 @@
   },
   "nidoranfess2": {
     "name": "Nidoran♀ (SS2)",
-    "num": -60015,
+    "num": -60078,
     "types": [
       "Fire"
     ],
@@ -42449,7 +44086,7 @@
   },
   "nidoranmass2": {
     "name": "Nidoran♂ (SS2)",
-    "num": -60016,
+    "num": -60079,
     "types": [
       "Ice"
     ],
@@ -44075,7 +45712,7 @@
   },
   "manaphyss2": {
     "name": "Manaphy (SS2)",
-    "num": -60017,
+    "num": -60080,
     "types": [
       "Water"
     ],
@@ -44099,7 +45736,7 @@
   },
   "dialgass2": {
     "name": "Dialga (SS2)",
-    "num": -60018,
+    "num": -60081,
     "types": [
       "Steel",
       "Dragon"
@@ -44124,7 +45761,7 @@
   },
   "palkiass2": {
     "name": "Palkia (SS2)",
-    "num": -60019,
+    "num": -60082,
     "types": [
       "Cosmic",
       "Dragon"
@@ -44149,7 +45786,7 @@
   },
   "giratinass2": {
     "name": "Giratina (SS2)",
-    "num": -60020,
+    "num": -60083,
     "types": [
       "Ghost",
       "Dragon"
@@ -44174,7 +45811,7 @@
   },
   "arceusss2": {
     "name": "Arceus (SS2)",
-    "num": -60021,
+    "num": -60084,
     "types": [
       "Light",
       "Dragon"

@@ -384,6 +384,15 @@ for (const block of pokemonBlocks) {
   processBlock(block);
 }
 
+// ─── Counters for new entries (shared across form processing + second pass) ──
+let directMatchCount = 0;
+let suffix2MatchCount = 0;
+let newEntryCount = 0;
+// Negative num starting point for truly new SS2-exclusive Pokémon
+let newEntryNum = -60001;
+// Track which dex keys are already used (prevents duplicates across strategies)
+const usedDexKeys = new Set(Object.keys(outPokedex));
+
 // Process forms (variant forms of orion/temporal species)
 let formMatchCount = 0;
 let formUnmatchCount = 0;
@@ -439,6 +448,38 @@ for (const block of formBlocks) {
       }
     } else {
       formUnmatchCount++;
+
+      // Strategy 4: Unmatched forms that have a unique FormName are distinct species
+      // (e.g. SHELLOS form 1 FormName=Shellsea types=DRAGON,WATER → add as 'shellsea')
+      if (r.FormName && r.Types && r.BaseStats) {
+        const pbsTypes = r.Types.split(',').map(t => pbsTypeToDisplay(t.trim()));
+        const formDisplayName = r.FormName.trim();
+        const formKey = normId(formDisplayName);
+        if (formKey && !outPokedex[formKey]) {
+          const baseStats = parseBaseStats(r.BaseStats);
+          const abilities = parseAbilitiesProper(r.Abilities || '', r.HiddenAbilities || '');
+          const levelLearnset = parseLevelMoves(r.Moves || '');
+          const tutorLearnset = parseTutorMoves(r.TutorMoves || '');
+          const eggLearnset = parseEggMoves(r.EggMoves || '');
+          const fullLearnset = mergeLearnsets(mergeLearnsets(levelLearnset, tutorLearnset), eggLearnset);
+
+          outPokedex[formKey] = {
+            name: formDisplayName,
+            num: newEntryNum--,
+            types: pbsTypes,
+            baseStats,
+            abilities: Object.keys(abilities).length > 0 ? abilities : {},
+            isNonstandard: 'Custom',
+            gen: 9,
+            color: r.Color || 'White',
+            tags: ['Soulstones'],
+          };
+          if (Object.keys(fullLearnset).length > 0) {
+            outLearnsets[formKey] = { learnset: fullLearnset };
+          }
+          newEntryCount++;
+        }
+      }
     }
   }
 }
@@ -452,16 +493,10 @@ for (const entry of Object.values(outPokedex)) {
 // Strategy 1: Direct pokeathlon match (galaxeon, prismeon, octaveon etc. without orion/temporal suffix)
 // Strategy 2: '2'-suffix variants → strip '2', look for orion/temporal match by base+types
 // Strategy 3: Truly new Pokémon → build from PBS data directly
+// (Counters and usedDexKeys/newEntryNum were declared before form processing above)
 
-let directMatchCount = 0;
-let suffix2MatchCount = 0;
-let newEntryCount = 0;
-
-// Track which PBS keys need a unique dex ID for "truly new"
-const usedDexKeys = new Set(Object.keys(outPokedex));
-
-// Negative num starting point for truly new SS2-exclusive Pokémon
-let newEntryNum = -60001;
+// Sync usedDexKeys with any entries added during form processing
+for (const k of Object.keys(outPokedex)) usedDexKeys.add(k);
 
 for (const block of pokemonBlocks) {
   const r = block._raw;
