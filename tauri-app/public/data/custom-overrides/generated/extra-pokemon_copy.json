@@ -1,0 +1,30 @@
+{
+  "obliteryx": {
+    "name": "Obliteryx",
+    "num": -50001,
+    "types": ["Flying", "Grass"],
+    "baseStats": { "hp": 70, "atk": 120, "def": 75, "spa": 85, "spd": 80, "spe": 160 },
+    "abilities": { "0": "Hurricane Force", "H": "Levitate" },
+    "heightm": 1.2,
+    "weightkg": 34.0,
+    "color": "Green",
+    "gen": 9,
+    "tier": "NDOU",
+    "isNonstandard": "CAP",
+    "tags": ["CAP"]
+  },
+  "chromera": {
+    "name": "Chromera",
+    "num": -50002,
+    "types": ["Dragon", "Water"],
+    "baseStats": { "hp": 100, "atk": 98, "def": 85, "spa": 75, "spd": 85, "spe": 90 },
+    "abilities": { "0": "Color Change", "H": "Protean" },
+    "heightm": 1.5,
+    "weightkg": 65.0,
+    "color": "Purple",
+    "gen": 9,
+    "tier": "NDOU",
+    "isNonstandard": "CAP",
+    "tags": ["CAP"]
+  }
+}
