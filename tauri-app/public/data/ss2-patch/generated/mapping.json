@@ -1,0 +1,4492 @@
+[
+  {
+    "ps2Species": "TORKOAL",
+    "orionTempletonKey": "torkoalorion",
+    "types": "Electric"
+  },
+  {
+    "ps2Species": "JELLICENT",
+    "orionTempletonKey": "jellicentorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "MANKEY",
+    "orionTempletonKey": "mankeyorion",
+    "types": "Sound,Fighting"
+  },
+  {
+    "ps2Species": "GRUMPIG",
+    "orionTempletonKey": "grumpigorion",
+    "types": "Fire"
+  },
+  {
+    "ps2Species": "SLOWKING",
+    "orionTempletonKey": "slowkingorion",
+    "types": "Normal,Bug"
+  },
+  {
+    "ps2Species": "SHELGON",
+    "orionTempletonKey": "shelgonorion",
+    "types": "Fire,Poison"
+  },
+  {
+    "ps2Species": "TORCHIC",
+    "orionTempletonKey": "torchicorion",
+    "types": "Ground,Flying"
+  },
+  {
+    "ps2Species": "EEVEE",
+    "orionTempletonKey": "eeveeorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "FLOETTE",
+    "orionTempletonKey": "floetteorion",
+    "types": "Fairy,Water"
+  },
+  {
+    "ps2Species": "TOGEKISS",
+    "orionTempletonKey": "togekissorion",
+    "types": "Dark,Flying"
+  },
+  {
+    "ps2Species": "CORVISQUIRE",
+    "orionTempletonKey": "corvisquireorion",
+    "types": "Dark,Electric"
+  },
+  {
+    "ps2Species": "ARMAROUGE",
+    "orionTempletonKey": "armarougeorion",
+    "types": "Electric,Fairy"
+  },
+  {
+    "ps2Species": "HOUNDSTONE",
+    "orionTempletonKey": "houndstoneorion",
+    "types": "Poison"
+  },
+  {
+    "ps2Species": "XATU",
+    "orionTempletonKey": "xatuorion",
+    "types": "Steel,Electric"
+  },
+  {
+    "ps2Species": "EMBOAR",
+    "orionTempletonKey": "emboarorion",
+    "types": "Ground,Rock"
+  },
+  {
+    "ps2Species": "PRINPLUP",
+    "orionTempletonKey": "prinpluporion",
+    "types": "Water,Ice"
+  },
+  {
+    "ps2Species": "ETERNATUS",
+    "orionTempletonKey": "eternatusorion",
+    "types": "Ghost,Dragon"
+  },
+  {
+    "ps2Species": "CHINCHOU",
+    "orionTempletonKey": "chinchouorion",
+    "types": "Light,Dark"
+  },
+  {
+    "ps2Species": "ABRA",
+    "orionTempletonKey": "abraorion",
+    "types": "Fighting,Normal"
+  },
+  {
+    "ps2Species": "PINECO",
+    "orionTempletonKey": "pinecoorion",
+    "types": "Rock,Fairy"
+  },
+  {
+    "ps2Species": "ANNIHILAPE",
+    "orionTempletonKey": "annihilapeorion",
+    "types": "Sound,Fighting"
+  },
+  {
+    "ps2Species": "SCEPTILE",
+    "orionTempletonKey": "sceptileorion",
+    "types": "Bug,Dragon"
+  },
+  {
+    "ps2Species": "CHARMANDER",
+    "orionTempletonKey": "charmanderorion",
+    "types": "Ground,Dragon"
+  },
+  {
+    "ps2Species": "SEEL",
+    "orionTempletonKey": "seelorion",
+    "types": "Water,Ground"
+  },
+  {
+    "ps2Species": "SHEDINJA",
+    "orionTempletonKey": "shedinjaorion",
+    "types": "Light,Bug"
+  },
+  {
+    "ps2Species": "SMOLIV",
+    "orionTempletonKey": "smolivorion",
+    "types": "Water,Psychic"
+  },
+  {
+    "ps2Species": "VIGOROTH",
+    "orionTempletonKey": "vigorothorion",
+    "types": "Ice,Fighting"
+  },
+  {
+    "ps2Species": "LUXIO",
+    "orionTempletonKey": "luxioorion",
+    "types": "Dark,Dragon"
+  },
+  {
+    "ps2Species": "MISMAGIUS",
+    "orionTempletonKey": "mismagiusorion",
+    "types": "Light,Sound"
+  },
+  {
+    "ps2Species": "PURRLOIN",
+    "orionTempletonKey": "purrloinorion",
+    "types": "Light,Cosmic"
+  },
+  {
+    "ps2Species": "CYCLIZAR",
+    "orionTempletonKey": "cyclizarorion",
+    "types": "Water,Steel"
+  },
+  {
+    "ps2Species": "GRAFAIAI",
+    "orionTempletonKey": "grafaiaiorion",
+    "types": "Steel,Dark"
+  },
+  {
+    "ps2Species": "FURRET",
+    "orionTempletonKey": "furretorion",
+    "types": "Ghost,Poison"
+  },
+  {
+    "ps2Species": "TOTODILE",
+    "orionTempletonKey": "totodileorion",
+    "types": "Fighting,Ground"
+  },
+  {
+    "ps2Species": "ARMALDO",
+    "orionTempletonKey": "armaldoorion",
+    "types": "Poison,Rock"
+  },
+  {
+    "ps2Species": "GOLURK",
+    "orionTempletonKey": "golurkorion",
+    "types": "Steel,Psychic"
+  },
+  {
+    "ps2Species": "FOMANTIS",
+    "orionTempletonKey": "fomantisorion",
+    "types": "Bug"
+  },
+  {
+    "ps2Species": "LECHONK",
+    "orionTempletonKey": "lechonkorion",
+    "types": "Grass,Dark"
+  },
+  {
+    "ps2Species": "RABOOT",
+    "orionTempletonKey": "rabootorion",
+    "types": "Fairy,Psychic"
+  },
+  {
+    "ps2Species": "LEAVANNY",
+    "orionTempletonKey": "leavannyorion",
+    "types": "Steel,Dark"
+  },
+  {
+    "ps2Species": "WOOPER",
+    "orionTempletonKey": "wooperorion",
+    "types": "Fairy,Fire"
+  },
+  {
+    "ps2Species": "SPHEAL",
+    "orionTempletonKey": "sphealorion",
+    "types": "Ice,Ground"
+  },
+  {
+    "ps2Species": "EMOLGA",
+    "orionTempletonKey": "emolgaorion",
+    "types": "Poison,Flying"
+  },
+  {
+    "ps2Species": "METAPOD",
+    "orionTempletonKey": "metapodorion",
+    "types": "Bug,Fairy"
+  },
+  {
+    "ps2Species": "SNORLAX",
+    "orionTempletonKey": "snorlaxorion",
+    "types": "Ice,Psychic"
+  },
+  {
+    "ps2Species": "FLITTLE",
+    "orionTempletonKey": "flittleorion",
+    "types": "Ice,Fairy"
+  },
+  {
+    "ps2Species": "ARAQUANID",
+    "orionTempletonKey": "araquanidorion",
+    "types": "Light,Electric"
+  },
+  {
+    "ps2Species": "LILLIGANT",
+    "orionTempletonKey": "lilligantorion",
+    "types": "Fire,Fairy"
+  },
+  {
+    "ps2Species": "FRAXURE",
+    "orionTempletonKey": "fraxureorion",
+    "types": "Rock,Dragon"
+  },
+  {
+    "ps2Species": "ZWEILOUS",
+    "orionTempletonKey": "zweilousorion",
+    "types": "Psychic,Dragon"
+  },
+  {
+    "ps2Species": "QUAXLY",
+    "orionTempletonKey": "quaxlyorion",
+    "types": "Normal,Sound"
+  },
+  {
+    "ps2Species": "ROGGENROLA",
+    "orionTempletonKey": "roggenrolaorion",
+    "types": "Ice,Water"
+  },
+  {
+    "ps2Species": "KOMMOO",
+    "orionTempletonKey": "kommooorion",
+    "types": "Steel,Fighting"
+  },
+  {
+    "ps2Species": "AZUMARILL",
+    "orionTempletonKey": "azumarillorion",
+    "types": "Fighting"
+  },
+  {
+    "ps2Species": "LOKIX",
+    "orionTempletonKey": "lokixorion",
+    "types": "Steel,Fire"
+  },
+  {
+    "ps2Species": "POPPLIO",
+    "orionTempletonKey": "popplioorion",
+    "types": "Grass,Fairy"
+  },
+  {
+    "ps2Species": "MAROWAK",
+    "orionTempletonKey": "marowakorion",
+    "types": "Water,Rock"
+  },
+  {
+    "ps2Species": "TYROGUE",
+    "orionTempletonKey": "tyrogueorion",
+    "types": "Fighting,Normal"
+  },
+  {
+    "ps2Species": "ANORITH",
+    "orionTempletonKey": "anorithorion",
+    "types": "Poison,Rock"
+  },
+  {
+    "ps2Species": "AMPHAROS",
+    "orionTempletonKey": "ampharosorion",
+    "types": "Fairy,Flying"
+  },
+  {
+    "ps2Species": "SHUCKLE",
+    "orionTempletonKey": "shuckleorion",
+    "types": "Cosmic,Bug"
+  },
+  {
+    "ps2Species": "AROMATISSE",
+    "orionTempletonKey": "aromatisseorion",
+    "types": "Fairy,Poison"
+  },
+  {
+    "ps2Species": "TENTACRUEL",
+    "orionTempletonKey": "tentacruelorion",
+    "types": "Cosmic,Water"
+  },
+  {
+    "ps2Species": "PYUKUMUKU",
+    "orionTempletonKey": "pyukumukuorion",
+    "types": "Bug"
+  },
+  {
+    "ps2Species": "RATICATE",
+    "orionTempletonKey": "raticateorion",
+    "types": "Psychic,Normal"
+  },
+  {
+    "ps2Species": "MEOWSTIC",
+    "orionTempletonKey": "meowsticorion",
+    "types": "Psychic,Ghost"
+  },
+  {
+    "ps2Species": "SLOWPOKE",
+    "orionTempletonKey": "slowpokeorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "INCINEROAR",
+    "orionTempletonKey": "incineroarorion",
+    "types": "Fighting,Cosmic"
+  },
+  {
+    "ps2Species": "HAXORUS",
+    "orionTempletonKey": "haxorusorion",
+    "types": "Rock,Dragon"
+  },
+  {
+    "ps2Species": "POLIWAG",
+    "orionTempletonKey": "poliwagorion",
+    "types": "Water,Ground"
+  },
+  {
+    "ps2Species": "SIMISAGE",
+    "orionTempletonKey": "simisageorion",
+    "types": "Fighting"
+  },
+  {
+    "ps2Species": "KOMALA",
+    "orionTempletonKey": "komalaorion",
+    "types": "Cosmic,Normal"
+  },
+  {
+    "ps2Species": "UNFEZANT",
+    "orionTempletonKey": "unfezantorion",
+    "types": "Psychic,Fairy"
+  },
+  {
+    "ps2Species": "BOUNSWEET",
+    "orionTempletonKey": "bounsweetorion",
+    "types": "Light,Dark"
+  },
+  {
+    "ps2Species": "AGGRON",
+    "orionTempletonKey": "aggronorion",
+    "types": "Bug,Rock"
+  },
+  {
+    "ps2Species": "CAPSAKID",
+    "orionTempletonKey": "capsakidorion",
+    "types": "Poison,Electric"
+  },
+  {
+    "ps2Species": "STARMIE",
+    "orionTempletonKey": "starmieorion",
+    "types": "Cosmic,Rock"
+  },
+  {
+    "ps2Species": "HARIYAMA",
+    "orionTempletonKey": "hariyamaorion",
+    "types": "Steel,Fighting"
+  },
+  {
+    "ps2Species": "BASTIODON",
+    "orionTempletonKey": "bastiodonorion",
+    "types": "Ice,Steel"
+  },
+  {
+    "ps2Species": "SWADLOON",
+    "orionTempletonKey": "swadloonorion",
+    "types": "Steel,Dark"
+  },
+  {
+    "ps2Species": "UNOWN",
+    "orionTempletonKey": "unownorion",
+    "types": "Rock,Sound"
+  },
+  {
+    "ps2Species": "SKRELP",
+    "orionTempletonKey": "skrelporion",
+    "types": "Grass,Water"
+  },
+  {
+    "ps2Species": "MANDIBUZZ",
+    "orionTempletonKey": "mandibuzzorion",
+    "types": "Ground,Flying"
+  },
+  {
+    "ps2Species": "HERACROSS",
+    "orionTempletonKey": "heracrossorion",
+    "types": "Bug,Ground"
+  },
+  {
+    "ps2Species": "ARBOLIVA",
+    "orionTempletonKey": "arbolivaorion",
+    "types": "Water,Psychic"
+  },
+  {
+    "ps2Species": "SQUIRTLE",
+    "orionTempletonKey": "squirtleorion",
+    "types": "Poison,Steel"
+  },
+  {
+    "ps2Species": "MEGANIUM",
+    "orionTempletonKey": "meganiumorion",
+    "types": "Fairy,Grass"
+  },
+  {
+    "ps2Species": "HAKAMOO",
+    "orionTempletonKey": "hakamooorion",
+    "types": "Steel,Fighting"
+  },
+  {
+    "ps2Species": "DEDENNE",
+    "orionTempletonKey": "dedenneorion",
+    "types": "Sound,Fairy"
+  },
+  {
+    "ps2Species": "SPIRITOMB",
+    "orionTempletonKey": "spiritomborion",
+    "types": "Cosmic,Light"
+  },
+  {
+    "ps2Species": "TOXAPEX",
+    "orionTempletonKey": "toxapexorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "PATRAT",
+    "orionTempletonKey": "patratorion",
+    "types": "Dark,Psychic"
+  },
+  {
+    "ps2Species": "FERROTHORN",
+    "orionTempletonKey": "ferrothornorion",
+    "types": "Grass"
+  },
+  {
+    "ps2Species": "MAWILE",
+    "orionTempletonKey": "mawileorion",
+    "types": "Dark"
+  },
+  {
+    "ps2Species": "DRIFLOON",
+    "orionTempletonKey": "drifloonorion",
+    "types": "Fire,Flying"
+  },
+  {
+    "ps2Species": "MIENSHAO",
+    "orionTempletonKey": "mienshaoorion",
+    "types": "Fire,Fighting"
+  },
+  {
+    "ps2Species": "WHIMSICOTT",
+    "orionTempletonKey": "whimsicottorion",
+    "types": "Ground,Flying"
+  },
+  {
+    "ps2Species": "CLOBBOPUS",
+    "orionTempletonKey": "clobbopusorion",
+    "types": "Water,Fighting"
+  },
+  {
+    "ps2Species": "CONKELDURR",
+    "orionTempletonKey": "conkeldurrorion",
+    "types": "Ghost,Fighting"
+  },
+  {
+    "ps2Species": "ACCELGOR",
+    "orionTempletonKey": "accelgororion",
+    "types": "Ground,Ghost"
+  },
+  {
+    "ps2Species": "GLOOM",
+    "orionTempletonKey": "gloomorion",
+    "types": "Grass,Cosmic"
+  },
+  {
+    "ps2Species": "LUDICOLO",
+    "orionTempletonKey": "ludicoloorion",
+    "types": "Grass,Ground"
+  },
+  {
+    "ps2Species": "DURANT",
+    "orionTempletonKey": "durantorion",
+    "types": "Bug,Fire"
+  },
+  {
+    "ps2Species": "WATTREL",
+    "orionTempletonKey": "wattrelorion",
+    "types": "Ice,Rock"
+  },
+  {
+    "ps2Species": "COPPERAJAH",
+    "orionTempletonKey": "copperajahorion",
+    "types": "Ground,Psychic"
+  },
+  {
+    "ps2Species": "DITTO",
+    "orionTempletonKey": "dittoorion",
+    "types": "Cosmic"
+  },
+  {
+    "ps2Species": "VIKAVOLT",
+    "orionTempletonKey": "vikavoltorion",
+    "types": "Steel,Light"
+  },
+  {
+    "ps2Species": "TYPHLOSION",
+    "orionTempletonKey": "typhlosionorion",
+    "types": "Steel,Normal"
+  },
+  {
+    "ps2Species": "CHESNAUGHT",
+    "orionTempletonKey": "chesnaughtorion",
+    "types": "Ground,Light"
+  },
+  {
+    "ps2Species": "PRIMARINA",
+    "orionTempletonKey": "primarinaorion",
+    "types": "Grass,Fairy"
+  },
+  {
+    "ps2Species": "FINNEON",
+    "orionTempletonKey": "finneonorion",
+    "types": "Water,Fairy"
+  },
+  {
+    "ps2Species": "MILOTIC",
+    "orionTempletonKey": "miloticorion",
+    "types": "Light,Fairy"
+  },
+  {
+    "ps2Species": "STOUTLAND",
+    "orionTempletonKey": "stoutlandorion",
+    "types": "Dark,Ghost"
+  },
+  {
+    "ps2Species": "PIDOVE",
+    "orionTempletonKey": "pidoveorion",
+    "types": "Psychic,Fairy"
+  },
+  {
+    "ps2Species": "PERSIAN",
+    "orionTempletonKey": "persianorion",
+    "types": "Electric,Normal"
+  },
+  {
+    "ps2Species": "SCATTERBUG",
+    "orionTempletonKey": "scatterbugorion",
+    "types": "Cosmic"
+  },
+  {
+    "ps2Species": "MAMOSWINE",
+    "orionTempletonKey": "mamoswineorion",
+    "types": "Electric,Ground"
+  },
+  {
+    "ps2Species": "TRUBBISH",
+    "orionTempletonKey": "trubbishorion",
+    "types": "Electric,Poison"
+  },
+  {
+    "ps2Species": "JANGMOO",
+    "orionTempletonKey": "jangmooorion",
+    "types": "Steel,Fighting"
+  },
+  {
+    "ps2Species": "VESPIQUEN",
+    "orionTempletonKey": "vespiquenorion",
+    "types": "Steel,Fire"
+  },
+  {
+    "ps2Species": "DRATINI",
+    "orionTempletonKey": "dratiniorion",
+    "types": "Light,Dragon"
+  },
+  {
+    "ps2Species": "STUNKY",
+    "orionTempletonKey": "stunkyorion",
+    "types": "Normal,Poison"
+  },
+  {
+    "ps2Species": "TOXEL",
+    "orionTempletonKey": "toxelorion",
+    "types": "Grass"
+  },
+  {
+    "ps2Species": "GASTLY",
+    "orionTempletonKey": "gastlyorion",
+    "types": "Ice,Flying"
+  },
+  {
+    "ps2Species": "TRANQUILL",
+    "orionTempletonKey": "tranquillorion",
+    "types": "Psychic,Fairy"
+  },
+  {
+    "ps2Species": "RIBOMBEE",
+    "orionTempletonKey": "ribombeeorion",
+    "types": "Bug,Flying"
+  },
+  {
+    "ps2Species": "KABUTO",
+    "orionTempletonKey": "kabutoorion",
+    "types": "Bug,Grass"
+  },
+  {
+    "ps2Species": "GOOMY",
+    "orionTempletonKey": "goomyorion",
+    "types": "Fairy,Normal"
+  },
+  {
+    "ps2Species": "SALAMENCE",
+    "orionTempletonKey": "salamenceorion",
+    "types": "Fire,Poison"
+  },
+  {
+    "ps2Species": "DEWGONG",
+    "orionTempletonKey": "dewgongorion",
+    "types": "Water,Ground"
+  },
+  {
+    "ps2Species": "PANSAGE",
+    "orionTempletonKey": "pansageorion",
+    "types": "Fighting"
+  },
+  {
+    "ps2Species": "WHISCASH",
+    "orionTempletonKey": "whiscashorion",
+    "types": "Light,Poison"
+  },
+  {
+    "ps2Species": "MIENFOO",
+    "orionTempletonKey": "mienfooorion",
+    "types": "Fire,Fighting"
+  },
+  {
+    "ps2Species": "GIRAFARIG",
+    "orionTempletonKey": "girafarigorion",
+    "types": "Light"
+  },
+  {
+    "ps2Species": "SLOWBRO",
+    "orionTempletonKey": "slowbroorion",
+    "types": "Normal,Bug"
+  },
+  {
+    "ps2Species": "FLYGON",
+    "orionTempletonKey": "flygonorion",
+    "types": "Ice,Dragon"
+  },
+  {
+    "ps2Species": "SCORBUNNY",
+    "orionTempletonKey": "scorbunnyorion",
+    "types": "Fairy,Psychic"
+  },
+  {
+    "ps2Species": "ONIX",
+    "orionTempletonKey": "onixorion",
+    "types": "Ice,Rock"
+  },
+  {
+    "ps2Species": "DUSTOX",
+    "orionTempletonKey": "dustoxorion",
+    "types": "Bug,Ice"
+  },
+  {
+    "ps2Species": "SPOINK",
+    "orionTempletonKey": "spoinkorion",
+    "types": "Fire"
+  },
+  {
+    "ps2Species": "CLODSIRE",
+    "orionTempletonKey": "clodsireorion",
+    "types": "Fairy,Poison"
+  },
+  {
+    "ps2Species": "ELECTRIKE",
+    "orionTempletonKey": "electrikeorion",
+    "types": "Ground,Ghost"
+  },
+  {
+    "ps2Species": "GROTLE",
+    "orionTempletonKey": "grotleorion",
+    "types": "Dragon,Fire"
+  },
+  {
+    "ps2Species": "BRAIXEN",
+    "orionTempletonKey": "braixenorion",
+    "types": "Water,Cosmic"
+  },
+  {
+    "ps2Species": "GROOKEY",
+    "orionTempletonKey": "grookeyorion",
+    "types": "Psychic,Ground"
+  },
+  {
+    "ps2Species": "MAGCARGO",
+    "orionTempletonKey": "magcargoorion",
+    "types": "Poison,Steel"
+  },
+  {
+    "ps2Species": "VICTREEBEL",
+    "orionTempletonKey": "victreebelorion",
+    "types": "Grass,Ghost"
+  },
+  {
+    "ps2Species": "CACTURNE",
+    "orionTempletonKey": "cacturneorion",
+    "types": "Ice,Fighting"
+  },
+  {
+    "ps2Species": "MEOWTH",
+    "orionTempletonKey": "meowthorion",
+    "types": "Electric,Normal"
+  },
+  {
+    "ps2Species": "TANDEMAUS",
+    "orionTempletonKey": "tandemausorion",
+    "types": "Ground,Normal"
+  },
+  {
+    "ps2Species": "ROSELIA",
+    "orionTempletonKey": "roseliaorion",
+    "types": "Ground,Fairy"
+  },
+  {
+    "ps2Species": "DELCATTY",
+    "orionTempletonKey": "delcattyorion",
+    "types": "Ghost,Normal"
+  },
+  {
+    "ps2Species": "FENNEKIN",
+    "orionTempletonKey": "fennekinorion",
+    "types": "Water,Cosmic"
+  },
+  {
+    "ps2Species": "SKELEDIRGE",
+    "orionTempletonKey": "skeledirgeorion",
+    "types": "Grass,Rock"
+  },
+  {
+    "ps2Species": "GOLISOPOD",
+    "orionTempletonKey": "golisopodorion",
+    "types": "Bug,Poison"
+  },
+  {
+    "ps2Species": "BRAMBLIN",
+    "orionTempletonKey": "bramblinorion",
+    "types": "Water,Rock"
+  },
+  {
+    "ps2Species": "KROKOROK",
+    "orionTempletonKey": "krokorokorion",
+    "types": "Water,Dark"
+  },
+  {
+    "ps2Species": "QUAGSIRE",
+    "orionTempletonKey": "quagsireorion",
+    "types": "Fairy,Fire"
+  },
+  {
+    "ps2Species": "WEEZING",
+    "orionTempletonKey": "weezingorion",
+    "types": "Fire,Poison"
+  },
+  {
+    "ps2Species": "PYROAR",
+    "orionTempletonKey": "pyroarorion",
+    "types": "Ice,Sound"
+  },
+  {
+    "ps2Species": "MAREEP",
+    "orionTempletonKey": "mareeporion",
+    "types": "Fairy,Flying"
+  },
+  {
+    "ps2Species": "BAXCALIBUR",
+    "orionTempletonKey": "baxcaliburorion",
+    "types": "Rock,Dragon"
+  },
+  {
+    "ps2Species": "GOTHITELLE",
+    "orionTempletonKey": "gothitelleorion",
+    "types": "Fairy,Fighting"
+  },
+  {
+    "ps2Species": "SOLOSIS",
+    "orionTempletonKey": "solosisorion",
+    "types": "Water,Psychic"
+  },
+  {
+    "ps2Species": "MUK",
+    "orionTempletonKey": "mukorion",
+    "types": "Grass,Ground"
+  },
+  {
+    "ps2Species": "LUVDISC",
+    "orionTempletonKey": "luvdiscorion",
+    "types": "Water,Sound"
+  },
+  {
+    "ps2Species": "GOLDUCK",
+    "orionTempletonKey": "golduckorion",
+    "types": "Ground,Psychic"
+  },
+  {
+    "ps2Species": "FIDOUGH",
+    "orionTempletonKey": "fidoughorion",
+    "types": "Flying"
+  },
+  {
+    "ps2Species": "MUNNA",
+    "orionTempletonKey": "munnaorion",
+    "types": "Electric"
+  },
+  {
+    "ps2Species": "SPRITZEE",
+    "orionTempletonKey": "spritzeeorion",
+    "types": "Fairy,Poison"
+  },
+  {
+    "ps2Species": "DRIZZILE",
+    "orionTempletonKey": "drizzileorion",
+    "types": "Water,Sound"
+  },
+  {
+    "ps2Species": "DUOSION",
+    "orionTempletonKey": "duosionorion",
+    "types": "Water,Psychic"
+  },
+  {
+    "ps2Species": "PIKIPEK",
+    "orionTempletonKey": "pikipekorion",
+    "types": "Grass,Flying"
+  },
+  {
+    "ps2Species": "HATENNA",
+    "orionTempletonKey": "hatennaorion",
+    "types": "Psychic,Ghost"
+  },
+  {
+    "ps2Species": "FERALIGATR",
+    "orionTempletonKey": "feraligatrorion",
+    "types": "Fighting,Ground"
+  },
+  {
+    "ps2Species": "SALAZZLE",
+    "orionTempletonKey": "salazzleorion",
+    "types": "Electric,Water"
+  },
+  {
+    "ps2Species": "TINKATINK",
+    "orionTempletonKey": "tinkatinkorion",
+    "types": "Ghost,Dragon"
+  },
+  {
+    "ps2Species": "SLUGMA",
+    "orionTempletonKey": "slugmaorion",
+    "types": "Poison"
+  },
+  {
+    "ps2Species": "LIEPARD",
+    "orionTempletonKey": "liepardorion",
+    "types": "Light,Cosmic"
+  },
+  {
+    "ps2Species": "ORTHWORM",
+    "orionTempletonKey": "orthwormorion",
+    "types": "Ice,Poison"
+  },
+  {
+    "ps2Species": "POLIWHIRL",
+    "orionTempletonKey": "poliwhirlorion",
+    "types": "Water,Ground"
+  },
+  {
+    "ps2Species": "GOLDEEN",
+    "orionTempletonKey": "goldeenorion",
+    "types": "Poison,Water"
+  },
+  {
+    "ps2Species": "VANILLUXE",
+    "orionTempletonKey": "vanilluxeorion",
+    "types": "Poison"
+  },
+  {
+    "ps2Species": "HITMONTOP",
+    "orionTempletonKey": "hitmontoporion",
+    "types": "Electric,Dark"
+  },
+  {
+    "ps2Species": "SIGILYPH",
+    "orionTempletonKey": "sigilyphorion",
+    "types": "Fire,Flying"
+  },
+  {
+    "ps2Species": "TATSUGIRI",
+    "orionTempletonKey": "tatsugiriorion",
+    "types": "Normal,Water"
+  },
+  {
+    "ps2Species": "TOEDSCRUEL",
+    "orionTempletonKey": "toedscruelorion",
+    "types": "Normal,Light"
+  },
+  {
+    "ps2Species": "SNIVY",
+    "orionTempletonKey": "snivyorion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "SAWK",
+    "orionTempletonKey": "sawkorion",
+    "types": "Rock,Fighting"
+  },
+  {
+    "ps2Species": "HITMONCHAN",
+    "orionTempletonKey": "hitmonchanorion",
+    "types": "Fire,Fighting"
+  },
+  {
+    "ps2Species": "TEDDIURSA",
+    "orionTempletonKey": "teddiursaorion",
+    "types": "Ghost,Cosmic"
+  },
+  {
+    "ps2Species": "MAGBY",
+    "orionTempletonKey": "magbyorion",
+    "types": "Water,Ice"
+  },
+  {
+    "ps2Species": "CERULEDGE",
+    "orionTempletonKey": "ceruledgeorion",
+    "types": "Electric,Ice"
+  },
+  {
+    "ps2Species": "MIMEJR",
+    "orionTempletonKey": "mimejrorion",
+    "types": "Sound,Psychic"
+  },
+  {
+    "ps2Species": "BANETTE",
+    "orionTempletonKey": "banetteorion",
+    "types": "Fairy,Dark"
+  },
+  {
+    "ps2Species": "KANGASKHAN",
+    "orionTempletonKey": "kangaskhanorion",
+    "types": "Cosmic,Fighting"
+  },
+  {
+    "ps2Species": "FERROSEED",
+    "orionTempletonKey": "ferroseedorion",
+    "types": "Grass"
+  },
+  {
+    "ps2Species": "SANDILE",
+    "orionTempletonKey": "sandileorion",
+    "types": "Water,Dark"
+  },
+  {
+    "ps2Species": "DIGLETT",
+    "orionTempletonKey": "diglettorion",
+    "types": "Ghost,Ground"
+  },
+  {
+    "ps2Species": "KRICKETOT",
+    "orionTempletonKey": "kricketotorion",
+    "types": "Bug,Sound"
+  },
+  {
+    "ps2Species": "ARBOK",
+    "orionTempletonKey": "arbokorion",
+    "types": "Ground,Poison"
+  },
+  {
+    "ps2Species": "LOTAD",
+    "orionTempletonKey": "lotadorion",
+    "types": "Grass,Ground"
+  },
+  {
+    "ps2Species": "BOLDORE",
+    "orionTempletonKey": "boldoreorion",
+    "types": "Ice,Water"
+  },
+  {
+    "ps2Species": "ZIGZAGOON",
+    "orionTempletonKey": "zigzagoonorion",
+    "types": "Ground,Dark"
+  },
+  {
+    "ps2Species": "MORGREM",
+    "orionTempletonKey": "morgremorion",
+    "types": "Ground,Fairy"
+  },
+  {
+    "ps2Species": "CROCALOR",
+    "orionTempletonKey": "crocalororion",
+    "types": "Grass,Rock"
+  },
+  {
+    "ps2Species": "TAROUNTULA",
+    "orionTempletonKey": "tarountulaorion",
+    "types": "Bug,Ice"
+  },
+  {
+    "ps2Species": "TORRACAT",
+    "orionTempletonKey": "torracatorion",
+    "types": "Fighting,Cosmic"
+  },
+  {
+    "ps2Species": "EISCUE",
+    "orionTempletonKey": "eiscueorion",
+    "types": "Steel"
+  },
+  {
+    "ps2Species": "AMOONGUSS",
+    "orionTempletonKey": "amoongussorion",
+    "types": "Poison,Fire"
+  },
+  {
+    "ps2Species": "PIDGEOTTO",
+    "orionTempletonKey": "pidgeottoorion",
+    "types": "Ice,Flying"
+  },
+  {
+    "ps2Species": "ALAKAZAM",
+    "orionTempletonKey": "alakazamorion",
+    "types": "Fighting,Normal"
+  },
+  {
+    "ps2Species": "HOPPIP",
+    "orionTempletonKey": "hoppiporion",
+    "types": "Ice,Sound"
+  },
+  {
+    "ps2Species": "NINETALES",
+    "orionTempletonKey": "ninetalesorion",
+    "types": "Cosmic"
+  },
+  {
+    "ps2Species": "BEEDRILL",
+    "orionTempletonKey": "beedrillorion",
+    "types": "Bug,Steel"
+  },
+  {
+    "ps2Species": "WORMADAM",
+    "orionTempletonKey": "wormadamorion",
+    "types": "Light,Bug"
+  },
+  {
+    "ps2Species": "BRIONNE",
+    "orionTempletonKey": "brionneorion",
+    "types": "Grass,Fairy"
+  },
+  {
+    "ps2Species": "SHUPPET",
+    "orionTempletonKey": "shuppetorion",
+    "types": "Fairy,Dark"
+  },
+  {
+    "ps2Species": "SLAKOTH",
+    "orionTempletonKey": "slakothorion",
+    "types": "Ice,Normal"
+  },
+  {
+    "ps2Species": "MONFERNO",
+    "orionTempletonKey": "monfernoorion",
+    "types": "Electric,Fighting"
+  },
+  {
+    "ps2Species": "NINJASK",
+    "orionTempletonKey": "ninjaskorion",
+    "types": "Dark,Bug"
+  },
+  {
+    "ps2Species": "DUGTRIO",
+    "orionTempletonKey": "dugtrioorion",
+    "types": "Ghost,Ground"
+  },
+  {
+    "ps2Species": "MAGMAR",
+    "orionTempletonKey": "magmarorion",
+    "types": "Water,Ice"
+  },
+  {
+    "ps2Species": "SHIINOTIC",
+    "orionTempletonKey": "shiinoticorion",
+    "types": "Ghost,Grass"
+  },
+  {
+    "ps2Species": "SKIPLOOM",
+    "orionTempletonKey": "skiploomorion",
+    "types": "Ice,Sound"
+  },
+  {
+    "ps2Species": "LITTEN",
+    "orionTempletonKey": "littenorion",
+    "types": "Fighting,Cosmic"
+  },
+  {
+    "ps2Species": "GLIMMET",
+    "orionTempletonKey": "glimmetorion",
+    "types": "Cosmic,Grass"
+  },
+  {
+    "ps2Species": "FROSLASS",
+    "orionTempletonKey": "froslassorion",
+    "types": "Ghost,Flying"
+  },
+  {
+    "ps2Species": "STARLY",
+    "orionTempletonKey": "starlyorion",
+    "types": "Sound,Flying"
+  },
+  {
+    "ps2Species": "SCRAGGY",
+    "orionTempletonKey": "scraggyorion",
+    "types": "Sound,Dark"
+  },
+  {
+    "ps2Species": "GOLETT",
+    "orionTempletonKey": "golettorion",
+    "types": "Steel,Psychic"
+  },
+  {
+    "ps2Species": "GRENINJA",
+    "orionTempletonKey": "greninjaorion",
+    "types": "Electric,Ghost"
+  },
+  {
+    "ps2Species": "CRAWDAUNT",
+    "orionTempletonKey": "crawdauntorion",
+    "types": "Rock,Dark"
+  },
+  {
+    "ps2Species": "BRAVIARY",
+    "orionTempletonKey": "braviaryorion",
+    "types": "Fire,Flying"
+  },
+  {
+    "ps2Species": "GOODRA",
+    "orionTempletonKey": "goodraorion",
+    "types": "Fairy,Normal"
+  },
+  {
+    "ps2Species": "ELECTIVIRE",
+    "orionTempletonKey": "electivireorion",
+    "types": "Bug,Fighting"
+  },
+  {
+    "ps2Species": "RAMPARDOS",
+    "orionTempletonKey": "rampardosorion",
+    "types": "Dragon,Dark"
+  },
+  {
+    "ps2Species": "ALTARIA",
+    "orionTempletonKey": "altariaorion",
+    "types": "Poison,Dragon"
+  },
+  {
+    "ps2Species": "FEAROW",
+    "orionTempletonKey": "fearoworion",
+    "types": "Water,Flying"
+  },
+  {
+    "ps2Species": "SILICOBRA",
+    "orionTempletonKey": "silicobraorion",
+    "types": "Water"
+  },
+  {
+    "ps2Species": "SKITTY",
+    "orionTempletonKey": "skittyorion",
+    "types": "Ghost,Normal"
+  },
+  {
+    "ps2Species": "CORVIKNIGHT",
+    "orionTempletonKey": "corviknightorion",
+    "types": "Dark,Electric"
+  },
+  {
+    "ps2Species": "SANDYGAST",
+    "orionTempletonKey": "sandygastorion",
+    "types": "Ghost,Ice"
+  },
+  {
+    "ps2Species": "LOMBRE",
+    "orionTempletonKey": "lombreorion",
+    "types": "Grass,Ground"
+  },
+  {
+    "ps2Species": "TAILLOW",
+    "orionTempletonKey": "tailloworion",
+    "types": "Dark,Flying"
+  },
+  {
+    "ps2Species": "MEDICHAM",
+    "orionTempletonKey": "medichamorion",
+    "types": "Light,Fighting"
+  },
+  {
+    "ps2Species": "GALVANTULA",
+    "orionTempletonKey": "galvantulaorion",
+    "types": "Bug,Dark"
+  },
+  {
+    "ps2Species": "FLORAGATO",
+    "orionTempletonKey": "floragatoorion",
+    "types": "Psychic,Fairy"
+  },
+  {
+    "ps2Species": "BUDEW",
+    "orionTempletonKey": "budeworion",
+    "types": "Ground,Fairy"
+  },
+  {
+    "ps2Species": "HAWLUCHA",
+    "orionTempletonKey": "hawluchaorion",
+    "types": "Poison,Dark"
+  },
+  {
+    "ps2Species": "SNOM",
+    "orionTempletonKey": "snomorion",
+    "types": "Rock"
+  },
+  {
+    "ps2Species": "LARVESTA",
+    "orionTempletonKey": "larvestaorion",
+    "types": "Bug,Electric"
+  },
+  {
+    "ps2Species": "HOUNDOOM",
+    "orionTempletonKey": "houndoomorion",
+    "types": "Fire,Light"
+  },
+  {
+    "ps2Species": "AIPOM",
+    "orionTempletonKey": "aipomorion",
+    "types": "Normal,Psychic"
+  },
+  {
+    "ps2Species": "SUNFLORA",
+    "orionTempletonKey": "sunfloraorion",
+    "types": "Grass,Fire"
+  },
+  {
+    "ps2Species": "PANSEAR",
+    "orionTempletonKey": "pansearorion",
+    "types": "Flying"
+  },
+  {
+    "ps2Species": "KECLEON",
+    "orionTempletonKey": "kecleonorion",
+    "types": "Psychic,Dragon"
+  },
+  {
+    "ps2Species": "SANDSHREW",
+    "orionTempletonKey": "sandshreworion",
+    "types": "Grass,Normal"
+  },
+  {
+    "ps2Species": "DREEPY",
+    "orionTempletonKey": "dreepyorion",
+    "types": "Steel,Flying"
+  },
+  {
+    "ps2Species": "TALONFLAME",
+    "orionTempletonKey": "talonflameorion",
+    "types": "Electric,Flying"
+  },
+  {
+    "ps2Species": "STARYU",
+    "orionTempletonKey": "staryuorion",
+    "types": "Cosmic,Rock"
+  },
+  {
+    "ps2Species": "GLALIE",
+    "orionTempletonKey": "glalieorion",
+    "types": "Ghost,Dark"
+  },
+  {
+    "ps2Species": "MEOWSCARADA",
+    "orionTempletonKey": "meowscaradaorion",
+    "types": "Psychic,Fairy"
+  },
+  {
+    "ps2Species": "GYARADOS",
+    "orionTempletonKey": "gyaradosorion",
+    "types": "Electric,Dark"
+  },
+  {
+    "ps2Species": "TSAREENA",
+    "orionTempletonKey": "tsareenaorion",
+    "types": "Light,Dark"
+  },
+  {
+    "ps2Species": "RALTS",
+    "orionTempletonKey": "raltsorion",
+    "types": "Dark,Poison"
+  },
+  {
+    "ps2Species": "SCIZOR",
+    "orionTempletonKey": "scizororion",
+    "types": "Light,Steel"
+  },
+  {
+    "ps2Species": "PACHIRISU",
+    "orionTempletonKey": "pachirisuorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "GRIMER",
+    "orionTempletonKey": "grimerorion",
+    "types": "Grass,Ground"
+  },
+  {
+    "ps2Species": "SEADRA",
+    "orionTempletonKey": "seadraorion",
+    "types": "Water,Light"
+  },
+  {
+    "ps2Species": "SLIGGOO",
+    "orionTempletonKey": "sliggooorion",
+    "types": "Fairy,Normal"
+  },
+  {
+    "ps2Species": "STANTLER",
+    "orionTempletonKey": "stantlerorion",
+    "types": "Ice,Grass"
+  },
+  {
+    "ps2Species": "UMBREON",
+    "orionTempletonKey": "umbreontemporal",
+    "types": "Fighting"
+  },
+  {
+    "ps2Species": "RATTATA",
+    "orionTempletonKey": "rattataorion",
+    "types": "Psychic,Normal"
+  },
+  {
+    "ps2Species": "OBSTAGOON",
+    "orionTempletonKey": "obstagoonorion",
+    "types": "Ground,Dark"
+  },
+  {
+    "ps2Species": "MABOSSTIFF",
+    "orionTempletonKey": "mabosstifforion",
+    "types": "Dark,Fire"
+  },
+  {
+    "ps2Species": "TRAPINCH",
+    "orionTempletonKey": "trapinchorion",
+    "types": "Ice"
+  },
+  {
+    "ps2Species": "SWOOBAT",
+    "orionTempletonKey": "swoobatorion",
+    "types": "Poison,Flying"
+  },
+  {
+    "ps2Species": "SHROOMISH",
+    "orionTempletonKey": "shroomishorion",
+    "types": "Steel"
+  },
+  {
+    "ps2Species": "COMFEY",
+    "orionTempletonKey": "comfeyorion",
+    "types": "Fairy,Water"
+  },
+  {
+    "ps2Species": "VENOMOTH",
+    "orionTempletonKey": "venomothorion",
+    "types": "Bug,Grass"
+  },
+  {
+    "ps2Species": "FUECOCO",
+    "orionTempletonKey": "fuecocoorion",
+    "types": "Grass,Rock"
+  },
+  {
+    "ps2Species": "PLUSLE",
+    "orionTempletonKey": "plusleorion",
+    "types": "Flying"
+  },
+  {
+    "ps2Species": "ESPURR",
+    "orionTempletonKey": "espurrorion",
+    "types": "Psychic,Ghost"
+  },
+  {
+    "ps2Species": "BISHARP",
+    "orionTempletonKey": "bisharporion",
+    "types": "Light,Steel"
+  },
+  {
+    "ps2Species": "BUTTERFREE",
+    "orionTempletonKey": "butterfreeorion",
+    "types": "Bug,Fairy"
+  },
+  {
+    "ps2Species": "CETITAN",
+    "orionTempletonKey": "cetitanorion",
+    "types": "Rock,Water"
+  },
+  {
+    "ps2Species": "APPLIN",
+    "orionTempletonKey": "applinorion",
+    "types": "Steel"
+  },
+  {
+    "ps2Species": "CHARIZARD",
+    "orionTempletonKey": "charizardorion",
+    "types": "Ground,Dragon"
+  },
+  {
+    "ps2Species": "DELIBIRD",
+    "orionTempletonKey": "delibirdorion",
+    "types": "Grass,Dark"
+  },
+  {
+    "ps2Species": "KLEAVOR",
+    "orionTempletonKey": "kleavororion",
+    "types": "Dark,Steel"
+  },
+  {
+    "ps2Species": "EXEGGUTOR",
+    "orionTempletonKey": "exeggutororion",
+    "types": "Electric,Poison"
+  },
+  {
+    "ps2Species": "MARILL",
+    "orionTempletonKey": "marillorion",
+    "types": "Fighting"
+  },
+  {
+    "ps2Species": "MILTANK",
+    "orionTempletonKey": "miltankorion",
+    "types": "Normal,Grass"
+  },
+  {
+    "ps2Species": "TYRANTRUM",
+    "orionTempletonKey": "tyrantrumorion",
+    "types": "Fire,Ice"
+  },
+  {
+    "ps2Species": "MEDITITE",
+    "orionTempletonKey": "medititeorion",
+    "types": "Light,Fighting"
+  },
+  {
+    "ps2Species": "ODDISH",
+    "orionTempletonKey": "oddishorion",
+    "types": "Grass,Cosmic"
+  },
+  {
+    "ps2Species": "PETILIL",
+    "orionTempletonKey": "petililorion",
+    "types": "Fire,Fairy"
+  },
+  {
+    "ps2Species": "PARASECT",
+    "orionTempletonKey": "parasectorion",
+    "types": "Bug,Ghost"
+  },
+  {
+    "ps2Species": "RELLOR",
+    "orionTempletonKey": "rellororion",
+    "types": "Light"
+  },
+  {
+    "ps2Species": "EELEKTRIK",
+    "orionTempletonKey": "eelektrikorion",
+    "types": "Bug,Ground"
+  },
+  {
+    "ps2Species": "CHARJABUG",
+    "orionTempletonKey": "charjabugorion",
+    "types": "Steel,Light"
+  },
+  {
+    "ps2Species": "BAGON",
+    "orionTempletonKey": "bagonorion",
+    "types": "Fire,Poison"
+  },
+  {
+    "ps2Species": "RAPIDASH",
+    "orionTempletonKey": "rapidashorion",
+    "types": "Ghost,Fire"
+  },
+  {
+    "ps2Species": "FROGADIER",
+    "orionTempletonKey": "frogadierorion",
+    "types": "Electric,Ghost"
+  },
+  {
+    "ps2Species": "SWANNA",
+    "orionTempletonKey": "swannaorion",
+    "types": "Light,Flying"
+  },
+  {
+    "ps2Species": "MILCERY",
+    "orionTempletonKey": "milceryorion",
+    "types": "Poison,Rock"
+  },
+  {
+    "ps2Species": "GOREBYSS",
+    "orionTempletonKey": "gorebyssorion",
+    "types": "Water,Bug"
+  },
+  {
+    "ps2Species": "GIMMIGHOUL",
+    "orionTempletonKey": "gimmighoulorion",
+    "types": "Bug"
+  },
+  {
+    "ps2Species": "DARUMAKA",
+    "orionTempletonKey": "darumakaorion",
+    "types": "Grass,Sound"
+  },
+  {
+    "ps2Species": "THWACKEY",
+    "orionTempletonKey": "thwackeyorion",
+    "types": "Psychic,Ground"
+  },
+  {
+    "ps2Species": "DRIFBLIM",
+    "orionTempletonKey": "drifblimorion",
+    "types": "Fire,Flying"
+  },
+  {
+    "ps2Species": "ESPATHRA",
+    "orionTempletonKey": "espathraorion",
+    "types": "Ice,Fairy"
+  },
+  {
+    "ps2Species": "VANILLISH",
+    "orionTempletonKey": "vanillishorion",
+    "types": "Poison"
+  },
+  {
+    "ps2Species": "ARCTIBAX",
+    "orionTempletonKey": "arctibaxorion",
+    "types": "Rock,Dragon"
+  },
+  {
+    "ps2Species": "LURANTIS",
+    "orionTempletonKey": "lurantisorion",
+    "types": "Bug,Fighting"
+  },
+  {
+    "ps2Species": "RELICANTH",
+    "orionTempletonKey": "relicanthorion",
+    "types": "Ghost,Fighting"
+  },
+  {
+    "ps2Species": "TYRANITAR",
+    "orionTempletonKey": "tyranitarorion",
+    "types": "Steel,Dragon"
+  },
+  {
+    "ps2Species": "DARTRIX",
+    "orionTempletonKey": "dartrixorion",
+    "types": "Fire,Flying"
+  },
+  {
+    "ps2Species": "WEEDLE",
+    "orionTempletonKey": "weedleorion",
+    "types": "Bug,Steel"
+  },
+  {
+    "ps2Species": "PINSIR",
+    "orionTempletonKey": "pinsirorion",
+    "types": "Electric,Rock"
+  },
+  {
+    "ps2Species": "KLINK",
+    "orionTempletonKey": "klinkorion",
+    "types": "Sound,Steel"
+  },
+  {
+    "ps2Species": "YAMASK",
+    "orionTempletonKey": "yamaskorion",
+    "types": "Sound,Ghost"
+  },
+  {
+    "ps2Species": "SAWSBUCK",
+    "orionTempletonKey": "sawsbuckorion",
+    "types": "Normal,Fire"
+  },
+  {
+    "ps2Species": "DHELMISE",
+    "orionTempletonKey": "dhelmiseorion",
+    "types": "Bug,Cosmic"
+  },
+  {
+    "ps2Species": "CORSOLA",
+    "orionTempletonKey": "corsolaorion",
+    "types": "Water,Poison"
+  },
+  {
+    "ps2Species": "SHELMET",
+    "orionTempletonKey": "shelmetorion",
+    "types": "Ground,Ghost"
+  },
+  {
+    "ps2Species": "PAWMO",
+    "orionTempletonKey": "pawmoorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "NUMEL",
+    "orionTempletonKey": "numelorion",
+    "types": "Fire,Water"
+  },
+  {
+    "ps2Species": "MACHOP",
+    "orionTempletonKey": "machoporion",
+    "types": "Ground,Fighting"
+  },
+  {
+    "ps2Species": "KABUTOPS",
+    "orionTempletonKey": "kabutopsorion",
+    "types": "Bug,Grass"
+  },
+  {
+    "ps2Species": "MARACTUS",
+    "orionTempletonKey": "maractusorion",
+    "types": "Steel,Dark"
+  },
+  {
+    "ps2Species": "HOOTHOOT",
+    "orionTempletonKey": "hoothootorion",
+    "types": "Psychic,Light"
+  },
+  {
+    "ps2Species": "SHIELDON",
+    "orionTempletonKey": "shieldonorion",
+    "types": "Ice,Steel"
+  },
+  {
+    "ps2Species": "TYMPOLE",
+    "orionTempletonKey": "tympoleorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "CYNDAQUIL",
+    "orionTempletonKey": "cyndaquilorion",
+    "types": "Steel,Normal"
+  },
+  {
+    "ps2Species": "YAMPER",
+    "orionTempletonKey": "yamperorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "BARRASKEWDA",
+    "orionTempletonKey": "barraskewdaorion",
+    "types": "Water,Ghost"
+  },
+  {
+    "ps2Species": "DUDUNSPARCE",
+    "orionTempletonKey": "dudunsparceorion",
+    "types": "Bug,Poison"
+  },
+  {
+    "ps2Species": "NYMBLE",
+    "orionTempletonKey": "nymbleorion",
+    "types": "Bug,Fire"
+  },
+  {
+    "ps2Species": "NIDOKING",
+    "orionTempletonKey": "nidokingorion",
+    "types": "Ice"
+  },
+  {
+    "ps2Species": "COTTONEE",
+    "orionTempletonKey": "cottoneeorion",
+    "types": "Ground,Flying"
+  },
+  {
+    "ps2Species": "BRONZOR",
+    "orionTempletonKey": "bronzororion",
+    "types": "Grass,Rock"
+  },
+  {
+    "ps2Species": "STUNFISK",
+    "orionTempletonKey": "stunfiskorion",
+    "types": "Normal,Sound"
+  },
+  {
+    "ps2Species": "LITLEO",
+    "orionTempletonKey": "litleoorion",
+    "types": "Ice,Sound"
+  },
+  {
+    "ps2Species": "PAWMOT",
+    "orionTempletonKey": "pawmotorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "ABSOL",
+    "orionTempletonKey": "absolorion",
+    "types": "Light"
+  },
+  {
+    "ps2Species": "DRAGONITE",
+    "orionTempletonKey": "dragoniteorion",
+    "types": "Light,Dragon"
+  },
+  {
+    "ps2Species": "SCRAFTY",
+    "orionTempletonKey": "scraftyorion",
+    "types": "Sound,Dark"
+  },
+  {
+    "ps2Species": "WOOBAT",
+    "orionTempletonKey": "woobatorion",
+    "types": "Poison,Flying"
+  },
+  {
+    "ps2Species": "NOIVERN",
+    "orionTempletonKey": "noivernorion",
+    "types": "Sound,Dragon"
+  },
+  {
+    "ps2Species": "NOSEPASS",
+    "orionTempletonKey": "nosepassorion",
+    "types": "Grass,Psychic"
+  },
+  {
+    "ps2Species": "SOBBLE",
+    "orionTempletonKey": "sobbleorion",
+    "types": "Water,Sound"
+  },
+  {
+    "ps2Species": "FLOATZEL",
+    "orionTempletonKey": "floatzelorion",
+    "types": "Water,Steel"
+  },
+  {
+    "ps2Species": "CLEFABLE",
+    "orionTempletonKey": "clefableorion",
+    "types": "Cosmic,Fairy"
+  },
+  {
+    "ps2Species": "TOXTRICITY",
+    "orionTempletonKey": "toxtricityorion",
+    "types": "Grass,Fighting"
+  },
+  {
+    "ps2Species": "BRONZONG",
+    "orionTempletonKey": "bronzongorion",
+    "types": "Grass,Rock"
+  },
+  {
+    "ps2Species": "VULLABY",
+    "orionTempletonKey": "vullabyorion",
+    "types": "Ground,Flying"
+  },
+  {
+    "ps2Species": "SCOLIPEDE",
+    "orionTempletonKey": "scolipedeorion",
+    "types": "Steel,Cosmic"
+  },
+  {
+    "ps2Species": "CARVANHA",
+    "orionTempletonKey": "carvanhaorion",
+    "types": "Steel,Flying"
+  },
+  {
+    "ps2Species": "FRILLISH",
+    "orionTempletonKey": "frillishorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "BURMY",
+    "orionTempletonKey": "burmyorion",
+    "types": "Light,Bug"
+  },
+  {
+    "ps2Species": "NICKIT",
+    "orionTempletonKey": "nickitorion",
+    "types": "Cosmic,Ghost"
+  },
+  {
+    "ps2Species": "DRAKLOAK",
+    "orionTempletonKey": "drakloakorion",
+    "types": "Steel,Flying"
+  },
+  {
+    "ps2Species": "VOLTORB",
+    "orionTempletonKey": "voltorborion",
+    "types": "Ice"
+  },
+  {
+    "ps2Species": "DRAMPA",
+    "orionTempletonKey": "drampaorion",
+    "types": "Fairy,Dragon"
+  },
+  {
+    "ps2Species": "MAGNEZONE",
+    "orionTempletonKey": "magnezoneorion",
+    "types": "Cosmic,Steel"
+  },
+  {
+    "ps2Species": "SNUBBULL",
+    "orionTempletonKey": "snubbullorion",
+    "types": "Water,Fighting"
+  },
+  {
+    "ps2Species": "WARTORTLE",
+    "orionTempletonKey": "wartortleorion",
+    "types": "Poison,Steel"
+  },
+  {
+    "ps2Species": "PONYTA",
+    "orionTempletonKey": "ponytaorion",
+    "types": "Ghost,Fire"
+  },
+  {
+    "ps2Species": "WEEPINBELL",
+    "orionTempletonKey": "weepinbellorion",
+    "types": "Grass,Ghost"
+  },
+  {
+    "ps2Species": "INKAY",
+    "orionTempletonKey": "inkayorion",
+    "types": "Cosmic,Flying"
+  },
+  {
+    "ps2Species": "ROWLET",
+    "orionTempletonKey": "rowletorion",
+    "types": "Fire,Flying"
+  },
+  {
+    "ps2Species": "URSALUNA",
+    "orionTempletonKey": "ursalunaorion",
+    "types": "Ghost,Cosmic"
+  },
+  {
+    "ps2Species": "FLAAFFY",
+    "orionTempletonKey": "flaaffyorion",
+    "types": "Fairy,Flying"
+  },
+  {
+    "ps2Species": "DRAGALGE",
+    "orionTempletonKey": "dragalgeorion",
+    "types": "Grass,Water"
+  },
+  {
+    "ps2Species": "GRANBULL",
+    "orionTempletonKey": "granbullorion",
+    "types": "Water,Fighting"
+  },
+  {
+    "ps2Species": "BELLIBOLT",
+    "orionTempletonKey": "belliboltorion",
+    "types": "Ghost,Ice"
+  },
+  {
+    "ps2Species": "NATU",
+    "orionTempletonKey": "natuorion",
+    "types": "Steel,Electric"
+  },
+  {
+    "ps2Species": "ARON",
+    "orionTempletonKey": "aronorion",
+    "types": "Bug,Rock"
+  },
+  {
+    "ps2Species": "TOXICROAK",
+    "orionTempletonKey": "toxicroakorion",
+    "types": "Poison,Psychic"
+  },
+  {
+    "ps2Species": "VIVILLON",
+    "orionTempletonKey": "vivillonorion",
+    "types": "Cosmic,Fire"
+  },
+  {
+    "ps2Species": "ABOMASNOW",
+    "orionTempletonKey": "abomasnoworion",
+    "types": "Grass"
+  },
+  {
+    "ps2Species": "TOGEPI",
+    "orionTempletonKey": "togepiorion",
+    "types": "Dark,Flying"
+  },
+  {
+    "ps2Species": "RHYHORN",
+    "orionTempletonKey": "rhyhornorion",
+    "types": "Water,Dragon"
+  },
+  {
+    "ps2Species": "CUFANT",
+    "orionTempletonKey": "cufantorion",
+    "types": "Ground,Psychic"
+  },
+  {
+    "ps2Species": "BRAMBLEGHAST",
+    "orionTempletonKey": "brambleghastorion",
+    "types": "Water,Rock"
+  },
+  {
+    "ps2Species": "ARROKUDA",
+    "orionTempletonKey": "arrokudaorion",
+    "types": "Water,Ghost"
+  },
+  {
+    "ps2Species": "TAUROS",
+    "orionTempletonKey": "taurosorion",
+    "types": "Fire,Electric"
+  },
+  {
+    "ps2Species": "TANGROWTH",
+    "orionTempletonKey": "tangrowthorion",
+    "types": "Ground,Grass"
+  },
+  {
+    "ps2Species": "LUMINEON",
+    "orionTempletonKey": "lumineonorion",
+    "types": "Water,Fairy"
+  },
+  {
+    "ps2Species": "SEISMITOAD",
+    "orionTempletonKey": "seismitoadorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "CLEFFA",
+    "orionTempletonKey": "cleffaorion",
+    "types": "Cosmic,Fairy"
+  },
+  {
+    "ps2Species": "VANILLITE",
+    "orionTempletonKey": "vanilliteorion",
+    "types": "Poison"
+  },
+  {
+    "ps2Species": "DUSCLOPS",
+    "orionTempletonKey": "dusclopsorion",
+    "types": "Fire,Ghost"
+  },
+  {
+    "ps2Species": "KOFFING",
+    "orionTempletonKey": "koffingorion",
+    "types": "Fire,Poison"
+  },
+  {
+    "ps2Species": "LEAFEON",
+    "orionTempletonKey": "leafeontemporal",
+    "types": "Bug"
+  },
+  {
+    "ps2Species": "NIDOQUEEN",
+    "orionTempletonKey": "nidoqueenorion",
+    "types": "Fire"
+  },
+  {
+    "ps2Species": "PIDGEY",
+    "orionTempletonKey": "pidgeyorion",
+    "types": "Ice,Flying"
+  },
+  {
+    "ps2Species": "CETODDLE",
+    "orionTempletonKey": "cetoddleorion",
+    "types": "Rock,Water"
+  },
+  {
+    "ps2Species": "THIEVUL",
+    "orionTempletonKey": "thievulorion",
+    "types": "Cosmic,Ghost"
+  },
+  {
+    "ps2Species": "CLEFAIRY",
+    "orionTempletonKey": "clefairyorion",
+    "types": "Cosmic,Fairy"
+  },
+  {
+    "ps2Species": "MAUSHOLD",
+    "orionTempletonKey": "mausholdorion",
+    "types": "Ground,Normal"
+  },
+  {
+    "ps2Species": "STARAPTOR",
+    "orionTempletonKey": "staraptororion",
+    "types": "Sound,Flying"
+  },
+  {
+    "ps2Species": "URSARING",
+    "orionTempletonKey": "ursaringorion",
+    "types": "Ghost,Cosmic"
+  },
+  {
+    "ps2Species": "STUFFUL",
+    "orionTempletonKey": "stuffulorion",
+    "types": "Ghost,Fighting"
+  },
+  {
+    "ps2Species": "PAWMI",
+    "orionTempletonKey": "pawmiorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "WYRDEER",
+    "orionTempletonKey": "wyrdeerorion",
+    "types": "Ice,Grass"
+  },
+  {
+    "ps2Species": "STONJOURNER",
+    "orionTempletonKey": "stonjournerorion",
+    "types": "Electric,Sound"
+  },
+  {
+    "ps2Species": "CHARCADET",
+    "orionTempletonKey": "charcadetorion",
+    "types": "Electric"
+  },
+  {
+    "ps2Species": "FARFETCHD",
+    "orionTempletonKey": "farfetchdorion",
+    "types": "Fighting,Flying"
+  },
+  {
+    "ps2Species": "MINUN",
+    "orionTempletonKey": "minunorion",
+    "types": "Ice"
+  },
+  {
+    "ps2Species": "STARAVIA",
+    "orionTempletonKey": "staraviaorion",
+    "types": "Sound,Flying"
+  },
+  {
+    "ps2Species": "HORSEA",
+    "orionTempletonKey": "horseaorion",
+    "types": "Water,Light"
+  },
+  {
+    "ps2Species": "SINISTEA",
+    "orionTempletonKey": "sinisteaorion",
+    "types": "Water,Poison"
+  },
+  {
+    "ps2Species": "LEDIAN",
+    "orionTempletonKey": "ledianorion",
+    "types": "Bug,Steel"
+  },
+  {
+    "ps2Species": "WAILMER",
+    "orionTempletonKey": "wailmerorion",
+    "types": "Ghost,Water"
+  },
+  {
+    "ps2Species": "LICKILICKY",
+    "orionTempletonKey": "lickilickyorion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "SANDSLASH",
+    "orionTempletonKey": "sandslashorion",
+    "types": "Grass,Normal"
+  },
+  {
+    "ps2Species": "MURKROW",
+    "orionTempletonKey": "murkroworion",
+    "types": "Normal,Flying"
+  },
+  {
+    "ps2Species": "VOLBEAT",
+    "orionTempletonKey": "volbeatorion",
+    "types": "Bug,Poison"
+  },
+  {
+    "ps2Species": "LUXRAY",
+    "orionTempletonKey": "luxrayorion",
+    "types": "Dark,Dragon"
+  },
+  {
+    "ps2Species": "EMPOLEON",
+    "orionTempletonKey": "empoleonorion",
+    "types": "Water,Ice"
+  },
+  {
+    "ps2Species": "GREAVARD",
+    "orionTempletonKey": "greavardorion",
+    "types": "Poison"
+  },
+  {
+    "ps2Species": "TREECKO",
+    "orionTempletonKey": "treeckoorion",
+    "types": "Bug,Dragon"
+  },
+  {
+    "ps2Species": "YUNGOOS",
+    "orionTempletonKey": "yungoosorion",
+    "types": "Normal,Ghost"
+  },
+  {
+    "ps2Species": "WIGLETT",
+    "orionTempletonKey": "wiglettorion",
+    "types": "Bug,Steel"
+  },
+  {
+    "ps2Species": "DUCKLETT",
+    "orionTempletonKey": "ducklettorion",
+    "types": "Light,Flying"
+  },
+  {
+    "ps2Species": "BEWEAR",
+    "orionTempletonKey": "bewearorion",
+    "types": "Ghost,Fighting"
+  },
+  {
+    "ps2Species": "GARGANACL",
+    "orionTempletonKey": "garganaclorion",
+    "types": "Fairy"
+  },
+  {
+    "ps2Species": "GEODUDE",
+    "orionTempletonKey": "geodudeorion",
+    "types": "Rock,Fire"
+  },
+  {
+    "ps2Species": "PUMPKABOO",
+    "orionTempletonKey": "pumpkabooorion",
+    "types": "Rock"
+  },
+  {
+    "ps2Species": "NACLI",
+    "orionTempletonKey": "nacliorion",
+    "types": "Fairy"
+  },
+  {
+    "ps2Species": "METAGROSS",
+    "orionTempletonKey": "metagrossorion",
+    "types": "Cosmic,Psychic"
+  },
+  {
+    "ps2Species": "POLITOED",
+    "orionTempletonKey": "politoedorion",
+    "types": "Water,Fighting"
+  },
+  {
+    "ps2Species": "SHROODLE",
+    "orionTempletonKey": "shroodleorion",
+    "types": "Steel"
+  },
+  {
+    "ps2Species": "SPEAROW",
+    "orionTempletonKey": "spearoworion",
+    "types": "Water,Flying"
+  },
+  {
+    "ps2Species": "DREDNAW",
+    "orionTempletonKey": "drednaworion",
+    "types": "Rock,Steel"
+  },
+  {
+    "ps2Species": "COFAGRIGUS",
+    "orionTempletonKey": "cofagrigusorion",
+    "types": "Sound,Ghost"
+  },
+  {
+    "ps2Species": "PRIMEAPE",
+    "orionTempletonKey": "primeapeorion",
+    "types": "Sound,Fighting"
+  },
+  {
+    "ps2Species": "AURORUS",
+    "orionTempletonKey": "aurorusorion",
+    "types": "Fairy,Dragon"
+  },
+  {
+    "ps2Species": "KADABRA",
+    "orionTempletonKey": "kadabraorion",
+    "types": "Fighting,Normal"
+  },
+  {
+    "ps2Species": "MUDKIP",
+    "orionTempletonKey": "mudkiporion",
+    "types": "Cosmic,Fire"
+  },
+  {
+    "ps2Species": "RAICHU",
+    "orionTempletonKey": "raichuorion",
+    "types": "Sound,Steel"
+  },
+  {
+    "ps2Species": "GARCHOMP",
+    "orionTempletonKey": "garchomporion",
+    "types": "Ghost,Dragon"
+  },
+  {
+    "ps2Species": "CHANSEY",
+    "orionTempletonKey": "chanseyorion",
+    "types": "Normal,Steel"
+  },
+  {
+    "ps2Species": "SPINDA",
+    "orionTempletonKey": "spindaorion",
+    "types": "Normal,Sound"
+  },
+  {
+    "ps2Species": "GRIMMSNARL",
+    "orionTempletonKey": "grimmsnarlorion",
+    "types": "Ground,Fairy"
+  },
+  {
+    "ps2Species": "ESCAVALIER",
+    "orionTempletonKey": "escavalierorion",
+    "types": "Steel,Dark"
+  },
+  {
+    "ps2Species": "GLIGAR",
+    "orionTempletonKey": "gligarorion",
+    "types": "Rock,Dragon"
+  },
+  {
+    "ps2Species": "LUCARIO",
+    "orionTempletonKey": "lucarioorion",
+    "types": "Psychic,Dark"
+  },
+  {
+    "ps2Species": "CLAWITZER",
+    "orionTempletonKey": "clawitzerorion",
+    "types": "Electric"
+  },
+  {
+    "ps2Species": "FALINKS",
+    "orionTempletonKey": "falinksorion",
+    "types": "Cosmic"
+  },
+  {
+    "ps2Species": "MUNCHLAX",
+    "orionTempletonKey": "munchlaxorion",
+    "types": "Ice,Psychic"
+  },
+  {
+    "ps2Species": "DONPHAN",
+    "orionTempletonKey": "donphanorion",
+    "types": "Ice,Ground"
+  },
+  {
+    "ps2Species": "KAKUNA",
+    "orionTempletonKey": "kakunaorion",
+    "types": "Bug,Steel"
+  },
+  {
+    "ps2Species": "LILLIPUP",
+    "orionTempletonKey": "lillipuporion",
+    "types": "Dark,Ghost"
+  },
+  {
+    "ps2Species": "BARBARACLE",
+    "orionTempletonKey": "barbaracleorion",
+    "types": "Rock,Psychic"
+  },
+  {
+    "ps2Species": "BASCULEGION",
+    "orionTempletonKey": "basculegionorion",
+    "types": "Dragon,Ghost"
+  },
+  {
+    "ps2Species": "INFERNAPE",
+    "orionTempletonKey": "infernapeorion",
+    "types": "Electric,Fighting"
+  },
+  {
+    "ps2Species": "GUMSHOOS",
+    "orionTempletonKey": "gumshoosorion",
+    "types": "Normal,Ghost"
+  },
+  {
+    "ps2Species": "MASCHIFF",
+    "orionTempletonKey": "maschifforion",
+    "types": "Dark,Fire"
+  },
+  {
+    "ps2Species": "SERVINE",
+    "orionTempletonKey": "servineorion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "HATTERENE",
+    "orionTempletonKey": "hattereneorion",
+    "types": "Psychic,Ghost"
+  },
+  {
+    "ps2Species": "BLAZIKEN",
+    "orionTempletonKey": "blazikenorion",
+    "types": "Ground,Flying"
+  },
+  {
+    "ps2Species": "HERDIER",
+    "orionTempletonKey": "herdierorion",
+    "types": "Dark,Ghost"
+  },
+  {
+    "ps2Species": "CROBAT",
+    "orionTempletonKey": "crobatorion",
+    "types": "Dark,Sound"
+  },
+  {
+    "ps2Species": "KLINKLANG",
+    "orionTempletonKey": "klinklangorion",
+    "types": "Sound,Steel"
+  },
+  {
+    "ps2Species": "GURDURR",
+    "orionTempletonKey": "gurdurrorion",
+    "types": "Ghost,Fighting"
+  },
+  {
+    "ps2Species": "MAGIKARP",
+    "orionTempletonKey": "magikarporion",
+    "types": "Electric,Dark"
+  },
+  {
+    "ps2Species": "RHYPERIOR",
+    "orionTempletonKey": "rhyperiororion",
+    "types": "Water,Dragon"
+  },
+  {
+    "ps2Species": "GOSSIFLEUR",
+    "orionTempletonKey": "gossifleurorion",
+    "types": "Dark,Grass"
+  },
+  {
+    "ps2Species": "CUBONE",
+    "orionTempletonKey": "cuboneorion",
+    "types": "Water,Rock"
+  },
+  {
+    "ps2Species": "RUFFLET",
+    "orionTempletonKey": "ruffletorion",
+    "types": "Fire,Flying"
+  },
+  {
+    "ps2Species": "ROCKRUFF",
+    "orionTempletonKey": "rockrufforion",
+    "types": "Normal,Cosmic"
+  },
+  {
+    "ps2Species": "CRYOGONAL",
+    "orionTempletonKey": "cryogonalorion",
+    "types": "Fire,Psychic"
+  },
+  {
+    "ps2Species": "HATTREM",
+    "orionTempletonKey": "hattremorion",
+    "types": "Psychic,Ghost"
+  },
+  {
+    "ps2Species": "KRICKETUNE",
+    "orionTempletonKey": "kricketuneorion",
+    "types": "Bug,Sound"
+  },
+  {
+    "ps2Species": "CUTIEFLY",
+    "orionTempletonKey": "cutieflyorion",
+    "types": "Bug,Flying"
+  },
+  {
+    "ps2Species": "FLAMIGO",
+    "orionTempletonKey": "flamigoorion",
+    "types": "Normal,Water"
+  },
+  {
+    "ps2Species": "PORYGONZ",
+    "orionTempletonKey": "porygonzorion",
+    "types": "Bug,Dark"
+  },
+  {
+    "ps2Species": "SKARMORY",
+    "orionTempletonKey": "skarmoryorion",
+    "types": "Rock,Fighting"
+  },
+  {
+    "ps2Species": "SABLEYE",
+    "orionTempletonKey": "sableyeorion",
+    "types": "Fire,Dark"
+  },
+  {
+    "ps2Species": "WHIRLIPEDE",
+    "orionTempletonKey": "whirlipedeorion",
+    "types": "Steel,Cosmic"
+  },
+  {
+    "ps2Species": "BARBOACH",
+    "orionTempletonKey": "barboachorion",
+    "types": "Light,Poison"
+  },
+  {
+    "ps2Species": "MAKUHITA",
+    "orionTempletonKey": "makuhitaorion",
+    "types": "Steel,Fighting"
+  },
+  {
+    "ps2Species": "PICHU",
+    "orionTempletonKey": "pichuorion",
+    "types": "Sound,Steel"
+  },
+  {
+    "ps2Species": "MACHOKE",
+    "orionTempletonKey": "machokeorion",
+    "types": "Ground,Fighting"
+  },
+  {
+    "ps2Species": "AMAURA",
+    "orionTempletonKey": "amauraorion",
+    "types": "Fairy,Dragon"
+  },
+  {
+    "ps2Species": "FROAKIE",
+    "orionTempletonKey": "froakieorion",
+    "types": "Electric,Ghost"
+  },
+  {
+    "ps2Species": "CRANIDOS",
+    "orionTempletonKey": "cranidosorion",
+    "types": "Dragon"
+  },
+  {
+    "ps2Species": "HITMONLEE",
+    "orionTempletonKey": "hitmonleeorion",
+    "types": "Psychic,Flying"
+  },
+  {
+    "ps2Species": "CARNIVINE",
+    "orionTempletonKey": "carnivineorion",
+    "types": "Grass,Bug"
+  },
+  {
+    "ps2Species": "CINCCINO",
+    "orionTempletonKey": "cinccinoorion",
+    "types": "Ghost,Fairy"
+  },
+  {
+    "ps2Species": "CRABRAWLER",
+    "orionTempletonKey": "crabrawlerorion",
+    "types": "Steel"
+  },
+  {
+    "ps2Species": "KROOKODILE",
+    "orionTempletonKey": "krookodileorion",
+    "types": "Water,Dark"
+  },
+  {
+    "ps2Species": "SNEASLER",
+    "orionTempletonKey": "sneaslerorion",
+    "types": "Fighting,Grass"
+  },
+  {
+    "ps2Species": "GIGALITH",
+    "orionTempletonKey": "gigalithorion",
+    "types": "Ice,Water"
+  },
+  {
+    "ps2Species": "TIRTOUGA",
+    "orionTempletonKey": "tirtougaorion",
+    "types": "Steel,Ground"
+  },
+  {
+    "ps2Species": "QUILAVA",
+    "orionTempletonKey": "quilavaorion",
+    "types": "Steel,Normal"
+  },
+  {
+    "ps2Species": "LINOONE",
+    "orionTempletonKey": "linooneorion",
+    "types": "Ground,Dark"
+  },
+  {
+    "ps2Species": "BUNNELBY",
+    "orionTempletonKey": "bunnelbyorion",
+    "types": "Ground,Fighting"
+  },
+  {
+    "ps2Species": "HYDRAPPLE",
+    "orionTempletonKey": "hydrappleorion",
+    "types": "Steel,Poison"
+  },
+  {
+    "ps2Species": "PINCURCHIN",
+    "orionTempletonKey": "pincurchinorion",
+    "types": "Sound,Normal"
+  },
+  {
+    "ps2Species": "EXPLOUD",
+    "orionTempletonKey": "exploudorion",
+    "types": "Electric,Sound"
+  },
+  {
+    "ps2Species": "KYUREM",
+    "orionTempletonKey": "kyuremorion",
+    "types": "Fire,Steel"
+  },
+  {
+    "ps2Species": "STEENEE",
+    "orionTempletonKey": "steeneeorion",
+    "types": "Light,Dark"
+  },
+  {
+    "ps2Species": "CHIMECHO",
+    "orionTempletonKey": "chimechoorion",
+    "types": "Electric,Steel"
+  },
+  {
+    "ps2Species": "CINDERACE",
+    "orionTempletonKey": "cinderaceorion",
+    "types": "Fairy,Psychic"
+  },
+  {
+    "ps2Species": "DOUBLADE",
+    "orionTempletonKey": "doubladeorion",
+    "types": "Fairy"
+  },
+  {
+    "ps2Species": "WISHIWASHI",
+    "orionTempletonKey": "wishiwashiorion",
+    "types": "Dark"
+  },
+  {
+    "ps2Species": "AMBIPOM",
+    "orionTempletonKey": "ambipomorion",
+    "types": "Normal,Psychic"
+  },
+  {
+    "ps2Species": "PELIPPER",
+    "orionTempletonKey": "pelipperorion",
+    "types": "Dark,Flying"
+  },
+  {
+    "ps2Species": "WALREIN",
+    "orionTempletonKey": "walreinorion",
+    "types": "Ice,Ground"
+  },
+  {
+    "ps2Species": "PAWNIARD",
+    "orionTempletonKey": "pawniardorion",
+    "types": "Light,Steel"
+  },
+  {
+    "ps2Species": "PANGORO",
+    "orionTempletonKey": "pangoroorion",
+    "types": "Poison,Fighting"
+  },
+  {
+    "ps2Species": "FARIGIRAF",
+    "orionTempletonKey": "farigiraforion",
+    "types": "Light,Dark"
+  },
+  {
+    "ps2Species": "BELLOSSOM",
+    "orionTempletonKey": "bellossomorion",
+    "types": "Grass,Psychic"
+  },
+  {
+    "ps2Species": "CHANDELURE",
+    "orionTempletonKey": "chandelureorion",
+    "types": "Light,Ghost"
+  },
+  {
+    "ps2Species": "ELECTRODE",
+    "orionTempletonKey": "electrodeorion",
+    "types": "Ice"
+  },
+  {
+    "ps2Species": "GOTHITA",
+    "orionTempletonKey": "gothitaorion",
+    "types": "Fairy,Fighting"
+  },
+  {
+    "ps2Species": "ZUBAT",
+    "orionTempletonKey": "zubatorion",
+    "types": "Dark,Sound"
+  },
+  {
+    "ps2Species": "SQUAWKABILLY",
+    "orionTempletonKey": "squawkabillyorion",
+    "types": "Sound,Steel"
+  },
+  {
+    "ps2Species": "VAROOM",
+    "orionTempletonKey": "varoomorion",
+    "types": "Fairy,Steel"
+  },
+  {
+    "ps2Species": "SPEWPA",
+    "orionTempletonKey": "spewpaorion",
+    "types": "Cosmic,Fire"
+  },
+  {
+    "ps2Species": "DUSKNOIR",
+    "orionTempletonKey": "dusknoirorion",
+    "types": "Fire,Ghost"
+  },
+  {
+    "ps2Species": "GROWLITHE",
+    "orionTempletonKey": "growlitheorion",
+    "types": "Cosmic,Dragon"
+  },
+  {
+    "ps2Species": "SWINUB",
+    "orionTempletonKey": "swinuborion",
+    "types": "Electric,Ground"
+  },
+  {
+    "ps2Species": "LANTURN",
+    "orionTempletonKey": "lanturnorion",
+    "types": "Light,Dark"
+  },
+  {
+    "ps2Species": "GENGAR",
+    "orionTempletonKey": "gengarorion",
+    "types": "Ice,Flying"
+  },
+  {
+    "ps2Species": "GULPIN",
+    "orionTempletonKey": "gulpinorion",
+    "types": "Ground"
+  },
+  {
+    "ps2Species": "DUBWOOL",
+    "orionTempletonKey": "dubwoolorion",
+    "types": "Rock,Normal"
+  },
+  {
+    "ps2Species": "MARSHTOMP",
+    "orionTempletonKey": "marshtomporion",
+    "types": "Cosmic,Fire"
+  },
+  {
+    "ps2Species": "EXEGGCUTE",
+    "orionTempletonKey": "exeggcuteorion",
+    "types": "Electric,Poison"
+  },
+  {
+    "ps2Species": "MAGNEMITE",
+    "orionTempletonKey": "magnemiteorion",
+    "types": "Cosmic,Steel"
+  },
+  {
+    "ps2Species": "JOLTEON",
+    "orionTempletonKey": "jolteontemporal",
+    "types": "Flying"
+  },
+  {
+    "ps2Species": "RHYDON",
+    "orionTempletonKey": "rhydonorion",
+    "types": "Water,Dragon"
+  },
+  {
+    "ps2Species": "MASQUERAIN",
+    "orionTempletonKey": "masquerainorion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "FLETCHINDER",
+    "orionTempletonKey": "fletchinderorion",
+    "types": "Electric,Flying"
+  },
+  {
+    "ps2Species": "DEINO",
+    "orionTempletonKey": "deinoorion",
+    "types": "Psychic,Dragon"
+  },
+  {
+    "ps2Species": "CHERRIM",
+    "orionTempletonKey": "cherrimorion",
+    "types": "Grass,Ice"
+  },
+  {
+    "ps2Species": "EXCADRILL",
+    "orionTempletonKey": "excadrillorion",
+    "types": "Ground,Sound"
+  },
+  {
+    "ps2Species": "JYNX",
+    "orionTempletonKey": "jynxorion",
+    "types": "Sound,Ice"
+  },
+  {
+    "ps2Species": "REMORAID",
+    "orionTempletonKey": "remoraidorion",
+    "types": "Water,Electric"
+  },
+  {
+    "ps2Species": "HIPPOPOTAS",
+    "orionTempletonKey": "hippopotasorion",
+    "types": "Grass,Water"
+  },
+  {
+    "ps2Species": "TURTONATOR",
+    "orionTempletonKey": "turtonatororion",
+    "types": "Water,Grass"
+  },
+  {
+    "ps2Species": "QUAQUAVAL",
+    "orionTempletonKey": "quaquavalorion",
+    "types": "Normal,Sound"
+  },
+  {
+    "ps2Species": "BUNEARY",
+    "orionTempletonKey": "bunearyorion",
+    "types": "Cosmic,Ice"
+  },
+  {
+    "ps2Species": "PIDGEOT",
+    "orionTempletonKey": "pidgeotorion",
+    "types": "Ice,Flying"
+  },
+  {
+    "ps2Species": "DACHSBUN",
+    "orionTempletonKey": "dachsbunorion",
+    "types": "Flying,Cosmic"
+  },
+  {
+    "ps2Species": "HYDREIGON",
+    "orionTempletonKey": "hydreigonorion",
+    "types": "Psychic,Dragon"
+  },
+  {
+    "ps2Species": "SANDACONDA",
+    "orionTempletonKey": "sandacondaorion",
+    "types": "Water"
+  },
+  {
+    "ps2Species": "MUDBRAY",
+    "orionTempletonKey": "mudbrayorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "SPINARAK",
+    "orionTempletonKey": "spinarakorion",
+    "types": "Dark,Poison"
+  },
+  {
+    "ps2Species": "NIDORINO",
+    "orionTempletonKey": "nidorinoorion",
+    "types": "Ice"
+  },
+  {
+    "ps2Species": "SURSKIT",
+    "orionTempletonKey": "surskitorion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "STEELIX",
+    "orionTempletonKey": "steelixorion",
+    "types": "Ice,Rock"
+  },
+  {
+    "ps2Species": "AVALUGG",
+    "orionTempletonKey": "avaluggorion",
+    "types": "Rock"
+  },
+  {
+    "ps2Species": "VENUSAUR",
+    "orionTempletonKey": "venusaurorion",
+    "types": "Ice,Fairy"
+  },
+  {
+    "ps2Species": "PORYGON2",
+    "orionTempletonKey": "porygon2orion",
+    "types": "Bug,Dark"
+  },
+  {
+    "ps2Species": "CHEWTLE",
+    "orionTempletonKey": "chewtleorion",
+    "types": "Rock,Steel"
+  },
+  {
+    "ps2Species": "QUAXWELL",
+    "orionTempletonKey": "quaxwellorion",
+    "types": "Normal,Sound"
+  },
+  {
+    "ps2Species": "ARCHEN",
+    "orionTempletonKey": "archenorion",
+    "types": "Electric,Dragon"
+  },
+  {
+    "ps2Species": "LITWICK",
+    "orionTempletonKey": "litwickorion",
+    "types": "Light,Ghost"
+  },
+  {
+    "ps2Species": "WINGULL",
+    "orionTempletonKey": "wingullorion",
+    "types": "Dark,Flying"
+  },
+  {
+    "ps2Species": "HOUNDOUR",
+    "orionTempletonKey": "houndourorion",
+    "types": "Fire,Light"
+  },
+  {
+    "ps2Species": "SWABLU",
+    "orionTempletonKey": "swabluorion",
+    "types": "Poison,Dragon"
+  },
+  {
+    "ps2Species": "IVYSAUR",
+    "orionTempletonKey": "ivysaurorion",
+    "types": "Ice,Fairy"
+  },
+  {
+    "ps2Species": "SEWADDLE",
+    "orionTempletonKey": "sewaddleorion",
+    "types": "Steel,Dark"
+  },
+  {
+    "ps2Species": "WOOLOO",
+    "orionTempletonKey": "woolooorion",
+    "types": "Rock,Normal"
+  },
+  {
+    "ps2Species": "WIGGLYTUFF",
+    "orionTempletonKey": "wigglytufforion",
+    "types": "Water,Normal"
+  },
+  {
+    "ps2Species": "HONCHKROW",
+    "orionTempletonKey": "honchkroworion",
+    "types": "Normal,Flying"
+  },
+  {
+    "ps2Species": "AUDINO",
+    "orionTempletonKey": "audinoorion",
+    "types": "Dark,Normal"
+  },
+  {
+    "ps2Species": "METANG",
+    "orionTempletonKey": "metangorion",
+    "types": "Cosmic,Psychic"
+  },
+  {
+    "ps2Species": "BOLTUND",
+    "orionTempletonKey": "boltundorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "SENTRET",
+    "orionTempletonKey": "sentretorion",
+    "types": "Ghost,Poison"
+  },
+  {
+    "ps2Species": "DEWOTT",
+    "orionTempletonKey": "dewottorion",
+    "types": "Ground,Fighting"
+  },
+  {
+    "ps2Species": "BLISSEY",
+    "orionTempletonKey": "blisseyorion",
+    "types": "Normal,Steel"
+  },
+  {
+    "ps2Species": "GABITE",
+    "orionTempletonKey": "gabiteorion",
+    "types": "Ghost,Dragon"
+  },
+  {
+    "ps2Species": "ROSERADE",
+    "orionTempletonKey": "roseradeorion",
+    "types": "Ground,Fairy"
+  },
+  {
+    "ps2Species": "KINGAMBIT",
+    "orionTempletonKey": "kingambitorion",
+    "types": "Light,Steel"
+  },
+  {
+    "ps2Species": "DEWPIDER",
+    "orionTempletonKey": "dewpiderorion",
+    "types": "Light,Electric"
+  },
+  {
+    "ps2Species": "CACNEA",
+    "orionTempletonKey": "cacneaorion",
+    "types": "Ice,Fighting"
+  },
+  {
+    "ps2Species": "DUSKULL",
+    "orionTempletonKey": "duskullorion",
+    "types": "Fire,Ghost"
+  },
+  {
+    "ps2Species": "GASTRODON",
+    "orionTempletonKey": "gastrodonorion",
+    "types": "Dragon,Normal"
+  },
+  {
+    "ps2Species": "VENIPEDE",
+    "orionTempletonKey": "venipedeorion",
+    "types": "Bug,Cosmic"
+  },
+  {
+    "ps2Species": "COALOSSAL",
+    "orionTempletonKey": "coalossalorion",
+    "types": "Rock,Ground"
+  },
+  {
+    "ps2Species": "NINCADA",
+    "orionTempletonKey": "nincadaorion",
+    "types": "Normal,Bug"
+  },
+  {
+    "ps2Species": "SYLVEON",
+    "orionTempletonKey": "sylveontemporal",
+    "types": "Dragon"
+  },
+  {
+    "ps2Species": "LILEEP",
+    "orionTempletonKey": "lileeporion",
+    "types": "Normal,Flying"
+  },
+  {
+    "ps2Species": "SALANDIT",
+    "orionTempletonKey": "salanditorion",
+    "types": "Electric,Water"
+  },
+  {
+    "ps2Species": "BLITZLE",
+    "orionTempletonKey": "blitzleorion",
+    "types": "Fairy,Light"
+  },
+  {
+    "ps2Species": "SILCOON",
+    "orionTempletonKey": "silcoonorion",
+    "types": "Bug,Psychic"
+  },
+  {
+    "ps2Species": "ORBEETLE",
+    "orionTempletonKey": "orbeetleorion",
+    "types": "Normal,Flying"
+  },
+  {
+    "ps2Species": "TURTWIG",
+    "orionTempletonKey": "turtwigorion",
+    "types": "Dragon,Fire"
+  },
+  {
+    "ps2Species": "JOLTIK",
+    "orionTempletonKey": "joltikorion",
+    "types": "Bug,Dark"
+  },
+  {
+    "ps2Species": "GOLEM",
+    "orionTempletonKey": "golemorion",
+    "types": "Rock,Fire"
+  },
+  {
+    "ps2Species": "GLISCOR",
+    "orionTempletonKey": "gliscororion",
+    "types": "Rock,Dragon"
+  },
+  {
+    "ps2Species": "YANMEGA",
+    "orionTempletonKey": "yanmegaorion",
+    "types": "Bug,Water"
+  },
+  {
+    "ps2Species": "DRUDDIGON",
+    "orionTempletonKey": "druddigonorion",
+    "types": "Dragon,Fighting"
+  },
+  {
+    "ps2Species": "JUMPLUFF",
+    "orionTempletonKey": "jumplufforion",
+    "types": "Ice,Sound"
+  },
+  {
+    "ps2Species": "SKWOVET",
+    "orionTempletonKey": "skwovetorion",
+    "types": "Ice,Normal"
+  },
+  {
+    "ps2Species": "REVAVROOM",
+    "orionTempletonKey": "revavroomorion",
+    "types": "Fairy,Steel"
+  },
+  {
+    "ps2Species": "DECIDUEYE",
+    "orionTempletonKey": "decidueyeorion",
+    "types": "Fire,Flying"
+  },
+  {
+    "ps2Species": "CROCONAW",
+    "orionTempletonKey": "croconaworion",
+    "types": "Fighting,Ground"
+  },
+  {
+    "ps2Species": "MELOETTA",
+    "orionTempletonKey": "meloettaorion",
+    "types": "Fire,Sound"
+  },
+  {
+    "ps2Species": "PIPLUP",
+    "orionTempletonKey": "pipluporion",
+    "types": "Water,Ice"
+  },
+  {
+    "ps2Species": "MIGHTYENA",
+    "orionTempletonKey": "mightyenaorion",
+    "types": "Ice"
+  },
+  {
+    "ps2Species": "MAREANIE",
+    "orionTempletonKey": "mareanieorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "CUBCHOO",
+    "orionTempletonKey": "cubchooorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "WEAVILE",
+    "orionTempletonKey": "weavileorion",
+    "types": "Dark,Grass"
+  },
+  {
+    "ps2Species": "CRUSTLE",
+    "orionTempletonKey": "crustleorion",
+    "types": "Bug,Water"
+  },
+  {
+    "ps2Species": "VENONAT",
+    "orionTempletonKey": "venonatorion",
+    "types": "Bug,Grass"
+  },
+  {
+    "ps2Species": "AEGISLASH",
+    "orionTempletonKey": "aegislashorion",
+    "types": "Fairy,Steel"
+  },
+  {
+    "ps2Species": "IMPIDIMP",
+    "orionTempletonKey": "impidimporion",
+    "types": "Ground,Fairy"
+  },
+  {
+    "ps2Species": "BLASTOISE",
+    "orionTempletonKey": "blastoiseorion",
+    "types": "Poison,Steel"
+  },
+  {
+    "ps2Species": "ALCREMIE",
+    "orionTempletonKey": "alcremieorion",
+    "types": "Poison,Rock"
+  },
+  {
+    "ps2Species": "SKIDDO",
+    "orionTempletonKey": "skiddoorion",
+    "types": "Rock,Ice"
+  },
+  {
+    "ps2Species": "OMASTAR",
+    "orionTempletonKey": "omastarorion",
+    "types": "Psychic"
+  },
+  {
+    "ps2Species": "LYCANROC",
+    "orionTempletonKey": "lycanrocorion",
+    "types": "Normal,Cosmic"
+  },
+  {
+    "ps2Species": "SEAKING",
+    "orionTempletonKey": "seakingorion",
+    "types": "Poison,Water"
+  },
+  {
+    "ps2Species": "BUIZEL",
+    "orionTempletonKey": "buizelorion",
+    "types": "Water,Steel"
+  },
+  {
+    "ps2Species": "SIMISEAR",
+    "orionTempletonKey": "simisearorion",
+    "types": "Flying"
+  },
+  {
+    "ps2Species": "TYRUNT",
+    "orionTempletonKey": "tyruntorion",
+    "types": "Fire,Ice"
+  },
+  {
+    "ps2Species": "PILOSWINE",
+    "orionTempletonKey": "piloswineorion",
+    "types": "Electric,Ground"
+  },
+  {
+    "ps2Species": "BERGMITE",
+    "orionTempletonKey": "bergmiteorion",
+    "types": "Rock"
+  },
+  {
+    "ps2Species": "GLACEON",
+    "orionTempletonKey": "glaceontemporal",
+    "types": "Rock"
+  },
+  {
+    "ps2Species": "BULBASAUR",
+    "orionTempletonKey": "bulbasaurorion",
+    "types": "Ice,Fairy"
+  },
+  {
+    "ps2Species": "CARBINK",
+    "orionTempletonKey": "carbinkorion",
+    "types": "Light,Rock"
+  },
+  {
+    "ps2Species": "THROH",
+    "orionTempletonKey": "throhorion",
+    "types": "Rock,Fighting"
+  },
+  {
+    "ps2Species": "GLIMMORA",
+    "orionTempletonKey": "glimmoraorion",
+    "types": "Cosmic,Grass"
+  },
+  {
+    "ps2Species": "BOUFFALANT",
+    "orionTempletonKey": "bouffalantorion",
+    "types": "Cosmic,Normal"
+  },
+  {
+    "ps2Species": "PANPOUR",
+    "orionTempletonKey": "panpourorion",
+    "types": "Rock"
+  },
+  {
+    "ps2Species": "CHINGLING",
+    "orionTempletonKey": "chinglingorion",
+    "types": "Electric,Steel"
+  },
+  {
+    "ps2Species": "SINISTCHA",
+    "orionTempletonKey": "sinistchaorion",
+    "types": "Normal,Poison"
+  },
+  {
+    "ps2Species": "INDEEDEE",
+    "orionTempletonKey": "indeedeeorion",
+    "types": "Poison"
+  },
+  {
+    "ps2Species": "NOIBAT",
+    "orionTempletonKey": "noibatorion",
+    "types": "Sound,Dragon"
+  },
+  {
+    "ps2Species": "EELEKTROSS",
+    "orionTempletonKey": "eelektrossorion",
+    "types": "Bug,Ground"
+  },
+  {
+    "ps2Species": "RIOLU",
+    "orionTempletonKey": "rioluorion",
+    "types": "Psychic"
+  },
+  {
+    "ps2Species": "LEDYBA",
+    "orionTempletonKey": "ledybaorion",
+    "types": "Bug,Steel"
+  },
+  {
+    "ps2Species": "VAPOREON",
+    "orionTempletonKey": "vaporeontemporal",
+    "types": "Ground"
+  },
+  {
+    "ps2Species": "POLTEAGEIST",
+    "orionTempletonKey": "polteageistorion",
+    "types": "Water,Poison"
+  },
+  {
+    "ps2Species": "TADBULB",
+    "orionTempletonKey": "tadbulborion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "ARIADOS",
+    "orionTempletonKey": "ariadosorion",
+    "types": "Dark,Poison"
+  },
+  {
+    "ps2Species": "TINKATON",
+    "orionTempletonKey": "tinkatonorion",
+    "types": "Ghost,Dragon"
+  },
+  {
+    "ps2Species": "OCTILLERY",
+    "orionTempletonKey": "octilleryorion",
+    "types": "Water,Electric"
+  },
+  {
+    "ps2Species": "REUNICLUS",
+    "orionTempletonKey": "reuniclusorion",
+    "types": "Water,Psychic"
+  },
+  {
+    "ps2Species": "DODRIO",
+    "orionTempletonKey": "dodrioorion",
+    "types": "Cosmic,Flying"
+  },
+  {
+    "ps2Species": "BIDOOF",
+    "orionTempletonKey": "bidooforion",
+    "types": "Water,Normal"
+  },
+  {
+    "ps2Species": "OINKOLOGNE",
+    "orionTempletonKey": "oinkologneorion",
+    "types": "Grass,Dark"
+  },
+  {
+    "ps2Species": "TANGELA",
+    "orionTempletonKey": "tangelaorion",
+    "types": "Ground,Grass"
+  },
+  {
+    "ps2Species": "PSYDUCK",
+    "orionTempletonKey": "psyduckorion",
+    "types": "Ground,Psychic"
+  },
+  {
+    "ps2Species": "FORRETRESS",
+    "orionTempletonKey": "forretressorion",
+    "types": "Rock,Fairy"
+  },
+  {
+    "ps2Species": "TEPIG",
+    "orionTempletonKey": "tepigorion",
+    "types": "Ground,Rock"
+  },
+  {
+    "ps2Species": "GARDEVOIR",
+    "orionTempletonKey": "gardevoirorion",
+    "types": "Dark,Poison"
+  },
+  {
+    "ps2Species": "VOLCARONA",
+    "orionTempletonKey": "volcaronaorion",
+    "types": "Bug,Electric"
+  },
+  {
+    "ps2Species": "GOTHORITA",
+    "orionTempletonKey": "gothoritaorion",
+    "types": "Fairy,Fighting"
+  },
+  {
+    "ps2Species": "MEW",
+    "orionTempletonKey": "meworion",
+    "types": "Dragon,Normal"
+  },
+  {
+    "ps2Species": "PASSIMIAN",
+    "orionTempletonKey": "passimianorion",
+    "types": "Cosmic,Psychic"
+  },
+  {
+    "ps2Species": "WOBBUFFET",
+    "orionTempletonKey": "wobbuffetorion",
+    "types": "Normal,Dark"
+  },
+  {
+    "ps2Species": "VELUZA",
+    "orionTempletonKey": "veluzaorion",
+    "types": "Flying,Fighting"
+  },
+  {
+    "ps2Species": "ELDEGOSS",
+    "orionTempletonKey": "eldegossorion",
+    "types": "Dark,Grass"
+  },
+  {
+    "ps2Species": "PARAS",
+    "orionTempletonKey": "parasorion",
+    "types": "Bug,Ghost"
+  },
+  {
+    "ps2Species": "ZEBSTRIKA",
+    "orionTempletonKey": "zebstrikaorion",
+    "types": "Fairy,Light"
+  },
+  {
+    "ps2Species": "BIBAREL",
+    "orionTempletonKey": "bibarelorion",
+    "types": "Water,Ground"
+  },
+  {
+    "ps2Species": "TOGEDEMARU",
+    "orionTempletonKey": "togedemaruorion",
+    "types": "Water,Steel"
+  },
+  {
+    "ps2Species": "ORANGURU",
+    "orionTempletonKey": "oranguruorion",
+    "types": "Cosmic,Light"
+  },
+  {
+    "ps2Species": "SKORUPI",
+    "orionTempletonKey": "skorupiorion",
+    "types": "Ground,Poison"
+  },
+  {
+    "ps2Species": "LICKITUNG",
+    "orionTempletonKey": "lickitungorion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "CLAUNCHER",
+    "orionTempletonKey": "clauncherorion",
+    "types": "Electric"
+  },
+  {
+    "ps2Species": "CATERPIE",
+    "orionTempletonKey": "caterpieorion",
+    "types": "Bug,Fairy"
+  },
+  {
+    "ps2Species": "GRAVELER",
+    "orionTempletonKey": "gravelerorion",
+    "types": "Rock,Fire"
+  },
+  {
+    "ps2Species": "GRUBBIN",
+    "orionTempletonKey": "grubbinorion",
+    "types": "Steel,Light"
+  },
+  {
+    "ps2Species": "BEARTIC",
+    "orionTempletonKey": "bearticorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "GRAPPLOCT",
+    "orionTempletonKey": "grapploctorion",
+    "types": "Water,Fighting"
+  },
+  {
+    "ps2Species": "MIMIKYU",
+    "orionTempletonKey": "mimikyuorion",
+    "types": "Ice,Ghost"
+  },
+  {
+    "ps2Species": "ROLYCOLY",
+    "orionTempletonKey": "rolycolyorion",
+    "types": "Rock,Ground"
+  },
+  {
+    "ps2Species": "CRAMORANT",
+    "orionTempletonKey": "cramorantorion",
+    "types": "Normal,Flying"
+  },
+  {
+    "ps2Species": "WHISMUR",
+    "orionTempletonKey": "whismurorion",
+    "types": "Electric,Sound"
+  },
+  {
+    "ps2Species": "SHARPEDO",
+    "orionTempletonKey": "sharpedoorion",
+    "types": "Steel,Flying"
+  },
+  {
+    "ps2Species": "DRAGAPULT",
+    "orionTempletonKey": "dragapultorion",
+    "types": "Steel,Flying"
+  },
+  {
+    "ps2Species": "ELEKID",
+    "orionTempletonKey": "elekidorion",
+    "types": "Bug,Fighting"
+  },
+  {
+    "ps2Species": "ARCHEOPS",
+    "orionTempletonKey": "archeopsorion",
+    "types": "Electric,Dragon"
+  },
+  {
+    "ps2Species": "CARKOL",
+    "orionTempletonKey": "carkolorion",
+    "types": "Rock,Ground"
+  },
+  {
+    "ps2Species": "SNOVER",
+    "orionTempletonKey": "snoverorion",
+    "types": "Grass"
+  },
+  {
+    "ps2Species": "CHARMELEON",
+    "orionTempletonKey": "charmeleonorion",
+    "types": "Ground,Dragon"
+  },
+  {
+    "ps2Species": "ZOROARK",
+    "orionTempletonKey": "zoroarkorion",
+    "types": "Ice,Dark"
+  },
+  {
+    "ps2Species": "BAYLEEF",
+    "orionTempletonKey": "bayleeforion",
+    "types": "Fairy,Grass"
+  },
+  {
+    "ps2Species": "GREEDENT",
+    "orionTempletonKey": "greedentorion",
+    "types": "Ice,Normal"
+  },
+  {
+    "ps2Species": "KLAWF",
+    "orionTempletonKey": "klawforion",
+    "types": "Ghost,Water"
+  },
+  {
+    "ps2Species": "SEVIPER",
+    "orionTempletonKey": "seviperorion",
+    "types": "Ghost,Fire"
+  },
+  {
+    "ps2Species": "CASCOON",
+    "orionTempletonKey": "cascoonorion",
+    "types": "Bug,Ice"
+  },
+  {
+    "ps2Species": "HAUNTER",
+    "orionTempletonKey": "haunterorion",
+    "types": "Ice,Flying"
+  },
+  {
+    "ps2Species": "TRUMBEAK",
+    "orionTempletonKey": "trumbeakorion",
+    "types": "Grass,Flying"
+  },
+  {
+    "ps2Species": "SERPERIOR",
+    "orionTempletonKey": "serperiororion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "WUGTRIO",
+    "orionTempletonKey": "wugtrioorion",
+    "types": "Bug,Steel"
+  },
+  {
+    "ps2Species": "CLAYDOL",
+    "orionTempletonKey": "claydolorion",
+    "types": "Electric,Psychic"
+  },
+  {
+    "ps2Species": "PROBOPASS",
+    "orionTempletonKey": "probopassorion",
+    "types": "Grass,Psychic"
+  },
+  {
+    "ps2Species": "CHIKORITA",
+    "orionTempletonKey": "chikoritaorion",
+    "types": "Fairy,Grass"
+  },
+  {
+    "ps2Species": "IGGLYBUFF",
+    "orionTempletonKey": "igglybufforion",
+    "types": "Water,Normal"
+  },
+  {
+    "ps2Species": "OMANYTE",
+    "orionTempletonKey": "omanyteorion",
+    "types": "Psychic"
+  },
+  {
+    "ps2Species": "WYNAUT",
+    "orionTempletonKey": "wynautorion",
+    "types": "Normal,Dark"
+  },
+  {
+    "ps2Species": "HONEDGE",
+    "orionTempletonKey": "honedgeorion",
+    "types": "Fairy"
+  },
+  {
+    "ps2Species": "MANECTRIC",
+    "orionTempletonKey": "manectricorion",
+    "types": "Ground,Ghost"
+  },
+  {
+    "ps2Species": "PHANPY",
+    "orionTempletonKey": "phanpyorion",
+    "types": "Ice,Ground"
+  },
+  {
+    "ps2Species": "SCYTHER",
+    "orionTempletonKey": "scytherorion",
+    "types": "Light,Dark"
+  },
+  {
+    "ps2Species": "WATCHOG",
+    "orionTempletonKey": "watchogorion",
+    "types": "Dark,Psychic"
+  },
+  {
+    "ps2Species": "RABSCA",
+    "orionTempletonKey": "rabscaorion",
+    "types": "Light,Sound"
+  },
+  {
+    "ps2Species": "BOMBIRDIER",
+    "orionTempletonKey": "bombirdierorion",
+    "types": "Flying,Grass"
+  },
+  {
+    "ps2Species": "GOGOAT",
+    "orionTempletonKey": "gogoatorion",
+    "types": "Rock,Ice"
+  },
+  {
+    "ps2Species": "BALTOY",
+    "orionTempletonKey": "baltoyorion",
+    "types": "Electric,Psychic"
+  },
+  {
+    "ps2Species": "POLIWRATH",
+    "orionTempletonKey": "poliwrathorion",
+    "types": "Water,Ground"
+  },
+  {
+    "ps2Species": "ARCANINE",
+    "orionTempletonKey": "arcanineorion",
+    "types": "Cosmic,Dragon"
+  },
+  {
+    "ps2Species": "ELECTABUZZ",
+    "orionTempletonKey": "electabuzzorion",
+    "types": "Bug,Fighting"
+  },
+  {
+    "ps2Species": "ROOKIDEE",
+    "orionTempletonKey": "rookideeorion",
+    "types": "Dark,Electric"
+  },
+  {
+    "ps2Species": "APPLETUN",
+    "orionTempletonKey": "appletunorion",
+    "types": "Steel,Dragon"
+  },
+  {
+    "ps2Species": "SKUNTANK",
+    "orionTempletonKey": "skuntankorion",
+    "types": "Normal,Poison"
+  },
+  {
+    "ps2Species": "RILLABOOM",
+    "orionTempletonKey": "rillaboomorion",
+    "types": "Psychic,Ground"
+  },
+  {
+    "ps2Species": "DODUO",
+    "orionTempletonKey": "doduoorion",
+    "types": "Cosmic,Flying"
+  },
+  {
+    "ps2Species": "DURALUDON",
+    "orionTempletonKey": "duraludonorion",
+    "types": "Light,Ground"
+  },
+  {
+    "ps2Species": "PALPITOAD",
+    "orionTempletonKey": "palpitoadorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "ZORUA",
+    "orionTempletonKey": "zoruaorion",
+    "types": "Ice,Dark"
+  },
+  {
+    "ps2Species": "DROWZEE",
+    "orionTempletonKey": "drowzeeorion",
+    "types": "Dark,Fighting"
+  },
+  {
+    "ps2Species": "ZANGOOSE",
+    "orionTempletonKey": "zangooseorion",
+    "types": "Steel,Fighting"
+  },
+  {
+    "ps2Species": "HIPPOWDON",
+    "orionTempletonKey": "hippowdonorion",
+    "types": "Grass,Water"
+  },
+  {
+    "ps2Species": "TREVENANT",
+    "orionTempletonKey": "trevenantorion",
+    "types": "Grass,Fire"
+  },
+  {
+    "ps2Species": "PIKACHU",
+    "orionTempletonKey": "pikachuorion",
+    "types": "Sound,Steel"
+  },
+  {
+    "ps2Species": "NUZLEAF",
+    "orionTempletonKey": "nuzleaforion",
+    "types": "Grass,Fire"
+  },
+  {
+    "ps2Species": "MUSHARNA",
+    "orionTempletonKey": "musharnaorion",
+    "types": "Electric,Bug"
+  },
+  {
+    "ps2Species": "MRMIME",
+    "orionTempletonKey": "mrmimeorion",
+    "types": "Sound,Psychic"
+  },
+  {
+    "ps2Species": "KINGLER",
+    "orionTempletonKey": "kinglerorion",
+    "types": "Ground,Rock"
+  },
+  {
+    "ps2Species": "GALLADE",
+    "orionTempletonKey": "galladeorion",
+    "types": "Dark,Poison"
+  },
+  {
+    "ps2Species": "SLAKING",
+    "orionTempletonKey": "slakingorion",
+    "types": "Ice,Normal"
+  },
+  {
+    "ps2Species": "DIPPLIN",
+    "orionTempletonKey": "dipplinorion",
+    "types": "Steel,Poison"
+  },
+  {
+    "ps2Species": "LAMPENT",
+    "orionTempletonKey": "lampentorion",
+    "types": "Light,Ghost"
+  },
+  {
+    "ps2Species": "HUNTAIL",
+    "orionTempletonKey": "huntailorion",
+    "types": "Water,Dark"
+  },
+  {
+    "ps2Species": "DIGGERSBY",
+    "orionTempletonKey": "diggersbyorion",
+    "types": "Ground,Fighting"
+  },
+  {
+    "ps2Species": "FURFROU",
+    "orionTempletonKey": "furfrouorion",
+    "types": "Flying"
+  },
+  {
+    "ps2Species": "PERRSERKER",
+    "orionTempletonKey": "perrserkerorion",
+    "types": "Ice,Electric"
+  },
+  {
+    "ps2Species": "SHINX",
+    "orionTempletonKey": "shinxorion",
+    "types": "Dark,Dragon"
+  },
+  {
+    "ps2Species": "FROSMOTH",
+    "orionTempletonKey": "frosmothorion",
+    "types": "Rock,Flying"
+  },
+  {
+    "ps2Species": "ELGYEM",
+    "orionTempletonKey": "elgyemorion",
+    "types": "Cosmic,Dark"
+  },
+  {
+    "ps2Species": "ESPEON",
+    "orionTempletonKey": "espeontemporal",
+    "types": "Poison"
+  },
+  {
+    "ps2Species": "TINKATUFF",
+    "orionTempletonKey": "tinkatufforion",
+    "types": "Ghost,Dragon"
+  },
+  {
+    "ps2Species": "TENTACOOL",
+    "orionTempletonKey": "tentacoolorion",
+    "types": "Cosmic,Water"
+  },
+  {
+    "ps2Species": "LAIRON",
+    "orionTempletonKey": "laironorion",
+    "types": "Bug,Rock"
+  },
+  {
+    "ps2Species": "PIGNITE",
+    "orionTempletonKey": "pigniteorion",
+    "types": "Ground,Rock"
+  },
+  {
+    "ps2Species": "SIZZLIPEDE",
+    "orionTempletonKey": "sizzlipedeorion",
+    "types": "Bug,Poison"
+  },
+  {
+    "ps2Species": "MACHAMP",
+    "orionTempletonKey": "machamporion",
+    "types": "Ground,Fighting"
+  },
+  {
+    "ps2Species": "CENTISKORCH",
+    "orionTempletonKey": "centiskorchorion",
+    "types": "Bug,Poison"
+  },
+  {
+    "ps2Species": "SIMIPOUR",
+    "orionTempletonKey": "simipourorion",
+    "types": "Rock"
+  },
+  {
+    "ps2Species": "TOGETIC",
+    "orionTempletonKey": "togeticorion",
+    "types": "Dark,Flying"
+  },
+  {
+    "ps2Species": "FOONGUS",
+    "orionTempletonKey": "foongusorion",
+    "types": "Poison,Fire"
+  },
+  {
+    "ps2Species": "PHANTUMP",
+    "orionTempletonKey": "phantumporion",
+    "types": "Grass,Fire"
+  },
+  {
+    "ps2Species": "POOCHYENA",
+    "orionTempletonKey": "poochyenaorion",
+    "types": "Ice"
+  },
+  {
+    "ps2Species": "BEHEEYEM",
+    "orionTempletonKey": "beheeyemorion",
+    "types": "Cosmic,Dark"
+  },
+  {
+    "ps2Species": "LUNATONE",
+    "orionTempletonKey": "lunatoneorion",
+    "types": "Ice,Cosmic"
+  },
+  {
+    "ps2Species": "FRIGIBAX",
+    "orionTempletonKey": "frigibaxorion",
+    "types": "Rock,Dragon"
+  },
+  {
+    "ps2Species": "LAPRAS",
+    "orionTempletonKey": "laprasorion",
+    "types": "Fire,Rock"
+  },
+  {
+    "ps2Species": "SWIRLIX",
+    "orionTempletonKey": "swirlixorion",
+    "types": "Flying,Light"
+  },
+  {
+    "ps2Species": "AXEW",
+    "orionTempletonKey": "axeworion",
+    "types": "Rock,Dragon"
+  },
+  {
+    "ps2Species": "ALOMOMOLA",
+    "orionTempletonKey": "alomomolaorion",
+    "types": "Water,Light"
+  },
+  {
+    "ps2Species": "OVERQWIL",
+    "orionTempletonKey": "overqwilorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "SMOOCHUM",
+    "orionTempletonKey": "smoochumorion",
+    "types": "Sound,Ice"
+  },
+  {
+    "ps2Species": "CHATOT",
+    "orionTempletonKey": "chatotorion",
+    "types": "Grass,Sound"
+  },
+  {
+    "ps2Species": "MUDSDALE",
+    "orionTempletonKey": "mudsdaleorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "GROVYLE",
+    "orionTempletonKey": "grovyleorion",
+    "types": "Bug,Dragon"
+  },
+  {
+    "ps2Species": "MINIOR",
+    "orionTempletonKey": "miniororion",
+    "types": "Ground,Cosmic"
+  },
+  {
+    "ps2Species": "BLIPBUG",
+    "orionTempletonKey": "blipbugorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "CASTFORM",
+    "orionTempletonKey": "castformorion",
+    "types": "Ground"
+  },
+  {
+    "ps2Species": "BONSLY",
+    "orionTempletonKey": "bonslyorion",
+    "types": "Ground,Grass"
+  },
+  {
+    "ps2Species": "INTELEON",
+    "orionTempletonKey": "inteleonorion",
+    "types": "Water,Sound"
+  },
+  {
+    "ps2Species": "MORELULL",
+    "orionTempletonKey": "morelullorion",
+    "types": "Ghost,Grass"
+  },
+  {
+    "ps2Species": "SWALOT",
+    "orionTempletonKey": "swalotorion",
+    "types": "Ground"
+  },
+  {
+    "ps2Species": "SEALEO",
+    "orionTempletonKey": "sealeoorion",
+    "types": "Ice,Ground"
+  },
+  {
+    "ps2Species": "DEERLING",
+    "orionTempletonKey": "deerlingorion",
+    "types": "Normal,Fire"
+  },
+  {
+    "ps2Species": "FLABEBE",
+    "orionTempletonKey": "flabebeorion",
+    "types": "Fairy,Water"
+  },
+  {
+    "ps2Species": "DONDOZO",
+    "orionTempletonKey": "dondozoorion",
+    "types": "Steel,Water"
+  },
+  {
+    "ps2Species": "PORYGON",
+    "orionTempletonKey": "porygonorion",
+    "types": "Bug,Dark"
+  },
+  {
+    "ps2Species": "GOLBAT",
+    "orionTempletonKey": "golbatorion",
+    "types": "Dark,Sound"
+  },
+  {
+    "ps2Species": "FLAREON",
+    "orionTempletonKey": "flareontemporal",
+    "types": "Steel"
+  },
+  {
+    "ps2Species": "PALOSSAND",
+    "orionTempletonKey": "palossandorion",
+    "types": "Ghost,Ice"
+  },
+  {
+    "ps2Species": "CHIMCHAR",
+    "orionTempletonKey": "chimcharorion",
+    "types": "Electric,Fighting"
+  },
+  {
+    "ps2Species": "ILLUMISE",
+    "orionTempletonKey": "illumiseorion",
+    "types": "Bug,Rock"
+  },
+  {
+    "ps2Species": "ROTOM",
+    "orionTempletonKey": "rotomorion",
+    "types": "Dark,Ghost"
+  },
+  {
+    "ps2Species": "DWEBBLE",
+    "orionTempletonKey": "dwebbleorion",
+    "types": "Bug,Water"
+  },
+  {
+    "ps2Species": "HYPNO",
+    "orionTempletonKey": "hypnoorion",
+    "types": "Dark,Fighting"
+  },
+  {
+    "ps2Species": "COMBEE",
+    "orionTempletonKey": "combeeorion",
+    "types": "Steel,Fire"
+  },
+  {
+    "ps2Species": "SUNKERN",
+    "orionTempletonKey": "sunkernorion",
+    "types": "Grass,Fire"
+  },
+  {
+    "ps2Species": "DRAPION",
+    "orionTempletonKey": "drapionorion",
+    "types": "Ground,Poison"
+  },
+  {
+    "ps2Species": "GHOLDENGO",
+    "orionTempletonKey": "gholdengoorion",
+    "types": "Bug,Ground"
+  },
+  {
+    "ps2Species": "BELDUM",
+    "orionTempletonKey": "beldumorion",
+    "types": "Cosmic,Psychic"
+  },
+  {
+    "ps2Species": "KLEFKI",
+    "orionTempletonKey": "klefkiorion",
+    "types": "Ghost,Steel"
+  },
+  {
+    "ps2Species": "SLURPUFF",
+    "orionTempletonKey": "slurpufforion",
+    "types": "Flying,Light"
+  },
+  {
+    "ps2Species": "BRUXISH",
+    "orionTempletonKey": "bruxishorion",
+    "types": "Water"
+  },
+  {
+    "ps2Species": "DARMANITAN",
+    "orionTempletonKey": "darmanitanorion",
+    "types": "Grass,Sound"
+  },
+  {
+    "ps2Species": "AZURILL",
+    "orionTempletonKey": "azurillorion",
+    "types": "Fighting"
+  },
+  {
+    "ps2Species": "COMBUSKEN",
+    "orionTempletonKey": "combuskenorion",
+    "types": "Ground,Flying"
+  },
+  {
+    "ps2Species": "KLANG",
+    "orionTempletonKey": "klangorion",
+    "types": "Sound,Steel"
+  },
+  {
+    "ps2Species": "NACLSTACK",
+    "orionTempletonKey": "naclstackorion",
+    "types": "Fairy"
+  },
+  {
+    "ps2Species": "SNEASEL",
+    "orionTempletonKey": "sneaselorion",
+    "types": "Dark,Grass"
+  },
+  {
+    "ps2Species": "SUDOWOODO",
+    "orionTempletonKey": "sudowoodoorion",
+    "types": "Ground,Grass"
+  },
+  {
+    "ps2Species": "SOLROCK",
+    "orionTempletonKey": "solrockorion",
+    "types": "Fire,Cosmic"
+  },
+  {
+    "ps2Species": "EKANS",
+    "orionTempletonKey": "ekansorion",
+    "types": "Ground,Poison"
+  },
+  {
+    "ps2Species": "DRAGONAIR",
+    "orionTempletonKey": "dragonairorion",
+    "types": "Light,Dragon"
+  },
+  {
+    "ps2Species": "CAMERUPT",
+    "orionTempletonKey": "cameruptorion",
+    "types": "Fire,Water"
+  },
+  {
+    "ps2Species": "MISDREAVUS",
+    "orionTempletonKey": "misdreavusorion",
+    "types": "Light,Sound"
+  },
+  {
+    "ps2Species": "MOTHIM",
+    "orionTempletonKey": "mothimorion",
+    "types": "Light,Bug"
+  },
+  {
+    "ps2Species": "OSHAWOTT",
+    "orionTempletonKey": "oshawottorion",
+    "types": "Ground,Fighting"
+  },
+  {
+    "ps2Species": "CORPHISH",
+    "orionTempletonKey": "corphishorion",
+    "types": "Rock,Dark"
+  },
+  {
+    "ps2Species": "HEATMOR",
+    "orionTempletonKey": "heatmororion",
+    "types": "Steel,Electric"
+  },
+  {
+    "ps2Species": "MANTYKE",
+    "orionTempletonKey": "mantykeorion",
+    "types": "Water,Electric"
+  },
+  {
+    "ps2Species": "CROAGUNK",
+    "orionTempletonKey": "croagunkorion",
+    "types": "Poison,Psychic"
+  },
+  {
+    "ps2Species": "FLAPPLE",
+    "orionTempletonKey": "flappleorion",
+    "types": "Steel,Fighting"
+  },
+  {
+    "ps2Species": "HELIOPTILE",
+    "orionTempletonKey": "helioptileorion",
+    "types": "Dragon,Rock"
+  },
+  {
+    "ps2Species": "HELIOLISK",
+    "orionTempletonKey": "helioliskorion",
+    "types": "Dragon,Rock"
+  },
+  {
+    "ps2Species": "MAGNETON",
+    "orionTempletonKey": "magnetonorion",
+    "types": "Cosmic,Steel"
+  },
+  {
+    "ps2Species": "NIDORINA",
+    "orionTempletonKey": "nidorinaorion",
+    "types": "Fire"
+  },
+  {
+    "ps2Species": "TYNAMO",
+    "orionTempletonKey": "tynamoorion",
+    "types": "Bug,Ground"
+  },
+  {
+    "ps2Species": "WIMPOD",
+    "orionTempletonKey": "wimpodorion",
+    "types": "Bug,Poison"
+  },
+  {
+    "ps2Species": "HAPPINY",
+    "orionTempletonKey": "happinyorion",
+    "types": "Normal,Steel"
+  },
+  {
+    "ps2Species": "VULPIX",
+    "orionTempletonKey": "vulpixorion",
+    "types": "Cosmic"
+  },
+  {
+    "ps2Species": "TROPIUS",
+    "orionTempletonKey": "tropiusorion",
+    "types": "Poison,Ghost"
+  },
+  {
+    "ps2Species": "FEEBAS",
+    "orionTempletonKey": "feebasorion",
+    "types": "Light,Fairy"
+  },
+  {
+    "ps2Species": "VIBRAVA",
+    "orionTempletonKey": "vibravaorion",
+    "types": "Ice,Dragon"
+  },
+  {
+    "ps2Species": "SHELLOS",
+    "orionTempletonKey": "shellosorion",
+    "types": "Dragon,Normal"
+  },
+  {
+    "ps2Species": "TOUCANNON",
+    "orionTempletonKey": "toucannonorion",
+    "types": "Grass,Flying"
+  },
+  {
+    "ps2Species": "SIRFETCHD",
+    "orionTempletonKey": "sirfetchdorion",
+    "types": "Fighting,Flying"
+  },
+  {
+    "ps2Species": "BASCULIN",
+    "orionTempletonKey": "basculinorion",
+    "types": "Dragon,Ghost"
+  },
+  {
+    "ps2Species": "KILOWATTREL",
+    "orionTempletonKey": "kilowattrelorion",
+    "types": "Ice,Rock"
+  },
+  {
+    "ps2Species": "BELLSPROUT",
+    "orionTempletonKey": "bellsproutorion",
+    "types": "Grass,Ghost"
+  },
+  {
+    "ps2Species": "CURSOLA",
+    "orionTempletonKey": "cursolaorion",
+    "types": "Water,Poison"
+  },
+  {
+    "ps2Species": "CRABOMINABLE",
+    "orionTempletonKey": "crabominableorion",
+    "types": "Steel"
+  },
+  {
+    "ps2Species": "KARRABLAST",
+    "orionTempletonKey": "karrablastorion",
+    "types": "Steel,Dark"
+  },
+  {
+    "ps2Species": "SWAMPERT",
+    "orionTempletonKey": "swampertorion",
+    "types": "Cosmic,Fire"
+  },
+  {
+    "ps2Species": "PALAFIN",
+    "orionTempletonKey": "palafinorion",
+    "types": "Ice,Water"
+  },
+  {
+    "ps2Species": "SEEDOT",
+    "orionTempletonKey": "seedotorion",
+    "types": "Grass,Fire"
+  },
+  {
+    "ps2Species": "SAMUROTT",
+    "orionTempletonKey": "samurottorion",
+    "types": "Ground,Fighting"
+  },
+  {
+    "ps2Species": "GARBODOR",
+    "orionTempletonKey": "garbodororion",
+    "types": "Electric,Poison"
+  },
+  {
+    "ps2Species": "WAILORD",
+    "orionTempletonKey": "wailordorion",
+    "types": "Ghost,Water"
+  },
+  {
+    "ps2Species": "DRILBUR",
+    "orionTempletonKey": "drilburorion",
+    "types": "Ground,Sound"
+  },
+  {
+    "ps2Species": "HOOPA",
+    "orionTempletonKey": "hoopaorion",
+    "types": "Fighting,Dark"
+  },
+  {
+    "ps2Species": "JIGGLYPUFF",
+    "orionTempletonKey": "jigglypufforion",
+    "types": "Water,Normal"
+  },
+  {
+    "ps2Species": "CLOYSTER",
+    "orionTempletonKey": "cloysterorion",
+    "types": "Cosmic,Psychic"
+  },
+  {
+    "ps2Species": "FLETCHLING",
+    "orionTempletonKey": "fletchlingorion",
+    "types": "Electric,Flying"
+  },
+  {
+    "ps2Species": "DOTTLER",
+    "orionTempletonKey": "dottlerorion",
+    "types": "Normal"
+  },
+  {
+    "ps2Species": "BRELOOM",
+    "orionTempletonKey": "breloomorion",
+    "types": "Steel,Fighting"
+  },
+  {
+    "ps2Species": "SPIDOPS",
+    "orionTempletonKey": "spidopsorion",
+    "types": "Bug,Ice"
+  },
+  {
+    "ps2Species": "PUPITAR",
+    "orionTempletonKey": "pupitarorion",
+    "types": "Steel,Dragon"
+  },
+  {
+    "ps2Species": "POLTCHAGEIST",
+    "orionTempletonKey": "poltchageistorion",
+    "types": "Normal,Poison"
+  },
+  {
+    "ps2Species": "TOEDSCOOL",
+    "orionTempletonKey": "toedscoolorion",
+    "types": "Normal,Light"
+  },
+  {
+    "ps2Species": "CARRACOSTA",
+    "orionTempletonKey": "carracostaorion",
+    "types": "Steel,Ground"
+  },
+  {
+    "ps2Species": "SHELLDER",
+    "orionTempletonKey": "shellderorion",
+    "types": "Cosmic,Psychic"
+  },
+  {
+    "ps2Species": "SMEARGLE",
+    "orionTempletonKey": "smeargleorion",
+    "types": "Dark"
+  },
+  {
+    "ps2Species": "QUILLADIN",
+    "orionTempletonKey": "quilladinorion",
+    "types": "Ground,Light"
+  },
+  {
+    "ps2Species": "PURUGLY",
+    "orionTempletonKey": "puruglyorion",
+    "types": "Ice,Poison"
+  },
+  {
+    "ps2Species": "LOPUNNY",
+    "orionTempletonKey": "lopunnyorion",
+    "types": "Cosmic,Ice"
+  },
+  {
+    "ps2Species": "QWILFISH",
+    "orionTempletonKey": "qwilfishorion",
+    "types": "Grass,Poison"
+  },
+  {
+    "ps2Species": "CRADILY",
+    "orionTempletonKey": "cradilyorion",
+    "types": "Normal,Flying"
+  },
+  {
+    "ps2Species": "MAGMORTAR",
+    "orionTempletonKey": "magmortarorion",
+    "types": "Water,Ice"
+  },
+  {
+    "ps2Species": "SPRIGATITO",
+    "orionTempletonKey": "sprigatitoorion",
+    "types": "Psychic,Fairy"
+  },
+  {
+    "ps2Species": "BINACLE",
+    "orionTempletonKey": "binacleorion",
+    "types": "Rock,Psychic"
+  },
+  {
+    "ps2Species": "RUNERIGUS",
+    "orionTempletonKey": "runerigusorion",
+    "types": "Dark,Sound"
+  },
+  {
+    "ps2Species": "TORTERRA",
+    "orionTempletonKey": "torterraorion",
+    "types": "Dragon,Fire"
+  },
+  {
+    "ps2Species": "DOLLIV",
+    "orionTempletonKey": "dollivorion",
+    "types": "Water,Psychic"
+  },
+  {
+    "ps2Species": "NOCTOWL",
+    "orionTempletonKey": "noctowlorion",
+    "types": "Psychic,Light"
+  },
+  {
+    "ps2Species": "SHIFTRY",
+    "orionTempletonKey": "shiftryorion",
+    "types": "Grass,Fire"
+  },
+  {
+    "ps2Species": "MANTINE",
+    "orionTempletonKey": "mantineorion",
+    "types": "Water,Electric"
+  },
+  {
+    "ps2Species": "ARCHALUDON",
+    "orionTempletonKey": "archaludonorion",
+    "types": "Light,Ground"
+  },
+  {
+    "ps2Species": "AERODACTYL",
+    "orionTempletonKey": "aerodactylorion",
+    "types": "Dragon,Flying"
+  },
+  {
+    "ps2Species": "CHESPIN",
+    "orionTempletonKey": "chespinorion",
+    "types": "Ground,Light"
+  },
+  {
+    "ps2Species": "MINCCINO",
+    "orionTempletonKey": "minccinoorion",
+    "types": "Ghost,Fairy"
+  },
+  {
+    "ps2Species": "BEAUTIFLY",
+    "orionTempletonKey": "beautiflyorion",
+    "types": "Bug,Psychic"
+  },
+  {
+    "ps2Species": "CHERUBI",
+    "orionTempletonKey": "cherubiorion",
+    "types": "Grass,Ice"
+  },
+  {
+    "ps2Species": "LARVITAR",
+    "orionTempletonKey": "larvitarorion",
+    "types": "Steel,Dragon"
+  },
+  {
+    "ps2Species": "MRRIME",
+    "orionTempletonKey": "mrrimeorion",
+    "types": "Sound,Psychic"
+  },
+  {
+    "ps2Species": "TIMBURR",
+    "orionTempletonKey": "timburrorion",
+    "types": "Ghost,Fighting"
+  },
+  {
+    "ps2Species": "DELPHOX",
+    "orionTempletonKey": "delphoxorion",
+    "types": "Water,Cosmic"
+  },
+  {
+    "ps2Species": "MORPEKO",
+    "orionTempletonKey": "morpekoorion",
+    "types": "Light"
+  },
+  {
+    "ps2Species": "DUNSPARCE",
+    "orionTempletonKey": "dunsparceorion",
+    "types": "Bug,Poison"
+  },
+  {
+    "ps2Species": "GIBLE",
+    "orionTempletonKey": "gibleorion",
+    "types": "Ghost,Dragon"
+  },
+  {
+    "ps2Species": "GOURGEIST",
+    "orionTempletonKey": "gourgeistorion",
+    "types": "Rock"
+  },
+  {
+    "ps2Species": "KRABBY",
+    "orionTempletonKey": "krabbyorion",
+    "types": "Ground,Rock"
+  },
+  {
+    "ps2Species": "SWELLOW",
+    "orionTempletonKey": "swelloworion",
+    "types": "Dark,Flying"
+  },
+  {
+    "ps2Species": "VILEPLUME",
+    "orionTempletonKey": "vileplumeorion",
+    "types": "Grass,Cosmic"
+  },
+  {
+    "ps2Species": "ORICORIO",
+    "orionTempletonKey": "oricorioorion",
+    "types": "Psychic,Sound"
+  },
+  {
+    "ps2Species": "GLAMEOW",
+    "orionTempletonKey": "glameoworion",
+    "types": "Ice,Poison"
+  },
+  {
+    "ps2Species": "MALAMAR",
+    "orionTempletonKey": "malamarorion",
+    "types": "Cosmic,Flying"
+  },
+  {
+    "ps2Species": "SCOVILLAIN",
+    "orionTempletonKey": "scovillainorion",
+    "types": "Poison,Electric"
+  },
+  {
+    "ps2Species": "SNORUNT",
+    "orionTempletonKey": "snoruntorion",
+    "types": "Ghost"
+  },
+  {
+    "ps2Species": "YANMA",
+    "orionTempletonKey": "yanmaorion",
+    "types": "Bug,Water"
+  },
+  {
+    "ps2Species": "FINIZEN",
+    "orionTempletonKey": "finizenorion",
+    "types": "Ice,Water"
+  },
+  {
+    "ps2Species": "FLORGES",
+    "orionTempletonKey": "florgesorion",
+    "types": "Fairy,Water"
+  },
+  {
+    "ps2Species": "LOUDRED",
+    "orionTempletonKey": "loudredorion",
+    "types": "Electric,Sound"
+  },
+  {
+    "ps2Species": "CLAMPERL",
+    "orionTempletonKey": "clamperlorion",
+    "types": "Psychic"
+  },
+  {
+    "ps2Species": "KIRLIA",
+    "orionTempletonKey": "kirliaorion",
+    "types": "Dark,Poison"
+  },
+  {
+    "ps2Species": "PANCHAM",
+    "orionTempletonKey": "panchamorion",
+    "types": "Poison,Fighting"
+  },
+  {
+    "ps2Species": "KINGDRA",
+    "orionTempletonKey": "kingdraorion",
+    "types": "Water,Light"
+  }
+]
