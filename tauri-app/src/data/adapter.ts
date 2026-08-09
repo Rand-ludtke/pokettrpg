@@ -1017,6 +1017,37 @@ export async function loadShowdownDex(options?: { base?: string }) {
     }
   }
 
+  // ── Mega-forme integrity pass ──────────────────────────────────────────────
+  // The Pokeathlon snapshot has mega formes (forme="Mega", requiredItem=...) but
+  // many are missing isMega:true which the PS battle engine requires to recognize
+  // and execute mega evolution.  Sweep the merged dex and inject isMega:true plus
+  // a changesFrom pointer wherever both conditions are met.
+  for (const [key, entry] of Object.entries(mergedDex)) {
+    if (!entry || typeof entry !== 'object') continue;
+    const formeStr = String(entry.forme || '');
+    // Match "Mega", "Mega-X", "Mega-Y", etc.
+    if (!formeStr.startsWith('Mega') && !formeStr.includes('-Mega')) continue;
+    if (!entry.requiredItem) continue; // only flag real mega evolutions
+    if (!entry.isMega) {
+      (mergedDex as DexIndex)[key] = { ...entry, isMega: true };
+    }
+    // Ensure changesFrom is set (PS needs this to revert back after battle)
+    const e2 = (mergedDex as DexIndex)[key];
+    if (!e2.changesFrom && e2.baseSpecies) {
+      e2.changesFrom = e2.baseSpecies;
+    }
+    // Ensure the base species' otherFormes includes this mega
+    const baseId = normalizeName(String(e2.baseSpecies || ''));
+    const baseEntry = baseId ? (mergedDex as DexIndex)[baseId] : undefined;
+    if (baseEntry) {
+      const megaName = e2.name || key;
+      const existing = new Set((baseEntry.otherFormes || []).map((f: string) => normalizeName(f)));
+      if (!existing.has(normalizeName(megaName))) {
+        baseEntry.otherFormes = [...(baseEntry.otherFormes || []), megaName];
+      }
+    }
+  }
+
   const mergedLs = { ...mergedBaseLearnsets, ...customLearnsets } as LearnsetsIndex;
   const mergedItems = { ...mergedBaseItems, ...customItems } as ItemIndex;
   const mergedMoves = { ...mergedBaseMoves, ...customMoves } as MoveIndex;
