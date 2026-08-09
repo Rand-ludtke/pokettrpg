@@ -1,0 +1,1447 @@
+{
+  "levitate": {
+    "name": "Levitate",
+    "shortDesc": "Levitate ability.",
+    "desc": "Levitate ability."
+  },
+  "whitesmoke": {
+    "name": "White Smoke",
+    "shortDesc": "White Smoke ability.",
+    "desc": "White Smoke ability."
+  },
+  "swiftswim": {
+    "name": "Swift Swim",
+    "shortDesc": "Swift Swim ability.",
+    "desc": "Swift Swim ability."
+  },
+  "magicbounce": {
+    "name": "Magic Bounce",
+    "shortDesc": "Magic Bounce ability.",
+    "desc": "Magic Bounce ability."
+  },
+  "filter": {
+    "name": "Filter",
+    "shortDesc": "Filter ability.",
+    "desc": "Filter ability."
+  },
+  "cloudnine": {
+    "name": "Cloud Nine",
+    "shortDesc": "Cloud Nine ability.",
+    "desc": "Cloud Nine ability."
+  },
+  "earlybird": {
+    "name": "Earlybird",
+    "shortDesc": "Earlybird ability.",
+    "desc": "Earlybird ability."
+  },
+  "competitive": {
+    "name": "Competitive",
+    "shortDesc": "Competitive ability.",
+    "desc": "Competitive ability."
+  },
+  "corrosion": {
+    "name": "Corrosion",
+    "shortDesc": "Corrosion ability.",
+    "desc": "Corrosion ability."
+  },
+  "sandspit": {
+    "name": "Sandspit",
+    "shortDesc": "Sandspit ability.",
+    "desc": "Sandspit ability."
+  },
+  "synchronize": {
+    "name": "Synchronize",
+    "shortDesc": "Synchronize ability.",
+    "desc": "Synchronize ability."
+  },
+  "vengeful": {
+    "name": "Vengeful",
+    "shortDesc": "Vengeful ability.",
+    "desc": "Vengeful ability."
+  },
+  "sturdy": {
+    "name": "Sturdy",
+    "shortDesc": "Sturdy ability.",
+    "desc": "Sturdy ability."
+  },
+  "unaware": {
+    "name": "Unaware",
+    "shortDesc": "Unaware ability.",
+    "desc": "Unaware ability."
+  },
+  "liquidooze": {
+    "name": "Liquidooze",
+    "shortDesc": "Liquidooze ability.",
+    "desc": "Liquidooze ability."
+  },
+  "ethereal": {
+    "name": "Ethereal",
+    "shortDesc": "Ethereal ability.",
+    "desc": "Ethereal ability."
+  },
+  "innardsout": {
+    "name": "Innardsout",
+    "shortDesc": "Innardsout ability.",
+    "desc": "Innardsout ability."
+  },
+  "keeneye": {
+    "name": "Keeneye",
+    "shortDesc": "Keeneye ability.",
+    "desc": "Keeneye ability."
+  },
+  "galvanize": {
+    "name": "Galvanize",
+    "shortDesc": "Galvanize ability.",
+    "desc": "Galvanize ability."
+  },
+  "battery": {
+    "name": "Battery",
+    "shortDesc": "Battery ability.",
+    "desc": "Battery ability."
+  },
+  "download": {
+    "name": "Download",
+    "shortDesc": "Download ability.",
+    "desc": "Download ability."
+  },
+  "defiant": {
+    "name": "Defiant",
+    "shortDesc": "Defiant ability.",
+    "desc": "Defiant ability."
+  },
+  "naturalcure": {
+    "name": "Natural Cure",
+    "shortDesc": "Natural Cure ability.",
+    "desc": "Natural Cure ability."
+  },
+  "leadership": {
+    "name": "Leadership",
+    "shortDesc": "Leadership ability.",
+    "desc": "Leadership ability."
+  },
+  "leechingfangs": {
+    "name": "Leechingfangs",
+    "shortDesc": "Leechingfangs ability.",
+    "desc": "Leechingfangs ability."
+  },
+  "sandrush": {
+    "name": "Sandrush",
+    "shortDesc": "Sandrush ability.",
+    "desc": "Sandrush ability."
+  },
+  "stormdrain": {
+    "name": "Stormdrain",
+    "shortDesc": "Stormdrain ability.",
+    "desc": "Stormdrain ability."
+  },
+  "effectspore": {
+    "name": "Effectspore",
+    "shortDesc": "Effectspore ability.",
+    "desc": "Effectspore ability."
+  },
+  "damp": {
+    "name": "Damp",
+    "shortDesc": "Damp ability.",
+    "desc": "Damp ability."
+  },
+  "regenerator": {
+    "name": "Regenerator",
+    "shortDesc": "Regenerator ability.",
+    "desc": "Regenerator ability."
+  },
+  "waterabsorb": {
+    "name": "Waterabsorb",
+    "shortDesc": "Waterabsorb ability.",
+    "desc": "Waterabsorb ability."
+  },
+  "poisontouch": {
+    "name": "Poisontouch",
+    "shortDesc": "Poisontouch ability.",
+    "desc": "Poisontouch ability."
+  },
+  "stakeout": {
+    "name": "Stakeout",
+    "shortDesc": "Stakeout ability.",
+    "desc": "Stakeout ability."
+  },
+  "clearbody": {
+    "name": "Clearbody",
+    "shortDesc": "Clearbody ability.",
+    "desc": "Clearbody ability."
+  },
+  "snowcloak": {
+    "name": "Snowcloak",
+    "shortDesc": "Snowcloak ability.",
+    "desc": "Snowcloak ability."
+  },
+  "moxie": {
+    "name": "Moxie",
+    "shortDesc": "Moxie ability.",
+    "desc": "Moxie ability."
+  },
+  "friendguard": {
+    "name": "Friendguard",
+    "shortDesc": "Friendguard ability.",
+    "desc": "Friendguard ability."
+  },
+  "serenegrace": {
+    "name": "Serene Grace",
+    "shortDesc": "Serene Grace ability.",
+    "desc": "Serene Grace ability."
+  },
+  "longreach": {
+    "name": "Longreach",
+    "shortDesc": "Longreach ability.",
+    "desc": "Longreach ability."
+  },
+  "ironfist": {
+    "name": "Ironfist",
+    "shortDesc": "Ironfist ability.",
+    "desc": "Ironfist ability."
+  },
+  "baddreams": {
+    "name": "Baddreams",
+    "shortDesc": "Baddreams ability.",
+    "desc": "Baddreams ability."
+  },
+  "tormented": {
+    "name": "Tormented",
+    "shortDesc": "Tormented ability.",
+    "desc": "Tormented ability."
+  },
+  "static": {
+    "name": "Static",
+    "shortDesc": "Static ability.",
+    "desc": "Static ability."
+  },
+  "tintedlens": {
+    "name": "Tinted Lens",
+    "shortDesc": "Tinted Lens ability.",
+    "desc": "Tinted Lens ability."
+  },
+  "harvest": {
+    "name": "Harvest",
+    "shortDesc": "Harvest ability.",
+    "desc": "Harvest ability."
+  },
+  "blacklight": {
+    "name": "Blacklight",
+    "shortDesc": "Blacklight ability.",
+    "desc": "Blacklight ability."
+  },
+  "angerpoint": {
+    "name": "Angerpoint",
+    "shortDesc": "Angerpoint ability.",
+    "desc": "Angerpoint ability."
+  },
+  "illuminate": {
+    "name": "Illuminate",
+    "shortDesc": "Illuminate ability.",
+    "desc": "Illuminate ability."
+  },
+  "impenetrable": {
+    "name": "Impenetrable",
+    "shortDesc": "Impenetrable ability.",
+    "desc": "Impenetrable ability."
+  },
+  "pressure": {
+    "name": "Pressure",
+    "shortDesc": "Pressure ability.",
+    "desc": "Pressure ability."
+  },
+  "sandstream": {
+    "name": "Sand Stream",
+    "shortDesc": "Sand Stream ability.",
+    "desc": "Sand Stream ability."
+  },
+  "forcefield": {
+    "name": "Forcefield",
+    "shortDesc": "Forcefield ability.",
+    "desc": "Forcefield ability."
+  },
+  "infiltrator": {
+    "name": "Infiltrator",
+    "shortDesc": "Infiltrator ability.",
+    "desc": "Infiltrator ability."
+  },
+  "aftermath": {
+    "name": "Aftermath",
+    "shortDesc": "Aftermath ability.",
+    "desc": "Aftermath ability."
+  },
+  "attunement": {
+    "name": "Attunement",
+    "shortDesc": "Attunement ability.",
+    "desc": "Attunement ability."
+  },
+  "steamengine": {
+    "name": "Steamengine",
+    "shortDesc": "Steamengine ability.",
+    "desc": "Steamengine ability."
+  },
+  "regrowth": {
+    "name": "Regrowth",
+    "shortDesc": "Regrowth ability.",
+    "desc": "Regrowth ability."
+  },
+  "torrent": {
+    "name": "Torrent",
+    "shortDesc": "Torrent ability.",
+    "desc": "Torrent ability."
+  },
+  "intimidate": {
+    "name": "Intimidate",
+    "shortDesc": "Intimidate ability.",
+    "desc": "Intimidate ability."
+  },
+  "icyveins": {
+    "name": "Icyveins",
+    "shortDesc": "Icyveins ability.",
+    "desc": "Icyveins ability."
+  },
+  "icebody": {
+    "name": "Icebody",
+    "shortDesc": "Icebody ability.",
+    "desc": "Icebody ability."
+  },
+  "orbit": {
+    "name": "Orbit",
+    "shortDesc": "Orbit ability.",
+    "desc": "Orbit ability."
+  },
+  "flamebody": {
+    "name": "Flamebody",
+    "shortDesc": "Flamebody ability.",
+    "desc": "Flamebody ability."
+  },
+  "realism": {
+    "name": "Realism",
+    "shortDesc": "Realism ability.",
+    "desc": "Realism ability."
+  },
+  "moldbreaker": {
+    "name": "Moldbreaker",
+    "shortDesc": "Moldbreaker ability.",
+    "desc": "Moldbreaker ability."
+  },
+  "soundproof": {
+    "name": "Soundproof",
+    "shortDesc": "Soundproof ability.",
+    "desc": "Soundproof ability."
+  },
+  "guts": {
+    "name": "Guts",
+    "shortDesc": "Guts ability.",
+    "desc": "Guts ability."
+  },
+  "swarm": {
+    "name": "Swarm",
+    "shortDesc": "Swarm ability.",
+    "desc": "Swarm ability."
+  },
+  "sniper": {
+    "name": "Sniper",
+    "shortDesc": "Sniper ability.",
+    "desc": "Sniper ability."
+  },
+  "impulsive": {
+    "name": "Impulsive",
+    "shortDesc": "Impulsive ability.",
+    "desc": "Impulsive ability."
+  },
+  "trace": {
+    "name": "Trace",
+    "shortDesc": "Trace ability.",
+    "desc": "Trace ability."
+  },
+  "innerfocus": {
+    "name": "Innerfocus",
+    "shortDesc": "Innerfocus ability.",
+    "desc": "Innerfocus ability."
+  },
+  "hydration": {
+    "name": "Hydration",
+    "shortDesc": "Hydration ability.",
+    "desc": "Hydration ability."
+  },
+  "dishearten": {
+    "name": "Dishearten",
+    "shortDesc": "Dishearten ability.",
+    "desc": "Dishearten ability."
+  },
+  "dryskin": {
+    "name": "Dryskin",
+    "shortDesc": "Dryskin ability.",
+    "desc": "Dryskin ability."
+  },
+  "gluttony": {
+    "name": "Gluttony",
+    "shortDesc": "Gluttony ability.",
+    "desc": "Gluttony ability."
+  },
+  "windrider": {
+    "name": "Windrider",
+    "shortDesc": "Windrider ability.",
+    "desc": "Windrider ability."
+  },
+  "unburden": {
+    "name": "Unburden",
+    "shortDesc": "Unburden ability.",
+    "desc": "Unburden ability."
+  },
+  "shadowtag": {
+    "name": "Shadow Tag",
+    "shortDesc": "Shadow Tag ability.",
+    "desc": "Shadow Tag ability."
+  },
+  "cottondown": {
+    "name": "Cottondown",
+    "shortDesc": "Cottondown ability.",
+    "desc": "Cottondown ability."
+  },
+  "sandveil": {
+    "name": "Sandveil",
+    "shortDesc": "Sandveil ability.",
+    "desc": "Sandveil ability."
+  },
+  "roughskin": {
+    "name": "Rough Skin",
+    "shortDesc": "Rough Skin ability.",
+    "desc": "Rough Skin ability."
+  },
+  "toughclaws": {
+    "name": "Tough Claws",
+    "shortDesc": "Tough Claws ability.",
+    "desc": "Tough Claws ability."
+  },
+  "speedboost": {
+    "name": "Speed Boost",
+    "shortDesc": "Speed Boost ability.",
+    "desc": "Speed Boost ability."
+  },
+  "intuition": {
+    "name": "Intuition",
+    "shortDesc": "Intuition ability.",
+    "desc": "Intuition ability."
+  },
+  "dazzling": {
+    "name": "Dazzling",
+    "shortDesc": "Dazzling ability.",
+    "desc": "Dazzling ability."
+  },
+  "packedsnow": {
+    "name": "Packedsnow",
+    "shortDesc": "Packedsnow ability.",
+    "desc": "Packedsnow ability."
+  },
+  "deepchill": {
+    "name": "Deepchill",
+    "shortDesc": "Deepchill ability.",
+    "desc": "Deepchill ability."
+  },
+  "analytic": {
+    "name": "Analytic",
+    "shortDesc": "Analytic ability.",
+    "desc": "Analytic ability."
+  },
+  "shedskin": {
+    "name": "Shed Skin",
+    "shortDesc": "Shed Skin ability.",
+    "desc": "Shed Skin ability."
+  },
+  "shielddust": {
+    "name": "Shielddust",
+    "shortDesc": "Shielddust ability.",
+    "desc": "Shielddust ability."
+  },
+  "battlearmor": {
+    "name": "Battlearmor",
+    "shortDesc": "Battlearmor ability.",
+    "desc": "Battlearmor ability."
+  },
+  "sandforce": {
+    "name": "Sandforce",
+    "shortDesc": "Sandforce ability.",
+    "desc": "Sandforce ability."
+  },
+  "noguard": {
+    "name": "No Guard",
+    "shortDesc": "No Guard ability.",
+    "desc": "No Guard ability."
+  },
+  "fairyaura": {
+    "name": "Fairyaura",
+    "shortDesc": "Fairyaura ability.",
+    "desc": "Fairyaura ability."
+  },
+  "icescales": {
+    "name": "Icescales",
+    "shortDesc": "Icescales ability.",
+    "desc": "Icescales ability."
+  },
+  "flashfire": {
+    "name": "Flashfire",
+    "shortDesc": "Flashfire ability.",
+    "desc": "Flashfire ability."
+  },
+  "reckless": {
+    "name": "Reckless",
+    "shortDesc": "Reckless ability.",
+    "desc": "Reckless ability."
+  },
+  "flareboost": {
+    "name": "Flareboost",
+    "shortDesc": "Flareboost ability.",
+    "desc": "Flareboost ability."
+  },
+  "unnerve": {
+    "name": "Unnerve",
+    "shortDesc": "Unnerve ability.",
+    "desc": "Unnerve ability."
+  },
+  "cursedbody": {
+    "name": "Cursed Body",
+    "shortDesc": "Cursed Body ability.",
+    "desc": "Cursed Body ability."
+  },
+  "wanderingspirit": {
+    "name": "Wanderingspirit",
+    "shortDesc": "Wanderingspirit ability.",
+    "desc": "Wanderingspirit ability."
+  },
+  "transistor": {
+    "name": "Transistor",
+    "shortDesc": "Transistor ability.",
+    "desc": "Transistor ability."
+  },
+  "toxicdebris": {
+    "name": "Toxicdebris",
+    "shortDesc": "Toxicdebris ability.",
+    "desc": "Toxicdebris ability."
+  },
+  "emergencyexit": {
+    "name": "Emergencyexit",
+    "shortDesc": "Emergencyexit ability.",
+    "desc": "Emergencyexit ability."
+  },
+  "chlorophyll": {
+    "name": "Chlorophyll",
+    "shortDesc": "Chlorophyll ability.",
+    "desc": "Chlorophyll ability."
+  },
+  "healer": {
+    "name": "Healer",
+    "shortDesc": "Healer ability.",
+    "desc": "Healer ability."
+  },
+  "strongjaw": {
+    "name": "Strongjaw",
+    "shortDesc": "Strongjaw ability.",
+    "desc": "Strongjaw ability."
+  },
+  "berserk": {
+    "name": "Berserk",
+    "shortDesc": "Berserk ability.",
+    "desc": "Berserk ability."
+  },
+  "slushrush": {
+    "name": "Slushrush",
+    "shortDesc": "Slushrush ability.",
+    "desc": "Slushrush ability."
+  },
+  "feedback": {
+    "name": "Feedback",
+    "shortDesc": "Feedback ability.",
+    "desc": "Feedback ability."
+  },
+  "immunity": {
+    "name": "Immunity",
+    "shortDesc": "Immunity ability.",
+    "desc": "Immunity ability."
+  },
+  "raindish": {
+    "name": "Raindish",
+    "shortDesc": "Raindish ability.",
+    "desc": "Raindish ability."
+  },
+  "furcoat": {
+    "name": "Furcoat",
+    "shortDesc": "Furcoat ability.",
+    "desc": "Furcoat ability."
+  },
+  "colorchange": {
+    "name": "Colorchange",
+    "shortDesc": "Colorchange ability.",
+    "desc": "Colorchange ability."
+  },
+  "compoundeyes": {
+    "name": "Compound Eyes",
+    "shortDesc": "Compound Eyes ability.",
+    "desc": "Compound Eyes ability."
+  },
+  "magnetpull": {
+    "name": "Magnet Pull",
+    "shortDesc": "Magnet Pull ability.",
+    "desc": "Magnet Pull ability."
+  },
+  "flowerveil": {
+    "name": "Flowerveil",
+    "shortDesc": "Flowerveil ability.",
+    "desc": "Flowerveil ability."
+  },
+  "solidrock": {
+    "name": "Solid Rock",
+    "shortDesc": "Solid Rock ability.",
+    "desc": "Solid Rock ability."
+  },
+  "rockhead": {
+    "name": "Rock Head",
+    "shortDesc": "Rock Head ability.",
+    "desc": "Rock Head ability."
+  },
+  "irradiate": {
+    "name": "Irradiate",
+    "shortDesc": "Irradiate ability.",
+    "desc": "Irradiate ability."
+  },
+  "charisma": {
+    "name": "Charisma",
+    "shortDesc": "Charisma ability.",
+    "desc": "Charisma ability."
+  },
+  "aromaveil": {
+    "name": "Aromaveil",
+    "shortDesc": "Aromaveil ability.",
+    "desc": "Aromaveil ability."
+  },
+  "neutralizinggas": {
+    "name": "Neutralizinggas",
+    "shortDesc": "Neutralizinggas ability.",
+    "desc": "Neutralizinggas ability."
+  },
+  "steadfast": {
+    "name": "Steadfast",
+    "shortDesc": "Steadfast ability.",
+    "desc": "Steadfast ability."
+  },
+  "telepathy": {
+    "name": "Telepathy",
+    "shortDesc": "Telepathy ability.",
+    "desc": "Telepathy ability."
+  },
+  "toxicboost": {
+    "name": "Toxicboost",
+    "shortDesc": "Toxicboost ability.",
+    "desc": "Toxicboost ability."
+  },
+  "poisonheal": {
+    "name": "Poisonheal",
+    "shortDesc": "Poisonheal ability.",
+    "desc": "Poisonheal ability."
+  },
+  "arenatrap": {
+    "name": "Arenatrap",
+    "shortDesc": "Arenatrap ability.",
+    "desc": "Arenatrap ability."
+  },
+  "drizzle": {
+    "name": "Drizzle",
+    "shortDesc": "Drizzle ability.",
+    "desc": "Drizzle ability."
+  },
+  "lightningrod": {
+    "name": "Lightning Rod",
+    "shortDesc": "Lightning Rod ability.",
+    "desc": "Lightning Rod ability."
+  },
+  "heatproof": {
+    "name": "Heatproof",
+    "shortDesc": "Heatproof ability.",
+    "desc": "Heatproof ability."
+  },
+  "ironbarbs": {
+    "name": "Ironbarbs",
+    "shortDesc": "Ironbarbs ability.",
+    "desc": "Ironbarbs ability."
+  },
+  "scrappy": {
+    "name": "Scrappy",
+    "shortDesc": "Scrappy ability.",
+    "desc": "Scrappy ability."
+  },
+  "wonderskin": {
+    "name": "Wonderskin",
+    "shortDesc": "Wonderskin ability.",
+    "desc": "Wonderskin ability."
+  },
+  "moody": {
+    "name": "Moody",
+    "shortDesc": "Moody ability.",
+    "desc": "Moody ability."
+  },
+  "quickfeet": {
+    "name": "Quickfeet",
+    "shortDesc": "Quickfeet ability.",
+    "desc": "Quickfeet ability."
+  },
+  "fortification": {
+    "name": "Fortification",
+    "shortDesc": "Fortification ability.",
+    "desc": "Fortification ability."
+  },
+  "gooey": {
+    "name": "Gooey",
+    "shortDesc": "Gooey ability.",
+    "desc": "Gooey ability."
+  },
+  "pickpocket": {
+    "name": "Pickpocket",
+    "shortDesc": "Pickpocket ability.",
+    "desc": "Pickpocket ability."
+  },
+  "psychicsurge": {
+    "name": "Psychicsurge",
+    "shortDesc": "Psychicsurge ability.",
+    "desc": "Psychicsurge ability."
+  },
+  "snowwarning": {
+    "name": "Snow Warning",
+    "shortDesc": "Snow Warning ability.",
+    "desc": "Snow Warning ability."
+  },
+  "comatose": {
+    "name": "Comatose",
+    "shortDesc": "Comatose ability.",
+    "desc": "Comatose ability."
+  },
+  "rattled": {
+    "name": "Rattled",
+    "shortDesc": "Rattled ability.",
+    "desc": "Rattled ability."
+  },
+  "cacophony": {
+    "name": "Cacophony",
+    "shortDesc": "Cacophony ability.",
+    "desc": "Cacophony ability."
+  },
+  "oblivious": {
+    "name": "Oblivious",
+    "shortDesc": "Oblivious ability.",
+    "desc": "Oblivious ability."
+  },
+  "rivalry": {
+    "name": "Rivalry",
+    "shortDesc": "Rivalry ability.",
+    "desc": "Rivalry ability."
+  },
+  "bigpecks": {
+    "name": "Bigpecks",
+    "shortDesc": "Bigpecks ability.",
+    "desc": "Bigpecks ability."
+  },
+  "conductor": {
+    "name": "Conductor",
+    "shortDesc": "Conductor ability.",
+    "desc": "Conductor ability."
+  },
+  "starstruck": {
+    "name": "Starstruck",
+    "shortDesc": "Starstruck ability.",
+    "desc": "Starstruck ability."
+  },
+  "neuroforce": {
+    "name": "Neuroforce",
+    "shortDesc": "Neuroforce ability.",
+    "desc": "Neuroforce ability."
+  },
+  "solarpower": {
+    "name": "Solarpower",
+    "shortDesc": "Solarpower ability.",
+    "desc": "Solarpower ability."
+  },
+  "superluck": {
+    "name": "Superluck",
+    "shortDesc": "Superluck ability.",
+    "desc": "Superluck ability."
+  },
+  "mistysurge": {
+    "name": "Mistysurge",
+    "shortDesc": "Mistysurge ability.",
+    "desc": "Mistysurge ability."
+  },
+  "protean": {
+    "name": "Protean",
+    "shortDesc": "Protean ability.",
+    "desc": "Protean ability."
+  },
+  "wimpout": {
+    "name": "Wimpout",
+    "shortDesc": "Wimpout ability.",
+    "desc": "Wimpout ability."
+  },
+  "runaway": {
+    "name": "Run Away",
+    "shortDesc": "Run Away ability.",
+    "desc": "Run Away ability."
+  },
+  "adaptability": {
+    "name": "Adaptability",
+    "shortDesc": "Adaptability ability.",
+    "desc": "Adaptability ability."
+  },
+  "marvelscale": {
+    "name": "Marvelscale",
+    "shortDesc": "Marvelscale ability.",
+    "desc": "Marvelscale ability."
+  },
+  "megalauncher": {
+    "name": "Megalauncher",
+    "shortDesc": "Megalauncher ability.",
+    "desc": "Megalauncher ability."
+  },
+  "irredeemable": {
+    "name": "Irredeemable",
+    "shortDesc": "Irredeemable ability.",
+    "desc": "Irredeemable ability."
+  },
+  "tanglinghair": {
+    "name": "Tanglinghair",
+    "shortDesc": "Tanglinghair ability.",
+    "desc": "Tanglinghair ability."
+  },
+  "pureheart": {
+    "name": "Pureheart",
+    "shortDesc": "Pureheart ability.",
+    "desc": "Pureheart ability."
+  },
+  "genius": {
+    "name": "Genius",
+    "shortDesc": "Genius ability.",
+    "desc": "Genius ability."
+  },
+  "leafguard": {
+    "name": "Leafguard",
+    "shortDesc": "Leafguard ability.",
+    "desc": "Leafguard ability."
+  },
+  "overgrow": {
+    "name": "Overgrow",
+    "shortDesc": "Overgrow ability.",
+    "desc": "Overgrow ability."
+  },
+  "hypercutter": {
+    "name": "Hypercutter",
+    "shortDesc": "Hypercutter ability.",
+    "desc": "Hypercutter ability."
+  },
+  "rockypayload": {
+    "name": "Rockypayload",
+    "shortDesc": "Rockypayload ability.",
+    "desc": "Rockypayload ability."
+  },
+  "flexible": {
+    "name": "Flexible",
+    "shortDesc": "Flexible ability.",
+    "desc": "Flexible ability."
+  },
+  "ripen": {
+    "name": "Ripen",
+    "shortDesc": "Ripen ability.",
+    "desc": "Ripen ability."
+  },
+  "motordrive": {
+    "name": "Motordrive",
+    "shortDesc": "Motordrive ability.",
+    "desc": "Motordrive ability."
+  },
+  "stalwart": {
+    "name": "Stalwart",
+    "shortDesc": "Stalwart ability.",
+    "desc": "Stalwart ability."
+  },
+  "angershell": {
+    "name": "Angershell",
+    "shortDesc": "Angershell ability.",
+    "desc": "Angershell ability."
+  },
+  "curiousmedicine": {
+    "name": "Curiousmedicine",
+    "shortDesc": "Curiousmedicine ability.",
+    "desc": "Curiousmedicine ability."
+  },
+  "merciless": {
+    "name": "Merciless",
+    "shortDesc": "Merciless ability.",
+    "desc": "Merciless ability."
+  },
+  "fluffy": {
+    "name": "Fluffy",
+    "shortDesc": "Fluffy ability.",
+    "desc": "Fluffy ability."
+  },
+  "thickfat": {
+    "name": "Thickfat",
+    "shortDesc": "Thickfat ability.",
+    "desc": "Thickfat ability."
+  },
+  "sheerforce": {
+    "name": "Sheer Force",
+    "shortDesc": "Sheer Force ability.",
+    "desc": "Sheer Force ability."
+  },
+  "magicguard": {
+    "name": "Magicguard",
+    "shortDesc": "Magicguard ability.",
+    "desc": "Magicguard ability."
+  },
+  "fullmetalbody": {
+    "name": "Fullmetalbody",
+    "shortDesc": "Fullmetalbody ability.",
+    "desc": "Fullmetalbody ability."
+  },
+  "wonderguard": {
+    "name": "Wonder Guard",
+    "shortDesc": "Wonder Guard ability.",
+    "desc": "Wonder Guard ability."
+  },
+  "resonant": {
+    "name": "Resonant",
+    "shortDesc": "Resonant ability.",
+    "desc": "Resonant ability."
+  },
+  "wintergift": {
+    "name": "Wintergift",
+    "shortDesc": "Wintergift ability.",
+    "desc": "Wintergift ability."
+  },
+  "gorging": {
+    "name": "Gorging",
+    "shortDesc": "Gorging ability.",
+    "desc": "Gorging ability."
+  },
+  "refrigerate": {
+    "name": "Refrigerate",
+    "shortDesc": "Refrigerate ability.",
+    "desc": "Refrigerate ability."
+  },
+  "voltabsorb": {
+    "name": "Voltabsorb",
+    "shortDesc": "Voltabsorb ability.",
+    "desc": "Voltabsorb ability."
+  },
+  "airlock": {
+    "name": "Airlock",
+    "shortDesc": "Airlock ability.",
+    "desc": "Airlock ability."
+  },
+  "terminator": {
+    "name": "Terminator",
+    "shortDesc": "Terminator ability.",
+    "desc": "Terminator ability."
+  },
+  "darkmatter": {
+    "name": "Darkmatter",
+    "shortDesc": "Darkmatter ability.",
+    "desc": "Darkmatter ability."
+  },
+  "suctioncups": {
+    "name": "Suctioncups",
+    "shortDesc": "Suctioncups ability.",
+    "desc": "Suctioncups ability."
+  },
+  "lightaura": {
+    "name": "Lightaura",
+    "shortDesc": "Lightaura ability.",
+    "desc": "Lightaura ability."
+  },
+  "darkaura": {
+    "name": "Darkaura",
+    "shortDesc": "Darkaura ability.",
+    "desc": "Darkaura ability."
+  },
+  "opaqueness": {
+    "name": "Opaqueness",
+    "shortDesc": "Opaqueness ability.",
+    "desc": "Opaqueness ability."
+  },
+  "weakarmor": {
+    "name": "Weakarmor",
+    "shortDesc": "Weakarmor ability.",
+    "desc": "Weakarmor ability."
+  },
+  "bulletproof": {
+    "name": "Bulletproof",
+    "shortDesc": "Bulletproof ability.",
+    "desc": "Bulletproof ability."
+  },
+  "cannonfire": {
+    "name": "Cannonfire",
+    "shortDesc": "Cannonfire ability.",
+    "desc": "Cannonfire ability."
+  },
+  "stench": {
+    "name": "Stench",
+    "shortDesc": "Stench ability.",
+    "desc": "Stench ability."
+  },
+  "hustle": {
+    "name": "Hustle",
+    "shortDesc": "Hustle ability.",
+    "desc": "Hustle ability."
+  },
+  "simple": {
+    "name": "Simple",
+    "shortDesc": "Simple ability.",
+    "desc": "Simple ability."
+  },
+  "vandal": {
+    "name": "Vandal",
+    "shortDesc": "Vandal ability.",
+    "desc": "Vandal ability."
+  },
+  "pickup": {
+    "name": "Pickup",
+    "shortDesc": "Pickup ability.",
+    "desc": "Pickup ability."
+  },
+  "frisk": {
+    "name": "Frisk",
+    "shortDesc": "Frisk ability.",
+    "desc": "Frisk ability."
+  },
+  "reaper": {
+    "name": "Reaper",
+    "shortDesc": "Reaper ability.",
+    "desc": "Reaper ability."
+  },
+  "electricsurge": {
+    "name": "Electricsurge",
+    "shortDesc": "Electricsurge ability.",
+    "desc": "Electricsurge ability."
+  },
+  "costar": {
+    "name": "Costar",
+    "shortDesc": "Costar ability.",
+    "desc": "Costar ability."
+  },
+  "dancer": {
+    "name": "Dancer",
+    "shortDesc": "Dancer ability.",
+    "desc": "Dancer ability."
+  },
+  "limber": {
+    "name": "Limber",
+    "shortDesc": "Limber ability.",
+    "desc": "Limber ability."
+  },
+  "sharpness": {
+    "name": "Sharpness",
+    "shortDesc": "Sharpness ability.",
+    "desc": "Sharpness ability."
+  },
+  "justified": {
+    "name": "Justified",
+    "shortDesc": "Justified ability.",
+    "desc": "Justified ability."
+  },
+  "quarkdrive": {
+    "name": "Quarkdrive",
+    "shortDesc": "Quarkdrive ability.",
+    "desc": "Quarkdrive ability."
+  },
+  "sapsipper": {
+    "name": "Sapsipper",
+    "shortDesc": "Sapsipper ability.",
+    "desc": "Sapsipper ability."
+  },
+  "prankster": {
+    "name": "Prankster",
+    "shortDesc": "Prankster ability.",
+    "desc": "Prankster ability."
+  },
+  "cheekpouch": {
+    "name": "Cheekpouch",
+    "shortDesc": "Cheekpouch ability.",
+    "desc": "Cheekpouch ability."
+  },
+  "astralmajesty": {
+    "name": "Astralmajesty",
+    "shortDesc": "Astralmajesty ability.",
+    "desc": "Astralmajesty ability."
+  },
+  "pounce": {
+    "name": "Pounce",
+    "shortDesc": "Pounce ability.",
+    "desc": "Pounce ability."
+  },
+  "sweetveil": {
+    "name": "Sweetveil",
+    "shortDesc": "Sweetveil ability.",
+    "desc": "Sweetveil ability."
+  },
+  "technician": {
+    "name": "Technician",
+    "shortDesc": "Technician ability.",
+    "desc": "Technician ability."
+  },
+  "disguise": {
+    "name": "Disguise",
+    "shortDesc": "Disguise ability.",
+    "desc": "Disguise ability."
+  },
+  "quickdraw": {
+    "name": "Quickdraw",
+    "shortDesc": "Quickdraw ability.",
+    "desc": "Quickdraw ability."
+  },
+  "owntempo": {
+    "name": "Owntempo",
+    "shortDesc": "Owntempo ability.",
+    "desc": "Owntempo ability."
+  },
+  "vitalspirit": {
+    "name": "Vitalspirit",
+    "shortDesc": "Vitalspirit ability.",
+    "desc": "Vitalspirit ability."
+  },
+  "purepower": {
+    "name": "Purepower",
+    "shortDesc": "Purepower ability.",
+    "desc": "Purepower ability."
+  },
+  "insomnia": {
+    "name": "Insomnia",
+    "shortDesc": "Insomnia ability.",
+    "desc": "Insomnia ability."
+  },
+  "retribution": {
+    "name": "Retribution",
+    "shortDesc": "Retribution ability.",
+    "desc": "Retribution ability."
+  },
+  "steelworker": {
+    "name": "Steelworker",
+    "shortDesc": "Steelworker ability.",
+    "desc": "Steelworker ability."
+  },
+  "liquidvoice": {
+    "name": "Liquidvoice",
+    "shortDesc": "Liquidvoice ability.",
+    "desc": "Liquidvoice ability."
+  },
+  "superconductive": {
+    "name": "Superconductive",
+    "shortDesc": "Superconductive ability.",
+    "desc": "Superconductive ability."
+  },
+  "precision": {
+    "name": "Precision",
+    "shortDesc": "Precision ability.",
+    "desc": "Precision ability."
+  },
+  "powerspot": {
+    "name": "Powerspot",
+    "shortDesc": "Powerspot ability.",
+    "desc": "Powerspot ability."
+  },
+  "whiteout": {
+    "name": "Whiteout",
+    "shortDesc": "Whiteout ability.",
+    "desc": "Whiteout ability."
+  },
+  "stamina": {
+    "name": "Stamina",
+    "shortDesc": "Stamina ability.",
+    "desc": "Stamina ability."
+  },
+  "vitality": {
+    "name": "Vitality",
+    "shortDesc": "Vitality ability.",
+    "desc": "Vitality ability."
+  },
+  "tangledfeet": {
+    "name": "Tangledfeet",
+    "shortDesc": "Tangledfeet ability.",
+    "desc": "Tangledfeet ability."
+  },
+  "galewings": {
+    "name": "Galewings",
+    "shortDesc": "Galewings ability.",
+    "desc": "Galewings ability."
+  },
+  "klutz": {
+    "name": "Klutz",
+    "shortDesc": "Klutz ability.",
+    "desc": "Klutz ability."
+  },
+  "unbreakable": {
+    "name": "Unbreakable",
+    "shortDesc": "Unbreakable ability.",
+    "desc": "Unbreakable ability."
+  },
+  "shellarmor": {
+    "name": "Shellarmor",
+    "shortDesc": "Shellarmor ability.",
+    "desc": "Shellarmor ability."
+  },
+  "teravolt": {
+    "name": "Teravolt",
+    "shortDesc": "Teravolt ability.",
+    "desc": "Teravolt ability."
+  },
+  "disarray": {
+    "name": "Disarray",
+    "shortDesc": "Disarray ability.",
+    "desc": "Disarray ability."
+  },
+  "parentalbond": {
+    "name": "Parentalbond",
+    "shortDesc": "Parentalbond ability.",
+    "desc": "Parentalbond ability."
+  },
+  "antigravity": {
+    "name": "Antigravity",
+    "shortDesc": "Antigravity ability.",
+    "desc": "Antigravity ability."
+  },
+  "punkrock": {
+    "name": "Punkrock",
+    "shortDesc": "Punkrock ability.",
+    "desc": "Punkrock ability."
+  },
+  "requiem": {
+    "name": "Requiem",
+    "shortDesc": "Requiem ability.",
+    "desc": "Requiem ability."
+  },
+  "protosynthesis": {
+    "name": "Protosynthesis",
+    "shortDesc": "Protosynthesis ability.",
+    "desc": "Protosynthesis ability."
+  },
+  "scorchscale": {
+    "name": "Scorchscale",
+    "shortDesc": "Scorchscale ability.",
+    "desc": "Scorchscale ability."
+  },
+  "rebellious": {
+    "name": "Rebellious",
+    "shortDesc": "Rebellious ability.",
+    "desc": "Rebellious ability."
+  },
+  "eartheater": {
+    "name": "Eartheater",
+    "shortDesc": "Eartheater ability.",
+    "desc": "Eartheater ability."
+  },
+  "contrary": {
+    "name": "Contrary",
+    "shortDesc": "Contrary ability.",
+    "desc": "Contrary ability."
+  },
+  "grasspelt": {
+    "name": "Grasspelt",
+    "shortDesc": "Grasspelt ability.",
+    "desc": "Grasspelt ability."
+  },
+  "multiscale": {
+    "name": "Multiscale",
+    "shortDesc": "Multiscale ability.",
+    "desc": "Multiscale ability."
+  },
+  "shadowshield": {
+    "name": "Shadowshield",
+    "shortDesc": "Shadowshield ability.",
+    "desc": "Shadowshield ability."
+  },
+  "cutecharm": {
+    "name": "Cutecharm",
+    "shortDesc": "Cutecharm ability.",
+    "desc": "Cutecharm ability."
+  },
+  "virtuoso": {
+    "name": "Virtuoso",
+    "shortDesc": "Virtuoso ability.",
+    "desc": "Virtuoso ability."
+  },
+  "synthesize": {
+    "name": "Synthesize",
+    "shortDesc": "Synthesize ability.",
+    "desc": "Synthesize ability."
+  },
+  "skilllink": {
+    "name": "Skilllink",
+    "shortDesc": "Skilllink ability.",
+    "desc": "Skilllink ability."
+  },
+  "waterveil": {
+    "name": "Waterveil",
+    "shortDesc": "Waterveil ability.",
+    "desc": "Waterveil ability."
+  },
+  "normalize": {
+    "name": "Normalize",
+    "shortDesc": "Normalize ability.",
+    "desc": "Normalize ability."
+  },
+  "dragonsmaw": {
+    "name": "Dragonsmaw",
+    "shortDesc": "Dragonsmaw ability.",
+    "desc": "Dragonsmaw ability."
+  },
+  "bonecollector": {
+    "name": "Bonecollector",
+    "shortDesc": "Bonecollector ability.",
+    "desc": "Bonecollector ability."
+  },
+  "hivebody": {
+    "name": "Hivebody",
+    "shortDesc": "Hivebody ability.",
+    "desc": "Hivebody ability."
+  },
+  "grassysurge": {
+    "name": "Grassysurge",
+    "shortDesc": "Grassysurge ability.",
+    "desc": "Grassysurge ability."
+  },
+  "darkswarm": {
+    "name": "Darkswarm",
+    "shortDesc": "Darkswarm ability.",
+    "desc": "Darkswarm ability."
+  },
+  "nobility": {
+    "name": "Nobility",
+    "shortDesc": "Nobility ability.",
+    "desc": "Nobility ability."
+  },
+  "hivemind": {
+    "name": "Hivemind",
+    "shortDesc": "Hivemind ability.",
+    "desc": "Hivemind ability."
+  },
+  "heavymetal": {
+    "name": "Heavy Metal",
+    "shortDesc": "Heavy Metal ability.",
+    "desc": "Heavy Metal ability."
+  },
+  "haunted": {
+    "name": "Haunted",
+    "shortDesc": "Haunted ability.",
+    "desc": "Haunted ability."
+  },
+  "poisonpoint": {
+    "name": "Poison Point",
+    "shortDesc": "Poison Point ability.",
+    "desc": "Poison Point ability."
+  },
+  "stickyhold": {
+    "name": "Stickyhold",
+    "shortDesc": "Stickyhold ability.",
+    "desc": "Stickyhold ability."
+  },
+  "maelstrom": {
+    "name": "Maelstrom",
+    "shortDesc": "Maelstrom ability.",
+    "desc": "Maelstrom ability."
+  },
+  "powerofalchemy": {
+    "name": "Powerofalchemy",
+    "shortDesc": "Powerofalchemy ability.",
+    "desc": "Powerofalchemy ability."
+  },
+  "screencleaner": {
+    "name": "Screencleaner",
+    "shortDesc": "Screencleaner ability.",
+    "desc": "Screencleaner ability."
+  },
+  "perishbody": {
+    "name": "Perishbody",
+    "shortDesc": "Perishbody ability.",
+    "desc": "Perishbody ability."
+  },
+  "mummy": {
+    "name": "Mummy",
+    "shortDesc": "Mummy ability.",
+    "desc": "Mummy ability."
+  },
+  "spellcaster": {
+    "name": "Spellcaster",
+    "shortDesc": "Spellcaster ability.",
+    "desc": "Spellcaster ability."
+  },
+  "watercompaction": {
+    "name": "Watercompaction",
+    "shortDesc": "Watercompaction ability.",
+    "desc": "Watercompaction ability."
+  },
+  "symphony": {
+    "name": "Symphony",
+    "shortDesc": "Symphony ability.",
+    "desc": "Symphony ability."
+  },
+  "pastelveil": {
+    "name": "Pastelveil",
+    "shortDesc": "Pastelveil ability.",
+    "desc": "Pastelveil ability."
+  },
+  "teleface": {
+    "name": "Teleface",
+    "shortDesc": "Teleface ability.",
+    "desc": "Teleface ability."
+  },
+  "destructivecore": {
+    "name": "Destructivecore",
+    "shortDesc": "Destructivecore ability.",
+    "desc": "Destructivecore ability."
+  },
+  "aerilate": {
+    "name": "Aerilate",
+    "shortDesc": "Aerilate ability.",
+    "desc": "Aerilate ability."
+  },
+  "mirrorarmor": {
+    "name": "Mirrorarmor",
+    "shortDesc": "Mirrorarmor ability.",
+    "desc": "Mirrorarmor ability."
+  },
+  "opportunist": {
+    "name": "Opportunist",
+    "shortDesc": "Opportunist ability.",
+    "desc": "Opportunist ability."
+  },
+  "victorystar": {
+    "name": "Victorystar",
+    "shortDesc": "Victorystar ability.",
+    "desc": "Victorystar ability."
+  },
+  "cartographer": {
+    "name": "Cartographer",
+    "shortDesc": "Cartographer ability.",
+    "desc": "Cartographer ability."
+  },
+  "overcoat": {
+    "name": "Overcoat",
+    "shortDesc": "Overcoat ability.",
+    "desc": "Overcoat ability."
+  },
+  "lightswitch": {
+    "name": "Lightswitch",
+    "shortDesc": "Lightswitch ability.",
+    "desc": "Lightswitch ability."
+  },
+  "blaze": {
+    "name": "Blaze",
+    "shortDesc": "Blaze ability.",
+    "desc": "Blaze ability."
+  },
+  "cometstorm": {
+    "name": "Cometstorm",
+    "shortDesc": "Cometstorm ability.",
+    "desc": "Cometstorm ability."
+  },
+  "drought": {
+    "name": "Drought",
+    "shortDesc": "Drought ability.",
+    "desc": "Drought ability."
+  }
+}

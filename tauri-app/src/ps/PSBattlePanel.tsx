@@ -3369,6 +3369,50 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
     const battle = battleRef.current;
     if (!battle || !request) return;
     
+    // ── Fusion type injection ─────────────────────────────────────────────────
+    // PS tooltip renderer reads types from battle.dex.species.get(speciesForme).
+    // Fusion Pokémon have a custom speciesForme that doesn't exist in the PS dex,
+    // so we inject a synthetic entry for each fusion with the correct combined types.
+    // Fusion types: head[0] + body[1 ?? 0] (same logic as FusionCreator.tsx fusionTypes())
+    try {
+      const allPoke = Array.isArray(request?.side?.pokemon) ? (request.side!.pokemon as any[]) : [];
+      for (const poke of allPoke) {
+        if (!poke || typeof poke !== 'object') continue;
+        const fusion = poke.fusion as { headName?: string; bodyName?: string } | undefined;
+        if (!fusion?.headName || !fusion?.bodyName) continue;
+        const speciesForme = String(poke.speciesForme || poke.species || '');
+        if (!speciesForme) continue;
+        // Look up parent types from PS dex
+        const headEntry = (battle as any)?.dex?.species?.get?.(fusion.headName);
+        const bodyEntry = (battle as any)?.dex?.species?.get?.(fusion.bodyName);
+        const headTypes: string[] = headEntry?.types || poke.fusion?.headTypes || [];
+        const bodyTypes: string[] = bodyEntry?.types || poke.fusion?.bodyTypes || [];
+        if (headTypes.length === 0 && bodyTypes.length === 0) continue;
+        const type1 = headTypes[0] || 'Normal';
+        const type2 = bodyTypes[1] || bodyTypes[0] || type1;
+        const fusionTypes = type1 === type2 ? [type1] : [type1, type2];
+        // Inject into window.BattlePokedex so PS tooltip can resolve the species
+        const psId = speciesForme.replace(/[^a-z0-9]/gi, '').toLowerCase();
+        if (psId && typeof window !== 'undefined') {
+          const bpDex = (window as any).BattlePokedex;
+          if (bpDex && typeof bpDex === 'object') {
+            if (!bpDex[psId] || !bpDex[psId].types?.length) {
+              bpDex[psId] = {
+                ...(bpDex[psId] || {}),
+                id: psId,
+                name: speciesForme,
+                types: fusionTypes,
+                baseStats: poke.baseStats || headEntry?.baseStats || { hp: 60, atk: 80, def: 60, spa: 80, spd: 60, spe: 80 },
+                num: -9999,
+              };
+            }
+          }
+        }
+      }
+    } catch (fusionInjectErr) {
+      // Non-fatal — tooltips will fall back to default type display
+    }
+
     // PS tooltips read from battle.request to get Pokemon data
     battle.request = request;
 

@@ -1,0 +1,65 @@
+{
+  "crystalbeam": {
+    "name": "Crystal Beam",
+    "type": "Crystal",
+    "basePower": 65,
+    "category": "Special",
+    "accuracy": 100,
+    "desc": "A beam of crystalline energy. High critical-hit ratio.",
+    "shortDesc": "Crystal-type beam. High crit ratio."
+  },
+  "crystalpulse": {
+    "name": "Crystal Pulse",
+    "type": "Crystal",
+    "basePower": 90,
+    "category": "Special",
+    "accuracy": 100,
+    "desc": "A powerful pulse of crystalline energy. May lower target Sp. Def.",
+    "shortDesc": "Crystal pulse. 30% chance to lower Sp. Def."
+  },
+  "cosmicpulse": {
+    "name": "Cosmic Pulse",
+    "type": "Cosmic",
+    "basePower": 60,
+    "category": "Special",
+    "accuracy": 100,
+    "desc": "A pulse of cosmic energy that may confuse the target.",
+    "shortDesc": "Cosmic energy. 30% chance to confuse."
+  },
+  "cosmicblast": {
+    "name": "Cosmic Blast",
+    "type": "Cosmic",
+    "basePower": 75,
+    "category": "Special",
+    "accuracy": 100,
+    "desc": "A blast of cosmic energy. Hits even in the dark.",
+    "shortDesc": "Cosmic blast. Never misses."
+  },
+  "cosmicshock": {
+    "name": "Cosmic Shock",
+    "type": "Cosmic",
+    "basePower": 90,
+    "category": "Special",
+    "accuracy": 100,
+    "desc": "A shockwave of cosmic energy that always hits.",
+    "shortDesc": "Powerful cosmic wave. Never misses."
+  },
+  "starfall": {
+    "name": "Starfall",
+    "type": "Stellar",
+    "basePower": 60,
+    "category": "Special",
+    "accuracy": 100,
+    "desc": "Stars rain down on the target. May lower accuracy.",
+    "shortDesc": "Stellar stars. 30% chance to lower accuracy."
+  },
+  "starfallstrike": {
+    "name": "Starfall Strike",
+    "type": "Stellar",
+    "basePower": 95,
+    "category": "Physical",
+    "accuracy": 95,
+    "desc": "The user strikes with the force of falling stars. High chance to flinch.",
+    "shortDesc": "Powerful stellar strike. 30% flinch."
+  }
+}

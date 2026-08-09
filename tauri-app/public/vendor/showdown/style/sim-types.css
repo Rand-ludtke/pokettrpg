@@ -409,3 +409,113 @@
 	background: linear-gradient(90deg, hsl(330, 65%, 45%), hsl(126, 71%, 73%), hsl(231, 100%, 86%));
 	border-color: linear-gradient(90deg, hsl(330, 66%, 58%), hsl(126, 79%, 65%), hsl(231, 98%, 65%));
 }
+
+/* --- Soulstone fangame types ------------------------------------------- */
+
+.movemenu button.type-Crystal {
+/* icy blue */
+background: hsl(190,65%,93%);
+background: linear-gradient(to bottom, hsl(190,65%,97%), hsl(190,65%,84%));
+border-color: hsl(190,65%,55%);
+}
+.movemenu button.type-Crystal small { color: hsl(190,65%,30%); }
+.movemenu button.type-Crystal:hover {
+background: hsl(190,65%,87%);
+background: linear-gradient(to bottom, hsl(190,65%,94%), hsl(190,65%,77%));
+border-color: hsl(190,65%,41%);
+}
+.movemenu button.type-Crystal:active, .movemenu button.type-Crystal.pressed {
+background: hsl(190,65%,77%);
+background: linear-gradient(to bottom, hsl(190,65%,77%), hsl(190,65%,83%));
+border-color: hsl(190,65%,41%);
+}
+
+.movemenu button.type-Cosmic {
+/* deep violet */
+background: hsl(270,55%,93%);
+background: linear-gradient(to bottom, hsl(270,55%,97%), hsl(270,55%,84%));
+border-color: hsl(270,55%,55%);
+}
+.movemenu button.type-Cosmic small { color: hsl(270,55%,30%); }
+.movemenu button.type-Cosmic:hover {
+background: hsl(270,55%,87%);
+background: linear-gradient(to bottom, hsl(270,55%,94%), hsl(270,55%,77%));
+border-color: hsl(270,55%,41%);
+}
+.movemenu button.type-Cosmic:active, .movemenu button.type-Cosmic.pressed {
+background: hsl(270,55%,77%);
+background: linear-gradient(to bottom, hsl(270,55%,77%), hsl(270,55%,83%));
+border-color: hsl(270,55%,41%);
+}
+
+.movemenu button.type-Sound {
+/* warm amber */
+background: hsl(35,85%,93%);
+background: linear-gradient(to bottom, hsl(35,85%,97%), hsl(35,85%,84%));
+border-color: hsl(35,85%,55%);
+}
+.movemenu button.type-Sound small { color: hsl(35,85%,30%); }
+.movemenu button.type-Sound:hover {
+background: hsl(35,85%,87%);
+background: linear-gradient(to bottom, hsl(35,85%,94%), hsl(35,85%,77%));
+border-color: hsl(35,85%,41%);
+}
+.movemenu button.type-Sound:active, .movemenu button.type-Sound.pressed {
+background: hsl(35,85%,77%);
+background: linear-gradient(to bottom, hsl(35,85%,77%), hsl(35,85%,83%));
+border-color: hsl(35,85%,41%);
+}
+
+.movemenu button.type-Light {
+/* bright golden yellow */
+background: hsl(52,95%,93%);
+background: linear-gradient(to bottom, hsl(52,95%,97%), hsl(52,95%,84%));
+border-color: hsl(52,95%,50%);
+}
+.movemenu button.type-Light small { color: hsl(52,95%,25%); }
+.movemenu button.type-Light:hover {
+background: hsl(52,95%,87%);
+background: linear-gradient(to bottom, hsl(52,95%,94%), hsl(52,95%,77%));
+border-color: hsl(52,95%,38%);
+}
+.movemenu button.type-Light:active, .movemenu button.type-Light.pressed {
+background: hsl(52,95%,77%);
+background: linear-gradient(to bottom, hsl(52,95%,77%), hsl(52,95%,83%));
+border-color: hsl(52,95%,38%);
+}
+
+.movemenu button.type-Nuclear {
+/* radioactive yellow-green */
+background: hsl(78,75%,90%);
+background: linear-gradient(to bottom, hsl(78,75%,95%), hsl(78,75%,80%));
+border-color: hsl(78,75%,45%);
+}
+.movemenu button.type-Nuclear small { color: hsl(78,75%,22%); }
+.movemenu button.type-Nuclear:hover {
+background: hsl(78,75%,84%);
+background: linear-gradient(to bottom, hsl(78,75%,91%), hsl(78,75%,73%));
+border-color: hsl(78,75%,35%);
+}
+.movemenu button.type-Nuclear:active, .movemenu button.type-Nuclear.pressed {
+background: hsl(78,75%,73%);
+background: linear-gradient(to bottom, hsl(78,75%,73%), hsl(78,75%,80%));
+border-color: hsl(78,75%,35%);
+}
+
+.movemenu button.type-Shadow {
+/* dark shadowy purple-gray */
+background: hsl(270,15%,88%);
+background: linear-gradient(to bottom, hsl(270,15%,93%), hsl(270,15%,78%));
+border-color: hsl(270,15%,48%);
+}
+.movemenu button.type-Shadow small { color: hsl(270,15%,28%); }
+.movemenu button.type-Shadow:hover {
+background: hsl(270,15%,82%);
+background: linear-gradient(to bottom, hsl(270,15%,89%), hsl(270,15%,71%));
+border-color: hsl(270,15%,35%);
+}
+.movemenu button.type-Shadow:active, .movemenu button.type-Shadow.pressed {
+background: hsl(270,15%,71%);
+background: linear-gradient(to bottom, hsl(270,15%,71%), hsl(270,15%,78%));
+border-color: hsl(270,15%,35%);
+}

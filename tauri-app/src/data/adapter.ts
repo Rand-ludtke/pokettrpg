@@ -754,9 +754,25 @@ export async function loadShowdownDex(options?: { base?: string }) {
   ]);
 
   // ── Soulstones Part 1 & PS2 data ───────────────────────────────────
-  const [soulstonePart1Dex, soulstonePS2Dex] = await Promise.all([
+  // ── Soulstones Part 1 (Crystal/Cosmic/Stellar type fangame – different game) ─
+  const [soulstonePart1Dex, soulstonePart1Learnsets, soulstonePart1Moves, soulstonePart1Abilities] = await Promise.all([
     fetchOptionalJson(withPublicBase('data/soulstones-part1/generated/pokedex.soulstones-part1.json')),
+    fetchOptionalJson(withPublicBase('data/soulstones-part1/generated/learnsets.soulstones-part1.json')),
+    fetchOptionalJson(withPublicBase('data/soulstones-part1/generated/moves.custom.soulstones-part1.json')),
+    fetchOptionalJson(withPublicBase('data/soulstones-part1/generated/abilities.custom.soulstones-part1.json')),
+  ]);
+  // ── Soulstones 2 PBS patch (Orion/Temporal forms with learnsets) ─────────────
+  const [soulstonePS2Dex, soulstonePS2Learnsets, soulstonePS2Moves, soulstonePS2Abilities] = await Promise.all([
     fetchOptionalJson(withPublicBase('data/ss2-patch/generated/pokedex.ss2-soulstones.json')),
+    fetchOptionalJson(withPublicBase('data/ss2-patch/generated/learnsets.ss2-soulstones.json')),
+    fetchOptionalJson(withPublicBase('data/ss2-patch/generated/moves.custom.ss2-soulstones.json')),
+    fetchOptionalJson(withPublicBase('data/ss2-patch/generated/abilities.custom.ss2-soulstones.json')),
+  ]);
+  // ── Custom extra Pokémon (Obliteryx / newer CAP / etc.) ──────────────────────
+  const [extraPokemonDex, extraPokemonLearnsets, extraPokemonMoves] = await Promise.all([
+    fetchOptionalJson(withPublicBase('data/custom-overrides/generated/extra-pokemon.json')),
+    fetchOptionalJson(withPublicBase('data/custom-overrides/generated/learnsets.extra-pokemon.json')),
+    fetchOptionalJson(withPublicBase('data/custom-overrides/generated/moves.extra-pokemon.json')),
   ]);
 
   // ── Pokeathlon DLC – load Soulstone CAP data ────────────────────────
@@ -811,6 +827,17 @@ export async function loadShowdownDex(options?: { base?: string }) {
     }
   }
 
+  // Helper: filter a raw JSON object to only valid DexSpecies entries (have string `name`)
+  const filterDexEntries = (raw: any): DexIndex => {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+    const out: DexIndex = {};
+    for (const [id, entry] of Object.entries(raw as Record<string, any>)) {
+      if (!entry || typeof entry !== 'object' || typeof entry.name !== 'string') continue;
+      out[normalizeName(id)] = entry as DexSpecies;
+    }
+    return out;
+  };
+
   const mergedBaseDex = {
     ...(pokedex as DexIndex),
     ...((sagePokedex || {}) as DexIndex),
@@ -819,9 +846,12 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumDex || {}) as DexIndex),
     ...((infinityDex || {}) as DexIndex),
     ...((mariomonDex || {}) as DexIndex),
-    // Soulstones Part 1 & PS2
-    ...(soulstonePart1Dex && typeof soulstonePart1Dex === 'object' ? soulstonePart1Dex : {}),
-    ...(soulstonePS2Dex && typeof soulstonePS2Dex === 'object' ? soulstonePS2Dex : {}),
+    // Soulstones Part 1 (Crystal/Cosmic/Stellar forms – separate game)
+    ...filterDexEntries(soulstonePart1Dex),
+    // Soulstones 2 PBS patch (Orion/Temporal forms with proper learnsets)
+    ...filterDexEntries(soulstonePS2Dex),
+    // Extra Pokémon overrides (Obliteryx, newer CAP, etc.)
+    ...filterDexEntries(extraPokemonDex),
     // Bundled pokeathlon snapshot is pre-filtered to Custom fangame entries only
     // (see scripts/fetch-pokeathlon-dex.mjs), so just normalize keys and merge directly.
     ...(pokeathlonDexRaw && typeof pokeathlonDexRaw === 'object' && !Array.isArray(pokeathlonDexRaw) ? (() => {
@@ -841,8 +871,12 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumLearnsets || {}) as LearnsetsIndex),
     ...((infinityLearnsets || {}) as LearnsetsIndex),
     ...((mariomonLearnsets || {}) as LearnsetsIndex),
-    ...(soulstonePart1Dex && typeof soulstonePart1Dex === 'object' ? (soulstonePart1Dex as any).learnsets || {} : {}),
-    ...(soulstonePS2Dex && typeof soulstonePS2Dex === 'object' ? (soulstonePS2Dex as any).learnsets || {} : {}),
+    // Soulstones Part 1 learnsets (separate files)
+    ...((soulstonePart1Learnsets || {}) as LearnsetsIndex),
+    // Soulstones 2 learnsets (parsed from PS2 PBS Moves= fields)
+    ...((soulstonePS2Learnsets || {}) as LearnsetsIndex),
+    // Extra Pokémon learnsets
+    ...((extraPokemonLearnsets || {}) as LearnsetsIndex),
   } as LearnsetsIndex;
   const mergedBaseMoves = {
     ...(moves as MoveIndex),
@@ -851,8 +885,12 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumMoves || {}) as MoveIndex),
     ...((infinityMoves || {}) as MoveIndex),
     ...((mariomonMoves || {}) as MoveIndex),
-    ...(soulstonePart1Dex && typeof soulstonePart1Dex === 'object' ? (soulstonePart1Dex as any).moves || {} : {}),
-    ...(soulstonePS2Dex && typeof soulstonePS2Dex === 'object' ? (soulstonePS2Dex as any).moves || {} : {}),
+    // Soulstones Part 1 custom moves (Crystal Beam, Cosmic Pulse, Starfall, etc.)
+    ...((soulstonePart1Moves || {}) as MoveIndex),
+    // Soulstones 2 custom moves (Sound, Cosmic, Light type moves)
+    ...((soulstonePS2Moves || {}) as MoveIndex),
+    // Extra Pokémon custom moves
+    ...((extraPokemonMoves || {}) as MoveIndex),
   } as MoveIndex;
   const mergedBaseAbilities = {
     ...(abilities as AbilityIndex),
@@ -862,8 +900,10 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumAbilities || {}) as AbilityIndex),
     ...((infinityAbilities || {}) as AbilityIndex),
     ...((mariomonAbilities || {}) as AbilityIndex),
-    ...(soulstonePart1Dex && typeof soulstonePart1Dex === 'object' ? (soulstonePart1Dex as any).abilities || {} : {}),
-    ...(soulstonePS2Dex && typeof soulstonePS2Dex === 'object' ? (soulstonePS2Dex as any).abilities || {} : {}),
+    // Soulstones Part 1 abilities
+    ...((soulstonePart1Abilities || {}) as AbilityIndex),
+    // Soulstones 2 abilities (from PBS)
+    ...((soulstonePS2Abilities || {}) as AbilityIndex),
   } as AbilityIndex;
   const mergedBaseItems = {
     ...(items as ItemIndex),

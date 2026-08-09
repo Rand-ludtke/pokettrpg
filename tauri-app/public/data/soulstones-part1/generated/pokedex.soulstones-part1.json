@@ -1,0 +1,252 @@
+{
+  "solosiss1": {
+    "name": "Solosis (S1)",
+    "num": -20001,
+    "types": [
+      "Crystal",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 20,
+      "def": 60,
+      "spa": 100,
+      "spd": 85,
+      "spe": 36
+    },
+    "abilities": {
+      "0": "Magic Bounce",
+      "H": "Technician"
+    },
+    "isNonstandard": "Custom",
+    "color": "Green",
+    "gen": 9,
+    "baseSpecies": "Solosis",
+    "forme": "S1",
+    "evos": [
+      "duosions1"
+    ],
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "duosions1": {
+    "name": "Duosion (S1)",
+    "num": -20002,
+    "types": [
+      "Crystal",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 35,
+      "def": 70,
+      "spa": 120,
+      "spd": 100,
+      "spe": 46
+    },
+    "abilities": {
+      "0": "Magic Bounce",
+      "H": "Regenerator"
+    },
+    "isNonstandard": "Custom",
+    "color": "Green",
+    "gen": 9,
+    "baseSpecies": "Duosion",
+    "forme": "S1",
+    "prevo": "solosiss1",
+    "evos": [
+      "reunicluss1"
+    ],
+    "evoLevel": 32,
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "reunicluss1": {
+    "name": "Reuniclus (S1)",
+    "num": -20003,
+    "types": [
+      "Crystal",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 40,
+      "def": 90,
+      "spa": 140,
+      "spd": 120,
+      "spe": 56
+    },
+    "abilities": {
+      "0": "Magic Bounce",
+      "H": "Regenerator"
+    },
+    "isNonstandard": "Custom",
+    "color": "Green",
+    "gen": 9,
+    "baseSpecies": "Reuniclus",
+    "forme": "S1",
+    "prevo": "duosions1",
+    "evoLevel": 41,
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gastlycosmics1": {
+    "name": "Gastly (Cosmic S1)",
+    "num": -20004,
+    "types": [
+      "Cosmic",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "atk": 35,
+      "def": 30,
+      "spa": 100,
+      "spd": 70,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Cursed Body"
+    },
+    "isNonstandard": "Custom",
+    "color": "Purple",
+    "gen": 9,
+    "baseSpecies": "Gastly",
+    "forme": "Cosmic S1",
+    "evos": [
+      "hauntercosmics1"
+    ],
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "hauntercosmics1": {
+    "name": "Haunter (Cosmic S1)",
+    "num": -20005,
+    "types": [
+      "Cosmic",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 50,
+      "def": 45,
+      "spa": 115,
+      "spd": 85,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Levitate",
+      "H": "Cursed Body"
+    },
+    "isNonstandard": "Custom",
+    "color": "Purple",
+    "gen": 9,
+    "baseSpecies": "Haunter",
+    "forme": "Cosmic S1",
+    "prevo": "gastlycosmics1",
+    "evos": [
+      "gengarcosmics1"
+    ],
+    "evoLevel": 25,
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gengarcosmics1": {
+    "name": "Gengar (Cosmic S1)",
+    "num": -20006,
+    "types": [
+      "Cosmic",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 65,
+      "def": 60,
+      "spa": 130,
+      "spd": 95,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Cursed Body",
+      "H": "Shadow Tag"
+    },
+    "isNonstandard": "Custom",
+    "color": "Purple",
+    "gen": 9,
+    "baseSpecies": "Gengar",
+    "forme": "Cosmic S1",
+    "prevo": "hauntercosmics1",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "doduostellars1": {
+    "name": "Doduo (Stellar S1)",
+    "num": -20007,
+    "types": [
+      "Stellar",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "atk": 85,
+      "def": 45,
+      "spa": 35,
+      "spd": 35,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Run Away",
+      "1": "Early Bird",
+      "H": "Tangled Feet"
+    },
+    "isNonstandard": "Custom",
+    "color": "Brown",
+    "gen": 9,
+    "baseSpecies": "Doduo",
+    "forme": "Stellar S1",
+    "evos": [
+      "dodriostellars1"
+    ],
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "dodriostellars1": {
+    "name": "Dodrio (Stellar S1)",
+    "num": -20008,
+    "types": [
+      "Stellar",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 110,
+      "def": 70,
+      "spa": 60,
+      "spd": 60,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Run Away",
+      "1": "Early Bird",
+      "H": "Tangled Feet"
+    },
+    "isNonstandard": "Custom",
+    "color": "Brown",
+    "gen": 9,
+    "baseSpecies": "Dodrio",
+    "forme": "Stellar S1",
+    "prevo": "doduostellars1",
+    "evoLevel": 31,
+    "tags": [
+      "Soulstones"
+    ]
+  }
+}

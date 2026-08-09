@@ -1,0 +1,494 @@
+{
+  "solosiss1": {
+    "learnset": {
+      "confusion": [
+        "9L1"
+      ],
+      "watersport": [
+        "9L1"
+      ],
+      "crystalbeam": [
+        "9L5"
+      ],
+      "healblock": [
+        "9L8"
+      ],
+      "reflect": [
+        "9L12",
+        "9T"
+      ],
+      "psybeam": [
+        "9L16"
+      ],
+      "crystalpulse": [
+        "9L20"
+      ],
+      "psyshock": [
+        "9L26"
+      ],
+      "calmmind": [
+        "9L32",
+        "9T"
+      ],
+      "psychic": [
+        "9L38",
+        "9T"
+      ],
+      "storedpower": [
+        "9L44"
+      ],
+      "trickroom": [
+        "9L52"
+      ],
+      "lightscreen": [
+        "9T"
+      ],
+      "protect": [
+        "9T"
+      ],
+      "rest": [
+        "9T"
+      ],
+      "sleeptalk": [
+        "9T"
+      ],
+      "guardswap": [
+        "9E"
+      ],
+      "powerswap": [
+        "9E"
+      ],
+      "trick": [
+        "9E"
+      ]
+    }
+  },
+  "duosions1": {
+    "learnset": {
+      "confusion": [
+        "9L1"
+      ],
+      "crystalbeam": [
+        "9L1"
+      ],
+      "healblock": [
+        "9L8"
+      ],
+      "reflect": [
+        "9L12",
+        "9T"
+      ],
+      "psybeam": [
+        "9L16"
+      ],
+      "magicroom": [
+        "9L20"
+      ],
+      "crystalpulse": [
+        "9L24"
+      ],
+      "psyshock": [
+        "9L28"
+      ],
+      "calmmind": [
+        "9L32",
+        "9T"
+      ],
+      "psychic": [
+        "9L38",
+        "9T"
+      ],
+      "storedpower": [
+        "9L44"
+      ],
+      "trickroom": [
+        "9L52"
+      ],
+      "lightscreen": [
+        "9T"
+      ],
+      "protect": [
+        "9T"
+      ],
+      "rest": [
+        "9T"
+      ],
+      "sleeptalk": [
+        "9T"
+      ]
+    }
+  },
+  "reunicluss1": {
+    "learnset": {
+      "confusion": [
+        "9L1"
+      ],
+      "crystalbeam": [
+        "9L1"
+      ],
+      "healblock": [
+        "9L8"
+      ],
+      "reflect": [
+        "9L12",
+        "9T"
+      ],
+      "psybeam": [
+        "9L16"
+      ],
+      "magicroom": [
+        "9L20"
+      ],
+      "crystalpulse": [
+        "9L24"
+      ],
+      "psyshock": [
+        "9L28"
+      ],
+      "calmmind": [
+        "9L32",
+        "9T"
+      ],
+      "psychic": [
+        "9L38",
+        "9T"
+      ],
+      "storedpower": [
+        "9L44"
+      ],
+      "trickroom": [
+        "9L52"
+      ],
+      "recover": [
+        "9L58"
+      ],
+      "lightscreen": [
+        "9T"
+      ],
+      "protect": [
+        "9T"
+      ],
+      "rest": [
+        "9T"
+      ],
+      "sleeptalk": [
+        "9T"
+      ],
+      "focusblast": [
+        "9T"
+      ]
+    }
+  },
+  "gastlycosmics1": {
+    "learnset": {
+      "lick": [
+        "9L1"
+      ],
+      "cosmicpulse": [
+        "9L1"
+      ],
+      "confuseray": [
+        "9L5"
+      ],
+      "nightshade": [
+        "9L8"
+      ],
+      "hypnosis": [
+        "9L12"
+      ],
+      "shadowball": [
+        "9L16",
+        "9T"
+      ],
+      "cosmicblast": [
+        "9L20"
+      ],
+      "willowisp": [
+        "9L26",
+        "9T"
+      ],
+      "dreameater": [
+        "9L32"
+      ],
+      "darkpulse": [
+        "9L38",
+        "9T"
+      ],
+      "perishsong": [
+        "9L44"
+      ],
+      "cosmicshock": [
+        "9L52"
+      ],
+      "protect": [
+        "9T"
+      ],
+      "rest": [
+        "9T"
+      ],
+      "sleeptalk": [
+        "9T"
+      ],
+      "destinybond": [
+        "9E"
+      ],
+      "meanlook": [
+        "9E"
+      ],
+      "painsplit": [
+        "9E"
+      ]
+    }
+  },
+  "hauntercosmics1": {
+    "learnset": {
+      "shadowsneak": [
+        "9L1"
+      ],
+      "lick": [
+        "9L1"
+      ],
+      "cosmicpulse": [
+        "9L1"
+      ],
+      "confuseray": [
+        "9L5"
+      ],
+      "nightshade": [
+        "9L8"
+      ],
+      "hypnosis": [
+        "9L12"
+      ],
+      "shadowball": [
+        "9L16",
+        "9T"
+      ],
+      "cosmicblast": [
+        "9L20"
+      ],
+      "willowisp": [
+        "9L26",
+        "9T"
+      ],
+      "dreameater": [
+        "9L32"
+      ],
+      "darkpulse": [
+        "9L38",
+        "9T"
+      ],
+      "perishsong": [
+        "9L44"
+      ],
+      "cosmicshock": [
+        "9L52"
+      ],
+      "protect": [
+        "9T"
+      ],
+      "rest": [
+        "9T"
+      ],
+      "sleeptalk": [
+        "9T"
+      ],
+      "psychic": [
+        "9T"
+      ]
+    }
+  },
+  "gengarcosmics1": {
+    "learnset": {
+      "shadowball": [
+        "9L1",
+        "9L16",
+        "9T"
+      ],
+      "shadowsneak": [
+        "9L1"
+      ],
+      "cosmicpulse": [
+        "9L1"
+      ],
+      "confuseray": [
+        "9L5"
+      ],
+      "nightshade": [
+        "9L8"
+      ],
+      "hypnosis": [
+        "9L12"
+      ],
+      "cosmicblast": [
+        "9L20"
+      ],
+      "cosmicshock": [
+        "9L24"
+      ],
+      "willowisp": [
+        "9L26",
+        "9T"
+      ],
+      "dreameater": [
+        "9L32"
+      ],
+      "darkpulse": [
+        "9L38",
+        "9T"
+      ],
+      "perishsong": [
+        "9L44"
+      ],
+      "destinybond": [
+        "9L52"
+      ],
+      "protect": [
+        "9T"
+      ],
+      "rest": [
+        "9T"
+      ],
+      "sleeptalk": [
+        "9T"
+      ],
+      "psychic": [
+        "9T"
+      ],
+      "focusblast": [
+        "9T"
+      ]
+    }
+  },
+  "doduostellars1": {
+    "learnset": {
+      "peck": [
+        "9L1"
+      ],
+      "growl": [
+        "9L1"
+      ],
+      "quickattack": [
+        "9L5"
+      ],
+      "rage": [
+        "9L8"
+      ],
+      "starfall": [
+        "9L12"
+      ],
+      "furyattack": [
+        "9L16"
+      ],
+      "swordsdance": [
+        "9L20"
+      ],
+      "jumpkick": [
+        "9L26"
+      ],
+      "agility": [
+        "9L32"
+      ],
+      "drillpeck": [
+        "9L38"
+      ],
+      "starfallstrike": [
+        "9L44"
+      ],
+      "fly": [
+        "9T"
+      ],
+      "airslash": [
+        "9T"
+      ],
+      "bravebird": [
+        "9T"
+      ],
+      "protect": [
+        "9T"
+      ],
+      "rest": [
+        "9T"
+      ],
+      "sleeptalk": [
+        "9T"
+      ],
+      "doubleteam": [
+        "9T"
+      ],
+      "pursuit": [
+        "9E"
+      ],
+      "supersonic": [
+        "9E"
+      ],
+      "haze": [
+        "9E"
+      ]
+    }
+  },
+  "dodriostellars1": {
+    "learnset": {
+      "peck": [
+        "9L1"
+      ],
+      "growl": [
+        "9L1"
+      ],
+      "quickattack": [
+        "9L5"
+      ],
+      "rage": [
+        "9L8"
+      ],
+      "starfall": [
+        "9L12"
+      ],
+      "furyattack": [
+        "9L16"
+      ],
+      "swordsdance": [
+        "9L20"
+      ],
+      "jumpkick": [
+        "9L26"
+      ],
+      "agility": [
+        "9L32"
+      ],
+      "drillpeck": [
+        "9L38"
+      ],
+      "starfallstrike": [
+        "9L44"
+      ],
+      "triattack": [
+        "9L52"
+      ],
+      "fly": [
+        "9T"
+      ],
+      "airslash": [
+        "9T"
+      ],
+      "bravebird": [
+        "9T"
+      ],
+      "protect": [
+        "9T"
+      ],
+      "rest": [
+        "9T"
+      ],
+      "sleeptalk": [
+        "9T"
+      ],
+      "doubleteam": [
+        "9T"
+      ],
+      "hyperbeam": [
+        "9T"
+      ]
+    }
+  }
+}
