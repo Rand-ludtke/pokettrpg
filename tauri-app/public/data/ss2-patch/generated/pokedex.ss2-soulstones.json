@@ -33918,5 +33918,10283 @@
     "isNonstandard": "Custom",
     "gen": 9,
     "doublesTier": "Illegal"
+  },
+  "eeveetemporal": {
+    "num": 190,
+    "name": "Eevee-Temporal",
+    "types": [
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 70,
+      "def": 75,
+      "spa": 90,
+      "spd": 70,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Cursed Body",
+      "1": "Shadow Tag",
+      "H": "Insomnia"
+    },
+    "heightm": 0.3,
+    "weightkg": 6.5,
+    "color": "Purple",
+    "evos": [
+      "Vaporeon-Temporal",
+      "Jolteon-Temporal",
+      "Flareon-Temporal",
+      "Leafeon-Temporal",
+      "Glaceon-Temporal",
+      "Espeon-Temporal",
+      "Umbreon-Temporal",
+      "Sylveon-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "wurmpless2": {
+    "name": "Wurmple (SS2)",
+    "num": -60001,
+    "types": [
+      "Bug",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 20,
+      "def": 35,
+      "spa": 20,
+      "spd": 45,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Telepathy",
+      "1": "Gluttony",
+      "H": "Compound Eyes"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "wurmple2ss2": {
+    "name": "Wurmple (SS2)",
+    "num": -60002,
+    "types": [
+      "Bug",
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 45,
+      "def": 35,
+      "spa": 20,
+      "spd": 20,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Deepchill",
+      "1": "Gluttony",
+      "H": "Compound Eyes"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "galaxeon": {
+    "num": 255,
+    "name": "Galaxeon",
+    "types": [
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 65,
+      "def": 110,
+      "spa": 85,
+      "spd": 60,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Wonderskin",
+      "1": "Magicguard",
+      "H": "Starstruck"
+    },
+    "heightm": 1,
+    "weightkg": 29,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Eevee-Orion",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "prismeon": {
+    "num": 256,
+    "name": "Prismeon",
+    "types": [
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 75,
+      "def": 110,
+      "spa": 95,
+      "spd": 110,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Solarpower",
+      "1": "Mirrorarmor",
+      "H": "Irradiate"
+    },
+    "heightm": 1,
+    "weightkg": 29,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Eevee-Orion",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "octaveon": {
+    "num": 257,
+    "name": "Octaveon",
+    "types": [
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 110,
+      "def": 70,
+      "spa": 95,
+      "spd": 110,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Resonant",
+      "1": "Requiem",
+      "H": "Maestro"
+    },
+    "heightm": 1,
+    "weightkg": 29,
+    "color": "Gray",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Eevee-Orion",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "regirockss2": {
+    "name": "Regirock (SS2)",
+    "num": -60003,
+    "types": [
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "atk": 25,
+      "def": 100,
+      "spa": 50,
+      "spd": 100,
+      "spe": 200
+    },
+    "abilities": {
+      "0": "Hydration",
+      "1": "Raindish",
+      "H": "Drizzle"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "regicess2": {
+    "name": "Regice (SS2)",
+    "num": -60004,
+    "types": [
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "atk": 100,
+      "def": 200,
+      "spa": 50,
+      "spd": 25,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "1": "Overcoat",
+      "H": "Overgrow"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Brown",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "registeelss2": {
+    "name": "Registeel (SS2)",
+    "num": -60005,
+    "types": [
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 75,
+      "def": 150,
+      "spa": 50,
+      "spd": 75,
+      "spe": 150
+    },
+    "abilities": {
+      "0": "Dazzling",
+      "1": "Screencleaner",
+      "H": "Spellcaster"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Purple",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "phionetemporal": {
+    "num": 438,
+    "name": "Phione-Temporal",
+    "types": [
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 80,
+      "def": 80,
+      "spa": 100,
+      "spd": 100,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Intuition",
+      "1": "Attunement",
+      "H": "Wonderskin"
+    },
+    "heightm": 0.4,
+    "weightkg": 3.1,
+    "color": "Pink",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "manaphy2ss2": {
+    "name": "T.Manaphy (SS2)",
+    "num": -60006,
+    "types": [
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 80,
+      "def": 100,
+      "spa": 110,
+      "spd": 110,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Intuition",
+      "1": "Attunement",
+      "H": "Wonderskin"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Pink",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "darkraiss2": {
+    "name": "Darkrai (SS2)",
+    "num": -60007,
+    "types": [
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 70,
+      "def": 90,
+      "spa": 125,
+      "spd": 135,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Healer",
+      "1": "Magic Bounce",
+      "H": "Levitate"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "cresseliass2": {
+    "name": "Cresselia (SS2)",
+    "num": -60008,
+    "types": [
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 120,
+      "atk": 100,
+      "def": 75,
+      "spa": 85,
+      "spd": 100,
+      "spe": 120
+    },
+    "abilities": {
+      "0": "Corrosion",
+      "1": "Merciless",
+      "H": "Levitate"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Yellow",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "gothitatemporal": {
+    "num": 450,
+    "name": "Gothita-Temporal",
+    "types": [
+      "Poison",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 50,
+      "def": 40,
+      "spa": 45,
+      "spd": 55,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Shed Skin",
+      "1": "Dishearten",
+      "H": "Stakeout"
+    },
+    "heightm": 0.4,
+    "weightkg": 5.8,
+    "color": "Green",
+    "evos": [
+      "Gothorita-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "gothoritatemporal": {
+    "num": 451,
+    "name": "Gothorita-Temporal",
+    "types": [
+      "Poison",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 70,
+      "def": 70,
+      "spa": 55,
+      "spd": 70,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Shed Skin",
+      "1": "Dishearten",
+      "H": "Stakeout"
+    },
+    "heightm": 0.7,
+    "weightkg": 18,
+    "color": "Green",
+    "evos": [
+      "Gothitelle-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Gothita-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "gothitelletemporal": {
+    "num": 452,
+    "name": "Gothitelle-Temporal",
+    "types": [
+      "Poison",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 105,
+      "def": 65,
+      "spa": 65,
+      "spd": 105,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Shed Skin",
+      "1": "Dishearten",
+      "H": "Stakeout"
+    },
+    "heightm": 1.5,
+    "weightkg": 44,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Gothitelle-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Gothitelle-Temporal",
+      "Gothitelle-Temporal-Mega"
+    ],
+    "prevo": "Gothorita-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "spritzeetemporal": {
+    "num": 457,
+    "name": "Spritzee-Temporal",
+    "types": [
+      "Fairy",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "atk": 48,
+      "def": 75,
+      "spa": 33,
+      "spd": 37,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Powerspot",
+      "1": "Prankster",
+      "H": "Receiver"
+    },
+    "heightm": 0.2,
+    "weightkg": 0.5,
+    "color": "Brown",
+    "evos": [
+      "Aromatisse-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "aromatissetemporal": {
+    "num": 458,
+    "name": "Aromatisse-Temporal",
+    "types": [
+      "Fairy",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 91,
+      "atk": 74,
+      "def": 99,
+      "spa": 49,
+      "spd": 67,
+      "spe": 82
+    },
+    "abilities": {
+      "0": "Powerspot",
+      "1": "Prankster",
+      "H": "Receiver"
+    },
+    "heightm": 0.8,
+    "weightkg": 15.5,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Spritzee-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "horseatemporal": {
+    "num": 459,
+    "name": "Horsea-Temporal",
+    "types": [
+      "Bug",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "atk": 30,
+      "def": 40,
+      "spa": 60,
+      "spd": 75,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Compound Eyes",
+      "1": "Intimidate",
+      "H": "Swarm"
+    },
+    "heightm": 0.4,
+    "weightkg": 8,
+    "color": "Black",
+    "evos": [
+      "Seadra-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "seadratemporal": {
+    "num": 460,
+    "name": "Seadra-Temporal",
+    "types": [
+      "Bug",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 45,
+      "def": 65,
+      "spa": 85,
+      "spd": 105,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Compound Eyes",
+      "1": "Intimidate",
+      "H": "Swarm"
+    },
+    "heightm": 1.2,
+    "weightkg": 25,
+    "color": "Black",
+    "evos": [
+      "Kingdra-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Horsea-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "kingdratemporal": {
+    "num": 461,
+    "name": "Kingdra-Temporal",
+    "types": [
+      "Bug",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 65,
+      "def": 75,
+      "spa": 95,
+      "spd": 125,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Compound Eyes",
+      "1": "Intimidate",
+      "H": "Swarm"
+    },
+    "heightm": 1.8,
+    "weightkg": 152,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Seadra-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "grimertemporal": {
+    "num": 468,
+    "name": "Grimer-Temporal",
+    "types": [
+      "Fire",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 60,
+      "def": 50,
+      "spa": 25,
+      "spd": 40,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Magma Armor",
+      "1": "Flamebody",
+      "H": "Clayform"
+    },
+    "heightm": 0.9,
+    "weightkg": 30,
+    "color": "Red",
+    "evos": [
+      "Muk-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "muktemporal": {
+    "num": 469,
+    "name": "Muk-Temporal",
+    "types": [
+      "Fire",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "atk": 85,
+      "def": 75,
+      "spa": 50,
+      "spd": 65,
+      "spe": 120
+    },
+    "abilities": {
+      "0": "Magma Armor",
+      "1": "Flamebody",
+      "H": "Clayform"
+    },
+    "heightm": 1.2,
+    "weightkg": 30,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Grimer-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "hoothoottemporal": {
+    "num": 477,
+    "name": "Hoothoot-Temporal",
+    "types": [
+      "Ice",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 50,
+      "spa": 75,
+      "spd": 25,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Insomnia",
+      "1": "Bigpecks",
+      "H": "Keeneye"
+    },
+    "heightm": 0.7,
+    "weightkg": 21.2,
+    "color": "Gray",
+    "evos": [
+      "Noctowl-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "noctowltemporal": {
+    "num": 478,
+    "name": "Noctowl-Temporal",
+    "types": [
+      "Ice",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 85,
+      "def": 70,
+      "spa": 85,
+      "spd": 35,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Insomnia",
+      "1": "Bigpecks",
+      "H": "Snow Warning"
+    },
+    "heightm": 1.6,
+    "weightkg": 40.8,
+    "color": "Gray",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Hoothoot-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "bounsweettemporal": {
+    "num": 487,
+    "name": "Bounsweet-Temporal",
+    "types": [
+      "Poison",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 42,
+      "atk": 34,
+      "def": 38,
+      "spa": 32,
+      "spd": 26,
+      "spe": 38
+    },
+    "abilities": {
+      "0": "Ironbarbs",
+      "1": "Powerofalchemy",
+      "H": "Unburden"
+    },
+    "heightm": 0.3,
+    "weightkg": 3.2,
+    "color": "Blue",
+    "evos": [
+      "Steenee-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "steeneetemporal": {
+    "num": 488,
+    "name": "Steenee-Temporal",
+    "types": [
+      "Poison",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 52,
+      "atk": 66,
+      "def": 40,
+      "spa": 62,
+      "spd": 40,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Ironbarbs",
+      "1": "Powerofalchemy",
+      "H": "Unburden"
+    },
+    "heightm": 0.7,
+    "weightkg": 8.2,
+    "color": "Blue",
+    "evos": [
+      "Tsareena-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Bounsweet-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "tsareenatemporal": {
+    "num": 489,
+    "name": "Tsareena-Temporal",
+    "types": [
+      "Poison",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "atk": 120,
+      "def": 90,
+      "spa": 86,
+      "spd": 50,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Ironbarbs",
+      "1": "Powerofalchemy",
+      "H": "Unburden"
+    },
+    "heightm": 1.2,
+    "weightkg": 21.4,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Steenee-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dewpidertemporal": {
+    "num": 494,
+    "name": "Dewpider-Temporal",
+    "types": [
+      "Bug",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "atk": 55,
+      "def": 42,
+      "spa": 52,
+      "spd": 40,
+      "spe": 42
+    },
+    "abilities": {
+      "0": "Merciless",
+      "1": "Compound Eyes",
+      "H": "Terrorize"
+    },
+    "heightm": 0.3,
+    "weightkg": 4,
+    "color": "Purple",
+    "evos": [
+      "Araquanid-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "araquanidtemporal": {
+    "num": 495,
+    "name": "Araquanid-Temporal",
+    "types": [
+      "Bug",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 68,
+      "atk": 85,
+      "def": 92,
+      "spa": 87,
+      "spd": 50,
+      "spe": 72
+    },
+    "abilities": {
+      "0": "Merciless",
+      "1": "Compound Eyes",
+      "H": "Terrorize"
+    },
+    "heightm": 1.8,
+    "weightkg": 82,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Dewpider-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "digletttemporal": {
+    "num": 502,
+    "name": "Diglett-Temporal",
+    "types": [
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 45,
+      "def": 45,
+      "spa": 95,
+      "spd": 45,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Flexible",
+      "1": "Packedsnow",
+      "H": "Regenerator"
+    },
+    "heightm": 0.2,
+    "weightkg": 0.8,
+    "color": "White",
+    "evos": [
+      "Dugtrio-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dugtriotemporal": {
+    "num": 503,
+    "name": "Dugtrio-Temporal",
+    "types": [
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 90,
+      "def": 70,
+      "spa": 110,
+      "spd": 90,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Flexible",
+      "1": "Packedsnow",
+      "H": "Regenerator"
+    },
+    "heightm": 0.7,
+    "weightkg": 33.3,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Dugtrio-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Dugtrio-Temporal",
+      "Dugtrio-Temporal-Mega"
+    ],
+    "prevo": "Diglett-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "absoltemporal": {
+    "num": 514,
+    "name": "Absol-Temporal",
+    "types": [
+      "Psychic",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 80,
+      "def": 105,
+      "spa": 75,
+      "spd": 45,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Magicguard",
+      "1": "Sniper",
+      "H": "Nebulacloud"
+    },
+    "heightm": 1.2,
+    "weightkg": 47,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Absol-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Absol-Temporal",
+      "Absol-Temporal-Mega"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "voltorbtemporal": {
+    "num": 521,
+    "name": "Voltorb-Temporal",
+    "types": [
+      "Cosmic",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 40,
+      "def": 45,
+      "spa": 100,
+      "spd": 55,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Orbit",
+      "1": "Aftermath",
+      "H": "Sturdy"
+    },
+    "heightm": 0.5,
+    "weightkg": 200.4,
+    "color": "Yellow",
+    "evos": [
+      "Electrode-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "electrodetemporal": {
+    "num": 522,
+    "name": "Electrode-Temporal",
+    "types": [
+      "Cosmic",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 50,
+      "def": 70,
+      "spa": 150,
+      "spd": 80,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Orbit",
+      "1": "Aftermath",
+      "H": "Sturdy"
+    },
+    "heightm": 1.2,
+    "weightkg": 450.6,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Voltorb-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "exeggcutetemporal": {
+    "num": 525,
+    "name": "Exeggcute-Temporal",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 50,
+      "def": 45,
+      "spa": 60,
+      "spd": 30,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Flamebody",
+      "1": "White Smoke",
+      "H": "Sturdy"
+    },
+    "heightm": 0.4,
+    "weightkg": 2.5,
+    "color": "Black",
+    "evos": [
+      "Exeggutor-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "exeggutortemporal": {
+    "num": 526,
+    "name": "Exeggutor-Temporal",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 100,
+      "def": 75,
+      "spa": 105,
+      "spd": 50,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Flamebody",
+      "1": "White Smoke",
+      "H": "Drought"
+    },
+    "heightm": 2,
+    "weightkg": 120,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Exeggcute-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sableyetemporal": {
+    "num": 527,
+    "name": "Sableye-Temporal",
+    "types": [
+      "Water",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 100,
+      "def": 80,
+      "spa": 50,
+      "spd": 50,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Leechingfangs",
+      "1": "Tinted Lens",
+      "H": "Suctioncups"
+    },
+    "heightm": 0.5,
+    "weightkg": 11,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Sableye-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Sableye-Temporal",
+      "Sableye-Temporal-Mega"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "swablutemporal": {
+    "num": 530,
+    "name": "Swablu-Temporal",
+    "types": [
+      "Electric",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 30,
+      "def": 50,
+      "spa": 50,
+      "spd": 60,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Cloud Nine",
+      "1": "Voltabsorb",
+      "H": "Stormdrain"
+    },
+    "heightm": 0.4,
+    "weightkg": 1.2,
+    "color": "Yellow",
+    "evos": [
+      "Altaria-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "altariatemporal": {
+    "num": 531,
+    "name": "Altaria-Temporal",
+    "types": [
+      "Electric",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 50,
+      "def": 70,
+      "spa": 80,
+      "spd": 105,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Cloud Nine",
+      "1": "Voltabsorb",
+      "H": "Stormdrain"
+    },
+    "heightm": 1.1,
+    "weightkg": 20.6,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Altaria-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Altaria-Temporal",
+      "Altaria-Temporal-Mega"
+    ],
+    "prevo": "Swablu-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "slugmatemporal": {
+    "num": 532,
+    "name": "Slugma-Temporal",
+    "types": [
+      "Water",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 25,
+      "def": 50,
+      "spa": 30,
+      "spd": 70,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Damp",
+      "1": "Clearbody",
+      "H": "Gooey"
+    },
+    "heightm": 0.7,
+    "weightkg": 35,
+    "color": "Blue",
+    "evos": [
+      "Magcargo-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "magcargotemporal": {
+    "num": 533,
+    "name": "Magcargo-Temporal",
+    "types": [
+      "Water",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 40,
+      "def": 75,
+      "spa": 55,
+      "spd": 110,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Damp",
+      "1": "Clearbody",
+      "H": "Psychicsurge"
+    },
+    "heightm": 0.8,
+    "weightkg": 55,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Magcargo-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Magcargo-Temporal",
+      "Magcargo-Temporal-Mega"
+    ],
+    "prevo": "Slugma-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mudkiptemporal": {
+    "num": 534,
+    "name": "Mudkip-Temporal",
+    "types": [
+      "Rock",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 40,
+      "def": 40,
+      "spa": 50,
+      "spd": 70,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Solid Rock",
+      "1": "Wonderskin",
+      "H": "Attunement"
+    },
+    "heightm": 0.4,
+    "weightkg": 7.6,
+    "color": "Brown",
+    "evos": [
+      "Marshtomp-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "marshtomptemporal": {
+    "num": 535,
+    "name": "Marshtomp-Temporal",
+    "types": [
+      "Rock",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 50,
+      "def": 60,
+      "spa": 60,
+      "spd": 85,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Solid Rock",
+      "1": "Wonderskin",
+      "H": "Attunement"
+    },
+    "heightm": 0.7,
+    "weightkg": 28,
+    "color": "Brown",
+    "evos": [
+      "Swampert-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Mudkip-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "swamperttemporal": {
+    "num": 536,
+    "name": "Swampert-Temporal",
+    "types": [
+      "Rock",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 120,
+      "atk": 75,
+      "def": 80,
+      "spa": 70,
+      "spd": 110,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Solid Rock",
+      "1": "Wonderskin",
+      "H": "Attunement"
+    },
+    "heightm": 1.5,
+    "weightkg": 81.9,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Swampert-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Swampert-Temporal",
+      "Swampert-Temporal-Mega"
+    ],
+    "prevo": "Marshtomp-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "chikoritatemporal": {
+    "num": 548,
+    "name": "Chikorita-Temporal",
+    "types": [
+      "Electric",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 39,
+      "def": 60,
+      "spa": 45,
+      "spd": 49,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Surgesurfer",
+      "H": "Solarpower"
+    },
+    "heightm": 0.9,
+    "weightkg": 6.4,
+    "color": "Green",
+    "evos": [
+      "Bayleef-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "bayleeftemporal": {
+    "num": 549,
+    "name": "Bayleef-Temporal",
+    "types": [
+      "Electric",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 52,
+      "def": 75,
+      "spa": 60,
+      "spd": 63,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Surgesurfer",
+      "H": "Solarpower"
+    },
+    "heightm": 1.2,
+    "weightkg": 15.8,
+    "color": "Green",
+    "evos": [
+      "Meganium-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Chikorita-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "meganiumtemporal": {
+    "num": 550,
+    "name": "Meganium-Temporal",
+    "types": [
+      "Electric",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 60,
+      "def": 100,
+      "spa": 80,
+      "spd": 85,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Surgesurfer",
+      "H": "Solarpower"
+    },
+    "heightm": 1.8,
+    "weightkg": 100.5,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Bayleef-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "cyndaquiltemporal": {
+    "num": 551,
+    "name": "Cyndaquil-Temporal",
+    "types": [
+      "Ice",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 59,
+      "atk": 32,
+      "def": 43,
+      "spa": 65,
+      "spd": 65,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Pressure",
+      "1": "Furcoat",
+      "H": "Icyveins"
+    },
+    "heightm": 0.5,
+    "weightkg": 7.9,
+    "color": "Blue",
+    "evos": [
+      "Quilava-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "quilavatemporal": {
+    "num": 552,
+    "name": "Quilava-Temporal",
+    "types": [
+      "Ice",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "atk": 35,
+      "def": 58,
+      "spa": 85,
+      "spd": 84,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Pressure",
+      "1": "Furcoat",
+      "H": "Icyveins"
+    },
+    "heightm": 0.9,
+    "weightkg": 19,
+    "color": "Blue",
+    "evos": [
+      "Typhlosion-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Cyndaquil-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "typhlosiontemporal": {
+    "num": 553,
+    "name": "Typhlosion-Temporal",
+    "types": [
+      "Ice",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 99,
+      "atk": 67,
+      "def": 74,
+      "spa": 99,
+      "spd": 110,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Pressure",
+      "1": "Furcoat",
+      "H": "Icyveins"
+    },
+    "heightm": 1.7,
+    "weightkg": 79.5,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Quilava-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "totodiletemporal": {
+    "num": 554,
+    "name": "Totodile-Temporal",
+    "types": [
+      "Dark",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 65,
+      "def": 48,
+      "spa": 43,
+      "spd": 44,
+      "spe": 64
+    },
+    "abilities": {
+      "0": "Gorging",
+      "1": "Bonecollector",
+      "H": "Blaze"
+    },
+    "heightm": 0.6,
+    "weightkg": 9.5,
+    "color": "Black",
+    "evos": [
+      "Croconaw-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "croconawtemporal": {
+    "num": 555,
+    "name": "Croconaw-Temporal",
+    "types": [
+      "Dark",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 80,
+      "def": 63,
+      "spa": 58,
+      "spd": 59,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Gorging",
+      "1": "Bonecollector",
+      "H": "Blaze"
+    },
+    "heightm": 1.1,
+    "weightkg": 25,
+    "color": "Black",
+    "evos": [
+      "Feraligatr-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Totodile-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "feraligatrtemporal": {
+    "num": 556,
+    "name": "Feraligatr-Temporal",
+    "types": [
+      "Dark",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 105,
+      "def": 93,
+      "spa": 78,
+      "spd": 59,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Gorging",
+      "1": "Bonecollector",
+      "H": "Blaze"
+    },
+    "heightm": 2.3,
+    "weightkg": 88.8,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Croconaw-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "surskittemporal": {
+    "num": 557,
+    "name": "Surskit-Temporal",
+    "types": [
+      "Grass",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 32,
+      "spa": 65,
+      "spd": 50,
+      "spe": 52
+    },
+    "abilities": {
+      "0": "Flowerveil",
+      "1": "Triage",
+      "H": "Regenerator"
+    },
+    "heightm": 0.5,
+    "weightkg": 1.7,
+    "color": "Green",
+    "evos": [
+      "Masquerain-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "masqueraintemporal": {
+    "num": 558,
+    "name": "Masquerain-Temporal",
+    "types": [
+      "Grass",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 60,
+      "def": 62,
+      "spa": 80,
+      "spd": 100,
+      "spe": 82
+    },
+    "abilities": {
+      "0": "Flowerveil",
+      "1": "Triage",
+      "H": "Regenerator"
+    },
+    "heightm": 0.8,
+    "weightkg": 3.6,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Masquerain-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Masquerain-Temporal",
+      "Masquerain-Temporal-Mega"
+    ],
+    "prevo": "Surskit-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "stantlertemporal": {
+    "num": 559,
+    "name": "Stantler-Temporal",
+    "types": [
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 73,
+      "atk": 115,
+      "def": 62,
+      "spa": 85,
+      "spd": 65,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Reckless",
+      "1": "Sheer Force",
+      "H": "Motordrive"
+    },
+    "heightm": 1.4,
+    "weightkg": 71.2,
+    "color": "Yellow",
+    "evos": [
+      "Wyrdeer-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "skittytemporal": {
+    "num": 568,
+    "name": "Skitty-Temporal",
+    "types": [
+      "Grass",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 32,
+      "def": 65,
+      "spa": 65,
+      "spd": 68,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Chlorophyll",
+      "1": "Cottondown",
+      "H": "Cutecharm"
+    },
+    "heightm": 0.6,
+    "weightkg": 11,
+    "color": "Green",
+    "evos": [
+      "Delcatty-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "delcattytemporal": {
+    "num": 569,
+    "name": "Delcatty-Temporal",
+    "types": [
+      "Grass",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 42,
+      "def": 85,
+      "spa": 85,
+      "spd": 98,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Chlorophyll",
+      "1": "Cottondown",
+      "H": "Grassysurge"
+    },
+    "heightm": 1.1,
+    "weightkg": 32.6,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Skitty-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "doduotemporal": {
+    "num": 570,
+    "name": "Doduo-Temporal",
+    "types": [
+      "Water",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 75,
+      "def": 35,
+      "spa": 95,
+      "spd": 35,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Cutecharm",
+      "1": "Affection",
+      "H": "Waterveil"
+    },
+    "heightm": 1.4,
+    "weightkg": 39.2,
+    "color": "Pink",
+    "evos": [
+      "Dodrio-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dodriotemporal": {
+    "num": 571,
+    "name": "Dodrio-Temporal",
+    "types": [
+      "Water",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 100,
+      "def": 60,
+      "spa": 125,
+      "spd": 60,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Cutecharm",
+      "1": "Affection",
+      "H": "Waterveil"
+    },
+    "heightm": 1.8,
+    "weightkg": 85.2,
+    "color": "Pink",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Doduo-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "numeltemporal": {
+    "num": 572,
+    "name": "Numel-Temporal",
+    "types": [
+      "Ice",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 70,
+      "def": 60,
+      "spa": 35,
+      "spd": 35,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Bulletproof",
+      "1": "Filter",
+      "H": "Fortification"
+    },
+    "heightm": 1.1,
+    "weightkg": 48,
+    "color": "Blue",
+    "evos": [
+      "Camerupt-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "camerupttemporal": {
+    "num": 573,
+    "name": "Camerupt-Temporal",
+    "types": [
+      "Ice",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 110,
+      "def": 105,
+      "spa": 40,
+      "spd": 45,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Bulletproof",
+      "1": "Filter",
+      "H": "Fortification"
+    },
+    "heightm": 2.3,
+    "weightkg": 220,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Numel-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "machoptemporal": {
+    "num": 578,
+    "name": "Machop-Temporal",
+    "types": [
+      "Fighting",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 35,
+      "def": 55,
+      "spa": 55,
+      "spd": 65,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Parentalbond",
+      "1": "Moldbreaker",
+      "H": "Scrappy"
+    },
+    "heightm": 0.8,
+    "weightkg": 19.5,
+    "color": "Black",
+    "evos": [
+      "Machoke-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "machoketemporal": {
+    "num": 579,
+    "name": "Machoke-Temporal",
+    "types": [
+      "Fighting",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 50,
+      "def": 75,
+      "spa": 75,
+      "spd": 85,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Parentalbond",
+      "1": "Moldbreaker",
+      "H": "Scrappy"
+    },
+    "heightm": 1.5,
+    "weightkg": 70.5,
+    "color": "Black",
+    "evos": [
+      "Machamp-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Machop-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "machamptemporal": {
+    "num": 580,
+    "name": "Machamp-Temporal",
+    "types": [
+      "Fighting",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 60,
+      "def": 85,
+      "spa": 90,
+      "spd": 105,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Parentalbond",
+      "1": "Moldbreaker",
+      "H": "Scrappy"
+    },
+    "heightm": 1.6,
+    "weightkg": 130,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Machoke-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "gibletemporal": {
+    "num": 590,
+    "name": "Gible-Temporal",
+    "types": [
+      "Water",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "atk": 55,
+      "def": 35,
+      "spa": 67,
+      "spd": 40,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "1": "Waterveil",
+      "H": "Intimidate"
+    },
+    "heightm": 0.7,
+    "weightkg": 20.5,
+    "color": "Blue",
+    "evos": [
+      "Gabite-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "gabitetemporal": {
+    "num": 591,
+    "name": "Gabite-Temporal",
+    "types": [
+      "Water",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 77,
+      "atk": 68,
+      "def": 60,
+      "spa": 90,
+      "spd": 50,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "1": "Waterveil",
+      "H": "Intimidate"
+    },
+    "heightm": 1.4,
+    "weightkg": 56,
+    "color": "Blue",
+    "evos": [
+      "Garchomp-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Gible-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "garchomptemporal": {
+    "num": 592,
+    "name": "Garchomp-Temporal",
+    "types": [
+      "Water",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 112,
+      "atk": 100,
+      "def": 90,
+      "spa": 118,
+      "spd": 85,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "1": "Waterveil",
+      "H": "Intimidate"
+    },
+    "heightm": 1.9,
+    "weightkg": 95,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Gabite-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "yanmatemporal": {
+    "num": 593,
+    "name": "Yanma-Temporal",
+    "types": [
+      "Steel",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 95,
+      "def": 45,
+      "spa": 95,
+      "spd": 45,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Weakarmor",
+      "1": "Levitate",
+      "H": "Quarkdrive"
+    },
+    "heightm": 1.2,
+    "weightkg": 38,
+    "color": "Gray",
+    "evos": [
+      "Yanmega-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "yanmegatemporal": {
+    "num": 594,
+    "name": "Yanmega-Temporal",
+    "types": [
+      "Steel",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 86,
+      "atk": 116,
+      "def": 66,
+      "spa": 115,
+      "spd": 76,
+      "spe": 56
+    },
+    "abilities": {
+      "0": "Weakarmor",
+      "1": "Levitate",
+      "H": "Quarkdrive"
+    },
+    "heightm": 1.9,
+    "weightkg": 51.5,
+    "color": "Gray",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Yanma-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "geodudetemporal": {
+    "num": 622,
+    "name": "Geodude-Temporal",
+    "types": [
+      "Ghost",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 80,
+      "def": 60,
+      "spa": 15,
+      "spd": 15,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Shadowshield",
+      "1": "Deepchill",
+      "H": "Longreach"
+    },
+    "heightm": 0.4,
+    "weightkg": 20.3,
+    "color": "Black",
+    "evos": [
+      "Graveler-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "gravelertemporal": {
+    "num": 623,
+    "name": "Graveler-Temporal",
+    "types": [
+      "Ghost",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 95,
+      "def": 80,
+      "spa": 20,
+      "spd": 25,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Shadowshield",
+      "1": "Deepchill",
+      "H": "Longreach"
+    },
+    "heightm": 1,
+    "weightkg": 110,
+    "color": "Black",
+    "evos": [
+      "Golem-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Geodude-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "golemtemporal": {
+    "num": 624,
+    "name": "Golem-Temporal",
+    "types": [
+      "Ghost",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 110,
+      "def": 110,
+      "spa": 30,
+      "spd": 35,
+      "spe": 120
+    },
+    "abilities": {
+      "0": "Shadowshield",
+      "1": "Deepchill",
+      "H": "Longreach"
+    },
+    "heightm": 1.7,
+    "weightkg": 316,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Graveler-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "roggenrolatemporal": {
+    "num": 625,
+    "name": "Roggenrola-Temporal",
+    "types": [
+      "Rock",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 30,
+      "def": 45,
+      "spa": 30,
+      "spd": 55,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Magnet Pull",
+      "1": "Levitate",
+      "H": "Aftermath"
+    },
+    "heightm": 0.4,
+    "weightkg": 18,
+    "color": "Brown",
+    "evos": [
+      "Boldore-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "boldoretemporal": {
+    "num": 626,
+    "name": "Boldore-Temporal",
+    "types": [
+      "Rock",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 45,
+      "def": 70,
+      "spa": 50,
+      "spd": 85,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Magnet Pull",
+      "1": "Levitate",
+      "H": "Aftermath"
+    },
+    "heightm": 0.9,
+    "weightkg": 102,
+    "color": "Brown",
+    "evos": [
+      "Gigalith-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Roggenrola-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "gigalithtemporal": {
+    "num": 627,
+    "name": "Gigalith-Temporal",
+    "types": [
+      "Rock",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 70,
+      "def": 85,
+      "spa": 75,
+      "spd": 105,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Magnet Pull",
+      "1": "Levitate",
+      "H": "Aftermath"
+    },
+    "heightm": 1.7,
+    "weightkg": 260,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Gigalith-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Gigalith-Temporal",
+      "Gigalith-Temporal-Mega"
+    ],
+    "prevo": "Boldore-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "vanillitetemporal": {
+    "num": 628,
+    "name": "Vanillite-Temporal",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 36,
+      "atk": 40,
+      "def": 50,
+      "spa": 54,
+      "spd": 75,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Magma Armor",
+      "1": "Flamebody",
+      "H": "Solarpower"
+    },
+    "heightm": 0.4,
+    "weightkg": 5.7,
+    "color": "Red",
+    "evos": [
+      "Vanillish-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "vanillishtemporal": {
+    "num": 629,
+    "name": "Vanillish-Temporal",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 51,
+      "atk": 55,
+      "def": 65,
+      "spa": 69,
+      "spd": 90,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Magma Armor",
+      "1": "Flamebody",
+      "H": "Drought"
+    },
+    "heightm": 1.1,
+    "weightkg": 41,
+    "color": "Red",
+    "evos": [
+      "Vanilluxe-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Vanillite-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "vanilluxetemporal": {
+    "num": 630,
+    "name": "Vanilluxe-Temporal",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 71,
+      "atk": 85,
+      "def": 85,
+      "spa": 89,
+      "spd": 120,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Magma Armor",
+      "1": "Flamebody",
+      "H": "Drought"
+    },
+    "heightm": 1.3,
+    "weightkg": 57.5,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Vanillish-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "murkrowtemporal": {
+    "num": 634,
+    "name": "Murkrow-Temporal",
+    "types": [
+      "Psychic",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 75,
+      "def": 57,
+      "spa": 81,
+      "spd": 75,
+      "spe": 57
+    },
+    "abilities": {
+      "0": "Impulsive",
+      "1": "Magicguard",
+      "H": "Spellcaster"
+    },
+    "heightm": 0.5,
+    "weightkg": 2.1,
+    "color": "Blue",
+    "evos": [
+      "Honchkrow-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "honchkrowtemporal": {
+    "num": 635,
+    "name": "Honchkrow-Temporal",
+    "types": [
+      "Psychic",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 100,
+      "def": 62,
+      "spa": 86,
+      "spd": 100,
+      "spe": 62
+    },
+    "abilities": {
+      "0": "Impulsive",
+      "1": "Magicguard",
+      "H": "Spellcaster"
+    },
+    "heightm": 0.9,
+    "weightkg": 27.3,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Murkrow-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "kabutotemporal": {
+    "num": 639,
+    "name": "Kabuto-Temporal",
+    "types": [
+      "Electric",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "atk": 90,
+      "def": 70,
+      "spa": 75,
+      "spd": 45,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Moxie",
+      "1": "Sheer Force",
+      "H": "Superconductive"
+    },
+    "heightm": 0.5,
+    "weightkg": 11.5,
+    "color": "Gray",
+    "evos": [
+      "Kabutops-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "kabutopstemporal": {
+    "num": 640,
+    "name": "Kabutops-Temporal",
+    "types": [
+      "Electric",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 115,
+      "def": 80,
+      "spa": 95,
+      "spd": 55,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Moxie",
+      "1": "Sheer Force",
+      "H": "Superconductive"
+    },
+    "heightm": 1.3,
+    "weightkg": 40.5,
+    "color": "Gray",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Kabuto-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "laprastemporal": {
+    "num": 655,
+    "name": "Lapras-Temporal",
+    "types": [
+      "Ground",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 140,
+      "atk": 95,
+      "def": 70,
+      "spa": 80,
+      "spd": 55,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Thickfat",
+      "1": "Protosynthesis",
+      "H": "Dragonsmaw"
+    },
+    "heightm": 2.5,
+    "weightkg": 220,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "woolootemporal": {
+    "num": 656,
+    "name": "Wooloo-Temporal",
+    "types": [
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 48,
+      "atk": 65,
+      "def": 60,
+      "spa": 67,
+      "spd": 20,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Harvest",
+      "1": "Grasspelt",
+      "H": "Gluttony"
+    },
+    "heightm": 0.6,
+    "weightkg": 6,
+    "color": "Green",
+    "evos": [
+      "Dubwool-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dubwooltemporal": {
+    "num": 657,
+    "name": "Dubwool-Temporal",
+    "types": [
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 82,
+      "atk": 100,
+      "def": 95,
+      "spa": 93,
+      "spd": 35,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Harvest",
+      "1": "Grasspelt",
+      "H": "Gluttony"
+    },
+    "heightm": 1.3,
+    "weightkg": 43,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Wooloo-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "drilburtemporal": {
+    "num": 662,
+    "name": "Drilbur-Temporal",
+    "types": [
+      "Ice",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 30,
+      "def": 50,
+      "spa": 68,
+      "spd": 75,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Wonderskin",
+      "1": "Prismarmor",
+      "H": "Rockypayload"
+    },
+    "heightm": 0.3,
+    "weightkg": 8.5,
+    "color": "White",
+    "evos": [
+      "Excadrill-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "excadrilltemporal": {
+    "num": 663,
+    "name": "Excadrill-Temporal",
+    "types": [
+      "Ice",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 50,
+      "def": 85,
+      "spa": 88,
+      "spd": 110,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Wonderskin",
+      "1": "Prismarmor",
+      "H": "Rockypayload"
+    },
+    "heightm": 0.7,
+    "weightkg": 40.4,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Drilbur-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "solosistemporal": {
+    "num": 671,
+    "name": "Solosis-Temporal",
+    "types": [
+      "Cosmic",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 60,
+      "def": 70,
+      "spa": 10,
+      "spd": 65,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Overcoat",
+      "H": "Analytic"
+    },
+    "heightm": 0.3,
+    "weightkg": 1,
+    "color": "Purple",
+    "evos": [
+      "Duosion-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "duosiontemporal": {
+    "num": 672,
+    "name": "Duosion-Temporal",
+    "types": [
+      "Cosmic",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 75,
+      "def": 80,
+      "spa": 20,
+      "spd": 80,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Overcoat",
+      "H": "Analytic"
+    },
+    "heightm": 0.6,
+    "weightkg": 8,
+    "color": "Purple",
+    "evos": [
+      "Reuniclus-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Solosis-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "reuniclustemporal": {
+    "num": 673,
+    "name": "Reuniclus-Temporal",
+    "types": [
+      "Cosmic",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 95,
+      "def": 105,
+      "spa": 35,
+      "spd": 100,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Overcoat",
+      "H": "Analytic"
+    },
+    "heightm": 1,
+    "weightkg": 20.1,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Duosion-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "hoppiptemporal": {
+    "num": 677,
+    "name": "Hoppip-Temporal",
+    "types": [
+      "Bug",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 25,
+      "def": 40,
+      "spa": 50,
+      "spd": 45,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Shielddust",
+      "1": "Effectspore",
+      "H": "Vitality"
+    },
+    "heightm": 0.4,
+    "weightkg": 0.5,
+    "color": "Yellow",
+    "evos": [
+      "Skiploom-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "skiploomtemporal": {
+    "num": 678,
+    "name": "Skiploom-Temporal",
+    "types": [
+      "Bug",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 35,
+      "def": 50,
+      "spa": 80,
+      "spd": 55,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Shielddust",
+      "1": "Effectspore",
+      "H": "Vitality"
+    },
+    "heightm": 0.6,
+    "weightkg": 1,
+    "color": "Yellow",
+    "evos": [
+      "Jumpluff-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Hoppip-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "jumplufftemporal": {
+    "num": 679,
+    "name": "Jumpluff-Temporal",
+    "types": [
+      "Bug",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 45,
+      "def": 70,
+      "spa": 100,
+      "spd": 85,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Shielddust",
+      "1": "Effectspore",
+      "H": "Vitality"
+    },
+    "heightm": 0.8,
+    "weightkg": 3,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Jumpluff-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Jumpluff-Temporal",
+      "Jumpluff-Temporal-Mega"
+    ],
+    "prevo": "Skiploom-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "timburrtemporal": {
+    "num": 691,
+    "name": "Timburr-Temporal",
+    "types": [
+      "Grass",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 70,
+      "def": 55,
+      "spa": 35,
+      "spd": 35,
+      "spe": 35
+    },
+    "abilities": {
+      "0": "Oblivious",
+      "1": "Sheer Force",
+      "H": "Ironfist"
+    },
+    "heightm": 0.6,
+    "weightkg": 12.5,
+    "color": "Gray",
+    "evos": [
+      "Gurdurr-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "gurdurrtemporal": {
+    "num": 692,
+    "name": "Gurdurr-Temporal",
+    "types": [
+      "Grass",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 90,
+      "def": 85,
+      "spa": 40,
+      "spd": 55,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Oblivious",
+      "1": "Sheer Force",
+      "H": "Ironfist"
+    },
+    "heightm": 1.2,
+    "weightkg": 40,
+    "color": "Gray",
+    "evos": [
+      "Conkeldurr-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Timburr-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "conkeldurrtemporal": {
+    "num": 693,
+    "name": "Conkeldurr-Temporal",
+    "types": [
+      "Grass",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "atk": 110,
+      "def": 105,
+      "spa": 45,
+      "spd": 60,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Oblivious",
+      "1": "Sheer Force",
+      "H": "Ironfist"
+    },
+    "heightm": 1.4,
+    "weightkg": 87,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Gurdurr-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "larvestatemporal": {
+    "num": 704,
+    "name": "Larvesta-Temporal",
+    "types": [
+      "Cosmic",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 85,
+      "def": 55,
+      "spa": 60,
+      "spd": 50,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Nebulacloud",
+      "1": "Dazzling",
+      "H": "Starstruck"
+    },
+    "heightm": 1.1,
+    "weightkg": 28.8,
+    "color": "Black",
+    "evos": [
+      "Volcarona-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "volcaronatemporal": {
+    "num": 705,
+    "name": "Volcarona-Temporal",
+    "types": [
+      "Cosmic",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 75,
+      "def": 65,
+      "spa": 85,
+      "spd": 135,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Nebulacloud",
+      "1": "Dazzling",
+      "H": "Starstruck"
+    },
+    "heightm": 1.6,
+    "weightkg": 46,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Larvesta-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "nosepasstemporal": {
+    "num": 717,
+    "name": "Nosepass-Temporal",
+    "types": [
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 85,
+      "def": 70,
+      "spa": 50,
+      "spd": 85,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Battery",
+      "1": "Surgesurfer",
+      "H": "Owntempo"
+    },
+    "heightm": 1,
+    "weightkg": 37,
+    "color": "Brown",
+    "evos": [
+      "Probopass-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "probopasstemporal": {
+    "num": 718,
+    "name": "Probopass-Temporal",
+    "types": [
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 105,
+      "def": 85,
+      "spa": 60,
+      "spd": 105,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Battery",
+      "1": "Surgesurfer",
+      "H": "Electricsurge"
+    },
+    "heightm": 1.4,
+    "weightkg": 120,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Nosepass-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "swinubtemporal": {
+    "num": 732,
+    "name": "Swinub-Temporal",
+    "types": [
+      "Grass",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 60,
+      "def": 55,
+      "spa": 35,
+      "spd": 25,
+      "spe": 25
+    },
+    "abilities": {
+      "0": "Leafguard",
+      "1": "Thickfat",
+      "H": "Reckless"
+    },
+    "heightm": 0.4,
+    "weightkg": 6.5,
+    "color": "Green",
+    "evos": [
+      "Piloswine-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "piloswinetemporal": {
+    "num": 733,
+    "name": "Piloswine-Temporal",
+    "types": [
+      "Grass",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 110,
+      "def": 100,
+      "spa": 55,
+      "spd": 50,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Leafguard",
+      "1": "Thickfat",
+      "H": "Reckless"
+    },
+    "heightm": 1.1,
+    "weightkg": 55.8,
+    "color": "Green",
+    "evos": [
+      "Mamoswine-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Swinub-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "mamoswinetemporal": {
+    "num": 734,
+    "name": "Mamoswine-Temporal",
+    "types": [
+      "Grass",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 120,
+      "def": 120,
+      "spa": 75,
+      "spd": 55,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Leafguard",
+      "1": "Thickfat",
+      "H": "Reckless"
+    },
+    "heightm": 2.5,
+    "weightkg": 291,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Piloswine-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "magnemitetemporal": {
+    "num": 737,
+    "name": "Magnemite-Temporal",
+    "types": [
+      "Rock",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 15,
+      "def": 70,
+      "spa": 35,
+      "spd": 85,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Levitate",
+      "1": "Solid Rock",
+      "H": "Tinted Lens"
+    },
+    "heightm": 0.3,
+    "weightkg": 6,
+    "color": "Gray",
+    "evos": [
+      "Magneton-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "magnetontemporal": {
+    "num": 738,
+    "name": "Magneton-Temporal",
+    "types": [
+      "Rock",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 25,
+      "def": 95,
+      "spa": 55,
+      "spd": 110,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Levitate",
+      "1": "Solid Rock",
+      "H": "Tinted Lens"
+    },
+    "heightm": 1,
+    "weightkg": 60,
+    "color": "Gray",
+    "evos": [
+      "Magnezone-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Magnemite-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "magnezonetemporal": {
+    "num": 739,
+    "name": "Magnezone-Temporal",
+    "types": [
+      "Rock",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 30,
+      "def": 110,
+      "spa": 60,
+      "spd": 125,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Levitate",
+      "1": "Solid Rock",
+      "H": "Tinted Lens"
+    },
+    "heightm": 1.2,
+    "weightkg": 180,
+    "color": "Gray",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Magneton-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "impidimptemporal": {
+    "num": 740,
+    "name": "Impidimp-Temporal",
+    "types": [
+      "Fire",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 60,
+      "def": 50,
+      "spa": 35,
+      "spd": 45,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Vengeful",
+      "1": "Merciless",
+      "H": "Irredeemable"
+    },
+    "heightm": 0.4,
+    "weightkg": 5.5,
+    "color": "Red",
+    "evos": [
+      "Morgrem-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "morgremtemporal": {
+    "num": 741,
+    "name": "Morgrem-Temporal",
+    "types": [
+      "Fire",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 80,
+      "def": 70,
+      "spa": 65,
+      "spd": 55,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Vengeful",
+      "1": "Merciless",
+      "H": "Irredeemable"
+    },
+    "heightm": 0.8,
+    "weightkg": 12.5,
+    "color": "Red",
+    "evos": [
+      "Grimmsnarl-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Impidimp-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "grimmsnarltemporal": {
+    "num": 742,
+    "name": "Grimmsnarl-Temporal",
+    "types": [
+      "Fire",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 100,
+      "def": 90,
+      "spa": 90,
+      "spd": 75,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Vengeful",
+      "1": "Merciless",
+      "H": "Irredeemable"
+    },
+    "heightm": 1.5,
+    "weightkg": 61,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Grimmsnarl-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Grimmsnarl-Temporal",
+      "Grimmsnarl-Temporal-Mega"
+    ],
+    "prevo": "Morgrem-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "budewtemporal": {
+    "num": 744,
+    "name": "Budew-Temporal",
+    "types": [
+      "Grass",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 35,
+      "spa": 50,
+      "spd": 70,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Aromaveil",
+      "1": "Ironbarbs",
+      "H": "Protosynthesis"
+    },
+    "heightm": 0.2,
+    "weightkg": 1.2,
+    "color": "Red",
+    "evos": [
+      "Roselia-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "roseliatemporal": {
+    "num": 745,
+    "name": "Roselia-Temporal",
+    "types": [
+      "Grass",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 60,
+      "def": 45,
+      "spa": 65,
+      "spd": 100,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Aromaveil",
+      "1": "Ironbarbs",
+      "H": "Protosynthesis"
+    },
+    "heightm": 0.3,
+    "weightkg": 2,
+    "color": "Red",
+    "evos": [
+      "Roserade-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Budew-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "roseradetemporal": {
+    "num": 746,
+    "name": "Roserade-Temporal",
+    "types": [
+      "Grass",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 70,
+      "def": 65,
+      "spa": 90,
+      "spd": 125,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Aromaveil",
+      "1": "Ironbarbs",
+      "H": "Protosynthesis"
+    },
+    "heightm": 0.9,
+    "weightkg": 14.5,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Roselia-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "wyrdeertemporal": {
+    "num": 753,
+    "name": "Wyrdeer-Temporal",
+    "types": [
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 93,
+      "atk": 125,
+      "def": 72,
+      "spa": 85,
+      "spd": 70,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Reckless",
+      "1": "Sheer Force",
+      "H": "Motordrive"
+    },
+    "heightm": 1.8,
+    "weightkg": 95.1,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Wyrdeer-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Wyrdeer-Temporal",
+      "Wyrdeer-Temporal-Mega"
+    ],
+    "prevo": "Stantler-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "feebastemporal": {
+    "num": 770,
+    "name": "Feebas-Temporal",
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 20,
+      "atk": 10,
+      "def": 65,
+      "spa": 40,
+      "spd": 15,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Scorchscale",
+      "1": "Dryskin",
+      "H": "Dishearten"
+    },
+    "heightm": 0.6,
+    "weightkg": 7.4,
+    "color": "Brown",
+    "evos": [
+      "Milotic-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "milotictemporal": {
+    "num": 771,
+    "name": "Milotic-Temporal",
+    "types": [
+      "Fire",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 55,
+      "def": 100,
+      "spa": 71,
+      "spd": 125,
+      "spe": 94
+    },
+    "abilities": {
+      "0": "Scorchscale",
+      "1": "Dryskin",
+      "H": "Dishearten"
+    },
+    "heightm": 6.2,
+    "weightkg": 162,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Feebas-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "tapukokoss2": {
+    "name": "Tapu Koko (SS2)",
+    "num": -60009,
+    "types": [
+      "Bug",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 115,
+      "def": 85,
+      "spa": 130,
+      "spd": 95,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Poisonheal",
+      "1": "Toxicboost",
+      "H": "Unnerve"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Yellow",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "tapuleless2": {
+    "name": "Tapu Lele (SS2)",
+    "num": -60010,
+    "types": [
+      "Normal",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 70,
+      "def": 75,
+      "spa": 95,
+      "spd": 130,
+      "spe": 115
+    },
+    "abilities": {
+      "0": "Attunement",
+      "1": "Owntempo",
+      "H": "Nobility"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Pink",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "tapubuluss2": {
+    "name": "Tapu Bulu (SS2)",
+    "num": -60011,
+    "types": [
+      "Fire",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 130,
+      "def": 115,
+      "spa": 75,
+      "spd": 85,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Drought",
+      "1": "Solarpower",
+      "H": "Reckless"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Red",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "tapufiniss2": {
+    "name": "Tapu Fini (SS2)",
+    "num": -60012,
+    "types": [
+      "Poison",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 75,
+      "def": 115,
+      "spa": 85,
+      "spd": 95,
+      "spe": 130
+    },
+    "abilities": {
+      "0": "Corrosion",
+      "1": "Shed Skin",
+      "H": "Keeneye"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Purple",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "bronzortemporal": {
+    "num": 794,
+    "name": "Bronzor-Temporal",
+    "types": [
+      "Ghost",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 56,
+      "atk": 24,
+      "def": 86,
+      "spa": 23,
+      "spd": 86,
+      "spe": 25
+    },
+    "abilities": {
+      "0": "Retribution",
+      "1": "Cursed Body",
+      "H": "Virtuoso"
+    },
+    "heightm": 0.5,
+    "weightkg": 60.5,
+    "color": "Gray",
+    "evos": [
+      "Bronzong-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "bronzongtemporal": {
+    "num": 795,
+    "name": "Bronzong-Temporal",
+    "types": [
+      "Ghost",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 77,
+      "atk": 52,
+      "def": 106,
+      "spa": 33,
+      "spd": 126,
+      "spe": 106
+    },
+    "abilities": {
+      "0": "Retribution",
+      "1": "Cursed Body",
+      "H": "Virtuoso"
+    },
+    "heightm": 1.3,
+    "weightkg": 187,
+    "color": "Gray",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Bronzor-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mimejrtemporal": {
+    "num": 810,
+    "name": "Mime Jr.-Temporal",
+    "types": [
+      "Ghost",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 25,
+      "def": 55,
+      "spa": 30,
+      "spd": 65,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Dishearten",
+      "1": "Dancer",
+      "H": "Irredeemable"
+    },
+    "heightm": 0.6,
+    "weightkg": 13,
+    "color": "Black",
+    "evos": [
+      "Mr. Mime-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mrmimetemporal": {
+    "num": 811,
+    "name": "Mr. Mime-Temporal",
+    "types": [
+      "Ghost",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 40,
+      "def": 90,
+      "spa": 60,
+      "spd": 90,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Dishearten",
+      "1": "Dancer",
+      "H": "Irredeemable"
+    },
+    "heightm": 1.3,
+    "weightkg": 54.5,
+    "color": "Black",
+    "evos": [
+      "Mr-Temporal. Rime"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Mime-Temporal Jr.",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "mrrimetemporal": {
+    "num": 812,
+    "name": "Mr. Rime-Temporal",
+    "types": [
+      "Ghost",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 50,
+      "def": 95,
+      "spa": 70,
+      "spd": 100,
+      "spe": 115
+    },
+    "abilities": {
+      "0": "Dishearten",
+      "1": "Dancer",
+      "H": "Irredeemable"
+    },
+    "heightm": 1.5,
+    "weightkg": 58.2,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Mr-Temporal. Mime",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "ponytatemporal": {
+    "num": 813,
+    "name": "Ponyta-Temporal",
+    "types": [
+      "Water",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 45,
+      "def": 65,
+      "spa": 100,
+      "spd": 75,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Swift Swim",
+      "1": "Attunement",
+      "H": "Affection"
+    },
+    "heightm": 1,
+    "weightkg": 30,
+    "color": "Blue",
+    "evos": [
+      "Rapidash-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "rapidashtemporal": {
+    "num": 814,
+    "name": "Rapidash-Temporal",
+    "types": [
+      "Water",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 55,
+      "def": 75,
+      "spa": 120,
+      "spd": 100,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Swift Swim",
+      "1": "Attunement",
+      "H": "Affection"
+    },
+    "heightm": 1.7,
+    "weightkg": 95,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Ponyta-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "goletttemporal": {
+    "num": 815,
+    "name": "Golett-Temporal",
+    "types": [
+      "Fire",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 64,
+      "atk": 64,
+      "def": 60,
+      "spa": 25,
+      "spd": 60,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Steamengine",
+      "1": "Flashfire",
+      "H": "White Smoke"
+    },
+    "heightm": 1,
+    "weightkg": 92,
+    "color": "Purple",
+    "evos": [
+      "Golurk-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "golurktemporal": {
+    "num": 816,
+    "name": "Golurk-Temporal",
+    "types": [
+      "Fire",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 84,
+      "atk": 105,
+      "def": 90,
+      "spa": 35,
+      "spd": 109,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Steamengine",
+      "1": "Flashfire",
+      "H": "White Smoke"
+    },
+    "heightm": 2.8,
+    "weightkg": 330,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Golett-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sphealtemporal": {
+    "num": 828,
+    "name": "Spheal-Temporal",
+    "types": [
+      "Fairy",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 35,
+      "def": 60,
+      "spa": 35,
+      "spd": 50,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Affection",
+      "H": "Overcoat"
+    },
+    "heightm": 0.8,
+    "weightkg": 39.5,
+    "color": "Pink",
+    "evos": [
+      "Sealeo-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sealeotemporal": {
+    "num": 829,
+    "name": "Sealeo-Temporal",
+    "types": [
+      "Fairy",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 45,
+      "def": 95,
+      "spa": 45,
+      "spd": 70,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Affection",
+      "H": "Overcoat"
+    },
+    "heightm": 1.1,
+    "weightkg": 87.6,
+    "color": "Pink",
+    "evos": [
+      "Walrein-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Spheal-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "walreintemporal": {
+    "num": 830,
+    "name": "Walrein-Temporal",
+    "types": [
+      "Fairy",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 55,
+      "def": 110,
+      "spa": 55,
+      "spd": 100,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Affection",
+      "H": "Overcoat"
+    },
+    "heightm": 1.4,
+    "weightkg": 150.6,
+    "color": "Pink",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Sealeo-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "zoruatemporal": {
+    "num": 865,
+    "name": "Zorua-Temporal",
+    "types": [
+      "Ghost",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 40,
+      "def": 50,
+      "spa": 85,
+      "spd": 60,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Flashfire",
+      "1": "Pounce",
+      "H": "Shadow Tag"
+    },
+    "heightm": 0.7,
+    "weightkg": 12.5,
+    "color": "Blue",
+    "evos": [
+      "Zoroark-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "zoroarktemporal": {
+    "num": 866,
+    "name": "Zoroark-Temporal",
+    "types": [
+      "Ghost",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 60,
+      "def": 80,
+      "spa": 115,
+      "spd": 85,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Flashfire",
+      "1": "Pounce",
+      "H": "Shadow Tag"
+    },
+    "heightm": 1.6,
+    "weightkg": 81.1,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Zorua-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "bergmitetemporal": {
+    "num": 873,
+    "name": "Bergmite-Temporal",
+    "types": [
+      "Grass",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 54,
+      "def": 75,
+      "spa": 28,
+      "spd": 32,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Sapsipper",
+      "1": "Ripen",
+      "H": "Bulletproof"
+    },
+    "heightm": 1,
+    "weightkg": 99.5,
+    "color": "Brown",
+    "evos": [
+      "Avalugg-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "avaluggtemporal": {
+    "num": 874,
+    "name": "Avalugg-Temporal",
+    "types": [
+      "Grass",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "atk": 95,
+      "def": 134,
+      "spa": 28,
+      "spd": 44,
+      "spe": 108
+    },
+    "abilities": {
+      "0": "Sapsipper",
+      "1": "Ripen",
+      "H": "Bulletproof"
+    },
+    "heightm": 2,
+    "weightkg": 505,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Bergmite-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "tyrunttemporal": {
+    "num": 875,
+    "name": "Tyrunt-Temporal",
+    "types": [
+      "Grass",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "atk": 69,
+      "def": 67,
+      "spa": 48,
+      "spd": 55,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Flowerveil",
+      "1": "Thickfat",
+      "H": "Natural Cure"
+    },
+    "heightm": 0.8,
+    "weightkg": 26,
+    "color": "Brown",
+    "evos": [
+      "Tyrantrum-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "tyrantrumtemporal": {
+    "num": 876,
+    "name": "Tyrantrum-Temporal",
+    "types": [
+      "Grass",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 87,
+      "atk": 111,
+      "def": 104,
+      "spa": 71,
+      "spd": 64,
+      "spe": 84
+    },
+    "abilities": {
+      "0": "Flowerveil",
+      "1": "Thickfat",
+      "H": "Grassysurge"
+    },
+    "heightm": 2.5,
+    "weightkg": 270,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Tyrunt-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "growlithetemporal": {
+    "num": 881,
+    "name": "Growlithe-Temporal",
+    "types": [
+      "Dark",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 40,
+      "def": 45,
+      "spa": 75,
+      "spd": 75,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Infiltrator",
+      "1": "Competitive",
+      "H": "Irredeemable"
+    },
+    "heightm": 0.7,
+    "weightkg": 19,
+    "color": "Purple",
+    "evos": [
+      "Arcanine-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "arcaninetemporal": {
+    "num": 882,
+    "name": "Arcanine-Temporal",
+    "types": [
+      "Dark",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 60,
+      "def": 80,
+      "spa": 105,
+      "spd": 110,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Infiltrator",
+      "1": "Competitive",
+      "H": "Irredeemable"
+    },
+    "heightm": 1.9,
+    "weightkg": 155,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Growlithe-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "duskulltemporal": {
+    "num": 892,
+    "name": "Duskull-Temporal",
+    "types": [
+      "Water",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 60,
+      "def": 40,
+      "spa": 45,
+      "spd": 60,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Steelworker",
+      "1": "Shadow Tag",
+      "H": "Moldbreaker"
+    },
+    "heightm": 0.8,
+    "weightkg": 15,
+    "color": "Red",
+    "evos": [
+      "Dusclops-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dusclopstemporal": {
+    "num": 893,
+    "name": "Dusclops-Temporal",
+    "types": [
+      "Water",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 80,
+      "def": 75,
+      "spa": 70,
+      "spd": 80,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Steelworker",
+      "1": "Shadow Tag",
+      "H": "Moldbreaker"
+    },
+    "heightm": 1.6,
+    "weightkg": 30.6,
+    "color": "Red",
+    "evos": [
+      "Dusknoir-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Duskull-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "dusknoirtemporal": {
+    "num": 894,
+    "name": "Dusknoir-Temporal",
+    "types": [
+      "Water",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 100,
+      "def": 80,
+      "spa": 95,
+      "spd": 100,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Steelworker",
+      "1": "Shadow Tag",
+      "H": "Moldbreaker"
+    },
+    "heightm": 2.2,
+    "weightkg": 106.6,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Dusclops-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "rowlettemporal": {
+    "num": 907,
+    "name": "Rowlet-Temporal",
+    "types": [
+      "Electric",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 63,
+      "atk": 45,
+      "def": 45,
+      "spa": 52,
+      "spd": 65,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Competitive",
+      "1": "Static",
+      "H": "Sharpshooter"
+    },
+    "heightm": 0.3,
+    "weightkg": 1.5,
+    "color": "Yellow",
+    "evos": [
+      "Dartrix-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dartrixtemporal": {
+    "num": 908,
+    "name": "Dartrix-Temporal",
+    "types": [
+      "Electric",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "atk": 55,
+      "def": 65,
+      "spa": 72,
+      "spd": 80,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Competitive",
+      "1": "Static",
+      "H": "Sharpshooter"
+    },
+    "heightm": 0.7,
+    "weightkg": 16,
+    "color": "Brown",
+    "evos": [
+      "Decidueye-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Rowlet-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "decidueyetemporal": {
+    "num": 909,
+    "name": "Decidueye-Temporal",
+    "types": [
+      "Electric",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 65,
+      "def": 85,
+      "spa": 95,
+      "spd": 110,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Competitive",
+      "1": "Static",
+      "H": "Sharpshooter"
+    },
+    "heightm": 1.6,
+    "weightkg": 36.6,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Dartrix-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "cacneatemporal": {
+    "num": 915,
+    "name": "Cacnea-Temporal",
+    "types": [
+      "Fire",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 30,
+      "def": 55,
+      "spa": 65,
+      "spd": 80,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Moldbreaker",
+      "1": "Aftermath",
+      "H": "Flamebody"
+    },
+    "heightm": 0.4,
+    "weightkg": 51.3,
+    "color": "Blue",
+    "evos": [
+      "Cacturne-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "cacturnetemporal": {
+    "num": 916,
+    "name": "Cacturne-Temporal",
+    "types": [
+      "Fire",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 50,
+      "def": 80,
+      "spa": 85,
+      "spd": 110,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Moldbreaker",
+      "1": "Aftermath",
+      "H": "Flamebody"
+    },
+    "heightm": 1.3,
+    "weightkg": 77.4,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Cacturne-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Cacturne-Temporal",
+      "Cacturne-Temporal-Mega"
+    ],
+    "prevo": "Cacnea-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "phantumptemporal": {
+    "num": 922,
+    "name": "Phantump-Temporal",
+    "types": [
+      "Cosmic",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 53,
+      "atk": 40,
+      "def": 38,
+      "spa": 43,
+      "spd": 60,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Ethereal",
+      "1": "Wanderingspirit",
+      "H": "Synchronize"
+    },
+    "heightm": 0.4,
+    "weightkg": 7,
+    "color": "White",
+    "evos": [
+      "Trevenant-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "trevenanttemporal": {
+    "num": 923,
+    "name": "Trevenant-Temporal",
+    "types": [
+      "Cosmic",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 55,
+      "def": 56,
+      "spa": 76,
+      "spd": 95,
+      "spe": 102
+    },
+    "abilities": {
+      "0": "Ethereal",
+      "1": "Wanderingspirit",
+      "H": "Psychicsurge"
+    },
+    "heightm": 1.5,
+    "weightkg": 71,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Phantump-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "igglybufftemporal": {
+    "num": 924,
+    "name": "Igglybuff-Temporal",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "atk": 45,
+      "def": 30,
+      "spa": 55,
+      "spd": 15,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Rockypayload",
+      "1": "Longreach",
+      "H": "No Guard"
+    },
+    "heightm": 0.2,
+    "weightkg": 0.1,
+    "color": "Red",
+    "evos": [
+      "Jigglypuff-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "jigglypufftemporal": {
+    "num": 925,
+    "name": "Jigglypuff-Temporal",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 60,
+      "def": 40,
+      "spa": 65,
+      "spd": 25,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Rockypayload",
+      "1": "Longreach",
+      "H": "No Guard"
+    },
+    "heightm": 1.5,
+    "weightkg": 0.2,
+    "color": "Red",
+    "evos": [
+      "Wigglytuff-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Igglybuff-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "wigglytufftemporal": {
+    "num": 926,
+    "name": "Wigglytuff-Temporal",
+    "types": [
+      "Fire",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 80,
+      "def": 80,
+      "spa": 100,
+      "spd": 35,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Rockypayload",
+      "1": "Longreach",
+      "H": "No Guard"
+    },
+    "heightm": 2,
+    "weightkg": 0.5,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Wigglytuff-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Wigglytuff-Temporal",
+      "Wigglytuff-Temporal-Mega"
+    ],
+    "prevo": "Jigglypuff-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "miniortemporal": {
+    "num": 929,
+    "name": "Minior-Temporal",
+    "types": [
+      "Cosmic",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 35,
+      "def": 90,
+      "spa": 100,
+      "spd": 105,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Precision",
+      "1": "Antigravity",
+      "H": "Quarkdrive"
+    },
+    "heightm": 0.3,
+    "weightkg": 400,
+    "color": "Gray",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "teddiursatemporal": {
+    "num": 934,
+    "name": "Teddiursa-Temporal",
+    "types": [
+      "Ice",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 70,
+      "spa": 55,
+      "spd": 35,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Hustle",
+      "1": "Poisontouch",
+      "H": "Thickfat"
+    },
+    "heightm": 0.6,
+    "weightkg": 8.8,
+    "color": "White",
+    "evos": [
+      "Ursaring-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "ursaringtemporal": {
+    "num": 935,
+    "name": "Ursaring-Temporal",
+    "types": [
+      "Ice",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 85,
+      "def": 95,
+      "spa": 85,
+      "spd": 60,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Hustle",
+      "1": "Poisontouch",
+      "H": "Thickfat"
+    },
+    "heightm": 1.8,
+    "weightkg": 125.8,
+    "color": "White",
+    "evos": [
+      "Ursaluna-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Teddiursa-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "ursalunatemporal": {
+    "num": 936,
+    "name": "Ursaluna-Temporal",
+    "types": [
+      "Ice",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "atk": 105,
+      "def": 105,
+      "spa": 60,
+      "spd": 65,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Hustle",
+      "1": "Poisontouch",
+      "H": "Thickfat"
+    },
+    "heightm": 2.4,
+    "weightkg": 290,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Ursaluna-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Ursaluna-Temporal",
+      "Ursaluna-Temporal-Mega"
+    ],
+    "prevo": "Ursaring-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sneaseltemporal": {
+    "num": 938,
+    "name": "Sneasel-Temporal",
+    "types": [
+      "Light",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 75,
+      "def": 65,
+      "spa": 80,
+      "spd": 75,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Blacklight",
+      "1": "Whiteout",
+      "H": "Arsonist"
+    },
+    "heightm": 0.9,
+    "weightkg": 28,
+    "color": "Black",
+    "evos": [
+      "Sneasler-Temporal",
+      "Weavile-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "weaviletemporal": {
+    "num": 939,
+    "name": "Weavile-Temporal",
+    "types": [
+      "Light",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 105,
+      "def": 60,
+      "spa": 100,
+      "spd": 105,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Lightaura",
+      "1": "Whiteout",
+      "H": "Pureheart"
+    },
+    "heightm": 1.1,
+    "weightkg": 34,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Sneasel-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sneaslertemporal": {
+    "num": 940,
+    "name": "Sneasler-Temporal",
+    "types": [
+      "Dark",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 79,
+      "atk": 100,
+      "def": 65,
+      "spa": 101,
+      "spd": 100,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Rebellious",
+      "1": "Darkaura",
+      "H": "Irredeemable"
+    },
+    "heightm": 1.1,
+    "weightkg": 34,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Sneasel-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "tandemaustemporal": {
+    "num": 943,
+    "name": "Tandemaus-Temporal",
+    "types": [
+      "Ice",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 60,
+      "def": 45,
+      "spa": 75,
+      "spd": 30,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Protean",
+      "1": "Friendguard",
+      "H": "Slushrush"
+    },
+    "heightm": 0.3,
+    "weightkg": 1.8,
+    "color": "White",
+    "evos": [
+      "Maushold-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mausholdtemporal": {
+    "num": 944,
+    "name": "Maushold-Temporal",
+    "types": [
+      "Ice",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "atk": 95,
+      "def": 70,
+      "spa": 111,
+      "spd": 45,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Protean",
+      "1": "Parentalbond",
+      "H": "Slushrush"
+    },
+    "heightm": 0.3,
+    "weightkg": 2.8,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Tandemaus-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "cetoddletemporal": {
+    "num": 947,
+    "name": "Cetoddle-Temporal",
+    "types": [
+      "Cosmic",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "atk": 30,
+      "def": 65,
+      "spa": 33,
+      "spd": 68,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Aftermath",
+      "1": "Orbit",
+      "H": "Filter"
+    },
+    "heightm": 1.2,
+    "weightkg": 45,
+    "color": "Purple",
+    "evos": [
+      "Cetitan-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "cetitantemporal": {
+    "num": 948,
+    "name": "Cetitan-Temporal",
+    "types": [
+      "Cosmic",
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 63,
+      "def": 90,
+      "spa": 73,
+      "spd": 105,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Aftermath",
+      "1": "Orbit",
+      "H": "Filter"
+    },
+    "heightm": 4.5,
+    "weightkg": 700,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Cetoddle-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "scythertemporal": {
+    "num": 949,
+    "name": "Scyther-Temporal",
+    "types": [
+      "Electric",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 110,
+      "def": 80,
+      "spa": 85,
+      "spd": 55,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Superconductive",
+      "1": "Surgesurfer",
+      "H": "Compound Eyes"
+    },
+    "heightm": 1.5,
+    "weightkg": 56,
+    "color": "Yellow",
+    "evos": [
+      "Scizor-Temporal",
+      "Kleavor-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "scizortemporal": {
+    "num": 950,
+    "name": "Scizor-Temporal",
+    "types": [
+      "Electric",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 55,
+      "def": 80,
+      "spa": 85,
+      "spd": 110,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Surgesurfer",
+      "H": "Compound Eyes"
+    },
+    "heightm": 1.8,
+    "weightkg": 118,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Scizor-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Scizor-Temporal",
+      "Scizor-Temporal-Mega"
+    ],
+    "prevo": "Scyther-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "skiddotemporal": {
+    "num": 957,
+    "name": "Skiddo-Temporal",
+    "types": [
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 56,
+      "atk": 60,
+      "def": 48,
+      "spa": 97,
+      "spd": 32,
+      "spe": 47
+    },
+    "abilities": {
+      "0": "Flexible",
+      "1": "Unburden",
+      "H": "Aerilate"
+    },
+    "heightm": 0.9,
+    "weightkg": 31,
+    "color": "Brown",
+    "evos": [
+      "Gogoat-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "gogoattemporal": {
+    "num": 958,
+    "name": "Gogoat-Temporal",
+    "types": [
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 93,
+      "atk": 100,
+      "def": 82,
+      "spa": 123,
+      "spd": 40,
+      "spe": 96
+    },
+    "abilities": {
+      "0": "Flexible",
+      "1": "Unburden",
+      "H": "Aerilate"
+    },
+    "heightm": 1.7,
+    "weightkg": 91,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Skiddo-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "parastemporal": {
+    "num": 984,
+    "name": "Paras-Temporal",
+    "types": [
+      "Bug",
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 20,
+      "def": 50,
+      "spa": 50,
+      "spd": 70,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Friendguard",
+      "1": "Stickyhold",
+      "H": "Natural Cure"
+    },
+    "heightm": 0.3,
+    "weightkg": 5.4,
+    "color": "Blue",
+    "evos": [
+      "Parasect-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "parasecttemporal": {
+    "num": 985,
+    "name": "Parasect-Temporal",
+    "types": [
+      "Bug",
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 30,
+      "def": 75,
+      "spa": 60,
+      "spd": 95,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Friendguard",
+      "1": "Stickyhold",
+      "H": "Natural Cure"
+    },
+    "heightm": 1,
+    "weightkg": 29.5,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Paras-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "phanpytemporal": {
+    "num": 986,
+    "name": "Phanpy-Temporal",
+    "types": [
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 20,
+      "def": 50,
+      "spa": 65,
+      "spd": 65,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Swift Swim",
+      "1": "Liquidvoice",
+      "H": "Maelstrom"
+    },
+    "heightm": 0.5,
+    "weightkg": 33.5,
+    "color": "Blue",
+    "evos": [
+      "Donphan-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "donphantemporal": {
+    "num": 987,
+    "name": "Donphan-Temporal",
+    "types": [
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 40,
+      "def": 80,
+      "spa": 110,
+      "spd": 100,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Swift Swim",
+      "1": "Liquidvoice",
+      "H": "Maelstrom"
+    },
+    "heightm": 1.1,
+    "weightkg": 120,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Phanpy-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "meltanss2": {
+    "name": "Meltan (SS2)",
+    "num": -60013,
+    "types": [
+      "Ice",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 66,
+      "atk": 65,
+      "def": 65,
+      "spa": 34,
+      "spd": 35,
+      "spe": 35
+    },
+    "abilities": {
+      "0": "Icebody",
+      "1": "Sweetveil",
+      "H": "Refrigerate"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Gray",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "melmetalss2": {
+    "name": "Melmetal (SS2)",
+    "num": -60014,
+    "types": [
+      "Ice",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 135,
+      "atk": 143,
+      "def": 103,
+      "spa": 64,
+      "spd": 50,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Icebody",
+      "1": "Sweetveil",
+      "H": "Refrigerate"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Gray",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "rookideetemporal": {
+    "num": 991,
+    "name": "Rookidee-Temporal",
+    "types": [
+      "Ghost",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 27,
+      "def": 47,
+      "spa": 50,
+      "spd": 45,
+      "spe": 47
+    },
+    "abilities": {
+      "0": "Stakeout",
+      "1": "Attunement",
+      "H": "Opportunist"
+    },
+    "heightm": 0.2,
+    "weightkg": 1.8,
+    "color": "Purple",
+    "evos": [
+      "Corvisquire-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "corvisquiretemporal": {
+    "num": 992,
+    "name": "Corvisquire-Temporal",
+    "types": [
+      "Ghost",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 39,
+      "def": 63,
+      "spa": 70,
+      "spd": 65,
+      "spe": 63
+    },
+    "abilities": {
+      "0": "Stakeout",
+      "1": "Attunement",
+      "H": "Opportunist"
+    },
+    "heightm": 0.8,
+    "weightkg": 16,
+    "color": "Purple",
+    "evos": [
+      "Corviknight-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Rookidee-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "corviknighttemporal": {
+    "num": 993,
+    "name": "Corviknight-Temporal",
+    "types": [
+      "Ghost",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 54,
+      "def": 81,
+      "spa": 105,
+      "spd": 100,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Stakeout",
+      "1": "Attunement",
+      "H": "Opportunist"
+    },
+    "heightm": 2.2,
+    "weightkg": 75,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Corvisquire-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "litleotemporal": {
+    "num": 994,
+    "name": "Litleo-Temporal",
+    "types": [
+      "Water",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "atk": 73,
+      "def": 58,
+      "spa": 52,
+      "spd": 40,
+      "spe": 58
+    },
+    "abilities": {
+      "0": "Watercompaction",
+      "1": "Tanglinghair",
+      "H": "Rivalry"
+    },
+    "heightm": 0.6,
+    "weightkg": 13.5,
+    "color": "Brown",
+    "evos": [
+      "Pyroar-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "pyroartemporal": {
+    "num": 995,
+    "name": "Pyroar-Temporal",
+    "types": [
+      "Water",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 112,
+      "def": 99,
+      "spa": 56,
+      "spd": 48,
+      "spe": 97
+    },
+    "abilities": {
+      "0": "Watercompaction",
+      "1": "Tanglinghair",
+      "H": "Rivalry"
+    },
+    "heightm": 1.5,
+    "weightkg": 81.5,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Litleo-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "tangelatemporal": {
+    "num": 996,
+    "name": "Tangela-Temporal",
+    "types": [
+      "Normal",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 85,
+      "def": 95,
+      "spa": 70,
+      "spd": 50,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Flamebody",
+      "1": "Unburden",
+      "H": "Protean"
+    },
+    "heightm": 1,
+    "weightkg": 10,
+    "color": "Yellow",
+    "evos": [
+      "Tangrowth-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "tangrowthtemporal": {
+    "num": 997,
+    "name": "Tangrowth-Temporal",
+    "types": [
+      "Normal",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "atk": 100,
+      "def": 105,
+      "spa": 80,
+      "spd": 60,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Flamebody",
+      "1": "Unburden",
+      "H": "Protean"
+    },
+    "heightm": 2,
+    "weightkg": 40,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Tangela-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mudbraytemporal": {
+    "num": 1010,
+    "name": "Mudbray-Temporal",
+    "types": [
+      "Fire",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 85,
+      "def": 70,
+      "spa": 80,
+      "spd": 25,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Sturdy",
+      "1": "Infiltrator",
+      "H": "Flamebody"
+    },
+    "heightm": 1,
+    "weightkg": 110,
+    "color": "Brown",
+    "evos": [
+      "Mudsdale-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mudsdaletemporal": {
+    "num": 1011,
+    "name": "Mudsdale-Temporal",
+    "types": [
+      "Fire",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 100,
+      "def": 90,
+      "spa": 100,
+      "spd": 45,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Sturdy",
+      "1": "Infiltrator",
+      "H": "Flamebody"
+    },
+    "heightm": 2.5,
+    "weightkg": 920,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Mudbray-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "pichutemporal": {
+    "num": 1020,
+    "name": "Pichu-Temporal",
+    "types": [
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 45,
+      "def": 25,
+      "spa": 40,
+      "spd": 30,
+      "spe": 25
+    },
+    "abilities": {
+      "0": "No Guard",
+      "1": "Stamina",
+      "H": "Ironfist"
+    },
+    "heightm": 0.3,
+    "weightkg": 2,
+    "color": "Blue",
+    "evos": [
+      "Pikachu-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "pikachutemporal": {
+    "num": 1021,
+    "name": "Pikachu-Temporal",
+    "types": [
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 70,
+      "def": 45,
+      "spa": 55,
+      "spd": 45,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "No Guard",
+      "1": "Stamina",
+      "H": "Ironfist"
+    },
+    "heightm": 0.4,
+    "weightkg": 6,
+    "color": "Blue",
+    "evos": [
+      "Raichu-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Pichu-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "raichutemporal": {
+    "num": 1022,
+    "name": "Raichu-Temporal",
+    "types": [
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 90,
+      "def": 60,
+      "spa": 100,
+      "spd": 70,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "No Guard",
+      "1": "Stamina",
+      "H": "Ironfist"
+    },
+    "heightm": 12,
+    "weightkg": 400,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Pikachu-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "raltstemporal": {
+    "num": 1024,
+    "name": "Ralts-Temporal",
+    "types": [
+      "Sound",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "atk": 25,
+      "def": 25,
+      "spa": 40,
+      "spd": 45,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Marvelscale",
+      "1": "Synchronize",
+      "H": "Baddreams"
+    },
+    "heightm": 0.4,
+    "weightkg": 6.6,
+    "color": "Red",
+    "evos": [
+      "Kirlia-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "kirliatemporal": {
+    "num": 1025,
+    "name": "Kirlia-Temporal",
+    "types": [
+      "Sound",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 35,
+      "def": 35,
+      "spa": 60,
+      "spd": 75,
+      "spe": 55
+    },
+    "abilities": {
+      "0": "Marvelscale",
+      "1": "Synchronize",
+      "H": "Baddreams"
+    },
+    "heightm": 0.8,
+    "weightkg": 20.2,
+    "color": "Red",
+    "evos": [
+      "Gardevoir-Temporal",
+      "Gallade-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Ralts-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "gardevoirtemporal": {
+    "num": 1026,
+    "name": "Gardevoir-Temporal",
+    "types": [
+      "Sound",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 88,
+      "atk": 65,
+      "def": 60,
+      "spa": 90,
+      "spd": 115,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Marvelscale",
+      "1": "Synchronize",
+      "H": "Baddreams"
+    },
+    "heightm": 1.6,
+    "weightkg": 48.4,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Kirlia-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "galladetemporal": {
+    "num": 1027,
+    "name": "Gallade-Temporal",
+    "types": [
+      "Poison",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 88,
+      "atk": 115,
+      "def": 100,
+      "spa": 90,
+      "spd": 65,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Gooey",
+      "1": "Poison Point",
+      "H": "Corrosion"
+    },
+    "heightm": 1.6,
+    "weightkg": 52,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Kirlia-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "treeckotemporal": {
+    "num": 1035,
+    "name": "Treecko-Temporal",
+    "types": [
+      "Steel",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 55,
+      "def": 40,
+      "spa": 70,
+      "spd": 55,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Spellcaster",
+      "1": "Mirrorarmor",
+      "H": "Pureheart"
+    },
+    "heightm": 0.5,
+    "weightkg": 5,
+    "color": "Blue",
+    "evos": [
+      "Grovyle-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "grovyletemporal": {
+    "num": 1036,
+    "name": "Grovyle-Temporal",
+    "types": [
+      "Steel",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 65,
+      "def": 75,
+      "spa": 90,
+      "spd": 65,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Spellcaster",
+      "1": "Mirrorarmor",
+      "H": "Pureheart"
+    },
+    "heightm": 0.9,
+    "weightkg": 21.6,
+    "color": "Blue",
+    "evos": [
+      "Sceptile-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Treecko-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "sceptiletemporal": {
+    "num": 1037,
+    "name": "Sceptile-Temporal",
+    "types": [
+      "Steel",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 100,
+      "def": 75,
+      "spa": 105,
+      "spd": 100,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Spellcaster",
+      "1": "Mirrorarmor",
+      "H": "Pureheart"
+    },
+    "heightm": 1.7,
+    "weightkg": 52.2,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Grovyle-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "spiritombtemporal": {
+    "num": 1038,
+    "name": "Spiritomb-Temporal",
+    "types": [
+      "Dark",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 52,
+      "def": 68,
+      "spa": 75,
+      "spd": 102,
+      "spe": 103
+    },
+    "abilities": {
+      "0": "Electricsurge",
+      "1": "Feedback",
+      "H": "Prankster"
+    },
+    "heightm": 1,
+    "weightkg": 999,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "komalatemporal": {
+    "num": 1040,
+    "name": "Komala-Temporal",
+    "types": [
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 100,
+      "def": 70,
+      "spa": 95,
+      "spd": 60,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Pounce",
+      "1": "Pickup",
+      "H": "Unburden"
+    },
+    "heightm": 0.4,
+    "weightkg": 1000,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "blitzletemporal": {
+    "num": 1041,
+    "name": "Blitzle-Temporal",
+    "types": [
+      "Dragon",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 40,
+      "def": 42,
+      "spa": 71,
+      "spd": 50,
+      "spe": 47
+    },
+    "abilities": {
+      "0": "Nobility",
+      "1": "Pureheart",
+      "H": "Magicguard"
+    },
+    "heightm": 0.8,
+    "weightkg": 29.8,
+    "color": "White",
+    "evos": [
+      "Zebstrika-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "zebstrikatemporal": {
+    "num": 1042,
+    "name": "Zebstrika-Temporal",
+    "types": [
+      "Dragon",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 60,
+      "def": 78,
+      "spa": 101,
+      "spd": 105,
+      "spe": 78
+    },
+    "abilities": {
+      "0": "Nobility",
+      "1": "Pureheart",
+      "H": "Magicguard"
+    },
+    "heightm": 1.6,
+    "weightkg": 79.5,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Blitzle-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "turtwigtemporal": {
+    "num": 1043,
+    "name": "Turtwig-Temporal",
+    "types": [
+      "Flying",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 41,
+      "def": 45,
+      "spa": 45,
+      "spd": 68,
+      "spe": 64
+    },
+    "abilities": {
+      "0": "Illuminate",
+      "1": "Windrider",
+      "H": "Screencleaner"
+    },
+    "heightm": 0.4,
+    "weightkg": 10.2,
+    "color": "Gray",
+    "evos": [
+      "Grotle-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "grotletemporal": {
+    "num": 1044,
+    "name": "Grotle-Temporal",
+    "types": [
+      "Flying",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 51,
+      "def": 55,
+      "spa": 60,
+      "spd": 79,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Illuminate",
+      "1": "Windrider",
+      "H": "Screencleaner"
+    },
+    "heightm": 1.1,
+    "weightkg": 97,
+    "color": "Gray",
+    "evos": [
+      "Torterra-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Turtwig-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "torterratemporal": {
+    "num": 1045,
+    "name": "Torterra-Temporal",
+    "types": [
+      "Flying",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 61,
+      "def": 81,
+      "spa": 84,
+      "spd": 104,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Illuminate",
+      "1": "Windrider",
+      "H": "Screencleaner"
+    },
+    "heightm": 2.2,
+    "weightkg": 310,
+    "color": "Gray",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Grotle-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "naclitemporal": {
+    "num": 1048,
+    "name": "Nacli-Temporal",
+    "types": [
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 50,
+      "def": 60,
+      "spa": 30,
+      "spd": 30,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Rock Head",
+      "1": "Sturdy",
+      "H": "Steamengine"
+    },
+    "heightm": 0.4,
+    "weightkg": 16,
+    "color": "Brown",
+    "evos": [
+      "Naclstack-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "naclstacktemporal": {
+    "num": 1049,
+    "name": "Naclstack-Temporal",
+    "types": [
+      "Steel",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 65,
+      "def": 70,
+      "spa": 40,
+      "spd": 45,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Rock Head",
+      "1": "Sturdy",
+      "H": "Steamengine"
+    },
+    "heightm": 0.6,
+    "weightkg": 105,
+    "color": "Brown",
+    "evos": [
+      "Garganacl-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Nacli-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "garganacltemporal": {
+    "num": 1050,
+    "name": "Garganacl-Temporal",
+    "types": [
+      "Steel",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 90,
+      "def": 100,
+      "spa": 50,
+      "spd": 55,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Rock Head",
+      "1": "Sturdy",
+      "H": "Steamengine"
+    },
+    "heightm": 2.3,
+    "weightkg": 240,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Naclstack-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "cottoneetemporal": {
+    "num": 1051,
+    "name": "Cottonee-Temporal",
+    "types": [
+      "Electric",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 57,
+      "def": 30,
+      "spa": 51,
+      "spd": 57,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Windrider",
+      "1": "Resonant",
+      "H": "Static"
+    },
+    "heightm": 0.3,
+    "weightkg": 0.6,
+    "color": "Brown",
+    "evos": [
+      "Whimsicott-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "whimsicotttemporal": {
+    "num": 1052,
+    "name": "Whimsicott-Temporal",
+    "types": [
+      "Electric",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 97,
+      "def": 60,
+      "spa": 91,
+      "spd": 97,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Windrider",
+      "1": "Resonant",
+      "H": "Static"
+    },
+    "heightm": 0.7,
+    "weightkg": 6.6,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Whimsicott-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Whimsicott-Temporal",
+      "Whimsicott-Temporal-Mega"
+    ],
+    "prevo": "Cottonee-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mimikyutemporal": {
+    "num": 1054,
+    "name": "Mimikyu-Temporal",
+    "types": [
+      "Steel",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 95,
+      "def": 76,
+      "spa": 85,
+      "spd": 94,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Disguise"
+    },
+    "heightm": 0.2,
+    "weightkg": 0.7,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Mimikyu-Temporal-Busted"
+    ],
+    "formeOrder": [
+      "Mimikyu-Temporal",
+      "Mimikyu-Temporal-Busted"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "onixtemporal": {
+    "num": 1067,
+    "name": "Onix-Temporal",
+    "types": [
+      "Psychic",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 85,
+      "def": 90,
+      "spa": 70,
+      "spd": 30,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Rockypayload",
+      "1": "Leechingfangs",
+      "H": "Contrary"
+    },
+    "heightm": 8.8,
+    "weightkg": 210,
+    "color": "Brown",
+    "evos": [
+      "Steelix-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "steelixtemporal": {
+    "num": 1068,
+    "name": "Steelix-Temporal",
+    "types": [
+      "Psychic",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 105,
+      "def": 110,
+      "spa": 80,
+      "spd": 55,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Rockypayload",
+      "1": "Leechingfangs",
+      "H": "Contrary"
+    },
+    "heightm": 9.2,
+    "weightkg": 400,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Onix-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "charmandertemporal": {
+    "num": 1069,
+    "name": "Charmander-Temporal",
+    "types": [
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 55,
+      "def": 47,
+      "spa": 55,
+      "spd": 37,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Tinted Lens",
+      "1": "Compound Eyes",
+      "H": "No Guard"
+    },
+    "heightm": 0.6,
+    "weightkg": 8.5,
+    "color": "Green",
+    "evos": [
+      "Charmeleon-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "charmeleontemporal": {
+    "num": 1070,
+    "name": "Charmeleon-Temporal",
+    "types": [
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 76,
+      "atk": 75,
+      "def": 60,
+      "spa": 75,
+      "spd": 54,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Tinted Lens",
+      "1": "Compound Eyes",
+      "H": "No Guard"
+    },
+    "heightm": 1.1,
+    "weightkg": 19,
+    "color": "Green",
+    "evos": [
+      "Charizard-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Charmander-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "charizardtemporal": {
+    "num": 1071,
+    "name": "Charizard-Temporal",
+    "types": [
+      "Bug",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 100,
+      "def": 80,
+      "spa": 105,
+      "spd": 74,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Tinted Lens",
+      "1": "Compound Eyes",
+      "H": "No Guard"
+    },
+    "heightm": 1.7,
+    "weightkg": 90.5,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Charizard-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Charizard-Temporal",
+      "Charizard-Temporal-Mega"
+    ],
+    "prevo": "Charmeleon-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "poltchageisttemporal": {
+    "num": 1072,
+    "name": "Poltchageist-Temporal",
+    "types": [
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 45,
+      "def": 50,
+      "spa": 45,
+      "spd": 59,
+      "spe": 49
+    },
+    "abilities": {
+      "0": "Liquidooze",
+      "1": "Powerofalchemy",
+      "H": "Serene Grace"
+    },
+    "heightm": 0.1,
+    "weightkg": 0.2,
+    "color": "Purple",
+    "evos": [
+      "Sinistcha-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sinistchatemporal": {
+    "num": 1073,
+    "name": "Sinistcha-Temporal",
+    "types": [
+      "Psychic",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 55,
+      "def": 80,
+      "spa": 95,
+      "spd": 104,
+      "spe": 94
+    },
+    "abilities": {
+      "0": "Liquidooze",
+      "1": "Powerofalchemy",
+      "H": "Psychicsurge"
+    },
+    "heightm": 0.2,
+    "weightkg": 0.4,
+    "color": "Purple",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Poltchageist-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sevipertemporal": {
+    "num": 1075,
+    "name": "Seviper-Temporal",
+    "types": [
+      "Dragon",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 58,
+      "def": 70,
+      "spa": 90,
+      "spd": 100,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Drought",
+      "1": "Windfury",
+      "H": "Serene Grace"
+    },
+    "heightm": 2.7,
+    "weightkg": 52.5,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "throhtemporal": {
+    "num": 1076,
+    "name": "Throh-Temporal",
+    "types": [
+      "Psychic",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 30,
+      "def": 110,
+      "spa": 40,
+      "spd": 95,
+      "spe": 110
+    },
+    "abilities": {
+      "0": "Weakarmor",
+      "1": "Stakeout",
+      "H": "Screencleaner"
+    },
+    "heightm": 1.3,
+    "weightkg": 55.5,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sawktemporal": {
+    "num": 1077,
+    "name": "Sawk-Temporal",
+    "types": [
+      "Psychic",
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 40,
+      "def": 60,
+      "spa": 105,
+      "spd": 120,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Wanderingspirit",
+      "1": "Analytic",
+      "H": "Emergencyexit"
+    },
+    "heightm": 1.4,
+    "weightkg": 51,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "tarountulatemporal": {
+    "num": 1078,
+    "name": "Tarountula-Temporal",
+    "types": [
+      "Fairy",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 24,
+      "def": 55,
+      "spa": 45,
+      "spd": 56,
+      "spe": 35
+    },
+    "abilities": {
+      "0": "Opportunist",
+      "1": "Shielddust",
+      "H": "Serene Grace"
+    },
+    "heightm": 0.3,
+    "weightkg": 4,
+    "color": "White",
+    "evos": [
+      "Spidops-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "spidopstemporal": {
+    "num": 1079,
+    "name": "Spidops-Temporal",
+    "types": [
+      "Fairy",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 66,
+      "def": 91,
+      "spa": 85,
+      "spd": 115,
+      "spe": 59
+    },
+    "abilities": {
+      "0": "Opportunist",
+      "1": "Shielddust",
+      "H": "Serene Grace"
+    },
+    "heightm": 1,
+    "weightkg": 16.5,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Tarountula-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "bulbasaurtemporal": {
+    "num": 1083,
+    "name": "Bulbasaur-Temporal",
+    "types": [
+      "Rock",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 59,
+      "atk": 40,
+      "def": 65,
+      "spa": 55,
+      "spd": 34,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Eartheater",
+      "1": "Dazzling",
+      "H": "Gluttony"
+    },
+    "heightm": 0.7,
+    "weightkg": 6.9,
+    "color": "Brown",
+    "evos": [
+      "Ivysaur-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "ivysaurtemporal": {
+    "num": 1084,
+    "name": "Ivysaur-Temporal",
+    "types": [
+      "Rock",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 55,
+      "def": 83,
+      "spa": 65,
+      "spd": 49,
+      "spe": 83
+    },
+    "abilities": {
+      "0": "Eartheater",
+      "1": "Dazzling",
+      "H": "Gluttony"
+    },
+    "heightm": 1,
+    "weightkg": 13,
+    "color": "Brown",
+    "evos": [
+      "Venusaur-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Bulbasaur-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "venusaurtemporal": {
+    "num": 1085,
+    "name": "Venusaur-Temporal",
+    "types": [
+      "Rock",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 72,
+      "def": 109,
+      "spa": 85,
+      "spd": 60,
+      "spe": 109
+    },
+    "abilities": {
+      "0": "Eartheater",
+      "1": "Dazzling",
+      "H": "Gluttony"
+    },
+    "heightm": 2,
+    "weightkg": 100,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Venusaur-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Venusaur-Temporal",
+      "Venusaur-Temporal-Mega"
+    ],
+    "prevo": "Ivysaur-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "comfeytemporal": {
+    "num": 1088,
+    "name": "Comfey-Temporal",
+    "types": [
+      "Grass",
+      "Light"
+    ],
+    "baseStats": {
+      "hp": 71,
+      "atk": 52,
+      "def": 95,
+      "spa": 80,
+      "spd": 92,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Motordrive",
+      "1": "Dazzling",
+      "H": "Slushrush"
+    },
+    "heightm": 0.1,
+    "weightkg": 0.3,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "kleavortemporal": {
+    "num": 1089,
+    "name": "Kleavor-Temporal",
+    "types": [
+      "Electric",
+      "Bug"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 80,
+      "def": 110,
+      "spa": 85,
+      "spd": 55,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Guts",
+      "1": "Surgesurfer",
+      "H": "Compound Eyes"
+    },
+    "heightm": 1.8,
+    "weightkg": 89,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Kleavor-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Kleavor-Temporal",
+      "Kleavor-Temporal-Mega"
+    ],
+    "prevo": "Scyther-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sewaddletemporal": {
+    "num": 1090,
+    "name": "Sewaddle-Temporal",
+    "types": [
+      "Bug",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 53,
+      "def": 70,
+      "spa": 42,
+      "spd": 40,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Prismarmor",
+      "1": "Impenetrable",
+      "H": "Wonderskin"
+    },
+    "heightm": 0.3,
+    "weightkg": 2.5,
+    "color": "Yellow",
+    "evos": [
+      "Swadloon-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "swadloontemporal": {
+    "num": 1091,
+    "name": "Swadloon-Temporal",
+    "types": [
+      "Bug",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 63,
+      "def": 90,
+      "spa": 50,
+      "spd": 42,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Prismarmor",
+      "1": "Impenetrable",
+      "H": "Wonderskin"
+    },
+    "heightm": 0.5,
+    "weightkg": 7.3,
+    "color": "Yellow",
+    "evos": [
+      "Leavanny-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Sewaddle-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "leavannytemporal": {
+    "num": 1092,
+    "name": "Leavanny-Temporal",
+    "types": [
+      "Bug",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 103,
+      "def": 85,
+      "spa": 103,
+      "spd": 54,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Prismarmor",
+      "1": "Tough Claws",
+      "H": "Wonderskin"
+    },
+    "heightm": 1.2,
+    "weightkg": 20.5,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Swadloon-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sentrettemporal": {
+    "num": 1093,
+    "name": "Sentret-Temporal",
+    "types": [
+      "Water",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "atk": 60,
+      "def": 48,
+      "spa": 48,
+      "spd": 25,
+      "spe": 34
+    },
+    "abilities": {
+      "0": "Cutecharm",
+      "1": "Multiscale",
+      "H": "Pureheart"
+    },
+    "heightm": 0.8,
+    "weightkg": 6,
+    "color": "Blue",
+    "evos": [
+      "Furret-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "furrettemporal": {
+    "num": 1094,
+    "name": "Furret-Temporal",
+    "types": [
+      "Water",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 95,
+      "def": 80,
+      "spa": 85,
+      "spd": 41,
+      "spe": 54
+    },
+    "abilities": {
+      "0": "Cutecharm",
+      "1": "Multiscale",
+      "H": "Pureheart"
+    },
+    "heightm": 1.8,
+    "weightkg": 32.5,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Furret-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Furret-Temporal",
+      "Furret-Temporal-Mega"
+    ],
+    "prevo": "Sentret-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "nidoranfess2": {
+    "name": "Nidoran♀ (SS2)",
+    "num": -60015,
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 40,
+      "def": 42,
+      "spa": 41,
+      "spd": 47,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Victorystar",
+      "1": "Scorchscale",
+      "H": "Tormented"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Blue",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "nidoranmass2": {
+    "name": "Nidoran♂ (SS2)",
+    "num": -60016,
+    "types": [
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 47,
+      "def": 50,
+      "spa": 41,
+      "spd": 40,
+      "spe": 42
+    },
+    "abilities": {
+      "0": "Sheer Force",
+      "1": "Icyveins",
+      "H": "Hustle"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Blue",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "grookeytemporal": {
+    "num": 1101,
+    "name": "Grookey-Temporal",
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 70,
+      "def": 55,
+      "spa": 50,
+      "spd": 35,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Angerpoint",
+      "1": "Flamebody",
+      "H": "Rock Head"
+    },
+    "heightm": 0.3,
+    "weightkg": 5,
+    "color": "Red",
+    "evos": [
+      "Thwackey-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "thwackeytemporal": {
+    "num": 1102,
+    "name": "Thwackey-Temporal",
+    "types": [
+      "Fire",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 90,
+      "def": 70,
+      "spa": 80,
+      "spd": 50,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Angerpoint",
+      "1": "Flamebody",
+      "H": "Rock Head"
+    },
+    "heightm": 0.7,
+    "weightkg": 14,
+    "color": "Red",
+    "evos": [
+      "Rillaboom-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Grookey-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "rillaboomtemporal": {
+    "num": 1103,
+    "name": "Rillaboom-Temporal",
+    "types": [
+      "Fire",
+      "Fighting"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 115,
+      "def": 85,
+      "spa": 100,
+      "spd": 60,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Angerpoint",
+      "1": "Flamebody",
+      "H": "Rock Head"
+    },
+    "heightm": 2.1,
+    "weightkg": 90,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Thwackey-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "pawniardtemporal": {
+    "num": 1106,
+    "name": "Pawniard-Temporal",
+    "types": [
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 70,
+      "def": 60,
+      "spa": 70,
+      "spd": 40,
+      "spe": 50
+    },
+    "abilities": {
+      "0": "Marvelscale",
+      "1": "Sniper",
+      "H": "Analytic"
+    },
+    "heightm": 0.5,
+    "weightkg": 10.2,
+    "color": "Blue",
+    "evos": [
+      "Bisharp-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "bisharptemporal": {
+    "num": 1107,
+    "name": "Bisharp-Temporal",
+    "types": [
+      "Water",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 100,
+      "def": 95,
+      "spa": 110,
+      "spd": 40,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Marvelscale",
+      "1": "Sniper",
+      "H": "Analytic"
+    },
+    "heightm": 1.6,
+    "weightkg": 70,
+    "color": "Blue",
+    "evos": [
+      "Kingambit-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Pawniard-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "kingambittemporal": {
+    "num": 1108,
+    "name": "Kingambit-Temporal",
+    "types": [
+      "Water",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "atk": 145,
+      "def": 115,
+      "spa": 50,
+      "spd": 40,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Marvelscale",
+      "1": "Sniper",
+      "H": "Analytic"
+    },
+    "heightm": 2,
+    "weightkg": 120,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Bisharp-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "shroomishtemporal": {
+    "num": 1112,
+    "name": "Shroomish-Temporal",
+    "types": [
+      "Normal"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 50,
+      "def": 65,
+      "spa": 45,
+      "spd": 30,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Shellarmor",
+      "1": "Friendguard",
+      "H": "Angershell"
+    },
+    "heightm": 0.4,
+    "weightkg": 4.5,
+    "color": "White",
+    "evos": [
+      "Breloom-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "breloomtemporal": {
+    "num": 1113,
+    "name": "Breloom-Temporal",
+    "types": [
+      "Normal",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 105,
+      "def": 70,
+      "spa": 110,
+      "spd": 55,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Shellarmor",
+      "1": "Friendguard",
+      "H": "Angershell"
+    },
+    "heightm": 1.2,
+    "weightkg": 39.2,
+    "color": "White",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Shroomish-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "munchlaxtemporal": {
+    "num": 1114,
+    "name": "Munchlax-Temporal",
+    "types": [
+      "Normal",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 70,
+      "def": 70,
+      "spa": 25,
+      "spd": 55,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Keeneye",
+      "1": "Bigpecks",
+      "H": "Cottondown"
+    },
+    "heightm": 0.6,
+    "weightkg": 105,
+    "color": "White",
+    "evos": [
+      "Snorlax-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "snorlaxtemporal": {
+    "num": 1115,
+    "name": "Snorlax-Temporal",
+    "types": [
+      "Normal",
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "atk": 95,
+      "def": 110,
+      "spa": 40,
+      "spd": 60,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Keeneye",
+      "1": "Bigpecks",
+      "H": "Cottondown"
+    },
+    "heightm": 2.1,
+    "weightkg": 460,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Snorlax-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Snorlax-Temporal",
+      "Snorlax-Temporal-Mega"
+    ],
+    "prevo": "Munchlax-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "applintemporal": {
+    "num": 1120,
+    "name": "Applin-Temporal",
+    "types": [
+      "Dark",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "atk": 40,
+      "def": 80,
+      "spa": 20,
+      "spd": 40,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Pastelveil",
+      "1": "Fairyaura",
+      "H": "Angerpoint"
+    },
+    "heightm": 4.2,
+    "weightkg": 30.5,
+    "color": "Pink",
+    "evos": [
+      "Flapple-Temporal",
+      "Appletun-Temporal",
+      "Dipplin-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "flappletemporal": {
+    "num": 1121,
+    "name": "Flapple-Temporal",
+    "types": [
+      "Dark",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 70,
+      "def": 75,
+      "spa": 75,
+      "spd": 110,
+      "spe": 85
+    },
+    "abilities": {
+      "0": "Unburden",
+      "1": "Fairyaura",
+      "H": "Gorging"
+    },
+    "heightm": 4.3,
+    "weightkg": 16,
+    "color": "Pink",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Applin-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "appletuntemporal": {
+    "num": 1122,
+    "name": "Appletun-Temporal",
+    "types": [
+      "Dark",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 80,
+      "def": 100,
+      "spa": 40,
+      "spd": 65,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Overcoat",
+      "1": "Fairyaura",
+      "H": "Aromaveil"
+    },
+    "heightm": 4.4,
+    "weightkg": 140,
+    "color": "Pink",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Applin-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dipplintemporal": {
+    "num": 1123,
+    "name": "Dipplin-Temporal",
+    "types": [
+      "Dark",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 105,
+      "def": 70,
+      "spa": 75,
+      "spd": 85,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Pastelveil",
+      "1": "Fairyaura",
+      "H": "Rattled"
+    },
+    "heightm": 4.4,
+    "weightkg": 140,
+    "color": "Pink",
+    "evos": [
+      "Hydrapple-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Applin-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "hydrappletemporal": {
+    "num": 1124,
+    "name": "Hydrapple-Temporal",
+    "types": [
+      "Dark",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "atk": 120,
+      "def": 75,
+      "spa": 105,
+      "spd": 50,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Pastelveil",
+      "1": "Fairyaura",
+      "H": "Shed Skin"
+    },
+    "heightm": 4.4,
+    "weightkg": 140,
+    "color": "Pink",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Dipplin-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "wimpodtemporal": {
+    "num": 1125,
+    "name": "Wimpod-Temporal",
+    "types": [
+      "Ice",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 30,
+      "def": 30,
+      "spa": 30,
+      "spd": 30,
+      "spe": 30
+    },
+    "abilities": {
+      "0": "Impulsive",
+      "1": "Shellarmor",
+      "H": "Wimpout"
+    },
+    "heightm": 0.5,
+    "weightkg": 12,
+    "color": "Blue",
+    "evos": [
+      "Golisopod-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "golisopodtemporal": {
+    "num": 1126,
+    "name": "Golisopod-Temporal",
+    "types": [
+      "Ice",
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 140,
+      "atk": 100,
+      "def": 75,
+      "spa": 40,
+      "spd": 100,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Impulsive",
+      "1": "Shellarmor",
+      "H": "Thermalexchange"
+    },
+    "heightm": 2,
+    "weightkg": 108,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Wimpod-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "carnivinetemporal": {
+    "num": 1129,
+    "name": "Carnivine-Temporal",
+    "types": [
+      "Steel",
+      "Fairy"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "atk": 90,
+      "def": 77,
+      "spa": 107,
+      "spd": 46,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Strongjaw",
+      "1": "Fluffy",
+      "H": "Haunted"
+    },
+    "heightm": 1.4,
+    "weightkg": 27,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "skrelptemporal": {
+    "num": 1135,
+    "name": "Skrelp-Temporal",
+    "types": [
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 30,
+      "def": 60,
+      "spa": 35,
+      "spd": 55,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "Windfury",
+      "1": "Aerilate",
+      "H": "Airlock"
+    },
+    "heightm": 0.5,
+    "weightkg": 7.3,
+    "color": "Blue",
+    "evos": [
+      "Dragalge-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dragalgetemporal": {
+    "num": 1136,
+    "name": "Dragalge-Temporal",
+    "types": [
+      "Flying"
+    ],
+    "baseStats": {
+      "hp": 101,
+      "atk": 50,
+      "def": 91,
+      "spa": 65,
+      "spd": 83,
+      "spe": 114
+    },
+    "abilities": {
+      "0": "Windfury",
+      "1": "Aerilate",
+      "H": "Deltastream"
+    },
+    "heightm": 1.8,
+    "weightkg": 81.5,
+    "color": "Blue",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Skrelp-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mareeptemporal": {
+    "num": 1137,
+    "name": "Mareep-Temporal",
+    "types": [
+      "Fighting",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 60,
+      "def": 35,
+      "spa": 55,
+      "spd": 35,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Opportunist",
+      "1": "Stakeout",
+      "H": "Arsonist"
+    },
+    "heightm": 0.6,
+    "weightkg": 7.8,
+    "color": "Red",
+    "evos": [
+      "Flaaffy-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "flaaffytemporal": {
+    "num": 1138,
+    "name": "Flaaffy-Temporal",
+    "types": [
+      "Fighting",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 85,
+      "def": 45,
+      "spa": 70,
+      "spd": 45,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Opportunist",
+      "1": "Stakeout",
+      "H": "Arsonist"
+    },
+    "heightm": 0.8,
+    "weightkg": 13.3,
+    "color": "Red",
+    "evos": [
+      "Ampharos-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Mareep-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "ampharostemporal": {
+    "num": 1139,
+    "name": "Ampharos-Temporal",
+    "types": [
+      "Fighting",
+      "Dark"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 110,
+      "def": 65,
+      "spa": 95,
+      "spd": 65,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Opportunist",
+      "1": "Stakeout",
+      "H": "Arsonist"
+    },
+    "heightm": 1.4,
+    "weightkg": 61.5,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "otherFormes": [
+      "Ampharos-Temporal-Mega"
+    ],
+    "formeOrder": [
+      "Ampharos-Temporal",
+      "Ampharos-Temporal-Mega"
+    ],
+    "prevo": "Flaaffy-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "dwebbletemporal": {
+    "num": 1140,
+    "name": "Dwebble-Temporal",
+    "types": [
+      "Fighting",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 60,
+      "def": 75,
+      "spa": 20,
+      "spd": 35,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Scrappy",
+      "1": "Heavy Metal",
+      "H": "Solid Rock"
+    },
+    "heightm": 0.3,
+    "weightkg": 45,
+    "color": "Red",
+    "evos": [
+      "Crustle-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "crustletemporal": {
+    "num": 1141,
+    "name": "Crustle-Temporal",
+    "types": [
+      "Fighting",
+      "Rock"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 100,
+      "def": 105,
+      "spa": 30,
+      "spd": 55,
+      "spe": 105
+    },
+    "abilities": {
+      "0": "Scrappy",
+      "1": "Heavy Metal",
+      "H": "Solid Rock"
+    },
+    "heightm": 1.4,
+    "weightkg": 450,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Dwebble-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "mawiletemporal": {
+    "num": 1144,
+    "name": "Mawile-Temporal",
+    "types": [
+      "Grass",
+      "Ghost"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 60,
+      "def": 80,
+      "spa": 55,
+      "spd": 105,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Grassysurge",
+      "1": "Intimidate",
+      "H": "Shadowshield"
+    },
+    "heightm": 0.6,
+    "weightkg": 11.5,
+    "color": "Black",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "meowthtemporal": {
+    "num": 1150,
+    "name": "Meowth-Temporal",
+    "types": [
+      "Light",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 30,
+      "def": 40,
+      "spa": 40,
+      "spd": 65,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Sandveil",
+      "1": "Queenlymajesty",
+      "H": "Irradiate"
+    },
+    "heightm": 0.4,
+    "weightkg": 4.2,
+    "color": "Yellow",
+    "evos": [
+      "Persian-Temporal",
+      "Perrserker-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "persiantemporal": {
+    "num": 1151,
+    "name": "Persian-Temporal",
+    "types": [
+      "Light",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 40,
+      "def": 75,
+      "spa": 55,
+      "spd": 90,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Sandveil",
+      "1": "Queenlymajesty",
+      "H": "Drought"
+    },
+    "heightm": 1,
+    "weightkg": 32,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Meowth-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "perrserkertemporal": {
+    "num": 1152,
+    "name": "Perrserker-Temporal",
+    "types": [
+      "Light",
+      "Steel"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 115,
+      "def": 47,
+      "spa": 104,
+      "spd": 54,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Sandveil",
+      "1": "Queenlymajesty",
+      "H": "Sand Stream"
+    },
+    "heightm": 0.8,
+    "weightkg": 28,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Meowth-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "pincurchintemporal": {
+    "num": 1156,
+    "name": "Pincurchin-Temporal",
+    "types": [
+      "Ground"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 70,
+      "def": 90,
+      "spa": 35,
+      "spd": 45,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Rough Skin",
+      "1": "Sand Stream",
+      "H": "Tropicalhide"
+    },
+    "heightm": 0.3,
+    "weightkg": 1,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "rockrufftemporal": {
+    "num": 1160,
+    "name": "Rockruff-Temporal",
+    "types": [
+      "Ice",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 55,
+      "def": 40,
+      "spa": 60,
+      "spd": 30,
+      "spe": 40
+    },
+    "abilities": {
+      "0": "Marvelscale",
+      "1": "Merciless",
+      "H": "Rivalry"
+    },
+    "heightm": 0.5,
+    "weightkg": 9.2,
+    "color": "Brown",
+    "evos": [
+      "Lycanroc-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "lycanroctemporal": {
+    "num": 1161,
+    "name": "Lycanroc-Temporal",
+    "types": [
+      "Ice",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "atk": 90,
+      "def": 80,
+      "spa": 97,
+      "spd": 55,
+      "spe": 80
+    },
+    "abilities": {
+      "0": "Marvelscale",
+      "1": "Merciless",
+      "H": "Rivalry"
+    },
+    "heightm": 0.8,
+    "weightkg": 25,
+    "color": "Brown",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Rockruff-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "staryutemporal": {
+    "num": 1162,
+    "name": "Staryu-Temporal",
+    "types": [
+      "Poison",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "atk": 60,
+      "def": 65,
+      "spa": 50,
+      "spd": 40,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Stickyhold",
+      "1": "Poison Point",
+      "H": "Rough Skin"
+    },
+    "heightm": 0.8,
+    "weightkg": 34.5,
+    "color": "Red",
+    "evos": [
+      "Starmie-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "starmietemporal": {
+    "num": 1163,
+    "name": "Starmie-Temporal",
+    "types": [
+      "Poison",
+      "Cosmic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "atk": 100,
+      "def": 110,
+      "spa": 70,
+      "spd": 55,
+      "spe": 90
+    },
+    "abilities": {
+      "0": "Stickyhold",
+      "1": "Poison Point",
+      "H": "Rough Skin"
+    },
+    "heightm": 1.1,
+    "weightkg": 80,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Staryu-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "litwicktemporal": {
+    "num": 1164,
+    "name": "Litwick-Temporal",
+    "types": [
+      "Fire",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "atk": 25,
+      "def": 60,
+      "spa": 20,
+      "spd": 60,
+      "spe": 60
+    },
+    "abilities": {
+      "0": "Competitive",
+      "1": "Magicguard",
+      "H": "Justified"
+    },
+    "heightm": 0.3,
+    "weightkg": 3.1,
+    "color": "Yellow",
+    "evos": [
+      "Lampent-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "lampenttemporal": {
+    "num": 1165,
+    "name": "Lampent-Temporal",
+    "types": [
+      "Fire",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "atk": 55,
+      "def": 65,
+      "spa": 40,
+      "spd": 85,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Competitive",
+      "1": "Magicguard",
+      "H": "Justified"
+    },
+    "heightm": 0.6,
+    "weightkg": 13,
+    "color": "Yellow",
+    "evos": [
+      "Chandelure-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Litwick-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "chandeluretemporal": {
+    "num": 1166,
+    "name": "Chandelure-Temporal",
+    "types": [
+      "Fire",
+      "Psychic"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "atk": 55,
+      "def": 95,
+      "spa": 60,
+      "spd": 135,
+      "spe": 95
+    },
+    "abilities": {
+      "0": "Competitive",
+      "1": "Magicguard",
+      "H": "Justified"
+    },
+    "heightm": 1,
+    "weightkg": 34.3,
+    "color": "Yellow",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Lampent-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "cyclizartemporal": {
+    "num": 1167,
+    "name": "Cyclizar-Temporal",
+    "types": [
+      "Cosmic",
+      "Poison"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 121,
+      "def": 65,
+      "spa": 125,
+      "spd": 50,
+      "spe": 65
+    },
+    "abilities": {
+      "0": "Poisontouch",
+      "1": "Speed Boost",
+      "H": "Gorging"
+    },
+    "heightm": 1.6,
+    "weightkg": 63,
+    "color": "Green",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "goomytemporal": {
+    "num": 1168,
+    "name": "Goomy-Temporal",
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "atk": 50,
+      "def": 35,
+      "spa": 40,
+      "spd": 55,
+      "spe": 45
+    },
+    "abilities": {
+      "0": "Flashfire",
+      "1": "Liquidooze",
+      "H": "Thermalexchange"
+    },
+    "heightm": 0.3,
+    "weightkg": 80.8,
+    "color": "Red",
+    "evos": [
+      "Sliggoo-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "sliggootemporal": {
+    "num": 1169,
+    "name": "Sliggoo-Temporal",
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 113,
+      "atk": 53,
+      "def": 68,
+      "spa": 60,
+      "spd": 83,
+      "spe": 75
+    },
+    "abilities": {
+      "0": "Flashfire",
+      "1": "Liquidooze",
+      "H": "Thermalexchange"
+    },
+    "heightm": 0.8,
+    "weightkg": 170.5,
+    "color": "Red",
+    "evos": [
+      "Goodra-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Goomy-Temporal",
+    "tier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "natDexTier": "Illegal",
+    "doublesTier": "Illegal"
+  },
+  "goodratemporal": {
+    "num": 1170,
+    "name": "Goodra-Temporal",
+    "types": [
+      "Fire"
+    ],
+    "baseStats": {
+      "hp": 150,
+      "atk": 100,
+      "def": 80,
+      "spa": 60,
+      "spd": 110,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Flashfire",
+      "1": "Liquidooze",
+      "H": "Thermalexchange"
+    },
+    "heightm": 2,
+    "weightkg": 550.5,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Sliggoo-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "snovertemporal": {
+    "num": 1171,
+    "name": "Snover-Temporal",
+    "types": [
+      "Fire",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "atk": 60,
+      "def": 80,
+      "spa": 30,
+      "spd": 60,
+      "spe": 49
+    },
+    "abilities": {
+      "0": "White Smoke",
+      "1": "Impulsive",
+      "H": "Steamengine"
+    },
+    "heightm": 1.9,
+    "weightkg": 150.5,
+    "color": "Red",
+    "evos": [
+      "Abomasnow-Temporal"
+    ],
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "abomasnowtemporal": {
+    "num": 1172,
+    "name": "Abomasnow-Temporal",
+    "types": [
+      "Fire",
+      "Sound"
+    ],
+    "baseStats": {
+      "hp": 74,
+      "atk": 95,
+      "def": 110,
+      "spa": 50,
+      "spd": 95,
+      "spe": 70
+    },
+    "abilities": {
+      "0": "White Smoke",
+      "1": "Impulsive",
+      "H": "Steamengine"
+    },
+    "heightm": 2.8,
+    "weightkg": 370,
+    "color": "Red",
+    "eggGroups": [
+      "Soulstones"
+    ],
+    "tags": [
+      "Soulstones"
+    ],
+    "prevo": "Snover-Temporal",
+    "tier": "Illegal",
+    "natDexTier": "Illegal",
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "doublesTier": "Illegal"
+  },
+  "manaphyss2": {
+    "name": "Manaphy (SS2)",
+    "num": -60017,
+    "types": [
+      "Water"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "atk": 100,
+      "def": 100,
+      "spa": 100,
+      "spd": 100,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Hydration"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Blue",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "dialgass2": {
+    "name": "Dialga (SS2)",
+    "num": -60018,
+    "types": [
+      "Steel",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 25,
+      "def": 125,
+      "spa": 75,
+      "spd": 100,
+      "spe": 125
+    },
+    "abilities": {
+      "0": "Adaptability"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "palkiass2": {
+    "name": "Palkia (SS2)",
+    "num": -60019,
+    "types": [
+      "Cosmic",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 125,
+      "def": 125,
+      "spa": 75,
+      "spd": 25,
+      "spe": 100
+    },
+    "abilities": {
+      "0": "Astralmajesty"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Purple",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "giratinass2": {
+    "name": "Giratina (SS2)",
+    "num": -60020,
+    "types": [
+      "Ghost",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 25,
+      "def": 125,
+      "spa": 75,
+      "spd": 100,
+      "spe": 125
+    },
+    "abilities": {
+      "0": "Filter"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "Black",
+    "tags": [
+      "Soulstones"
+    ]
+  },
+  "arceusss2": {
+    "name": "Arceus (SS2)",
+    "num": -60021,
+    "types": [
+      "Light",
+      "Dragon"
+    ],
+    "baseStats": {
+      "hp": 300,
+      "atk": 120,
+      "def": 120,
+      "spa": 120,
+      "spd": 120,
+      "spe": 120
+    },
+    "abilities": {
+      "0": "Dazzling"
+    },
+    "isNonstandard": "Custom",
+    "gen": 9,
+    "color": "White",
+    "tags": [
+      "Soulstones"
+    ]
   }
 }

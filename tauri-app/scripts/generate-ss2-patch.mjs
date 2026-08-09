@@ -281,6 +281,12 @@ for (const [key, entry] of Object.entries(pokeathlonDex)) {
 }
 console.log(`Found ${orionTemporalEntries.size} Orion/Temporal entries in pokeathlon dex`);
 
+// Build comprehensive lookup: all pokeathlon entries by normId
+const pokeathlonByNormId = new Map();
+for (const [key, entry] of Object.entries(pokeathlonDex)) {
+  pokeathlonByNormId.set(normId(key), [key, entry]);
+}
+
 // Build type-lookup map: normBaseName_typekey → [orionKey, entry]
 // e.g. "solosis_waterpsychic" → ["solosisorion", {...}]
 const orionByNameAndTypes = new Map();
@@ -442,11 +448,134 @@ for (const entry of Object.values(outPokedex)) {
   delete entry._formProcessed;
 }
 
-console.log(`\n=== Matching Results ===`);
-console.log(`Base pokemon matched: ${matchedCount}`);
+// ─── Second Pass: Handle unmatched blocks with extended strategies ──────────
+// Strategy 1: Direct pokeathlon match (galaxeon, prismeon, octaveon etc. without orion/temporal suffix)
+// Strategy 2: '2'-suffix variants → strip '2', look for orion/temporal match by base+types
+// Strategy 3: Truly new Pokémon → build from PBS data directly
+
+let directMatchCount = 0;
+let suffix2MatchCount = 0;
+let newEntryCount = 0;
+
+// Track which PBS keys need a unique dex ID for "truly new"
+const usedDexKeys = new Set(Object.keys(outPokedex));
+
+// Negative num starting point for truly new SS2-exclusive Pokémon
+let newEntryNum = -60001;
+
+for (const block of pokemonBlocks) {
+  const r = block._raw;
+  const pbsName = block._key;
+  if (!r.Types || !r.BaseStats) continue;
+
+  const pbsTypes = r.Types.split(',').map(t => pbsTypeToDisplay(t.trim()));
+  const typeKey = pbsTypes.map(t => normId(t)).sort().join('');
+  const baseNameKey = normId(pbsName);
+
+  // Skip already-matched from first pass
+  const firstPassKey = `${baseNameKey}_${typeKey}`;
+  if (orionByNameAndTypes.has(firstPassKey)) continue;
+
+  // Build learnsets from PBS
+  const buildLearnset = (rr) => {
+    const lv = parseLevelMoves(rr.Moves || '');
+    const tu = parseTutorMoves(rr.TutorMoves || '');
+    const eg = parseEggMoves(rr.EggMoves || '');
+    return mergeLearnsets(mergeLearnsets(lv, tu), eg);
+  };
+  const fullLearnset = buildLearnset(r);
+  const baseStats = parseBaseStats(r.BaseStats);
+  const abilities = parseAbilitiesProper(r.Abilities || '', r.HiddenAbilities || '');
+
+  // Strategy 1: Direct pokeathlon match (no orion/temporal suffix)
+  const directMatch = pokeathlonByNormId.get(baseNameKey);
+  if (directMatch && !directMatch[0].endsWith('orion') && !directMatch[0].endsWith('temporal')) {
+    const [pokKey, pokEntry] = directMatch;
+    // Don't overwrite if already present
+    if (!outPokedex[pokKey]) {
+      outPokedex[pokKey] = {
+        ...pokEntry,
+        baseStats,
+        abilities: Object.keys(abilities).length > 0 ? abilities : (pokEntry.abilities || {}),
+        types: pbsTypes,
+        name: pokEntry.name || r.Name || pbsName,
+        isNonstandard: 'Custom',
+      };
+    }
+    if (Object.keys(fullLearnset).length > 0) {
+      const existing = outLearnsets[pokKey]?.learnset || {};
+      outLearnsets[pokKey] = { learnset: mergeLearnsets(existing, fullLearnset) };
+    }
+    directMatchCount++;
+    continue;
+  }
+
+  // Strategy 2: '2' suffix variants
+  if (pbsName.endsWith('2')) {
+    const baseWithout2 = normId(pbsName.slice(0, -1));
+    const orionLk2 = `${baseWithout2}_${typeKey}`;
+    const orionMatch2 = orionByNameAndTypes.get(orionLk2);
+    if (orionMatch2) {
+      const [orionKey2, orionEntry2] = orionMatch2;
+      // Add/update species entry if not already set from first pass
+      if (!outPokedex[orionKey2]) {
+        outPokedex[orionKey2] = {
+          ...orionEntry2,
+          baseStats,
+          abilities: Object.keys(abilities).length > 0 ? abilities : (orionEntry2.abilities || {}),
+          types: pbsTypes,
+          name: orionEntry2.name || r.Name || pbsName,
+          isNonstandard: 'Custom',
+        };
+      }
+      // Always merge learnsets for alternate forms
+      if (Object.keys(fullLearnset).length > 0) {
+        const existing = outLearnsets[orionKey2]?.learnset || {};
+        outLearnsets[orionKey2] = { learnset: mergeLearnsets(existing, fullLearnset) };
+      }
+      suffix2MatchCount++;
+      continue;
+    }
+  }
+
+  // Strategy 3: Truly new Pokémon (not in pokeathlon at all)
+  // Create a new entry with an 'ss2' suffix to avoid clobbering canonical PS dex entries.
+  // E.g. PBS DARKRAI [Light] → key 'darkraiss2', name 'Darkrai (SS2)'
+  // This prevents the SS2-specific typing from overriding the canonical species in the merged dex.
+  const newKey = `${baseNameKey}ss2`;
+  if (!usedDexKeys.has(newKey)) {
+    usedDexKeys.add(newKey);
+    const rawName = r.Name || pbsName;
+    // Append "(SS2)" if the name doesn't already hint at a variant
+    const displayName = rawName.endsWith(')') ? rawName : `${rawName} (SS2)`;
+    outPokedex[newKey] = {
+      name: displayName,
+      num: newEntryNum--,
+      types: pbsTypes,
+      baseStats,
+      abilities: Object.keys(abilities).length > 0 ? abilities : {},
+      isNonstandard: 'Custom',
+      gen: 9,
+      color: r.Color || 'White',
+      tags: ['Soulstones'],
+    };
+    if (Object.keys(fullLearnset).length > 0) {
+      outLearnsets[newKey] = { learnset: fullLearnset };
+    }
+    newEntryCount++;
+  }
+}
+
+console.log(`\n=== Extended Matching Results ===`);
+console.log(`Strategy 1 - Direct pokeathlon match: ${directMatchCount}`);
+console.log(`Strategy 2 - Suffix-2 orion/temporal match: ${suffix2MatchCount}`);
+console.log(`Strategy 3 - Truly new entries: ${newEntryCount}`);
+
+console.log(`\n=== Total Results ===`);
+console.log(`Base pokemon matched (orion/temporal): ${matchedCount}`);
 console.log(`Base pokemon unmatched: ${unmatchedCount}`);
 console.log(`Form variants matched: ${formMatchCount}`);
-console.log(`Form variants unmatched (expected): ${formUnmatchCount}`);
+console.log(`Form variants unmatched: ${formUnmatchCount}`);
 console.log(`Total pokedex entries: ${Object.keys(outPokedex).length}`);
 console.log(`Total learnset entries: ${Object.keys(outLearnsets).length}`);
 console.log(`Total custom abilities: ${Object.keys(outAbilities).length}`);
