@@ -226,11 +226,15 @@ function removeClientFromRoom(room, socketId) {
 const app = (0, express_1.default)();
 // Respect reverse-proxy headers from Caddy (X-Forwarded-Proto, etc.)
 app.set("trust proxy", true);
-// Enable CORS for all API routes
+// Enable CORS for all API routes — including Socket.IO polling requests.
+// Using a custom middleware (rather than the `cors` package) ensures headers
+// are present on every response, even when a route throws or Cloudflare/Tunnel
+// returns an error page.
 app.use((_req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Max-Age", "86400");
     if (_req.method === "OPTIONS") {
         return res.sendStatus(200);
     }
@@ -1214,6 +1218,19 @@ app.get("/api/bug-reports/:id", (req, res) => {
     if (!report)
         return res.status(404).json({ error: "not found" });
     res.json(report);
+});
+// Fallback error handler: ensures CORS headers survive error responses so the
+// browser never reports a spurious "No 'Access-Control-Allow-Origin' header"
+// for failures that originate inside route handlers.
+// NOTE: Express error middleware MUST be registered AFTER all routes, otherwise
+// it is never invoked.
+app.use((err, _req, res, _next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (!res.headersSent) {
+        res.status(500).json({ error: err?.message || "internal error" });
+    }
 });
 const server = http_1.default.createServer(app);
 const RECONNECT_GRACE_MS = 15000; // 15 seconds to reconnect before losing battle slot
@@ -3828,4 +3845,3 @@ function startServer(port = Number(process.env.PORT) || 3000) {
 if (require.main === module) {
     startServer();
 }
-//# sourceMappingURL=index.js.map

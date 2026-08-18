@@ -126,9 +126,12 @@ async function takeScreenshot(): Promise<string | undefined> {
 /* ---------- submit to server ---------- */
 async function submitReport(report: BugReport): Promise<boolean> {
   try {
-    const base = (localStorage.getItem('ttrpg.apiBase') || 'https://47-218-210-137.nip.io')
-      .replace(/^https:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, 'https://47-218-210-137.nip.io')
-      .replace(/^https:\/\/47-218-210-137\.nip\.io(?=\/|$)/i, 'https://47-218-210-137.nip.io')
+    // Current backend origin; rewrite legacy duckdns / nip.io hosts that may
+    // still be cached in localStorage under 'ttrpg.apiBase'.
+    const CURRENT_BASE = 'https://pokettrpg-app.pokemondnd.xyz';
+    const base = (localStorage.getItem('ttrpg.apiBase') || CURRENT_BASE)
+      .replace(/^https?:\/\/pokettrpg\.duckdns\.org(:3000)?(?=\/|$)/i, CURRENT_BASE)
+      .replace(/^https?:\/\/47-218-210-137\.nip\.io(:3000)?(?=\/|$)/i, CURRENT_BASE)
       .replace(/\/+$/, '');
     const resp = await fetch(`${base}/api/bug-report`, {
       method: 'POST',

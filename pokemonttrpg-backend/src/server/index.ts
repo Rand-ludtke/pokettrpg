@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
 import path from "path";
@@ -324,11 +324,15 @@ const app = express();
 // Respect reverse-proxy headers from Caddy (X-Forwarded-Proto, etc.)
 app.set("trust proxy", true);
 
-// Enable CORS for all API routes
+// Enable CORS for all API routes — including Socket.IO polling requests.
+// Using a custom middleware (rather than the `cors` package) ensures headers
+// are present on every response, even when a route throws or Cloudflare/Tunnel
+// returns an error page.
 app.use((_req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Max-Age", "86400");
   if (_req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
@@ -1313,6 +1317,20 @@ app.get("/api/bug-reports/:id", (req: Request, res: Response) => {
   const report = reports.find((r: any) => r.id === req.params.id);
   if (!report) return res.status(404).json({ error: "not found" });
   res.json(report);
+});
+
+// Fallback error handler: ensures CORS headers survive error responses so the
+// browser never reports a spurious "No 'Access-Control-Allow-Origin' header"
+// for failures that originate inside route handlers.
+// NOTE: Express error middleware MUST be registered AFTER all routes, otherwise
+// it is never invoked.
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (!res.headersSent) {
+    res.status(500).json({ error: err?.message || "internal error" });
+  }
 });
 
 const server = http.createServer(app);

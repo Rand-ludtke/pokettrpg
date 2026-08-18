@@ -12,19 +12,5 @@
     "tier": "NDOU",
     "isNonstandard": "CAP",
     "tags": ["CAP"]
-  },
-  "chromera": {
-    "name": "Chromera",
-    "num": -50002,
-    "types": ["Dragon", "Water"],
-    "baseStats": { "hp": 100, "atk": 98, "def": 85, "spa": 75, "spd": 85, "spe": 90 },
-    "abilities": { "0": "Color Change", "H": "Protean" },
-    "heightm": 1.5,
-    "weightkg": 65.0,
-    "color": "Purple",
-    "gen": 9,
-    "tier": "NDOU",
-    "isNonstandard": "CAP",
-    "tags": ["CAP"]
   }
 }

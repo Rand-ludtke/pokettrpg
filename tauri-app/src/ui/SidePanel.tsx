@@ -31,6 +31,9 @@ const TYPE_COLORS: Record<string, string> = {
   '???': '#68A090',
   stellar: '#44698f',
   shadow: '#5a4975',
+
+  sound: '#ff66aa',
+  light: '#fffacd',
 };
 
 const NATURES: Array<{ name: string; plus: string | null; minus: string | null }> = [

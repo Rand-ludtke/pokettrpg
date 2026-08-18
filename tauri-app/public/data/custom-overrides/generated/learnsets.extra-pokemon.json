@@ -21,21 +21,5 @@
       "defog": ["9M"],
       "roar": ["9M"]
     }
-  },
-  "chromera": {
-    "learnset": {
-      "scald": ["9L1"],
-      "dragonbreath": ["9L5"],
-      "aquajet": ["9L10"],
-      "waterfall": ["9L20"],
-      "dragonpulse": ["9L30"],
-      "hydropump": ["9L40"],
-      "dracometeor": ["9L50"],
-      "surf": ["9M"],
-      "icebeam": ["9M"],
-      "thunderbolt": ["9M"],
-      "protect": ["9M"],
-      "roost": ["9M"]
-    }
   }
 }

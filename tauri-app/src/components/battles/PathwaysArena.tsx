@@ -438,6 +438,7 @@ const TYPE_COLORS: Record<string, string> = {
   Rock: '#b6a136', Ghost: '#735797', Dragon: '#6f35fc', Dark: '#705746',
   Steel: '#b7b7ce', Fairy: '#d685ad', Crystal: '#a0d2eb', Cosmic: '#c491e9',
   Nuclear: '#4caf50', Stellar: '#fbc531', Sound: '#ff66aa', Light: '#fffacd',
+  Shadow: '#5a4975',
 };
 
 const typeColor = (type: string) => TYPE_COLORS[type] || '#888';

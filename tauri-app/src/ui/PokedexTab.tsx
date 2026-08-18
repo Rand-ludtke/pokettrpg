@@ -14,7 +14,21 @@ const adapter = adapterUtils;
 const TYPE_OPTIONS = [
   'Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying',
   'Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy',
+  // Fangame / Soulstones types
+  'Crystal','Cosmic','Nuclear','Stellar','Sound','Light','Shadow',
 ];
+
+/** Type badge color helper for Dex/PC display */
+const TYPE_BADGE_COLORS: Record<string, string> = {
+  Normal: '#A8A878', Fire: '#F08030', Water: '#6890F0', Electric: '#F8D030',
+  Grass: '#78C850', Ice: '#98D8D8', Fighting: '#C03028', Poison: '#A040A0',
+  Ground: '#E0C068', Flying: '#A890F0', Psychic: '#F85888', Bug: '#A8B820',
+  Rock: '#B8A038', Ghost: '#705898', Dragon: '#7038F8', Dark: '#705848',
+  Steel: '#B8B8D0', Fairy: '#EE99AC',
+  // Fangame types
+  Crystal: '#a0d2eb', Cosmic: '#c491e9', Nuclear: '#92D050',
+  Stellar: '#fbc531', Sound: '#ff66aa', Light: '#fffacd', Shadow: '#4a3a66',
+};
 
 // Helper to convert to ID (same as PS's toID)
 function toID(text: string): string {
@@ -126,6 +140,11 @@ const TYPE_STYLE: Record<string, React.CSSProperties> = {
   fairy: { background: 'linear-gradient(#F830D0,#F008C1)', borderColor: '#C1079B' },
   nuclear: { background: 'linear-gradient(#92D050,#6DBB2D)', borderColor: '#559922' },
   cosmic: { background: 'linear-gradient(#6B2FA0,#4E1F78)', borderColor: '#3A1759' },
+  crystal: { background: 'linear-gradient(#a0d2eb,#6CB8D8)', borderColor: '#4A9FC0' },
+  stellar: { background: 'linear-gradient(#F5C518,#D4A60E)', borderColor: '#A5830B' },
+  sound: { background: 'linear-gradient(#ff66aa,#E8408A)', borderColor: '#C02060' },
+  light: { background: 'linear-gradient(#fffacd,#F5E880)', borderColor: '#C8B800' },
+  shadow: { background: 'linear-gradient(#4a3a66,#332649)', borderColor: '#221A33' },
 };
 
 const STAT_NAMES: Record<string, string> = {

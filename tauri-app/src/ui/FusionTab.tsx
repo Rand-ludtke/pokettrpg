@@ -19,6 +19,9 @@ const TYPE_COLORS: Record<string, string> = {
   steel:'#B8B8D0', fairy:'#EE99AC',
   nuclear:'#92D050', cosmic:'#6B2FA0',
   crystal:'#A8D8EA', '???':'#68A090', stellar:'#44698f', shadow:'#5a4975',
+
+  Sound: '#ff66aa',
+  Light: '#fffacd',
 };
 
 /* ──────────────────────────── stat helpers ───────────────────────── */
@@ -132,18 +135,21 @@ function buildSpeciesSearchText(name: string, key?: string): string {
 
 /** Upload a painted fusion sprite data URL to the backend */
 async function uploadFusionSpriteToBackend(headNum: number, bodyNum: number, dataUrl: string) {
+  // Current backend origin. Legacy duckdns and nip.io hosts are rewritten so
+  // stale values cached in localStorage still reach the live server.
+  const CURRENT_BASE = 'https://pokettrpg-app.pokemondnd.xyz';
   const normalizeBase = (value: string) => value
     .trim()
-    .replace(/^https:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, 'https://47-218-210-137.nip.io')
-    .replace(/^https:\/\/47-218-210-137\.nip\.io(?=\/|$)/i, 'https://47-218-210-137.nip.io')
-    .replace(/^http:\/\/pokettrpg\.duckdns\.org:3000(?=\/|$)/i, 'https://47-218-210-137.nip.io')
-    .replace(/^http:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, 'https://47-218-210-137.nip.io')
+    .replace(/^https:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, CURRENT_BASE)
+    .replace(/^http:\/\/pokettrpg\.duckdns\.org:3000(?=\/|$)/i, CURRENT_BASE)
+    .replace(/^http:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, CURRENT_BASE)
+    .replace(/^https?:\/\/47-218-210-137\.nip\.io(:3000)?(?=\/|$)/i, CURRENT_BASE)
     .replace(/\/+$/, '');
   const bases = [
     localStorage.getItem('ttrpg.fusionApiBase'),
     'http://localhost:3000',
     localStorage.getItem('ttrpg.apiBase'),
-    'https://47-218-210-137.nip.io',
+    CURRENT_BASE,
   ].filter(Boolean).map(v => normalizeBase(String(v))) as string[];
 
   for (const base of bases) {

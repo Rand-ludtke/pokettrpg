@@ -47,6 +47,10 @@ const TYPE_COLORS: Record<string, string> = {
   shadow: '#5a4975',
   nuclear: '#92D050',
   cosmic: '#6B2FA0',
+
+  crystal: '#a0d2eb',
+  sound: '#ff66aa',
+  light: '#fffacd',
 };
 
 const FX_ASSET_BASE = '/fx';

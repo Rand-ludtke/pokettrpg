@@ -1,3 +1,14 @@
+const FUSION_PREFIX = '_fusion_';
+const FUSION_DELIMITER = '/';
+
+function resolveSpecies(name: string): string | null {
+  if (name.startsWith(FUSION_PREFIX)) return name;
+  const parts = name.split('/');
+  if (parts.length !== 2) return null;
+  const [head, body] = parts;
+  return `${FUSION_PREFIX}${head}/${body}`;
+}
+
 import { BattlePokemon, Pokemon } from '../types';
 import { calculateHp } from '../rules';
 import { withPublicBase } from '../utils/publicBase';
@@ -483,27 +494,165 @@ export function normalizeName(id: string) {
   return id.replace(/[^a-z0-9]/gi, '').toLowerCase();
 }
 
+/** A custom move pack contributed by a fangame data source. */
+type CustomMovePack = {
+  /** Human-readable label used in the duplicate's display name. */
+  label: string;
+  /** Key suffix for type-variant duplicates (e.g. 'ss2' -> 'swiftss2'). */
+  suffix: string;
+  moves: MoveIndex | null | undefined;
+};
+
+export type CustomMoveMergeResult = {
+  moves: MoveIndex;
+  /** suffix -> (base move key -> variant key) for learnset remapping. */
+  variantKeysBySuffix: Map<string, Map<string, string>>;
+  stats: { added: number; variants: number; skippedSameType: number };
+};
+
+/**
+ * Merge fangame move packs on top of the canonical Showdown move table.
+ *
+ * The fangame PBS exports only carry {name, type, basePower, category, accuracy,
+ * desc, shortDesc} — they have no `pp`, `target`, `flags`, `priority` or `num`.
+ * A naive object spread therefore DESTROYS battle-critical data for every
+ * canonical move whose name collides (770 of them for the SS2 pack alone),
+ * which breaks PP tracking and move targeting in battle.
+ *
+ * Rules applied here:
+ *  1. A move that does not exist in the base table is added as-is (genuinely new).
+ *  2. A colliding move with the SAME type is skipped — the canonical entry is
+ *     strictly richer, so there is nothing to gain.
+ *  3. A colliding move with a DIFFERENT type is exposed as an ADDITIONAL entry
+ *     under `<key><suffix>`, inheriting the canonical battle fields and
+ *     overriding only the fangame-specific ones. The canonical move keeps its
+ *     original typing, so both variants coexist.
+ */
+export function mergeCustomMovePacks(baseMoves: MoveIndex, packs: CustomMovePack[]): CustomMoveMergeResult {
+  const merged: MoveIndex = { ...baseMoves };
+  const variantKeysBySuffix = new Map<string, Map<string, string>>();
+  const stats = { added: 0, variants: 0, skippedSameType: 0 };
+
+  // normalized key -> actual key as it appears in the base table
+  const baseKeyByNorm = new Map<string, string>();
+  for (const key of Object.keys(baseMoves || {})) {
+    const norm = normalizeName(key);
+    if (norm && !baseKeyByNorm.has(norm)) baseKeyByNorm.set(norm, key);
+  }
+
+  for (const pack of packs) {
+    if (!pack?.moves) continue;
+    const variantMap = variantKeysBySuffix.get(pack.suffix) ?? new Map<string, string>();
+    variantKeysBySuffix.set(pack.suffix, variantMap);
+
+    for (const [rawKey, rawEntry] of Object.entries(pack.moves)) {
+      const entry = rawEntry as MoveEntry | undefined;
+      if (!entry || typeof entry !== 'object') continue;
+      const norm = normalizeName(rawKey);
+      if (!norm) continue;
+
+      const baseKey = baseKeyByNorm.get(norm);
+      if (!baseKey) {
+        // Rule 1: brand-new fangame move.
+        if (!merged[norm]) {
+          merged[norm] = entry;
+          stats.added++;
+        }
+        continue;
+      }
+
+      const baseEntry = baseMoves[baseKey];
+      const baseType = normalizeName(String(baseEntry?.type || ''));
+      const customType = normalizeName(String(entry.type || ''));
+
+      // Rule 2: same typing -> canonical entry already covers it.
+      if (!customType || customType === baseType) {
+        stats.skippedSameType++;
+        continue;
+      }
+
+      // Rule 3: retyped variant -> add alongside the canonical move.
+      const variantKey = `${norm}${pack.suffix}`;
+      variantMap.set(norm, variantKey);
+      if (merged[variantKey]) continue;
+      merged[variantKey] = {
+        // Canonical battle fields first (pp, target, flags, priority, num, ...)
+        ...(baseEntry as any),
+        // Then the fangame overrides (type, basePower, category, accuracy, desc)
+        ...(entry as any),
+        name: `${entry.name || baseEntry?.name || rawKey} (${pack.label})`,
+      } as MoveEntry;
+      stats.variants++;
+    }
+  }
+
+  return { moves: merged, variantKeysBySuffix, stats };
+}
+
+/**
+ * Rewrite a fangame learnset table so its species reference that pack's
+ * retyped move variants instead of the canonical same-named moves.
+ *
+ * Only safe to call for packs whose species keys do not collide with canonical
+ * species (verified for SS2 via scripts/audit-data-collisions.mjs), because it
+ * rewrites every learnset entry in the table it is given.
+ */
+export function remapLearnsetsToMoveVariants(
+  learnsets: LearnsetsIndex | null | undefined,
+  variantMap: Map<string, string> | undefined,
+): LearnsetsIndex {
+  if (!learnsets) return {};
+  if (!variantMap || variantMap.size === 0) return learnsets;
+
+  const out: LearnsetsIndex = {};
+  for (const [speciesKey, record] of Object.entries(learnsets)) {
+    const learnset = record?.learnset;
+    if (!learnset || typeof learnset !== 'object') {
+      out[speciesKey] = record;
+      continue;
+    }
+    const nextLearnset: Record<string, any> = {};
+    for (const [moveKey, sources] of Object.entries(learnset)) {
+      const variantKey = variantMap.get(normalizeName(moveKey));
+      nextLearnset[variantKey || moveKey] = sources;
+    }
+    out[speciesKey] = { ...record, learnset: nextLearnset };
+  }
+  return out;
+}
+
 const DEFAULT_DATA_BASE = withPublicBase('vendor/showdown/data').replace(/\/+$/, '');
 const DEFAULT_SPRITE_BASE = withPublicBase('vendor/showdown/sprites').replace(/\/+$/, '');
 /** Custom/regional sprites shipped at public/sprites/ (Wylin, Sage, etc.) */
 const CUSTOM_SPRITE_BASE = withPublicBase('sprites').replace(/\/+$/, '');
 const LEGACY_DUCKDNS_BASE = 'https://pokettrpg.duckdns.org';
 const LEGACY_DUCKDNS_HTTP_BASE = 'http://pokettrpg.duckdns.org';
-const STABLE_HTTPS_BASE = 'https://47-218-210-137.nip.io';
-const STABLE_HTTP_BASE = 'http://47-218-210-137.nip.io';
+// Current backend host. Served over HTTPS only (Cloudflare Tunnel), so both the
+// "https" and "http" migration targets point at the HTTPS origin — emitting an
+// http:// URL here would be blocked as mixed content on GitHub Pages.
+const STABLE_HTTPS_BASE = 'https://pokettrpg-app.pokemondnd.xyz';
+const STABLE_HTTP_BASE = 'https://pokettrpg-app.pokemondnd.xyz';
+const LEGACY_NIPIO_BASE = 'https://47-218-210-137.nip.io';
+const LEGACY_NIPIO_HTTP_BASE = 'http://47-218-210-137.nip.io';
 
 function normalizeBaseUrl(base: string | null | undefined): string {
   const value = String(base || '').trim();
   if (!value) return '';
   return value
     .replace(new RegExp(`^${LEGACY_DUCKDNS_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`, 'i'), STABLE_HTTPS_BASE)
-    .replace(new RegExp(`^${LEGACY_DUCKDNS_HTTP_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:3000(?=/|$)`, 'i'), `${STABLE_HTTP_BASE}:3000`)
+    // Legacy duckdns :3000 → current origin (no port; Cloudflare terminates on 443)
+    .replace(new RegExp(`^${LEGACY_DUCKDNS_HTTP_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:3000(?=/|$)`, 'i'), STABLE_HTTPS_BASE)
     .replace(new RegExp(`^${LEGACY_DUCKDNS_HTTP_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`, 'i'), STABLE_HTTP_BASE)
+    // Legacy nip.io host (previous backend) → current origin. Users may still
+    // have this cached in localStorage 'ttrpg.apiBase'.
+    .replace(new RegExp(`^${LEGACY_NIPIO_HTTP_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:3000(?=/|$)`, 'i'), STABLE_HTTPS_BASE)
+    .replace(new RegExp(`^${LEGACY_NIPIO_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`, 'i'), STABLE_HTTPS_BASE)
+    .replace(new RegExp(`^${LEGACY_NIPIO_HTTP_BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=/|$)`, 'i'), STABLE_HTTP_BASE)
     .replace(/\/+$/, '');
 }
 
 /** Default backend URL for sprite index / BaseSprites (mirrored from fusion API). */
-const DEFAULT_BACKEND_SPRITE_BASE = 'https://47-218-210-137.nip.io/sprites';
+const DEFAULT_BACKEND_SPRITE_BASE = `${STABLE_HTTPS_BASE}/sprites`;
 
 // ── Infinite Fusion Dex CDN (community sprite source) ──
 export const IFD_CDN_BASE = 'https://ifd-spaces.sfo2.cdn.digitaloceanspaces.com';
@@ -863,6 +1012,27 @@ export async function loadShowdownDex(options?: { base?: string }) {
       return injected;
     })() : {}),
   } as DexIndex;
+  // Merge fangame move packs WITHOUT clobbering canonical Showdown moves.
+  // A plain spread here used to overwrite 770 canonical moves with PBS entries
+  // that carry no pp/target/flags/priority, silently breaking PP tracking and
+  // move targeting in battle. mergeCustomMovePacks() instead keeps the canonical
+  // move and exposes any retyped fangame version as a separate `<move><suffix>`
+  // entry, so both the original and the new typing remain available.
+  // Computed before the learnset merge because the learnset remap depends on it.
+  const customMoveMerge = mergeCustomMovePacks(moves as MoveIndex, [
+    { label: 'Sage', suffix: 'sage', moves: sageMoves as MoveIndex },
+    { label: 'Wylin', suffix: 'wylin', moves: wylinMoves as MoveIndex },
+    { label: 'Uranium', suffix: 'uranium', moves: uraniumMoves as MoveIndex },
+    { label: 'Infinity', suffix: 'infinity', moves: infinityMoves as MoveIndex },
+    { label: 'Mariomon', suffix: 'mariomon', moves: mariomonMoves as MoveIndex },
+    // Soulstones Part 1 custom moves (Crystal Beam, Cosmic Pulse, Starfall, etc.)
+    { label: 'Soulstones', suffix: 'ss1', moves: soulstonePart1Moves as MoveIndex },
+    // Soulstones 2 custom moves (Sound, Cosmic, Light type moves)
+    { label: 'Soulstones 2', suffix: 'ss2', moves: soulstonePS2Moves as MoveIndex },
+    // Extra Pokémon custom moves
+    { label: 'Extra', suffix: 'extra', moves: extraPokemonMoves as MoveIndex },
+  ]);
+
   const mergedBaseLearnsets = {
     ...(learnsets as LearnsetsIndex),
     ...((sageLearnsets || {}) as LearnsetsIndex),
@@ -871,27 +1041,27 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((uraniumLearnsets || {}) as LearnsetsIndex),
     ...((infinityLearnsets || {}) as LearnsetsIndex),
     ...((mariomonLearnsets || {}) as LearnsetsIndex),
-    // Soulstones Part 1 learnsets (separate files)
-    ...((soulstonePart1Learnsets || {}) as LearnsetsIndex),
-    // Soulstones 2 learnsets (parsed from PS2 PBS Moves= fields)
-    ...((soulstonePS2Learnsets || {}) as LearnsetsIndex),
+    // Soulstones Part 1 learnsets, remapped onto the SS1 retyped move variants.
+    ...(remapLearnsetsToMoveVariants(
+      soulstonePart1Learnsets as LearnsetsIndex,
+      customMoveMerge.variantKeysBySuffix.get('ss1'),
+    ) as LearnsetsIndex),
+    // Soulstones 2 learnsets (parsed from PS2 PBS Moves= fields), remapped onto
+    // the SS2 retyped move variants so SS2 species actually use SS2 typings.
+    // Safe because SS2 species keys are namespaced and never collide with
+    // canonical species (verified by scripts/audit-data-collisions.mjs).
+    ...(remapLearnsetsToMoveVariants(
+      soulstonePS2Learnsets as LearnsetsIndex,
+      customMoveMerge.variantKeysBySuffix.get('ss2'),
+    ) as LearnsetsIndex),
     // Extra Pokémon learnsets
     ...((extraPokemonLearnsets || {}) as LearnsetsIndex),
   } as LearnsetsIndex;
-  const mergedBaseMoves = {
-    ...(moves as MoveIndex),
-    ...((sageMoves || {}) as MoveIndex),
-    ...((wylinMoves || {}) as MoveIndex),
-    ...((uraniumMoves || {}) as MoveIndex),
-    ...((infinityMoves || {}) as MoveIndex),
-    ...((mariomonMoves || {}) as MoveIndex),
-    // Soulstones Part 1 custom moves (Crystal Beam, Cosmic Pulse, Starfall, etc.)
-    ...((soulstonePart1Moves || {}) as MoveIndex),
-    // Soulstones 2 custom moves (Sound, Cosmic, Light type moves)
-    ...((soulstonePS2Moves || {}) as MoveIndex),
-    // Extra Pokémon custom moves
-    ...((extraPokemonMoves || {}) as MoveIndex),
-  } as MoveIndex;
+  const mergedBaseMoves = customMoveMerge.moves;
+  if (typeof console !== 'undefined') {
+    const s = customMoveMerge.stats;
+    console.log(`[adapter] custom moves: +${s.added} new, +${s.variants} retyped duplicates, ${s.skippedSameType} same-type collisions kept canonical`);
+  }
   const mergedBaseAbilities = {
     ...(abilities as AbilityIndex),
     ...((sageAbilities || {}) as AbilityIndex),
@@ -2359,8 +2529,10 @@ function uploadSpriteToBackend(id: string, slot: SpriteSlot, dataUrl: string) {
   if (!dataUrl || !dataUrl.startsWith('data:image/')) return;
   const bases = [
     (() => { try { return localStorage.getItem('ttrpg.apiBase'); } catch { return null; } })(),
-    'https://47-218-210-137.nip.io',
-  ].filter(Boolean) as string[];
+    STABLE_HTTPS_BASE,
+  ]
+    .map((b) => normalizeBaseUrl(b))
+    .filter(Boolean) as string[];
   // Try each base; stop on first success
   (async () => {
     for (const base of bases) {
@@ -2949,8 +3121,8 @@ function uploadIfdSpriteToBackend(headNum: number, bodyNum: number, dataUrl: str
   }
 }
 
-const DEFAULT_FUSION_API_BASE = 'https://47-218-210-137.nip.io';
-const EXTERNAL_HTTP_FUSION_API = 'https://47-218-210-137.nip.io';
+const DEFAULT_FUSION_API_BASE = STABLE_HTTPS_BASE;
+const EXTERNAL_HTTP_FUSION_API = STABLE_HTTPS_BASE;
 const LOCAL_FUSION_API_BASES = ['http://127.0.0.1:3000', 'http://localhost:3000'];
 const gFusionEnsurePromises = new Map<string, Promise<string | null>>();
 
@@ -2966,11 +3138,9 @@ function normalizeBase(raw: string | null | undefined): string | null {
   if (!raw) return null;
   const trimmed = String(raw).trim();
   if (!trimmed) return null;
-  return trimmed
-    .replace(/^https:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, STABLE_HTTPS_BASE)
-    .replace(/^http:\/\/pokettrpg\.duckdns\.org:3000(?=\/|$)/i, `${STABLE_HTTP_BASE}:3000`)
-    .replace(/^http:\/\/pokettrpg\.duckdns\.org(?=\/|$)/i, STABLE_HTTP_BASE)
-    .replace(/\/+$/, '');
+  // Delegate to the shared normalizer so legacy duckdns AND legacy nip.io hosts
+  // are both migrated to the current backend origin.
+  return normalizeBaseUrl(trimmed) || null;
 }
 
 export function getFusionApiBases(): string[] {
