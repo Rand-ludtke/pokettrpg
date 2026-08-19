@@ -1232,6 +1232,10 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
   const [customAbilityName, setCustomAbilityName] = useState('');
   const [customAbilityShortDesc, setCustomAbilityShortDesc] = useState('');
   const [customAbilityDesc, setCustomAbilityDesc] = useState('');
+  // Random Pokémon finder — up to 2 optional type filters
+  const [randomType1, setRandomType1] = useState('');
+  const [randomType2, setRandomType2] = useState('');
+  const [randomResult, setRandomResult] = useState<string | null>(null);
 
   const dexOptions = useMemo(() => {
     if (!dexData) return null;
@@ -1453,6 +1457,26 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
     setBstMin('');
     setBstMax('');
   }, []);
+
+  // Random Pokémon finder — picks a random Pokémon matching up to 2 type filters
+  const handleRandomFind = useCallback(() => {
+    if (!dexData) return;
+    const types = [randomType1, randomType2].map(t => t.toLowerCase()).filter(Boolean);
+    const pool = Object.values(dexData.pokedex).filter(p => {
+      if (!p.name) return false;
+      if (!p.types || p.types.length === 0) return false;
+      if (types.length === 0) return true;
+      const pTypes = p.types.map(t => t.toLowerCase());
+      return types.some(t => pTypes.includes(t));
+    });
+    if (pool.length === 0) {
+      setRandomResult('No Pokémon found with those type filters.');
+      return;
+    }
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    setRandomResult(pick.name);
+    setSelectedId(pick.id);
+  }, [dexData, randomType1, randomType2]);
 
   // Load PC list from localStorage
   const loadPc = useCallback(() => {
@@ -2317,6 +2341,34 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
                     Clear
                   </button>
                 </div>
+              </div>
+            </details>
+
+            <details style={{ marginTop: 4 }}>
+              <summary style={{ cursor: 'pointer', fontSize: 12, color: '#444' }}>🎲 Random Pokémon Finder</summary>
+              <div style={{ border: '1px solid #ccc', borderRadius: 6, marginTop: 6, padding: 10, background: '#fff', display: 'grid', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Type 1 (optional)
+                    <select value={randomType1} onChange={e => setRandomType1(e.target.value)}>
+                      <option value="">— Any —</option>
+                      {TYPE_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </label>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Type 2 (optional)
+                    <select value={randomType2} onChange={e => setRandomType2(e.target.value)}>
+                      <option value="">— Any —</option>
+                      {TYPE_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </label>
+                </div>
+                <button type="button" onClick={handleRandomFind} disabled={!dataLoaded} style={{ padding: '6px 12px', border: '1px solid #4a9eff', background: '#4a9eff', color: '#fff', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>
+                  🎲 Find Random Pokémon
+                </button>
+                {randomResult && (
+                  <div style={{ fontSize: 12, color: '#444', fontWeight: 'bold' }}>Result: {randomResult}</div>
+                )}
               </div>
             </details>
           </div>

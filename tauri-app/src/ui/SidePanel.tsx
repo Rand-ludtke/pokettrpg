@@ -1449,6 +1449,32 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
               <span className="dim">No fusion sprite variants found.</span>
             )}
 
+            {/* Use base sprite fallback when no fusion sprite found */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+              <button
+                className="mini"
+                onClick={() => {
+                  const headSp = spriteUrl(fusion.headName || String(fusion.headId || ''));
+                  const next = { ...selected, sprite: headSp, spriteChoiceId: `base:${fusion.headId}`, spriteChoiceLabel: `Use ${fusion.headName} sprite` } as any;
+                  onReplaceSelected && onReplaceSelected(next);
+                }}
+                title={`Use ${fusion.headName}'s sprite as fallback`}
+              >
+                Use {fusion.headName} Sprite
+              </button>
+              <button
+                className="mini"
+                onClick={() => {
+                  const bodySp = spriteUrl(fusion.bodyName || String(fusion.bodyId || ''));
+                  const next = { ...selected, sprite: bodySp, spriteChoiceId: `base:${fusion.bodyId}`, spriteChoiceLabel: `Use ${fusion.bodyName} sprite` } as any;
+                  onReplaceSelected && onReplaceSelected(next);
+                }}
+                title={`Use ${fusion.bodyName}'s sprite as fallback`}
+              >
+                Use {fusion.bodyName} Sprite
+              </button>
+            </div>
+
             {/* Defuse Button */}
             <button
               className="mini"
@@ -3056,9 +3082,10 @@ const TYPE_CHART: Record<string, Record<string, number>> = {
   dark: { ghost: 2, psychic: 2, fighting: 0.5, dark: 0.5, fairy: 0.5 },
   steel: { rock: 2, ice: 2, fairy: 2, fire: 0.5, water: 0.5, electric: 0.5, steel: 0.5 },
   fairy: { fighting: 2, dragon: 2, dark: 2, fire: 0.5, poison: 0.5, steel: 0.5 },
-  nuclear: { normal: 2, fire: 2, water: 2, electric: 2, grass: 2, ice: 2, fighting: 2, poison: 2, ground: 2, flying: 2, psychic: 2, bug: 2, rock: 2, ghost: 2, dragon: 2, dark: 2, fairy: 2, cosmic: 2, nuclear: 0.5, steel: 0.5 },
-  cosmic: { fairy: 2, normal: 2, nuclear: 2, psychic: 0.5 },
-  crystal: {},
+  nuclear: { normal: 2, fire: 2, water: 2, electric: 2, grass: 2, ice: 2, fighting: 2, poison: 2, ground: 2, flying: 2, psychic: 2, bug: 2, rock: 2, ghost: 2, dragon: 2, dark: 2, fairy: 2, cosmic: 2, nuclear: 0.5, steel: 0.5, crystal: 0.5, light: 2, sound: 2 },
+  cosmic: { fairy: 2, normal: 2, nuclear: 2, psychic: 0.5, cosmic: 0.5, sound: 0.5, light: 2 },
+  crystal: { cosmic: 2, nuclear: 2, stellar: 2, light: 2, sound: 0.5 },
+  shadow: { ghost: 2, dragon: 2, dark: 0.5, normal: 0, psychic: 0.5, fairy: 0.5, cosmic: 0.5, nuclear: 0.5, steel: 0.5, sound: 0.5, crystal: 0.5, light: 0.5 },
   '???': {},
 };
 

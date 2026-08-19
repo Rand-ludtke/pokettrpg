@@ -114,7 +114,7 @@ const getTypeColor = (type: string): string => {
     dark: "#705746", steel: "#b7b7ce", fairy: "#d685ad",
     // Custom Soulstones types matching Pokeathlon style
     Crystal: "#a0d2eb", Cosmic: "#c491e9", Nuclear: "#4caf50", 
-    Stellar: "#fbc531", Sound: "#ff66aa", Light: "#fffacd"
+    Stellar: "#fbc531", Sound: "#ff66aa", Light: "#fffacd", Shadow: "#4a3a66"
   };
   return colors[type] || "#888";
 };

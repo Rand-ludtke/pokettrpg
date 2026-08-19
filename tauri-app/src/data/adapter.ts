@@ -555,7 +555,18 @@ export function mergeCustomMovePacks(baseMoves: MoveIndex, packs: CustomMovePack
       if (!baseKey) {
         // Rule 1: brand-new fangame move.
         if (!merged[norm]) {
-          merged[norm] = entry;
+          // PBS exports carry no pp/target/flags/priority/num. Without them the
+          // move is unusable in battle (0 PP, no target). Fill sensible defaults.
+          const category = String(entry.category || 'Status').toLowerCase() as 'physical'|'special'|'status';
+          const ppDefault = category === 'status' ? 15 : (Number(entry.basePower) > 0 ? 20 : 10);
+          merged[norm] = {
+            ...entry,
+            pp: Number(entry.pp) > 0 ? Number(entry.pp) : ppDefault,
+            target: entry.target || 'normal',
+            priority: Number(entry.priority) || 0,
+            num: Number(entry.num) || 0,
+            flags: entry.flags || {},
+          } as MoveEntry;
           stats.added++;
         }
         continue;
@@ -1028,7 +1039,7 @@ export async function loadShowdownDex(options?: { base?: string }) {
     // Soulstones Part 1 custom moves (Crystal Beam, Cosmic Pulse, Starfall, etc.)
     { label: 'Soulstones', suffix: 'ss1', moves: soulstonePart1Moves as MoveIndex },
     // Soulstones 2 custom moves (Sound, Cosmic, Light type moves)
-    { label: 'Soulstones 2', suffix: 'ss2', moves: soulstonePS2Moves as MoveIndex },
+    { label: 'SS2', suffix: 'ss2', moves: soulstonePS2Moves as MoveIndex },
     // Extra Pokémon custom moves
     { label: 'Extra', suffix: 'extra', moves: extraPokemonMoves as MoveIndex },
   ]);
