@@ -1466,8 +1466,9 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
       if (!p.name) return false;
       if (!p.types || p.types.length === 0) return false;
       if (types.length === 0) return true;
-      const pTypes = p.types.map(t => t.toLowerCase());
-      return types.some(t => pTypes.includes(t));
+      const pTypes = new Set(p.types.map(t => t.toLowerCase()));
+      // All selected types must be present (AND semantics for up to 2 type filter)
+      return types.every(t => pTypes.has(t));
     });
     if (pool.length === 0) {
       setRandomResult('No Pokémon found with those type filters.');

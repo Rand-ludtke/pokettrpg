@@ -3086,6 +3086,9 @@ const TYPE_CHART: Record<string, Record<string, number>> = {
   cosmic: { fairy: 2, normal: 2, nuclear: 2, psychic: 0.5, cosmic: 0.5, sound: 0.5, light: 2 },
   crystal: { cosmic: 2, nuclear: 2, stellar: 2, light: 2, sound: 0.5 },
   shadow: { ghost: 2, dragon: 2, dark: 0.5, normal: 0, psychic: 0.5, fairy: 0.5, cosmic: 0.5, nuclear: 0.5, steel: 0.5, sound: 0.5, crystal: 0.5, light: 0.5 },
+  sound: { bug: 2, ghost: 2, psychic: 2, rock: 0.5, steel: 0.5, ground: 2, sound: 0.5, crystal: 2, cosmic: 0.5 },
+  light: { dark: 2, ghost: 2, ice: 2, poison: 2, psychic: 0.5, fire: 0.5, electric: 0.5, light: 0.5, steel: 0.5 },
+  stellar: { bug: 2, rock: 2, dark: 2, fire: 2, water: 2, electric: 2, grass: 2, ice: 2, fighting: 2, poison: 2, ground: 2, flying: 2, psychic: 2, ghost: 2, dragon: 0.5, dark: 0.5, steel: 0.5, fairy: 2, cosmic: 0.5, nuclear: 0.5, crystal: 0.5, light: 0.5, shadow: 0.5, stellar: 0.5 },
   '???': {},
 };
 
