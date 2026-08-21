@@ -47,7 +47,22 @@ export type DexSpecies = {
   isMega?: boolean;
 };
 
-export type MoveEntry = { name: string; type: string; basePower: number; category: 'Physical'|'Special'|'Status'; accuracy?: number | true; secondary?: any; secondaries?: any[]; desc?: string; shortDesc?: string };
+export type MoveEntry = {
+  name: string;
+  type: string;
+  basePower: number;
+  category: 'Physical'|'Special'|'Status';
+  accuracy?: number | true;
+  secondary?: any;
+  secondaries?: any[];
+  desc?: string;
+  shortDesc?: string;
+  pp?: number;
+  target?: string;
+  priority?: number;
+  num?: number;
+  flags?: Record<string, any>;
+};
 export type AbilityEntry = { name: string; desc?: string; shortDesc?: string };
 export type ItemEntry = { name: string; desc?: string; shortDesc?: string; sprite?: string; megaStone?: string };
 
