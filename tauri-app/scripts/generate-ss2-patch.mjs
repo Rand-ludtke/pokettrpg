@@ -126,6 +126,26 @@ function parsePBSMoves(filePath) {
   return moves;
 }
 
+// Parse PBS abilities.txt into a map: normId -> { name, desc, shortDesc }
+function parsePBSAbilities(filePath) {
+  if (!fs.existsSync(filePath)) {
+    console.warn(`Abilities file not found: ${filePath}`);
+    return {};
+  }
+  const blocks = parsePBSBlocks(filePath);
+  const out = {};
+  for (const b of blocks) {
+    const r = b._raw;
+    const id = normId(b._key);
+    if (!id) continue;
+    const name = r.Name || b._key;
+    const fullDesc = (r.FullDesc || '').trim();
+    const shortDesc = (r.Description || '').trim();
+    out[id] = { name, desc: fullDesc || shortDesc, shortDesc: shortDesc || fullDesc };
+  }
+  return out;
+}
+
 // Parse Moves = level,MOVE,level,MOVE,... field into learnset entries
 function parseLevelMoves(movesStr) {
   const learnset = {};
@@ -314,6 +334,10 @@ console.log('Parsing PBS moves.txt...');
 const customMoves = parsePBSMoves(path.join(PBS_DIR, 'moves.txt'));
 console.log(`Parsed ${Object.keys(customMoves).length} custom moves`);
 
+console.log('Parsing PBS abilities.txt...');
+const pbsAbilities = parsePBSAbilities(path.join(PBS_DIR, 'abilities.txt'));
+console.log(`Parsed ${Object.keys(pbsAbilities).length} PBS abilities`);
+
 // ─── Process Pokemon Blocks ────────────────────────────────────────────────
 
 const outPokedex = {};
@@ -373,7 +397,11 @@ function processBlock(block) {
       const abId = normId(ab);
       if (abId && !outAbilities[abId]) {
         const abName = abilities[Object.keys(abilities).find(k => normId(abilities[k]) === abId) || '0'] || ab;
-        outAbilities[abId] = { name: abName, shortDesc: `${abName} ability.`, desc: `${abName} ability.` };
+        // Use the real PBS description when available instead of a placeholder.
+        const pbs = pbsAbilities[abId];
+        const desc = pbs?.desc || pbs?.shortDesc || `${abName} ability.`;
+        const shortD = pbs?.shortDesc || pbs?.desc || `${abName} ability.`;
+        outAbilities[abId] = { name: pbs?.name || abName, shortDesc: shortD, desc };
       }
     }
   }
@@ -598,6 +626,20 @@ for (const block of pokemonBlocks) {
       outLearnsets[newKey] = { learnset: fullLearnset };
     }
     newEntryCount++;
+  }
+}
+
+// ─── Final sweep: register every ability referenced by any dex entry ─────────
+for (const entry of Object.values(outPokedex)) {
+  for (const abName of Object.values(entry.abilities || {})) {
+    const abId = normId(abName);
+    if (!abId || outAbilities[abId]) continue;
+    const pbs = pbsAbilities[abId];
+    outAbilities[abId] = {
+      name: pbs?.name || abName,
+      shortDesc: pbs?.shortDesc || pbs?.desc || `${abName} ability.`,
+      desc: pbs?.desc || pbs?.shortDesc || `${abName} ability.`,
+    };
   }
 }
 

@@ -250,7 +250,9 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
          insPokedex, insAbilities, insItems,
          uraniumPokedex, uraniumMoves, uraniumAbilities,
          infinityPokedex, infinityMoves, infinityAbilities,
-         mariomonPokedex, mariomonMoves, mariomonAbilities] = await Promise.all([
+         mariomonPokedex, mariomonMoves, mariomonAbilities,
+         ss2Pokedex, ss2Moves, ss2Abilities,
+         ss1Pokedex, ss1Moves, ss1Abilities] = await Promise.all([
     fetchOptionalJson(withPublicBase('data/sage/generated/pokedex.sage.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/moves.custom.sage.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/abilities.custom.sage.json')),
@@ -267,6 +269,12 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
     fetchOptionalJson(withPublicBase('data/mariomon/generated/pokedex.mariomon.json')),
     fetchOptionalJson(withPublicBase('data/mariomon/generated/moves.custom.mariomon.json')),
     fetchOptionalJson(withPublicBase('data/mariomon/generated/abilities.custom.mariomon.json')),
+    fetchOptionalJson(withPublicBase('data/ss2-patch/generated/pokedex.ss2-soulstones.json')),
+    fetchOptionalJson(withPublicBase('data/ss2-patch/generated/moves.custom.ss2-soulstones.json')),
+    fetchOptionalJson(withPublicBase('data/ss2-patch/generated/abilities.custom.ss2-soulstones.json')),
+    fetchOptionalJson(withPublicBase('data/soulstones-part1/generated/pokedex.soulstones-part1.json')),
+    fetchOptionalJson(withPublicBase('data/soulstones-part1/generated/moves.custom.soulstones-part1.json')),
+    fetchOptionalJson(withPublicBase('data/soulstones-part1/generated/abilities.custom.soulstones-part1.json')),
   ]);
 
   const battleDex = ((window as any).BattlePokedex = (window as any).BattlePokedex || {});
@@ -315,6 +323,35 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
   applied += mergeEntries(uraniumAbilities, battleAbilities, 'Uranium abilities');
   applied += mergeEntries(infinityAbilities, battleAbilities, 'Infinity abilities');
   applied += mergeEntries(mariomonAbilities, battleAbilities, 'Mariomon abilities');
+  applied += mergeEntries(ss2Pokedex, battleDex, 'SS2 dex', true);
+  applied += mergeEntries(ss2Moves, battleMovedex, 'SS2 moves');
+  applied += mergeEntries(ss2Abilities, battleAbilities, 'SS2 abilities');
+  applied += mergeEntries(ss1Pokedex, battleDex, 'SS1 dex', true);
+  applied += mergeEntries(ss1Moves, battleMovedex, 'SS1 moves');
+  applied += mergeEntries(ss1Abilities, battleAbilities, 'SS1 abilities');
+
+  // Create retyped move variants (<move>ss2 / <move>ss1) so battles can resolve
+  // the remapped learnset entries produced by mergeCustomMovePacks().
+  const createMoveVariants = (source: Record<string, any> | null, target: Record<string, any>, suffix: string, label: string) => {
+    if (!source || typeof source !== 'object') return 0;
+    let count = 0;
+    for (const [rawKey, rawEntry] of Object.entries(source)) {
+      const keyId = toPSId(rawKey);
+      if (!keyId) continue;
+      const entry = rawEntry || {};
+      const baseEntry = target[keyId];
+      if (!baseEntry) continue; // brand-new moves were added directly above
+      const customType = String(entry.type || '');
+      if (!customType || customType === String(baseEntry.type || '')) continue;
+      const variantKey = `${keyId}${suffix}`;
+      if (target[variantKey]) continue;
+      target[variantKey] = { ...baseEntry, ...entry, name: `${entry.name || baseEntry.name} (${label})` };
+      count++;
+    }
+    return count;
+  };
+  applied += createMoveVariants(ss2Moves, battleMovedex, 'ss2', 'SS2');
+  applied += createMoveVariants(ss1Moves, battleMovedex, 'ss1', 'Soulstones');
 
   // Keep Dex data pointers in sync for tooltip/species lookups
   if ((window as any).Dex?.data) {

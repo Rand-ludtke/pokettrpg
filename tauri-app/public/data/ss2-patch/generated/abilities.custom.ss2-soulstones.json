@@ -1,1447 +1,1597 @@
 {
   "levitate": {
     "name": "Levitate",
-    "shortDesc": "Levitate ability.",
-    "desc": "Levitate ability."
+    "shortDesc": "Gives full immunity to all Ground-type moves.",
+    "desc": "User takes no damage from Ground-type moves. User is also considered ungrounded and thus unaffected by entry hazards or terrain."
   },
   "whitesmoke": {
     "name": "White Smoke",
-    "shortDesc": "White Smoke ability.",
-    "desc": "White Smoke ability."
+    "shortDesc": "Prevents other Pokémon from lowering its stats.",
+    "desc": "User's stats cannot be lowered by other Pokémon. If user is in the lead, reduces wild Pokémon encounter rate by 50%."
   },
   "swiftswim": {
     "name": "Swift Swim",
-    "shortDesc": "Swift Swim ability.",
-    "desc": "Swift Swim ability."
+    "shortDesc": "Boosts the Pokémon's Speed in rain.",
+    "desc": "User's Speed stat is doubled during Rain."
   },
   "magicbounce": {
     "name": "Magic Bounce",
-    "shortDesc": "Magic Bounce ability.",
-    "desc": "Magic Bounce ability."
+    "shortDesc": "Reflects status-changing moves.",
+    "desc": "Reflects status-changing moves."
   },
   "filter": {
     "name": "Filter",
-    "shortDesc": "Filter ability.",
-    "desc": "Filter ability."
+    "shortDesc": "Reduces damage from super-effective attacks.",
+    "desc": "User takes 0.75x damage from super-effective attacks."
   },
   "cloudnine": {
     "name": "Cloud Nine",
-    "shortDesc": "Cloud Nine ability.",
-    "desc": "Cloud Nine ability."
+    "shortDesc": "Eliminates the effects of weather and terrain.",
+    "desc": "When user is on the field, all effects of the current Weather are nullified. The Weather itself is not nullified."
   },
   "earlybird": {
-    "name": "Earlybird",
-    "shortDesc": "Earlybird ability.",
-    "desc": "Earlybird ability."
+    "name": "Early Bird",
+    "shortDesc": "Awakens from sleep 2x as fast.",
+    "desc": "Awakens from sleep 2x as fast."
   },
   "competitive": {
     "name": "Competitive",
-    "shortDesc": "Competitive ability.",
-    "desc": "Competitive ability."
+    "shortDesc": "Sharply boosts SpAtk when a stat is lowered.",
+    "desc": "When user's stats are lowered by an opponent, their Special Attack raises by two stages."
   },
   "corrosion": {
     "name": "Corrosion",
-    "shortDesc": "Corrosion ability.",
-    "desc": "Corrosion ability."
+    "shortDesc": "Poison hits Steel/Poison for 1x and can poison them.",
+    "desc": "User's Poison-type moves deal 1x damage against Steel or Poison types. User can also poison and badly poison Steel and Poison types."
   },
   "sandspit": {
-    "name": "Sandspit",
-    "shortDesc": "Sandspit ability.",
-    "desc": "Sandspit ability."
+    "name": "Sand Spit",
+    "shortDesc": "Creates a sandstorm when it's hit by an attack.",
+    "desc": "User summons a Sandstorm for 5 turns when hit by an attack, unless a Sandstorm is already present. User takes no damage from Sandstorm."
   },
   "synchronize": {
     "name": "Synchronize",
-    "shortDesc": "Synchronize ability.",
-    "desc": "Synchronize ability."
+    "shortDesc": "Passes status conditions to enemy.",
+    "desc": "When user is poisoned, burned, frostbitten or paralyzed by another Pokémon, that Pokémon will also become afflicted with the same status."
   },
   "vengeful": {
     "name": "Vengeful",
-    "shortDesc": "Vengeful ability.",
-    "desc": "Vengeful ability."
+    "shortDesc": "Ups Atk and Speed if a hit makes its HP <50%.",
+    "desc": "Ups Atk and Speed if a hit makes its HP <50%."
   },
   "sturdy": {
     "name": "Sturdy",
-    "shortDesc": "Sturdy ability.",
-    "desc": "Sturdy ability."
+    "shortDesc": "It cannot be knocked out with one hit.",
+    "desc": "User will always survive attacks with 1 HP if it has full HP, and is also immune to One-Hit Knockout moves."
   },
   "unaware": {
     "name": "Unaware",
-    "shortDesc": "Unaware ability.",
-    "desc": "Unaware ability."
+    "shortDesc": "Ignores any stat changes in the Pokémon.",
+    "desc": "User ignores Evasion, Defense and Special Defense stat stages of the target when attacking. User ignores Accuracy, Attack and Special Attack stat stages of the attacker when being attacked."
   },
   "liquidooze": {
-    "name": "Liquidooze",
-    "shortDesc": "Liquidooze ability.",
-    "desc": "Liquidooze ability."
+    "name": "Liquid Ooze",
+    "shortDesc": "Damages attackers using any draining move.",
+    "desc": "When user is hit by an HP-draining move or effect, the attacker loses HP equal to the amount they would have been healed for instead."
   },
   "ethereal": {
     "name": "Ethereal",
-    "shortDesc": "Ethereal ability.",
-    "desc": "Ethereal ability."
+    "shortDesc": "Shields the Pokémon from one contact move.",
+    "desc": "User will be immune to the first contact move they are hit with. This shield is restored on switch-out."
   },
   "innardsout": {
-    "name": "Innardsout",
-    "shortDesc": "Innardsout ability.",
-    "desc": "Innardsout ability."
+    "name": "Innards Out",
+    "shortDesc": "Damages an attacker that lands the finishing hit.",
+    "desc": "When user faints, deal damage equal to the HP they had remaining before the last attack to the attacker."
   },
   "keeneye": {
-    "name": "Keeneye",
-    "shortDesc": "Keeneye ability.",
-    "desc": "Keeneye ability."
+    "name": "Keen Eye",
+    "shortDesc": "Prevents other Pokémon from lowering accuracy.",
+    "desc": "User's Accuracy stat cannot be lowered by other Pokémon and they will ignore any Evasion stat boosts when attacking. If user is in the lead, has 50% chance to prevent random encounters from Pokémon 5 or more levels lower."
   },
   "galvanize": {
     "name": "Galvanize",
-    "shortDesc": "Galvanize ability.",
-    "desc": "Galvanize ability."
+    "shortDesc": "Normal-type moves become Electric-type and powered.",
+    "desc": "User's Normal-type moves become Electric-type and deal 1.2x damage."
   },
   "battery": {
     "name": "Battery",
-    "shortDesc": "Battery ability.",
-    "desc": "Battery ability."
+    "shortDesc": "Powers up ally Pokémon's special moves.",
+    "desc": "When user is on the field, all other allies deal 1.3x damage with Special moves."
   },
   "download": {
     "name": "Download",
-    "shortDesc": "Download ability.",
-    "desc": "Download ability."
+    "shortDesc": "Adjusts power according to a foe's defenses.",
+    "desc": "When entering the field, raises Attack by one stage if foes' average Defense is lower than Special Defense, otherwise it raises Special Attack by one stage."
   },
   "defiant": {
     "name": "Defiant",
-    "shortDesc": "Defiant ability.",
-    "desc": "Defiant ability."
+    "shortDesc": "When its stats are lowered its Attack increases.",
+    "desc": "When user's stats are lowered by an opponent, their Attack raises by two stages."
   },
   "naturalcure": {
     "name": "Natural Cure",
-    "shortDesc": "Natural Cure ability.",
-    "desc": "Natural Cure ability."
+    "shortDesc": "All status problems heal when it switches out.",
+    "desc": "All status problems heal when it switches out."
   },
   "leadership": {
     "name": "Leadership",
-    "shortDesc": "Leadership ability.",
-    "desc": "Leadership ability."
+    "shortDesc": "On switch-in, user gains priority for first move.",
+    "desc": "On switch-in, user gains priority for first move."
   },
   "leechingfangs": {
-    "name": "Leechingfangs",
-    "shortDesc": "Leechingfangs ability.",
-    "desc": "Leechingfangs ability."
+    "name": "Leeching Fangs",
+    "shortDesc": "Restores 1/8 life with every biting contact move.",
+    "desc": "When the user damages a target with moves that have both the Biting and Contact flags, they recover HP equal to 1/8 of their target's max HP."
   },
   "sandrush": {
-    "name": "Sandrush",
-    "shortDesc": "Sandrush ability.",
-    "desc": "Sandrush ability."
+    "name": "Sand Rush",
+    "shortDesc": "Boosts the Pokémon's Speed in a sandstorm.",
+    "desc": "User's Speed stat is doubled during a Sandstorm. User takes no damage from Sandstorm."
   },
   "stormdrain": {
-    "name": "Stormdrain",
-    "shortDesc": "Stormdrain ability.",
-    "desc": "Stormdrain ability."
+    "name": "Storm Drain",
+    "shortDesc": "Draws in all Water-type moves to up SpAtk.",
+    "desc": "User redirects all single target Water-type moves towards itself and is immune to Water-type moves. When hit by a Water-type move, their Special Attack is increased by one stage. If user is in the lead, has 50% chance to force wild encounters to be Water types."
   },
   "effectspore": {
-    "name": "Effectspore",
-    "shortDesc": "Effectspore ability.",
-    "desc": "Effectspore ability."
+    "name": "Effect Spore",
+    "shortDesc": "Contact may cause poison, paralysis or sleep.",
+    "desc": "When user is hit by a contact move, there's a 30% chance to either poison, paralyze, or sleep the attacker."
   },
   "damp": {
     "name": "Damp",
-    "shortDesc": "Damp ability.",
-    "desc": "Damp ability."
+    "shortDesc": "Prevents the use of self-destructing moves and sets up Water Sport.",
+    "desc": "When user is on the field, self-destructing moves from all Pokémon on both sides will always fail. Additionally, user sets up Water Sport for 5 turns when entering the field."
   },
   "regenerator": {
     "name": "Regenerator",
-    "shortDesc": "Regenerator ability.",
-    "desc": "Regenerator ability."
+    "shortDesc": "Restores a little HP when withdrawn from battle.",
+    "desc": "User recovers 33% of their max HP when switched out."
   },
   "waterabsorb": {
-    "name": "Waterabsorb",
-    "shortDesc": "Waterabsorb ability.",
-    "desc": "Waterabsorb ability."
+    "name": "Water Absorb",
+    "shortDesc": "Restores HP if hit by a Water-type move.",
+    "desc": "User is immune to Water-type moves, when hit by a Water-type move they get healed for 1/4 of their max HP."
   },
   "poisontouch": {
-    "name": "Poisontouch",
-    "shortDesc": "Poisontouch ability.",
-    "desc": "Poisontouch ability."
+    "name": "Poison Touch",
+    "shortDesc": "May poison targets when a Pokémon makes contact.",
+    "desc": "When user hits an enemy with a contact move, there's a 30% chance to poison the target."
   },
   "stakeout": {
     "name": "Stakeout",
-    "shortDesc": "Stakeout ability.",
-    "desc": "Stakeout ability."
+    "shortDesc": "Deals 30% more damage on target's first turn.",
+    "desc": "User deals 30% more damage to the target if it is their first turn on the field. Also applies on the turn the target switches in (turn 0)."
   },
   "clearbody": {
-    "name": "Clearbody",
-    "shortDesc": "Clearbody ability.",
-    "desc": "Clearbody ability."
+    "name": "Clear Body",
+    "shortDesc": "Prevents other Pokémon from lowering its stats.",
+    "desc": "Prevents other Pokémon from lowering its stats."
   },
   "snowcloak": {
-    "name": "Snowcloak",
-    "shortDesc": "Snowcloak ability.",
-    "desc": "Snowcloak ability."
+    "name": "Snow Cloak",
+    "shortDesc": "Boosts SpDef in a hailstorm.",
+    "desc": "User gets 1.5x Special Defense during Hail. User takes no damage from Hail. If user is in the lead, reduces wild Pokémon encounter rate by 50% on areas with Hail."
   },
   "moxie": {
     "name": "Moxie",
-    "shortDesc": "Moxie ability.",
-    "desc": "Moxie ability."
+    "shortDesc": "On KO, Attack is boosted once per switch-in.",
+    "desc": "On KO, Attack is boosted once per switch-in."
   },
   "friendguard": {
-    "name": "Friendguard",
-    "shortDesc": "Friendguard ability.",
-    "desc": "Friendguard ability."
+    "name": "Friend Guard",
+    "shortDesc": "Reduces damage done to allies.",
+    "desc": "When user is on the field, all other allies take 0.75x damage."
   },
   "serenegrace": {
     "name": "Serene Grace",
-    "shortDesc": "Serene Grace ability.",
-    "desc": "Serene Grace ability."
+    "shortDesc": "Moves' effect chance x2 but dmg lower by chance%.",
+    "desc": "User's damaging moves with additional effects get the chance of said effects activating doubled, however, said moves will also deal reduced damage equal to the effect's original infliction chance. Does not affect moves that already have a 100% chance of triggering their effects."
   },
   "longreach": {
-    "name": "Longreach",
-    "shortDesc": "Longreach ability.",
-    "desc": "Longreach ability."
+    "name": "Long Reach",
+    "shortDesc": "Uses moves without making contact with the target.",
+    "desc": "User's moves lose the Contact flag if they had it. User is also immune to most harmful effects that proc upon attacking an enemy."
   },
   "ironfist": {
-    "name": "Ironfist",
-    "shortDesc": "Ironfist ability.",
-    "desc": "Ironfist ability."
+    "name": "Iron Fist",
+    "shortDesc": "Boosts the power of punching moves.",
+    "desc": "User's moves with the Punching flag deal 1.2x damage."
   },
   "baddreams": {
-    "name": "Baddreams",
-    "shortDesc": "Baddreams ability.",
-    "desc": "Baddreams ability."
+    "name": "Bad Dreams",
+    "shortDesc": "Reduces a sleeping foe's HP.",
+    "desc": "When user is on the field, all adjacent opponents that are asleep will lose 1/8 max HP each turn."
   },
   "tormented": {
     "name": "Tormented",
-    "shortDesc": "Tormented ability.",
-    "desc": "Tormented ability."
+    "shortDesc": "Boosts the SpAtk stat but lowers accuracy.",
+    "desc": "User has 1.5x Special Attack but 0.8x Accuracy with special moves."
   },
   "static": {
     "name": "Static",
-    "shortDesc": "Static ability.",
-    "desc": "Static ability."
+    "shortDesc": "Contact with the Pokémon may cause paralysis.",
+    "desc": "When user is hit by a contact move, there's a 30% chance to paralyze the attacker."
   },
   "tintedlens": {
     "name": "Tinted Lens",
-    "shortDesc": "Tinted Lens ability.",
-    "desc": "Tinted Lens ability."
+    "shortDesc": "Powers up not very effective moves.",
+    "desc": "User's not very effective moves deal 2x damage."
   },
   "harvest": {
     "name": "Harvest",
-    "shortDesc": "Harvest ability.",
-    "desc": "Harvest ability."
+    "shortDesc": "May create another Berry after one is used.",
+    "desc": "At the end of each turn, the user has a 50% chance to restore the last Berry they consumed during the battle. During Harsh Sunlight this chance becomes 100%. If user is in the lead, has 50% chance to force wild encounters to be Grass types."
   },
   "blacklight": {
-    "name": "Blacklight",
-    "shortDesc": "Blacklight ability.",
-    "desc": "Blacklight ability."
+    "name": "Black Light",
+    "shortDesc": "Light moves become 1.2x power Dark moves.",
+    "desc": "User's Light-type moves become Dark-type and deal 1.2x damage."
   },
   "angerpoint": {
-    "name": "Angerpoint",
-    "shortDesc": "Angerpoint ability.",
-    "desc": "Angerpoint ability."
+    "name": "Anger Point",
+    "shortDesc": "Maxes Attack after taking a critical hit.",
+    "desc": "Maxes Attack after taking a critical hit."
   },
   "illuminate": {
     "name": "Illuminate",
-    "shortDesc": "Illuminate ability.",
-    "desc": "Illuminate ability."
+    "shortDesc": "Normal moves become Light-type and 1.2x boost.",
+    "desc": "User's Normal-type moves become Light-type and deal 1.2x damage. If user is in the lead, reduces wild Pokémon encounter rate by 50%."
   },
   "impenetrable": {
     "name": "Impenetrable",
-    "shortDesc": "Impenetrable ability.",
-    "desc": "Impenetrable ability."
+    "shortDesc": "Prevents other Pokémon from lowering Def/SpDef.",
+    "desc": "User's Defense and Special Defense stats cannot be lowered by other Pokémon."
   },
   "pressure": {
     "name": "Pressure",
-    "shortDesc": "Pressure ability.",
-    "desc": "Pressure ability."
+    "shortDesc": "The Pokémon raises the foe's PP usage.",
+    "desc": "When user is on the field, opponents' moves will consume twice as much PP."
   },
   "sandstream": {
     "name": "Sand Stream",
-    "shortDesc": "Sand Stream ability.",
-    "desc": "Sand Stream ability."
+    "shortDesc": "The Pokémon summons a sandstorm in battle.",
+    "desc": "User summons a Sandstorm for 5 turns when entering the field, unless a Sandstorm is already present. User takes no damage from Sandstorm."
   },
   "forcefield": {
-    "name": "Forcefield",
-    "shortDesc": "Forcefield ability.",
-    "desc": "Forcefield ability."
+    "name": "Force Field",
+    "shortDesc": "Inflicts damage to the foe on special hit.",
+    "desc": "When user is hit by a special move, attacker takes damage equal to 1/8 of their max HP."
   },
   "infiltrator": {
     "name": "Infiltrator",
-    "shortDesc": "Infiltrator ability.",
-    "desc": "Infiltrator ability."
+    "shortDesc": "Passes through the foe's barrier and strikes.",
+    "desc": "User's moves will ignore the effects of Reflect, Light Screen, Aurora Veil, Mist and Safeguard, and will also bypass Substitutes."
   },
   "aftermath": {
     "name": "Aftermath",
-    "shortDesc": "Aftermath ability.",
-    "desc": "Aftermath ability."
+    "shortDesc": "Damages the attacker landing the finishing hit.",
+    "desc": "When user is KO'ed by a contact move, the attacker loses 1/4 of their max HP."
   },
   "attunement": {
     "name": "Attunement",
-    "shortDesc": "Attunement ability.",
-    "desc": "Attunement ability."
+    "shortDesc": "Boosts SpAtk if there is a status problem.",
+    "desc": "User gets 1.5x Special Attack when under any status condition. The user also does not have its Special Attack lowered when frostbitten."
   },
   "steamengine": {
-    "name": "Steamengine",
-    "shortDesc": "Steamengine ability.",
-    "desc": "Steamengine ability."
+    "name": "Steam Engine",
+    "shortDesc": "Boosts Speed when hit by a Fire or Water-type move.",
+    "desc": "When user is hit by a Fire or Water-type move, their Speed is increased by six stages. When user is in the party, eggs hatch twice as fast."
   },
   "regrowth": {
     "name": "Regrowth",
-    "shortDesc": "Regrowth ability.",
-    "desc": "Regrowth ability."
+    "shortDesc": "Regains 1/16 max HP or lowered stats each turn.",
+    "desc": "All of user's lowered stats are restored by 1 stage at the end of each turn, if user has no lowered stats regain 1/16 max HP at the end of each turn instead."
   },
   "torrent": {
     "name": "Torrent",
-    "shortDesc": "Torrent ability.",
-    "desc": "Torrent ability."
+    "shortDesc": "Powers up Water-type moves in a pinch.",
+    "desc": "User's Water-type moves deal 1.5x damage when they have 1/3 or less HP remaining."
   },
   "intimidate": {
     "name": "Intimidate",
-    "shortDesc": "Intimidate ability.",
-    "desc": "Intimidate ability."
+    "shortDesc": "Lowers the foe's Attack stat.",
+    "desc": "Lowers all adjacent foes' Attack stat by one stage when user enters the field. If user is in the lead, has 50% chance to prevent random encounters from Pokémon 5 or more levels lower."
   },
   "icyveins": {
-    "name": "Icyveins",
-    "shortDesc": "Icyveins ability.",
-    "desc": "Icyveins ability."
+    "name": "Icy Veins",
+    "shortDesc": "Boosts moves' power in hail.",
+    "desc": "User's moves deal 1.3x damage during Hail. User takes no damage from Hail."
   },
   "icebody": {
-    "name": "Icebody",
-    "shortDesc": "Icebody ability.",
-    "desc": "Icebody ability."
+    "name": "Ice Body",
+    "shortDesc": "The Pokémon regains 1/8 max HP in hail.",
+    "desc": "User regains 1/8 max HP every turn during Hail. User takes no damage from Hail."
   },
   "orbit": {
     "name": "Orbit",
-    "shortDesc": "Orbit ability.",
-    "desc": "Orbit ability."
+    "shortDesc": "Sets up Gravity on entry.",
+    "desc": "User sets up Gravity for 5 turns when entering the field, unless Gravity is already in effect."
   },
   "flamebody": {
-    "name": "Flamebody",
-    "shortDesc": "Flamebody ability.",
-    "desc": "Flamebody ability."
+    "name": "Flame Body",
+    "shortDesc": "Physical moves may burn the attacker.",
+    "desc": "When user is hit by a physical move, there's a 30% chance to burn the attacker. When user is in the party, eggs hatch twice as fast."
   },
   "realism": {
     "name": "Realism",
-    "shortDesc": "Realism ability.",
-    "desc": "Realism ability."
+    "shortDesc": "Halves damage from Ghost and Fairy-type moves.",
+    "desc": "Halves damage from Ghost and Fairy-type moves."
   },
   "moldbreaker": {
-    "name": "Moldbreaker",
-    "shortDesc": "Moldbreaker ability.",
-    "desc": "Moldbreaker ability."
+    "name": "Mold Breaker",
+    "shortDesc": "Moves can be used regardless of Abilities.",
+    "desc": "Moves can be used regardless of Abilities."
   },
   "soundproof": {
     "name": "Soundproof",
-    "shortDesc": "Soundproof ability.",
-    "desc": "Soundproof ability."
+    "shortDesc": "Gives full immunity to all sound-based moves.",
+    "desc": "Gives full immunity to all sound-based moves."
   },
   "guts": {
     "name": "Guts",
-    "shortDesc": "Guts ability.",
-    "desc": "Guts ability."
+    "shortDesc": "Boosts Attack if there is a status problem.",
+    "desc": "User gets 1.5x Attack when under any non-volatile status condition. The user also does not have its Attack lowered when burned."
   },
   "swarm": {
     "name": "Swarm",
-    "shortDesc": "Swarm ability.",
-    "desc": "Swarm ability."
+    "shortDesc": "Powers up Bug-type moves in a pinch.",
+    "desc": "User's Bug-type moves deal 1.5x damage when they have 1/3 or less HP remaining."
   },
   "sniper": {
     "name": "Sniper",
-    "shortDesc": "Sniper ability.",
-    "desc": "Sniper ability."
+    "shortDesc": "Powers up moves if they become critical hits.",
+    "desc": "Critical hits deal 1.5x damage."
   },
   "impulsive": {
     "name": "Impulsive",
-    "shortDesc": "Impulsive ability.",
-    "desc": "Impulsive ability."
+    "shortDesc": "1.4x damage, but lowers used stat after attacking.",
+    "desc": "User deals 1.4x damage with their moves, but their Attack will be lowered by one stage after using physical moves, and their Special Attack will be lowered by one stage after using special moves."
   },
   "trace": {
     "name": "Trace",
-    "shortDesc": "Trace ability.",
-    "desc": "Trace ability."
+    "shortDesc": "The Pokémon copies a foe's Ability.",
+    "desc": "The Pokémon copies a foe's Ability."
   },
   "innerfocus": {
-    "name": "Innerfocus",
-    "shortDesc": "Innerfocus ability.",
-    "desc": "Innerfocus ability."
+    "name": "Inner Focus",
+    "shortDesc": "Shielded from flinching.",
+    "desc": "Prevents the user from flinching. The user is also immune to Intimidate and Dishearten."
   },
   "hydration": {
     "name": "Hydration",
-    "shortDesc": "Hydration ability.",
-    "desc": "Hydration ability."
+    "shortDesc": "Prevents problems with status in rainy weather.",
+    "desc": "User will recover from any non-volatile status effects it's suffering from at the end of each turn during Rain."
   },
   "dishearten": {
     "name": "Dishearten",
-    "shortDesc": "Dishearten ability.",
-    "desc": "Dishearten ability."
+    "shortDesc": "Lowers the foe's SpAtk stat.",
+    "desc": "Lowers all adjacent foes' Special Attack stat by one stage when user enters the field."
   },
   "dryskin": {
-    "name": "Dryskin",
-    "shortDesc": "Dryskin ability.",
-    "desc": "Dryskin ability."
+    "name": "Dry Skin",
+    "shortDesc": "Reduces HP if it is hot. Water restores HP.",
+    "desc": "User heals 1/8 HP each turn during Rain and is immune to Water-type moves, when hit by a Water-type move they get healed for 1/4 of their max HP. User loses 1/8 HP each turn during Harsh Sunlight and takes 1.25x damage from Fire-type moves."
   },
   "gluttony": {
     "name": "Gluttony",
-    "shortDesc": "Gluttony ability.",
-    "desc": "Gluttony ability."
+    "shortDesc": "Encourages the early use of a held Berry.",
+    "desc": "User eats berries that are usually eaten at 25% HP at 50% HP instead."
   },
   "windrider": {
-    "name": "Windrider",
-    "shortDesc": "Windrider ability.",
-    "desc": "Windrider ability."
+    "name": "Wind Rider",
+    "shortDesc": "No damage from wind, ups Atk/SpAtk instead.",
+    "desc": "User is immune to moves with the Wind flag, when hit by a move with the Wind flag or entering Tailwind, their Attack and Special Attack is increased by one stage."
   },
   "unburden": {
     "name": "Unburden",
-    "shortDesc": "Unburden ability.",
-    "desc": "Unburden ability."
+    "shortDesc": "Raises Speed if a held item is used up or lost.",
+    "desc": "When user uses or loses a held item (except when it's traded for another), their Speed stat is doubled until they switch out or gain an item."
   },
   "shadowtag": {
     "name": "Shadow Tag",
-    "shortDesc": "Shadow Tag ability.",
-    "desc": "Shadow Tag ability."
+    "shortDesc": "Prevents the foe from escaping.",
+    "desc": "When user is on the field, all adjacent opponents cannot switch out or escape."
   },
   "cottondown": {
-    "name": "Cottondown",
-    "shortDesc": "Cottondown ability.",
-    "desc": "Cottondown ability."
+    "name": "Cotton Down",
+    "shortDesc": "Lowers everyone else's Speed when attacked.",
+    "desc": "Lowers everyone else's Speed when attacked."
   },
   "sandveil": {
-    "name": "Sandveil",
-    "shortDesc": "Sandveil ability.",
-    "desc": "Sandveil ability."
+    "name": "Sand Veil",
+    "shortDesc": "Boosts defense in a sandstorm.",
+    "desc": "User gets 1.5x Defense during a Sandstorm. User takes no damage from Sandstorm. If user is in the lead, reduces wild Pokémon encounter rate by 50% on areas with a Sandstorm."
   },
   "roughskin": {
     "name": "Rough Skin",
-    "shortDesc": "Rough Skin ability.",
-    "desc": "Rough Skin ability."
+    "shortDesc": "Inflicts damage to the foe on physical hit.",
+    "desc": "When user is hit by a physical move, attacker takes damage equal to 1/8 of their max HP."
   },
   "toughclaws": {
     "name": "Tough Claws",
-    "shortDesc": "Tough Claws ability.",
-    "desc": "Tough Claws ability."
+    "shortDesc": "Powers up moves that make direct contact.",
+    "desc": "User's moves that make contact deal 1.3x damage."
   },
   "speedboost": {
     "name": "Speed Boost",
-    "shortDesc": "Speed Boost ability.",
-    "desc": "Speed Boost ability."
+    "shortDesc": "Its Speed stat is gradually boosted.",
+    "desc": "At the end of every turn, user's Speed is raised by one stage."
   },
   "intuition": {
     "name": "Intuition",
-    "shortDesc": "Intuition ability.",
-    "desc": "Intuition ability."
+    "shortDesc": "Prevents other Pokémon from lowering SpAtk.",
+    "desc": "User's Special Attack stat cannot be lowered by other Pokémon."
   },
   "dazzling": {
     "name": "Dazzling",
-    "shortDesc": "Dazzling ability.",
-    "desc": "Dazzling ability."
+    "shortDesc": "Makes foes unable to use priority attacks.",
+    "desc": "When user is on the field, opponent's priority moves that target the user and/or its allies will be nullified."
   },
   "packedsnow": {
-    "name": "Packedsnow",
-    "shortDesc": "Packedsnow ability.",
-    "desc": "Packedsnow ability."
+    "name": "Packed Snow",
+    "shortDesc": "Halves effectiveness of S/E moves in Hail.",
+    "desc": "User takes 0.5x damage from super-effective moves during Hail. User takes no damage from Hail."
   },
   "deepchill": {
-    "name": "Deepchill",
-    "shortDesc": "Deepchill ability.",
-    "desc": "Deepchill ability."
+    "name": "Deep Chill",
+    "shortDesc": "Special moves may frostbite the attacker.",
+    "desc": "When user is hit by a special move, there's a 30% chance to frostbite the attacker."
   },
   "analytic": {
     "name": "Analytic",
-    "shortDesc": "Analytic ability.",
-    "desc": "Analytic ability."
+    "shortDesc": "Boosts move power when the Pokémon moves last.",
+    "desc": "When user moves after all other Pokémon on the field, their moves deal 1.3x damage."
   },
   "shedskin": {
     "name": "Shed Skin",
-    "shortDesc": "Shed Skin ability.",
-    "desc": "Shed Skin ability."
+    "shortDesc": "The Pokémon may heal its own status problems.",
+    "desc": "User has 1/3 chance of automatically recovering from any non-volatile status effects it's suffering from at the end of each turn."
   },
   "shielddust": {
-    "name": "Shielddust",
-    "shortDesc": "Shielddust ability.",
-    "desc": "Shielddust ability."
+    "name": "Shield Dust",
+    "shortDesc": "Blocks the added effects of attacks taken.",
+    "desc": "Blocks the added effects of attacks taken."
   },
   "battlearmor": {
-    "name": "Battlearmor",
-    "shortDesc": "Battlearmor ability.",
-    "desc": "Battlearmor ability."
+    "name": "Battle Armor",
+    "shortDesc": "Prevents crits and 1.2x Pokémon's SpDef stat.",
+    "desc": "Attacks against the user will never be critical hits. User has 1.2x Special Defense against special moves."
   },
   "sandforce": {
-    "name": "Sandforce",
-    "shortDesc": "Sandforce ability.",
-    "desc": "Sandforce ability."
+    "name": "Sand Force",
+    "shortDesc": "Boosts moves' power in a sandstorm.",
+    "desc": "User's moves deal 1.3x damage during a Sandstorm. User takes no damage from Sandstorm."
   },
   "noguard": {
     "name": "No Guard",
-    "shortDesc": "No Guard ability.",
-    "desc": "No Guard ability."
+    "shortDesc": "Ensures attacks by or against the Pokémon land.",
+    "desc": "Attacks used by or against the user will ignore accuracy checks to always hit. If user is in the lead, increases wild Pokémon encounter rate by 100%."
   },
   "fairyaura": {
-    "name": "Fairyaura",
-    "shortDesc": "Fairyaura ability.",
-    "desc": "Fairyaura ability."
+    "name": "Fairy Aura",
+    "shortDesc": "Powers up each Pokémon's Fairy-type moves.",
+    "desc": "When user is on the field, all Pokémon on both sides deal 1.33x damage with Fairy-type moves. Multiple instances of this ability will not stack."
   },
   "icescales": {
-    "name": "Icescales",
-    "shortDesc": "Icescales ability.",
-    "desc": "Icescales ability."
+    "name": "Ice Scales",
+    "shortDesc": "Halves the damage taken from special moves.",
+    "desc": "Halves the damage taken from special moves."
   },
   "flashfire": {
-    "name": "Flashfire",
-    "shortDesc": "Flashfire ability.",
-    "desc": "Flashfire ability."
+    "name": "Flash Fire",
+    "shortDesc": "It powers up Fire-type moves if it's hit by one.",
+    "desc": "User is immune to Fire-type moves. The first time they're hit by a Fire-type move, their own Fire-type moves will deal 1.5x damage until they switch out. If user is in the lead, has 50% chance to force wild encounters to be Fire types."
   },
   "reckless": {
     "name": "Reckless",
-    "shortDesc": "Reckless ability.",
-    "desc": "Reckless ability."
+    "shortDesc": "Powers up moves that have recoil damage.",
+    "desc": "Moves with recoil or crash damage deal 1.2x damage."
   },
   "flareboost": {
-    "name": "Flareboost",
-    "shortDesc": "Flareboost ability.",
-    "desc": "Flareboost ability."
+    "name": "Flare Boost",
+    "shortDesc": "Burn does 1/2 damage and ups special attacks.",
+    "desc": "User's special attacks deal 1.5x damage when burned. User takes halved damage from burns."
   },
   "unnerve": {
     "name": "Unnerve",
-    "shortDesc": "Unnerve ability.",
-    "desc": "Unnerve ability."
+    "shortDesc": "Makes the foe nervous and unable to eat Berries.",
+    "desc": "Makes the foe nervous and unable to eat Berries."
   },
   "cursedbody": {
     "name": "Cursed Body",
-    "shortDesc": "Cursed Body ability.",
-    "desc": "Cursed Body ability."
+    "shortDesc": "May disable a move used on the Pokémon.",
+    "desc": "When user is hit by a damaging move, there's a 30% chance to disable the attacker's move."
   },
   "wanderingspirit": {
-    "name": "Wanderingspirit",
-    "shortDesc": "Wanderingspirit ability.",
-    "desc": "Wanderingspirit ability."
+    "name": "Wandering Spirit",
+    "shortDesc": "Taking a contact hit exchanges Abilities.",
+    "desc": "Taking a contact hit exchanges Abilities."
   },
   "transistor": {
     "name": "Transistor",
-    "shortDesc": "Transistor ability.",
-    "desc": "Transistor ability."
+    "shortDesc": "Powers up Electric-type moves.",
+    "desc": "User's Electric-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "toxicdebris": {
-    "name": "Toxicdebris",
-    "shortDesc": "Toxicdebris ability.",
-    "desc": "Toxicdebris ability."
+    "name": "Toxic Debris",
+    "shortDesc": "Scatters poison spikes upon physical hit.",
+    "desc": "When hit by a physical move, user sets up Toxic Spikes on the enemy side of the field."
   },
   "emergencyexit": {
-    "name": "Emergencyexit",
-    "shortDesc": "Emergencyexit ability.",
-    "desc": "Emergencyexit ability."
+    "name": "Emergency Exit",
+    "shortDesc": "Switches out if its HP becomes half or less.",
+    "desc": "When the user's HP is reduced to half or less, the user switches out or escapes at the end of the turn."
   },
   "chlorophyll": {
     "name": "Chlorophyll",
-    "shortDesc": "Chlorophyll ability.",
-    "desc": "Chlorophyll ability."
+    "shortDesc": "Boosts the Pokémon's Speed in sunshine.",
+    "desc": "User's Speed stat is doubled during Harsh Sunlight."
   },
   "healer": {
     "name": "Healer",
-    "shortDesc": "Healer ability.",
-    "desc": "Healer ability."
+    "shortDesc": "Sometimes cures allies' statuses.",
+    "desc": "User has a 50% chance to cure any adjacent allies' non-volatile status effects at the end of each turn."
   },
   "strongjaw": {
-    "name": "Strongjaw",
-    "shortDesc": "Strongjaw ability.",
-    "desc": "Strongjaw ability."
+    "name": "Strong Jaw",
+    "shortDesc": "Boosts the power of biting moves.",
+    "desc": "User's moves with the Biting flag deal 1.5x damage."
   },
   "berserk": {
     "name": "Berserk",
-    "shortDesc": "Berserk ability.",
-    "desc": "Berserk ability."
+    "shortDesc": "Ups SpAtk if a hit makes its HP half or less.",
+    "desc": "Ups SpAtk if a hit makes its HP half or less."
   },
   "slushrush": {
-    "name": "Slushrush",
-    "shortDesc": "Slushrush ability.",
-    "desc": "Slushrush ability."
+    "name": "Slush Rush",
+    "shortDesc": "Boosts the Pokémon's Speed stat in a hailstorm.",
+    "desc": "User's Speed stat is doubled during Hail. User takes no damage from Hail."
   },
   "feedback": {
     "name": "Feedback",
-    "shortDesc": "Feedback ability.",
-    "desc": "Feedback ability."
+    "shortDesc": "Inflicts damage to the foe on special hit.",
+    "desc": "When user is hit by a special move, attacker takes damage equal to 1/8 of their max HP."
   },
   "immunity": {
     "name": "Immunity",
-    "shortDesc": "Immunity ability.",
-    "desc": "Immunity ability."
+    "shortDesc": "Immunity to poison moves and being poisoned.",
+    "desc": "User is immune to Poison-type moves, cannot be poisoned or badly poisoned, and also cures said statuses if already inflicted."
   },
   "raindish": {
-    "name": "Raindish",
-    "shortDesc": "Raindish ability.",
-    "desc": "Raindish ability."
+    "name": "Rain Dish",
+    "shortDesc": "The Pokémon gradually regains 1/8 max HP in rain.",
+    "desc": "The Pokémon gradually regains 1/8 max HP in rain."
   },
   "furcoat": {
-    "name": "Furcoat",
-    "shortDesc": "Furcoat ability.",
-    "desc": "Furcoat ability."
+    "name": "Fur Coat",
+    "shortDesc": "Halves the damage from physical moves.",
+    "desc": "Halves the damage from physical moves."
   },
   "colorchange": {
-    "name": "Colorchange",
-    "shortDesc": "Colorchange ability.",
-    "desc": "Colorchange ability."
+    "name": "Color Change",
+    "shortDesc": "Changes the Pokémon's type to the foe's move.",
+    "desc": "When user is hit by a damaging move of a type different from their current ones, their typing will change into a single type of the same type as the attack."
   },
   "compoundeyes": {
     "name": "Compound Eyes",
-    "shortDesc": "Compound Eyes ability.",
-    "desc": "Compound Eyes ability."
+    "shortDesc": "The Pokémon's accuracy is boosted.",
+    "desc": "User's moves have 1.3x Accuracy. If user is in the lead, increases chances of wild encounters carrying an item."
   },
   "magnetpull": {
     "name": "Magnet Pull",
-    "shortDesc": "Magnet Pull ability.",
-    "desc": "Magnet Pull ability."
+    "shortDesc": "Prevents Steel-type Pokémon from escaping.",
+    "desc": "When user is on the field, adjacent enemy Steel types cannot switch out or escape. If user is in the lead, has 50% chance to force wild encounters to be Steel types."
   },
   "flowerveil": {
-    "name": "Flowerveil",
-    "shortDesc": "Flowerveil ability.",
-    "desc": "Flowerveil ability."
+    "name": "Flower Veil",
+    "shortDesc": "Protects Grass-type allies from stat/status effects.",
+    "desc": "When user is on the field, all Grass-type allies including the user become immune to stat drops inflicted from other Pokémon, as well as non-volatile status effects."
   },
   "solidrock": {
     "name": "Solid Rock",
-    "shortDesc": "Solid Rock ability.",
-    "desc": "Solid Rock ability."
+    "shortDesc": "Reduces damage from super-effective attacks.",
+    "desc": "User takes 0.75x damage from super-effective attacks."
   },
   "rockhead": {
     "name": "Rock Head",
-    "shortDesc": "Rock Head ability.",
-    "desc": "Rock Head ability."
+    "shortDesc": "Protects the Pokémon from recoil damage.",
+    "desc": "Protects the Pokémon from recoil damage."
   },
   "irradiate": {
     "name": "Irradiate",
-    "shortDesc": "Irradiate ability.",
-    "desc": "Irradiate ability."
+    "shortDesc": "Powers up Light-type moves in a pinch.",
+    "desc": "User's Light-type moves deal 1.5x damage when they have 1/3 or less HP remaining."
   },
   "charisma": {
     "name": "Charisma",
-    "shortDesc": "Charisma ability.",
-    "desc": "Charisma ability."
+    "shortDesc": "On KO, SpAtk is boosted once per switch-in.",
+    "desc": "On KO, SpAtk is boosted once per switch-in."
   },
   "aromaveil": {
-    "name": "Aromaveil",
-    "shortDesc": "Aromaveil ability.",
-    "desc": "Aromaveil ability."
+    "name": "Aroma Veil",
+    "shortDesc": "Protects against attacks that limit move choices.",
+    "desc": "When user is on the field, all allies including the user cannot be disabled, infatuated, taunted, encored, heal blocked, or tormented."
   },
   "neutralizinggas": {
-    "name": "Neutralizinggas",
-    "shortDesc": "Neutralizinggas ability.",
-    "desc": "Neutralizinggas ability."
+    "name": "Neutralizing Gas",
+    "shortDesc": "Abilities will be nullified or will not be triggered.",
+    "desc": "Abilities will be nullified or will not be triggered."
   },
   "steadfast": {
     "name": "Steadfast",
-    "shortDesc": "Steadfast ability.",
-    "desc": "Steadfast ability."
+    "shortDesc": "Deals 30% more move damage to Pokémon that haven't acted.",
+    "desc": "When user moves before their target, their moves deal 1.3x damage."
   },
   "telepathy": {
     "name": "Telepathy",
-    "shortDesc": "Telepathy ability.",
-    "desc": "Telepathy ability."
+    "shortDesc": "Anticipates an ally's attack and dodges it.",
+    "desc": "Dodges damaging spread moves an ally uses that hits the user."
   },
   "toxicboost": {
-    "name": "Toxicboost",
-    "shortDesc": "Toxicboost ability.",
-    "desc": "Toxicboost ability."
+    "name": "Toxic Boost",
+    "shortDesc": "Poison does 1/2 damage and ups physical attacks.",
+    "desc": "User's physical attacks deal 1.5x damage when poisoned or badly poisoned. User takes halved damage from poison and bad poison."
   },
   "poisonheal": {
-    "name": "Poisonheal",
-    "shortDesc": "Poisonheal ability.",
-    "desc": "Poisonheal ability."
+    "name": "Poison Heal",
+    "shortDesc": "Restores HP if the Pokémon is poisoned.",
+    "desc": "User takes no damage from poison and bad poison and is healed by 1/8 max HP each turn instead."
   },
   "arenatrap": {
-    "name": "Arenatrap",
-    "shortDesc": "Arenatrap ability.",
-    "desc": "Arenatrap ability."
+    "name": "Arena Trap",
+    "shortDesc": "Prevents the foe from fleeing.",
+    "desc": "When user is on the field, adjacent grounded enemies cannot switch out or escape. If user is in the lead, increases wild Pokémon encounter rate by 100%."
   },
   "drizzle": {
     "name": "Drizzle",
-    "shortDesc": "Drizzle ability.",
-    "desc": "Drizzle ability."
+    "shortDesc": "The Pokémon makes it rain if it appears in battle.",
+    "desc": "User summons Rain for 5 turns when entering the field, unless Rain is already present."
   },
   "lightningrod": {
     "name": "Lightning Rod",
-    "shortDesc": "Lightning Rod ability.",
-    "desc": "Lightning Rod ability."
+    "shortDesc": "Draws in all Electric-type moves to up SpAtk.",
+    "desc": "User redirects all single target Electric-type moves towards itself and is immune to Electric-type moves, when hit by an Electric-type move their Special Attack is increased by one stage. If user is in the lead, has 50% chance to force wild encounters to be Electric types."
   },
   "heatproof": {
     "name": "Heatproof",
-    "shortDesc": "Heatproof ability.",
-    "desc": "Heatproof ability."
+    "shortDesc": "Halves damage from Fire-type attacks and burns.",
+    "desc": "Halves damage from Fire-type attacks and burns."
   },
   "ironbarbs": {
-    "name": "Ironbarbs",
-    "shortDesc": "Ironbarbs ability.",
-    "desc": "Ironbarbs ability."
+    "name": "Iron Barbs",
+    "shortDesc": "Inflicts damage to the foe on physical hit.",
+    "desc": "When user is hit by a physical move, attacker takes damage equal to 1/8 of their max HP."
   },
   "scrappy": {
     "name": "Scrappy",
-    "shortDesc": "Scrappy ability.",
-    "desc": "Scrappy ability."
+    "shortDesc": "Enables moves to hit Ghost-type Pokémon.",
+    "desc": "User's Normal and Fighting-type moves deal 1x damage against Ghost types. The user is also immune to Intimidate and Dishearten."
   },
   "wonderskin": {
-    "name": "Wonderskin",
-    "shortDesc": "Wonderskin ability.",
-    "desc": "Wonderskin ability."
+    "name": "Wonder Skin",
+    "shortDesc": "Makes status-changing moves more likely to miss.",
+    "desc": "Lowers the base Accuracy of any Status moves used against the user to 50%. Does not affect moves that already have 50% or lower Accuracy, nor moves that cannot miss."
   },
   "moody": {
     "name": "Moody",
-    "shortDesc": "Moody ability.",
-    "desc": "Moody ability."
+    "shortDesc": "Raises one stat and lowers the previous raised.",
+    "desc": "Every turn, the user gets one out of their Attack, Special Attack, Defense, Special Defense or Speed raised by two stages at random. The previous turn's boost is lost on the following turn."
   },
   "quickfeet": {
-    "name": "Quickfeet",
-    "shortDesc": "Quickfeet ability.",
-    "desc": "Quickfeet ability."
+    "name": "Quick Feet",
+    "shortDesc": "Boosts Speed if there is a status problem.",
+    "desc": "User gets 1.5x Speed when under any non-volatile status condition. The user also does not have its Speed lowered when paralyzed. If user is in the lead, reduces wild Pokémon encounter rate by 50%."
   },
   "fortification": {
     "name": "Fortification",
-    "shortDesc": "Fortification ability.",
-    "desc": "Fortification ability."
+    "shortDesc": "Ups Def and SpDef if a hit makes its HP <50%.",
+    "desc": "Ups Def and SpDef if a hit makes its HP <50%."
   },
   "gooey": {
     "name": "Gooey",
-    "shortDesc": "Gooey ability.",
-    "desc": "Gooey ability."
+    "shortDesc": "Contact with it lowers the attacker's Speed stat.",
+    "desc": "Contact with it lowers the attacker's Speed stat."
   },
   "pickpocket": {
     "name": "Pickpocket",
-    "shortDesc": "Pickpocket ability.",
-    "desc": "Pickpocket ability."
+    "shortDesc": "Steals an item when hit by another Pokémon.",
+    "desc": "When user is not holding an item and is hit by a contact move, user steals the attacker's held item."
   },
   "psychicsurge": {
-    "name": "Psychicsurge",
-    "shortDesc": "Psychicsurge ability.",
-    "desc": "Psychicsurge ability."
+    "name": "Psychic Surge",
+    "shortDesc": "Turns the ground into Psychic Terrain.",
+    "desc": "User sets up Psychic Terrain for 5 turns when entering the field, unless Psychic Terrain is already present."
   },
   "snowwarning": {
     "name": "Snow Warning",
-    "shortDesc": "Snow Warning ability.",
-    "desc": "Snow Warning ability."
+    "shortDesc": "The Pokémon summons a hailstorm in battle.",
+    "desc": "User summons Hail for 5 turns when entering the field, unless Hail is already present. User takes no damage from Hail."
   },
   "comatose": {
     "name": "Comatose",
-    "shortDesc": "Comatose ability.",
-    "desc": "Comatose ability."
+    "shortDesc": "It's always drowsing",
+    "desc": "The user is always considered to be asleep."
   },
   "rattled": {
     "name": "Rattled",
-    "shortDesc": "Rattled ability.",
-    "desc": "Rattled ability."
+    "shortDesc": "Some move types scare it and boost its Speed.",
+    "desc": "When user gets hit by a Bug, Dark or Ghost-type move, or has their stats lowered by Intimidate/Dishearten, their Speed is raised by one stage."
   },
   "cacophony": {
     "name": "Cacophony",
-    "shortDesc": "Cacophony ability.",
-    "desc": "Cacophony ability."
+    "shortDesc": "Draws in all Sound-type moves to up SpAtk.",
+    "desc": "User redirects all single target Sound-type moves towards itself and is immune to Sound-type moves, when hit by a Sound-type move their Special Attack is increased by one stage."
   },
   "oblivious": {
     "name": "Oblivious",
-    "shortDesc": "Oblivious ability.",
-    "desc": "Oblivious ability."
+    "shortDesc": "Prevents it from becoming infatuated.",
+    "desc": "Prevents the user from becoming infatuated or being taunted, it also cures said statuses from the user if already inflicted. The user is also immune to Intimidate and Dishearten."
   },
   "rivalry": {
     "name": "Rivalry",
-    "shortDesc": "Rivalry ability.",
-    "desc": "Rivalry ability."
+    "shortDesc": "Deals more damage if the foe shares a type.",
+    "desc": "User's moves deal 1.25x damage against targets that share at least one type with it."
   },
   "bigpecks": {
-    "name": "Bigpecks",
-    "shortDesc": "Bigpecks ability.",
-    "desc": "Bigpecks ability."
+    "name": "Big Pecks",
+    "shortDesc": "30% more damage to foes below half HP.",
+    "desc": "User's moves deal 1.3x damage against targets that are below half HP."
   },
   "conductor": {
     "name": "Conductor",
-    "shortDesc": "Conductor ability.",
-    "desc": "Conductor ability."
+    "shortDesc": "Electric moves can hit Ground or Electric.",
+    "desc": "User's Electric-type moves deal 1x damage against Ground or Electric types."
   },
   "starstruck": {
     "name": "Starstruck",
-    "shortDesc": "Starstruck ability.",
-    "desc": "Starstruck ability."
+    "shortDesc": "Powers up Cosmic-type moves in a pinch.",
+    "desc": "User's Cosmic-type moves deal 1.5x damage when they have 1/3 or less HP remaining."
   },
   "neuroforce": {
     "name": "Neuroforce",
-    "shortDesc": "Neuroforce ability.",
-    "desc": "Neuroforce ability."
+    "shortDesc": "Powers up moves that are super-effective.",
+    "desc": "User's super-effective moves deal 1.25x damage."
   },
   "solarpower": {
-    "name": "Solarpower",
-    "shortDesc": "Solarpower ability.",
-    "desc": "Solarpower ability."
+    "name": "Solar Power",
+    "shortDesc": "Ups SpAtk 1.5x in sun; lose 1/8 HP each turn.",
+    "desc": "Ups SpAtk 1.5x in sun; lose 1/8 HP each turn."
   },
   "superluck": {
-    "name": "Superluck",
-    "shortDesc": "Superluck ability.",
-    "desc": "Superluck ability."
+    "name": "Super Luck",
+    "shortDesc": "Heightens the critical-hit ratios of moves.",
+    "desc": "User has +1 crit rate on all moves. If user is in the lead, increases chances of wild encounters carrying an item."
   },
   "mistysurge": {
-    "name": "Mistysurge",
-    "shortDesc": "Mistysurge ability.",
-    "desc": "Mistysurge ability."
+    "name": "Misty Surge",
+    "shortDesc": "Turns the ground into Misty Terrain.",
+    "desc": "User sets up Misty Terrain for 5 turns when entering the field, unless Misty Terrain is already present."
   },
   "protean": {
     "name": "Protean",
-    "shortDesc": "Protean ability.",
-    "desc": "Protean ability."
+    "shortDesc": "It changes type to that of the move it's about to use.",
+    "desc": "When user uses a move, before the move is executed their typing will change into a single type of the same type as the move."
   },
   "wimpout": {
-    "name": "Wimpout",
-    "shortDesc": "Wimpout ability.",
-    "desc": "Wimpout ability."
+    "name": "Wimp Out",
+    "shortDesc": "Cowardly switches out if its HP becomes half or less.",
+    "desc": "When the user's HP is reduced to half or less, the user immediately switches out or escapes."
   },
   "runaway": {
     "name": "Run Away",
-    "shortDesc": "Run Away ability.",
-    "desc": "Run Away ability."
+    "shortDesc": "Ignores trapping and ensures escapes from wild Pokemon.",
+    "desc": "User can switch out and escape even when under the effects of moves and abilities that prevent switching/escaping. User is guaranteed to escape from wild encounters."
   },
   "adaptability": {
     "name": "Adaptability",
-    "shortDesc": "Adaptability ability.",
-    "desc": "Adaptability ability."
+    "shortDesc": "Powers up moves of the same type.",
+    "desc": "Increases STAB from 1.5x damage to 2x damage."
   },
   "marvelscale": {
-    "name": "Marvelscale",
-    "shortDesc": "Marvelscale ability.",
-    "desc": "Marvelscale ability."
+    "name": "Marvel Scale",
+    "shortDesc": "Ups Defense if there is a status problem.",
+    "desc": "User gets 1.5x Defense when under any non-volatile status condition."
   },
   "megalauncher": {
-    "name": "Megalauncher",
-    "shortDesc": "Megalauncher ability.",
-    "desc": "Megalauncher ability."
+    "name": "Mega Launcher",
+    "shortDesc": "Powers up aura and pulse moves.",
+    "desc": "User's moves with the Pulse flag deal 1.5x damage."
   },
   "irredeemable": {
     "name": "Irredeemable",
-    "shortDesc": "Irredeemable ability.",
-    "desc": "Irredeemable ability."
+    "shortDesc": "Halves damage from Light and Fairy-type moves.",
+    "desc": "Halves damage from Light and Fairy-type moves."
   },
   "tanglinghair": {
-    "name": "Tanglinghair",
-    "shortDesc": "Tanglinghair ability.",
-    "desc": "Tanglinghair ability."
+    "name": "Tangling Hair",
+    "shortDesc": "Contact with it lowers the attacker's Speed.",
+    "desc": "Contact with it lowers the attacker's Speed."
   },
   "pureheart": {
-    "name": "Pureheart",
-    "shortDesc": "Pureheart ability.",
-    "desc": "Pureheart ability."
+    "name": "Pure Heart",
+    "shortDesc": "Gradually regains 1/16 max HP each turn.",
+    "desc": "Gradually regains 1/16 max HP each turn."
   },
   "genius": {
     "name": "Genius",
-    "shortDesc": "Genius ability.",
-    "desc": "Genius ability."
+    "shortDesc": "Doubles the Pokémon's SpAtk stat.",
+    "desc": "Doubles the Pokémon's SpAtk stat."
   },
   "leafguard": {
-    "name": "Leafguard",
-    "shortDesc": "Leafguard ability.",
-    "desc": "Leafguard ability."
+    "name": "Leaf Guard",
+    "shortDesc": "Prevents problems with status in sunny weather.",
+    "desc": "User cannot be inflicted with non-volatile status effects during Harsh Sunlight."
   },
   "overgrow": {
     "name": "Overgrow",
-    "shortDesc": "Overgrow ability.",
-    "desc": "Overgrow ability."
+    "shortDesc": "Powers up Grass-type moves in a pinch.",
+    "desc": "User's Grass-type moves deal 1.5x damage when they have 1/3 or less HP remaining."
   },
   "hypercutter": {
-    "name": "Hypercutter",
-    "shortDesc": "Hypercutter ability.",
-    "desc": "Hypercutter ability."
+    "name": "Hyper Cutter",
+    "shortDesc": "Prevents other Pokémon from lowering Attack stat.",
+    "desc": "User's Attack stat cannot be lowered by other Pokémon."
   },
   "rockypayload": {
-    "name": "Rockypayload",
-    "shortDesc": "Rockypayload ability.",
-    "desc": "Rockypayload ability."
+    "name": "Rocky Payload",
+    "shortDesc": "Powers up Rock-type moves.",
+    "desc": "User's Rock-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "flexible": {
     "name": "Flexible",
-    "shortDesc": "Flexible ability.",
-    "desc": "Flexible ability."
+    "shortDesc": "1.3x damage when using non-STAB moves.",
+    "desc": "User's moves that don't share a type with it deal 1.3x damage."
   },
   "ripen": {
     "name": "Ripen",
-    "shortDesc": "Ripen ability.",
-    "desc": "Ripen ability."
+    "shortDesc": "Ripens Berries and increases their effect.",
+    "desc": "Berries that restore HP/PP, increase stat stages, or deal damage have their effects doubled; berries that reduce damage received have their effects increased to 95% reduction."
   },
   "motordrive": {
-    "name": "Motordrive",
-    "shortDesc": "Motordrive ability.",
-    "desc": "Motordrive ability."
+    "name": "Motor Drive",
+    "shortDesc": "Raises Speed if hit by an Electric-type move.",
+    "desc": "User is immune to Electric-type moves, when hit by an Electric-type move their Speed is increased by one stage."
   },
   "stalwart": {
     "name": "Stalwart",
-    "shortDesc": "Stalwart ability.",
-    "desc": "Stalwart ability."
+    "shortDesc": "Ignores effects that change a move's target.",
+    "desc": "Ignores effects that change a move's target."
   },
   "angershell": {
-    "name": "Angershell",
-    "shortDesc": "Angershell ability.",
-    "desc": "Angershell ability."
+    "name": "Anger Shell",
+    "shortDesc": "At 50% HP, Atk/SpAtk/Spe up but Def/SpDef down.",
+    "desc": "When HP is reduced to 50% or less, user's Defense and Special Defense are lowered by one stage, while their Attack, Special Attack and Speed are raised by one stage."
   },
   "curiousmedicine": {
-    "name": "Curiousmedicine",
-    "shortDesc": "Curiousmedicine ability.",
-    "desc": "Curiousmedicine ability."
+    "name": "CuriousMedicine",
+    "shortDesc": "Clears allies' stat changes upon entry.",
+    "desc": "Clears allies' stat changes upon entry."
   },
   "merciless": {
     "name": "Merciless",
-    "shortDesc": "Merciless ability.",
-    "desc": "Merciless ability."
+    "shortDesc": "Guarantees crits against statused targets.",
+    "desc": "Guarantees crits against statused targets."
   },
   "fluffy": {
     "name": "Fluffy",
-    "shortDesc": "Fluffy ability.",
-    "desc": "Fluffy ability."
+    "shortDesc": "Resists contact damage but weaker to Fire-type.",
+    "desc": "User takes 0.5x damage from contact moves, but takes 2x damage from Fire-type moves."
   },
   "thickfat": {
-    "name": "Thickfat",
-    "shortDesc": "Thickfat ability.",
-    "desc": "Thickfat ability."
+    "name": "Thick Fat",
+    "shortDesc": "Halves damage from Fire and Ice-type moves.",
+    "desc": "Halves damage from Fire and Ice-type moves."
   },
   "sheerforce": {
     "name": "Sheer Force",
-    "shortDesc": "Sheer Force ability.",
-    "desc": "Sheer Force ability."
+    "shortDesc": "Removes added effects to increase move damage.",
+    "desc": "User's moves with additional effects deal 1.3x damage but can no longer inflict those effects."
   },
   "magicguard": {
-    "name": "Magicguard",
-    "shortDesc": "Magicguard ability.",
-    "desc": "Magicguard ability."
+    "name": "Magic Guard",
+    "shortDesc": "The Pokémon only takes damage from attacks.",
+    "desc": "User is immune to non-direct damage such as entry hazards, damage from statuses, or recoil."
   },
   "fullmetalbody": {
-    "name": "Fullmetalbody",
-    "shortDesc": "Fullmetalbody ability.",
-    "desc": "Fullmetalbody ability."
+    "name": "Full Metal Body",
+    "shortDesc": "Prevents other Pokémon from lowering its stats.",
+    "desc": "Prevents other Pokémon from lowering its stats."
   },
   "wonderguard": {
     "name": "Wonder Guard",
-    "shortDesc": "Wonder Guard ability.",
-    "desc": "Wonder Guard ability."
+    "shortDesc": "Only super-effective moves will hit.",
+    "desc": "Only super-effective moves will hit."
   },
   "resonant": {
     "name": "Resonant",
-    "shortDesc": "Resonant ability.",
-    "desc": "Resonant ability."
+    "shortDesc": "Moves hitting multiple targets deal 1.33x damage.",
+    "desc": "User's spread moves deal 1.33x damage when they hit multiple different targets (essentially cancelling the spread move damage penalty)."
   },
   "wintergift": {
-    "name": "Wintergift",
-    "shortDesc": "Wintergift ability.",
-    "desc": "Wintergift ability."
+    "name": "Winter Gift",
+    "shortDesc": "Powers up party's SpAtk/SpDef in hail.",
+    "desc": "User changes to its Hailing form when it's Hailing. When user is on the field, all allies including user get 1.5x Special Attack and Special Defense during Hail. User takes no damage from Hail."
   },
   "gorging": {
     "name": "Gorging",
-    "shortDesc": "Gorging ability.",
-    "desc": "Gorging ability."
+    "shortDesc": "Draining moves deal 30% more damage.",
+    "desc": "Draining moves deal 30% more damage."
   },
   "refrigerate": {
     "name": "Refrigerate",
-    "shortDesc": "Refrigerate ability.",
-    "desc": "Refrigerate ability."
+    "shortDesc": "Normal-type moves become Ice-type and powered up.",
+    "desc": "User's Normal-type moves become Ice-type and deal 1.2x damage."
   },
   "voltabsorb": {
-    "name": "Voltabsorb",
-    "shortDesc": "Voltabsorb ability.",
-    "desc": "Voltabsorb ability."
+    "name": "Volt Absorb",
+    "shortDesc": "Restores HP if hit by an Electric-type move.",
+    "desc": "User is immune to Electric-type moves, when hit by an Electric-type move they get healed for 1/4 of their max HP."
   },
   "airlock": {
-    "name": "Airlock",
-    "shortDesc": "Airlock ability.",
-    "desc": "Airlock ability."
+    "name": "Air Lock",
+    "shortDesc": "Eliminates the effects of weather.",
+    "desc": "When user is on the field, all effects of the current Weather are nullified. The Weather itself is not nullified."
   },
   "terminator": {
     "name": "Terminator",
-    "shortDesc": "Terminator ability.",
-    "desc": "Terminator ability."
+    "shortDesc": "Ups Atk if a hit makes its HP <50%.",
+    "desc": "Ups Atk if a hit makes its HP <50%."
   },
   "darkmatter": {
-    "name": "Darkmatter",
-    "shortDesc": "Darkmatter ability.",
-    "desc": "Darkmatter ability."
+    "name": "Dark Matter",
+    "shortDesc": "Normal moves become 1.2x power Cosmic moves.",
+    "desc": "User's Normal-type moves become Cosmic-type and deal 1.2x damage."
   },
   "suctioncups": {
-    "name": "Suctioncups",
-    "shortDesc": "Suctioncups ability.",
-    "desc": "Suctioncups ability."
+    "name": "Suction Cups",
+    "shortDesc": "Negates all moves that force switching out.",
+    "desc": "User cannot forcibly be switched out by enemy moves or items. If user is in the lead, increases bite rate when fishing."
   },
   "lightaura": {
-    "name": "Lightaura",
-    "shortDesc": "Lightaura ability.",
-    "desc": "Lightaura ability."
+    "name": "Light Aura",
+    "shortDesc": "Powers up each Pokémon's Light-type moves.",
+    "desc": "When user is on the field, all Pokémon on both sides deal 1.33x damage with Light-type moves. Multiple instances of this ability will not stack."
   },
   "darkaura": {
-    "name": "Darkaura",
-    "shortDesc": "Darkaura ability.",
-    "desc": "Darkaura ability."
+    "name": "Dark Aura",
+    "shortDesc": "Powers up each Pokémon's Dark-type moves.",
+    "desc": "When user is on the field, all Pokémon on both sides deal 1.33x damage with Dark-type moves. Multiple instances of this ability will not stack."
   },
   "opaqueness": {
     "name": "Opaqueness",
-    "shortDesc": "Opaqueness ability.",
-    "desc": "Opaqueness ability."
+    "shortDesc": "Immune to Light-type moves.",
+    "desc": "Immune to Light-type moves."
   },
   "weakarmor": {
-    "name": "Weakarmor",
-    "shortDesc": "Weakarmor ability.",
-    "desc": "Weakarmor ability."
+    "name": "Weak Armor",
+    "shortDesc": "Physical attacks lower Defense and raise Speed.",
+    "desc": "When user is hit by a physical attack, their Defense is lowered by one stage and their Speed is raised by two stages."
   },
   "bulletproof": {
     "name": "Bulletproof",
-    "shortDesc": "Bulletproof ability.",
-    "desc": "Bulletproof ability."
+    "shortDesc": "Protects the Pokémon from some ball and bomb moves.",
+    "desc": "User is immune to moves with the Bomb flag."
   },
   "cannonfire": {
-    "name": "Cannonfire",
-    "shortDesc": "Cannonfire ability.",
-    "desc": "Cannonfire ability."
+    "name": "Cannon Fire",
+    "shortDesc": "Powers up bomb-type moves.",
+    "desc": "User's moves with the Bomb flag deal 1.5x damage."
   },
   "stench": {
     "name": "Stench",
-    "shortDesc": "Stench ability.",
-    "desc": "Stench ability."
+    "shortDesc": "The stench may cause the target to flinch.",
+    "desc": "When attacking, user's damaging moves that don't already have a chance to flinch gain a 10% chance to do so. If user is in the lead, reduces wild Pokémon encounter rate by 50%."
   },
   "hustle": {
     "name": "Hustle",
-    "shortDesc": "Hustle ability.",
-    "desc": "Hustle ability."
+    "shortDesc": "Boosts the Attack stat but lowers accuracy.",
+    "desc": "User has 1.5x Attack but 0.8x Accuracy with physical moves."
   },
   "simple": {
     "name": "Simple",
-    "shortDesc": "Simple ability.",
-    "desc": "Simple ability."
+    "shortDesc": "The Pokémon is prone to wild stat changes.",
+    "desc": "The user doubles any stat drops and boosts it receives."
   },
   "vandal": {
     "name": "Vandal",
-    "shortDesc": "Vandal ability.",
-    "desc": "Vandal ability."
+    "shortDesc": "Deals 30% more damage to targets that have an item.",
+    "desc": "Deals 30% more damage to targets that have an item."
   },
   "pickup": {
     "name": "Pickup",
-    "shortDesc": "Pickup ability.",
-    "desc": "Pickup ability."
+    "shortDesc": "The Pokémon may pick up items.",
+    "desc": "When user is on the field and not holding an item, at the end of every turn they will collect the last item consumed by another Pokémon in that turn. After a battle, the user has a 10% chance to generate a random item if they are not already holding an item."
   },
   "frisk": {
     "name": "Frisk",
-    "shortDesc": "Frisk ability.",
-    "desc": "Frisk ability."
+    "shortDesc": "The Pokémon can check a foe's held item.",
+    "desc": "The Pokémon can check a foe's held item."
   },
   "reaper": {
     "name": "Reaper",
-    "shortDesc": "Reaper ability.",
-    "desc": "Reaper ability."
+    "shortDesc": "Fainting foes in trainer battles heal you for 20%.",
+    "desc": "Fainting foes in trainer battles heal you for 20%."
   },
   "electricsurge": {
-    "name": "Electricsurge",
-    "shortDesc": "Electricsurge ability.",
-    "desc": "Electricsurge ability."
+    "name": "Electric Surge",
+    "shortDesc": "Turns the ground into Electric Terrain.",
+    "desc": "User sets up Electric Terrain for 5 turns when entering the field, unless Electric Terrain is already present."
   },
   "costar": {
     "name": "Costar",
-    "shortDesc": "Costar ability.",
-    "desc": "Costar ability."
+    "shortDesc": "Copies an ally's stat changes upon entry.",
+    "desc": "Copies an ally's stat changes upon entry."
   },
   "dancer": {
     "name": "Dancer",
-    "shortDesc": "Dancer ability.",
-    "desc": "Dancer ability."
+    "shortDesc": "Repeats another Pokémon's dance move immediately.",
+    "desc": "Repeats another Pokémon's dance move immediately."
   },
   "limber": {
     "name": "Limber",
-    "shortDesc": "Limber ability.",
-    "desc": "Limber ability."
+    "shortDesc": "The Pokémon is protected from paralysis.",
+    "desc": "User cannot be paralyzed, it also cures paralysis from the user if already inflicted."
   },
   "sharpness": {
     "name": "Sharpness",
-    "shortDesc": "Sharpness ability.",
-    "desc": "Sharpness ability."
+    "shortDesc": "Powers up slicing moves.",
+    "desc": "User's moves with the Slicing flag deal 1.5x damage."
   },
   "justified": {
     "name": "Justified",
-    "shortDesc": "Justified ability.",
-    "desc": "Justified ability."
+    "shortDesc": "Raises both attack stats when hit by a Dark-type move.",
+    "desc": "Raises Attack and Special Attack when hit by a Dark-type move."
   },
   "quarkdrive": {
-    "name": "Quarkdrive",
-    "shortDesc": "Quarkdrive ability.",
-    "desc": "Quarkdrive ability."
+    "name": "Quark Drive",
+    "shortDesc": "Boosts its best stat in Electric Terrain.",
+    "desc": "Under Electric Terrain or when the user is holding a Booster Energy, the user's highest non-HP stat (taking into account stat changes but not items) increases by 30% (50% for Speed)."
   },
   "sapsipper": {
-    "name": "Sapsipper",
-    "shortDesc": "Sapsipper ability.",
-    "desc": "Sapsipper ability."
+    "name": "Sap Sipper",
+    "shortDesc": "Boosts Attack when hit by a Grass-type move.",
+    "desc": "User is immune to Grass-type moves, when hit by a Grass-type move their Attack is increased by one stage."
   },
   "prankster": {
     "name": "Prankster",
-    "shortDesc": "Prankster ability.",
-    "desc": "Prankster ability."
+    "shortDesc": "Gives priority to a status move.",
+    "desc": "User's Status moves get +1 priority but become ineffective against Dark types."
   },
   "cheekpouch": {
-    "name": "Cheekpouch",
-    "shortDesc": "Cheekpouch ability.",
-    "desc": "Cheekpouch ability."
+    "name": "Cheek Pouch",
+    "shortDesc": "Restores HP as well when the Pokémon eats a Berry.",
+    "desc": "When the user eats a berry, they also recover 1/3 of their max HP on top of the berry's effect."
   },
   "astralmajesty": {
-    "name": "Astralmajesty",
-    "shortDesc": "Astralmajesty ability.",
-    "desc": "Astralmajesty ability."
+    "name": "Astral Majesty",
+    "shortDesc": "Halves damage from Light and Dragon-type moves.",
+    "desc": "Halves damage from Light and Dragon-type moves."
   },
   "pounce": {
     "name": "Pounce",
-    "shortDesc": "Pounce ability.",
-    "desc": "Pounce ability."
+    "shortDesc": "On switch-in, user gains priority for first move.",
+    "desc": "On switch-in, user gains priority for first move."
   },
   "sweetveil": {
-    "name": "Sweetveil",
-    "shortDesc": "Sweetveil ability.",
-    "desc": "Sweetveil ability."
+    "name": "Sweet Veil",
+    "shortDesc": "Prevents itself and allies from falling asleep.",
+    "desc": "Prevents itself and allies from falling asleep."
   },
   "technician": {
     "name": "Technician",
-    "shortDesc": "Technician ability.",
-    "desc": "Technician ability."
+    "shortDesc": "Powers up the Pokémon's weaker moves.",
+    "desc": "Moves with 60 or lower BP deal 1.5x damage."
   },
   "disguise": {
     "name": "Disguise",
-    "shortDesc": "Disguise ability.",
-    "desc": "Disguise ability."
+    "shortDesc": "Its shroud protects it from an attack just once.",
+    "desc": "Protects the user from an opposing attack or self-inflicted confusion hit just once, only taking 1/8th damage."
   },
   "quickdraw": {
-    "name": "Quickdraw",
-    "shortDesc": "Quickdraw ability.",
-    "desc": "Quickdraw ability."
+    "name": "Quick Draw",
+    "shortDesc": "Enables moving first sometimes.",
+    "desc": "User has a 30% chance to move first in its priority bracket."
   },
   "owntempo": {
-    "name": "Owntempo",
-    "shortDesc": "Owntempo ability.",
-    "desc": "Owntempo ability."
+    "name": "Own Tempo",
+    "shortDesc": "Prevents the Pokémon from becoming confused.",
+    "desc": "Prevents the user from becoming confused, it also cures confusion from the user if already inflicted. The user is also immune to Intimidate and Dishearten."
   },
   "vitalspirit": {
-    "name": "Vitalspirit",
-    "shortDesc": "Vitalspirit ability.",
-    "desc": "Vitalspirit ability."
+    "name": "Vital Spirit",
+    "shortDesc": "Prevents the Pokémon from falling asleep.",
+    "desc": "User cannot fall asleep, it also wakes the user up if already inflicted."
   },
   "purepower": {
-    "name": "Purepower",
-    "shortDesc": "Purepower ability.",
-    "desc": "Purepower ability."
+    "name": "Pure Power",
+    "shortDesc": "Doubles the Pokémon's Attack stat.",
+    "desc": "Doubles the Pokémon's Attack stat."
   },
   "insomnia": {
     "name": "Insomnia",
-    "shortDesc": "Insomnia ability.",
-    "desc": "Insomnia ability."
+    "shortDesc": "Prevents the Pokémon from falling asleep.",
+    "desc": "User cannot fall asleep, it also wakes the user up if already inflicted."
   },
   "retribution": {
     "name": "Retribution",
-    "shortDesc": "Retribution ability.",
-    "desc": "Retribution ability."
+    "shortDesc": "Inflicts damage to the foe on special hit.",
+    "desc": "When user is hit by a special move, attacker takes damage equal to 1/8 of their max HP."
   },
   "steelworker": {
     "name": "Steelworker",
-    "shortDesc": "Steelworker ability.",
-    "desc": "Steelworker ability."
+    "shortDesc": "Powers up Steel-type moves.",
+    "desc": "User's Steel-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "liquidvoice": {
-    "name": "Liquidvoice",
-    "shortDesc": "Liquidvoice ability.",
-    "desc": "Liquidvoice ability."
+    "name": "Liquid Voice",
+    "shortDesc": "Moves with sound flag are Water-type and 1.2x boost.",
+    "desc": "Moves with sound flag are Water-type and 1.2x boost."
   },
   "superconductive": {
     "name": "Superconductive",
-    "shortDesc": "Superconductive ability.",
-    "desc": "Superconductive ability."
+    "shortDesc": "Frostbite does 1/2 damage and ups physical attacks.",
+    "desc": "User's physical attacks deal 1.5x damage when frostbitten. User takes halved damage from frostbite."
   },
   "precision": {
     "name": "Precision",
-    "shortDesc": "Precision ability.",
-    "desc": "Precision ability."
+    "shortDesc": "The Pokémon's accuracy is boosted.",
+    "desc": "User's moves have 1.3x Accuracy."
   },
   "powerspot": {
-    "name": "Powerspot",
-    "shortDesc": "Powerspot ability.",
-    "desc": "Powerspot ability."
+    "name": "Power Spot",
+    "shortDesc": "Powers up all the moves of all allies.",
+    "desc": "When user is on the field, all other allies deal 1.3x damage."
   },
   "whiteout": {
     "name": "Whiteout",
-    "shortDesc": "Whiteout ability.",
-    "desc": "Whiteout ability."
+    "shortDesc": "Dark moves become 1.2x power Light moves",
+    "desc": "User's Dark-type moves become Light-type and deal 1.2x damage."
   },
   "stamina": {
     "name": "Stamina",
-    "shortDesc": "Stamina ability.",
-    "desc": "Stamina ability."
+    "shortDesc": "Boosts Defense when hit by an attack.",
+    "desc": "Boosts Defense when hit by an attack."
   },
   "vitality": {
     "name": "Vitality",
-    "shortDesc": "Vitality ability.",
-    "desc": "Vitality ability."
+    "shortDesc": "Raises the Pokémon's SpDef when hit.",
+    "desc": "Raises the Pokémon's SpDef when hit."
   },
   "tangledfeet": {
-    "name": "Tangledfeet",
-    "shortDesc": "Tangledfeet ability.",
-    "desc": "Tangledfeet ability."
+    "name": "Tangled Feet",
+    "shortDesc": "Raises evasion if the Pokémon is confused.",
+    "desc": "When user is confused, incoming moves have 0.5x Accuracy."
   },
   "galewings": {
-    "name": "Galewings",
-    "shortDesc": "Galewings ability.",
-    "desc": "Galewings ability."
+    "name": "Gale Wings",
+    "shortDesc": "Flying-type moves gain priority when its HP is full.",
+    "desc": "Flying-type moves gain priority when its HP is full."
   },
   "klutz": {
     "name": "Klutz",
-    "shortDesc": "Klutz ability.",
-    "desc": "Klutz ability."
+    "shortDesc": "The Pokémon can't use any held items.",
+    "desc": "The Pokémon can't use any held items."
   },
   "unbreakable": {
     "name": "Unbreakable",
-    "shortDesc": "Unbreakable ability.",
-    "desc": "Unbreakable ability."
+    "shortDesc": "Prevents other Pokémon from lowering Defense.",
+    "desc": "User's Defense stat cannot be lowered by other Pokémon."
   },
   "shellarmor": {
-    "name": "Shellarmor",
-    "shortDesc": "Shellarmor ability.",
-    "desc": "Shellarmor ability."
+    "name": "Shell Armor",
+    "shortDesc": "Prevents crits and 1.2x Pokémon's Defense stat.",
+    "desc": "Attacks against the user will never be critical hits. User has 1.2x Defense against physical moves."
   },
   "teravolt": {
     "name": "Teravolt",
-    "shortDesc": "Teravolt ability.",
-    "desc": "Teravolt ability."
+    "shortDesc": "Moves can be used regardless of Abilities.",
+    "desc": "Moves can be used regardless of Abilities."
   },
   "disarray": {
     "name": "Disarray",
-    "shortDesc": "Disarray ability.",
-    "desc": "Disarray ability."
+    "shortDesc": "Temporarily twists the dimensions.",
+    "desc": "User sets up Trick Room for 5 turns when entering the field, if Trick Room is already in effect it will end instead."
   },
   "parentalbond": {
-    "name": "Parentalbond",
-    "shortDesc": "Parentalbond ability.",
-    "desc": "Parentalbond ability."
+    "name": "Parental Bond",
+    "shortDesc": "All moves land a second hit for 25% damage.",
+    "desc": "All moves land a second hit for 25% damage."
   },
   "antigravity": {
-    "name": "Antigravity",
-    "shortDesc": "Antigravity ability.",
-    "desc": "Antigravity ability."
+    "name": "Anti-Gravity",
+    "shortDesc": "Sound/Ground can hit Cosmic.",
+    "desc": "User's Sound and Ground-type moves deal 1x damage against Cosmic types."
   },
   "punkrock": {
-    "name": "Punkrock",
-    "shortDesc": "Punkrock ability.",
-    "desc": "Punkrock ability."
+    "name": "Punk Rock",
+    "shortDesc": "Boosts power and resistance of sound moves.",
+    "desc": "User's moves with the Sound flag deal 1.3x damage. User takes 0.5x damage from moves with the Sound flag."
   },
   "requiem": {
     "name": "Requiem",
-    "shortDesc": "Requiem ability.",
-    "desc": "Requiem ability."
+    "shortDesc": "Powers up Dark-type moves.",
+    "desc": "User's Dark-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "protosynthesis": {
     "name": "Protosynthesis",
-    "shortDesc": "Protosynthesis ability.",
-    "desc": "Protosynthesis ability."
+    "shortDesc": "Boosts its best stat in harsh sunlight.",
+    "desc": "Under Harsh Sunlight or when the user is holding a Booster Energy, the user's highest non-HP stat (taking into account stat changes but not items) increases by 30% (50% for Speed)."
   },
   "scorchscale": {
-    "name": "Scorchscale",
-    "shortDesc": "Scorchscale ability.",
-    "desc": "Scorchscale ability."
+    "name": "Scorch Scale",
+    "shortDesc": "Burns those using contact priority moves on it.",
+    "desc": "When user is targeted by a priority move that makes contact, the attacker will be burned right before their move is executed."
   },
   "rebellious": {
     "name": "Rebellious",
-    "shortDesc": "Rebellious ability.",
-    "desc": "Rebellious ability."
+    "shortDesc": "1.3x damage if an enemy has lowered their stats.",
+    "desc": "If user's stats have been lowered by an opponent, they will deal 1.3x damage until they switch out. The damage boost remains even if the lowered stats are restored."
   },
   "eartheater": {
-    "name": "Eartheater",
-    "shortDesc": "Eartheater ability.",
-    "desc": "Eartheater ability."
+    "name": "Earth Eater",
+    "shortDesc": "Restores HP if hit by a Ground-type move.",
+    "desc": "User is immune to Ground-type moves, when hit by a Ground-type move they get healed for 1/4 of their max HP."
   },
   "contrary": {
     "name": "Contrary",
-    "shortDesc": "Contrary ability.",
-    "desc": "Contrary ability."
+    "shortDesc": "Makes stat changes have an opposite effect.",
+    "desc": "Makes stat changes have an opposite effect."
   },
   "grasspelt": {
-    "name": "Grasspelt",
-    "shortDesc": "Grasspelt ability.",
-    "desc": "Grasspelt ability."
+    "name": "Grass Pelt",
+    "shortDesc": "Boosts Def/SpDef stats on Grassy Terrain.",
+    "desc": "User gets 1.5x Defense and Special Defense when under Grassy Terrain."
   },
   "multiscale": {
     "name": "Multiscale",
-    "shortDesc": "Multiscale ability.",
-    "desc": "Multiscale ability."
+    "shortDesc": "Reduces damage when HP is full.",
+    "desc": "User takes 0.5x damage while their HP is full."
   },
   "shadowshield": {
-    "name": "Shadowshield",
-    "shortDesc": "Shadowshield ability.",
-    "desc": "Shadowshield ability."
+    "name": "Shadow Shield",
+    "shortDesc": "Resists damage while its HP is full.",
+    "desc": "User takes 0.5x damage while their HP is full."
   },
   "cutecharm": {
-    "name": "Cutecharm",
-    "shortDesc": "Cutecharm ability.",
-    "desc": "Cutecharm ability."
+    "name": "Cute Charm",
+    "shortDesc": "Reduces damage from opponents with shared types.",
+    "desc": "The user has 1.25x Defense/Special Defense against attacks from opponents that share one of their typings."
   },
   "virtuoso": {
     "name": "Virtuoso",
-    "shortDesc": "Virtuoso ability.",
-    "desc": "Virtuoso ability."
+    "shortDesc": "Powers up Sound-type moves.",
+    "desc": "User's Sound-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "synthesize": {
     "name": "Synthesize",
-    "shortDesc": "Synthesize ability.",
-    "desc": "Synthesize ability."
+    "shortDesc": "The Pokémon regains 1/8 max HP in sunlight.",
+    "desc": "The Pokémon regains 1/8 max HP in sunlight."
   },
   "skilllink": {
-    "name": "Skilllink",
-    "shortDesc": "Skilllink ability.",
-    "desc": "Skilllink ability."
+    "name": "Skill Link",
+    "shortDesc": "Increases the frequency of multi-strike moves.",
+    "desc": "User's multi-strike moves with a variable number of hits will always hit for the maximum possible number of hits. User's accuracy-dependent multi-strike moves will only have a single accuracy check."
   },
   "waterveil": {
-    "name": "Waterveil",
-    "shortDesc": "Waterveil ability.",
-    "desc": "Waterveil ability."
+    "name": "Water Veil",
+    "shortDesc": "Prevents the Pokémon from getting a burn.",
+    "desc": "User cannot be burned, it also cures burn from the user if already inflicted."
   },
   "normalize": {
     "name": "Normalize",
-    "shortDesc": "Normalize ability.",
-    "desc": "Normalize ability."
+    "shortDesc": "Moves become the Normal type and 1.2x boost.",
+    "desc": "User's moves become Normal-type and deal 1.2x damage. Moves that were originally Normal-type also get this boost."
   },
   "dragonsmaw": {
-    "name": "Dragonsmaw",
-    "shortDesc": "Dragonsmaw ability.",
-    "desc": "Dragonsmaw ability."
+    "name": "Dragon's Maw",
+    "shortDesc": "Powers up Dragon-type moves.",
+    "desc": "User's Dragon-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "bonecollector": {
-    "name": "Bonecollector",
-    "shortDesc": "Bonecollector ability.",
-    "desc": "Bonecollector ability."
+    "name": "Bone Collector",
+    "shortDesc": "Powers up Ground-type moves.",
+    "desc": "User's Ground-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "hivebody": {
-    "name": "Hivebody",
-    "shortDesc": "Hivebody ability.",
-    "desc": "Hivebody ability."
+    "name": "Hive Body",
+    "shortDesc": "May proc Infestation on contact.",
+    "desc": "When user is hit by a move that makes contact, there's a 30% chance to trap the attacker in Infestation."
   },
   "grassysurge": {
-    "name": "Grassysurge",
-    "shortDesc": "Grassysurge ability.",
-    "desc": "Grassysurge ability."
+    "name": "Grassy Surge",
+    "shortDesc": "Turns the ground into Grassy Terrain.",
+    "desc": "User sets up Grassy Terrain for 5 turns when entering the field, unless Grassy Terrain is already present."
   },
   "darkswarm": {
-    "name": "Darkswarm",
-    "shortDesc": "Darkswarm ability.",
-    "desc": "Darkswarm ability."
+    "name": "Dark Swarm",
+    "shortDesc": "At Lv20+, forms a dark swarm while it has >25% HP.",
+    "desc": "At Lv20+, forms a dark swarm while it has >25% HP."
   },
   "nobility": {
     "name": "Nobility",
-    "shortDesc": "Nobility ability.",
-    "desc": "Nobility ability."
+    "shortDesc": "Makes foes unable to use priority attacks.",
+    "desc": "When user is on the field, opponent's priority moves that target the user and/or its allies will be nullified."
   },
   "hivemind": {
     "name": "Hivemind",
-    "shortDesc": "Hivemind ability.",
-    "desc": "Hivemind ability."
+    "shortDesc": "Powers up Bug-type moves.",
+    "desc": "User's Bug-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "heavymetal": {
     "name": "Heavy Metal",
-    "shortDesc": "Heavy Metal ability.",
-    "desc": "Heavy Metal ability."
+    "shortDesc": "Doubles the Pokémon's weight.",
+    "desc": "Doubles the Pokémon's weight."
   },
   "haunted": {
     "name": "Haunted",
-    "shortDesc": "Haunted ability.",
-    "desc": "Haunted ability."
+    "shortDesc": "Powers up Ghost-type moves.",
+    "desc": "User's Ghost-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
   },
   "poisonpoint": {
     "name": "Poison Point",
-    "shortDesc": "Poison Point ability.",
-    "desc": "Poison Point ability."
+    "shortDesc": "Contact with the Pokémon may poison the attacker.",
+    "desc": "When user is hit by a contact move, there's a 30% chance to poison the attacker."
   },
   "stickyhold": {
-    "name": "Stickyhold",
-    "shortDesc": "Stickyhold ability.",
-    "desc": "Stickyhold ability."
+    "name": "Sticky Hold",
+    "shortDesc": "Protects the Pokémon from item theft.",
+    "desc": "User's held item cannot be removed, stolen, swapped or destroyed by others. If user is in the lead, increases bite rate when fishing."
   },
   "maelstrom": {
     "name": "Maelstrom",
-    "shortDesc": "Maelstrom ability.",
-    "desc": "Maelstrom ability."
+    "shortDesc": "Traps grounded foes. May proc a Whirlpool on contact.",
+    "desc": "When user is on the field, adjacent grounded enemies cannot escape or switch out. When user is hit by a move that makes contact, there's a 30% chance to trap the attacker in a Whirlpool."
   },
   "powerofalchemy": {
-    "name": "Powerofalchemy",
-    "shortDesc": "Powerofalchemy ability.",
-    "desc": "Powerofalchemy ability."
+    "name": "Alchemy",
+    "shortDesc": "Copies the Ability of a defeated ally.",
+    "desc": "When an ally faints, this Pokémon also gains their ability"
   },
   "screencleaner": {
-    "name": "Screencleaner",
-    "shortDesc": "Screencleaner ability.",
-    "desc": "Screencleaner ability."
+    "name": "Screen Cleaner",
+    "shortDesc": "All screen effects are nullified upon entry.",
+    "desc": "All screen effects are nullified upon entry."
   },
   "perishbody": {
-    "name": "Perishbody",
-    "shortDesc": "Perishbody ability.",
-    "desc": "Perishbody ability."
+    "name": "Perish Body",
+    "shortDesc": "On hit, target + victim faint in 3 turns unless switched.",
+    "desc": "On hit, target + victim faint in 3 turns unless switched."
   },
   "mummy": {
     "name": "Mummy",
-    "shortDesc": "Mummy ability.",
-    "desc": "Mummy ability."
+    "shortDesc": "Contact with this Pokémon spreads this Ability.",
+    "desc": "Contact with this Pokémon spreads this Ability."
   },
   "spellcaster": {
     "name": "Spellcaster",
-    "shortDesc": "Spellcaster ability.",
-    "desc": "Spellcaster ability."
+    "shortDesc": "Powers up Psychic-type moves in a pinch.",
+    "desc": "User's Psychic-type moves deal 1.5x damage when they have 1/3 or less HP remaining."
   },
   "watercompaction": {
-    "name": "Watercompaction",
-    "shortDesc": "Watercompaction ability.",
-    "desc": "Watercompaction ability."
+    "name": "Water Compaction",
+    "shortDesc": "Sharply ups Defense when hit by a Water-type move.",
+    "desc": "Sharply ups Defense when hit by a Water-type move."
   },
   "symphony": {
     "name": "Symphony",
-    "shortDesc": "Symphony ability.",
-    "desc": "Symphony ability."
+    "shortDesc": "At Lv20+, Forms a symphony while it has >25% HP.",
+    "desc": "At Lv20+, Forms a symphony while it has >25% HP."
   },
   "pastelveil": {
-    "name": "Pastelveil",
-    "shortDesc": "Pastelveil ability.",
-    "desc": "Pastelveil ability."
+    "name": "Pastel Veil",
+    "shortDesc": "Protects itself and all allies from being poisoned.",
+    "desc": "When user is on the field, all allies (including the user) cannot be poisoned or badly poisoned, it also cures said statuses from the user if already inflicted, and cures said statuses from their allies on switch-in."
   },
   "teleface": {
-    "name": "Teleface",
-    "shortDesc": "Teleface ability.",
-    "desc": "Teleface ability."
+    "name": "TV Face",
+    "shortDesc": "Prevent a physical attack. Restored in elec. terrain.",
+    "desc": "Protects from one physical attack, entering electric terrain will restore this shield. Form and stats change when the shield is down."
   },
   "destructivecore": {
-    "name": "Destructivecore",
-    "shortDesc": "Destructivecore ability.",
-    "desc": "Destructivecore ability."
+    "name": "Dest. Core",
+    "shortDesc": "It changes form if its HP becomes half or less.",
+    "desc": "User's default form is immune to non-volative status effects. If user has 50% or less HP at the end of the turn or at the start of combat, they change to Reactive Form. This form has reduced defenses but increased Attack and Speed. They change back into their default form if they have more than 50% HP at the end of the turn, and also at the end of combat."
   },
   "aerilate": {
     "name": "Aerilate",
-    "shortDesc": "Aerilate ability.",
-    "desc": "Aerilate ability."
+    "shortDesc": "Normal-type moves become Flying-type and power up.",
+    "desc": "User's Normal-type moves become Flying-type and deal 1.2x damage."
   },
   "mirrorarmor": {
-    "name": "Mirrorarmor",
-    "shortDesc": "Mirrorarmor ability.",
-    "desc": "Mirrorarmor ability."
+    "name": "Mirror Armor",
+    "shortDesc": "Bounces back stat-lowering effects.",
+    "desc": "Bounces back stat-lowering effects."
   },
   "opportunist": {
     "name": "Opportunist",
-    "shortDesc": "Opportunist ability.",
-    "desc": "Opportunist ability."
+    "shortDesc": "Copies an opponent's stat boost whenever it happens.",
+    "desc": "Copies an opponent's stat boost whenever it happens."
   },
   "victorystar": {
-    "name": "Victorystar",
-    "shortDesc": "Victorystar ability.",
-    "desc": "Victorystar ability."
+    "name": "Victory Star",
+    "shortDesc": "Boosts the accuracy of its allies and itself.",
+    "desc": "When user is on the field, all allies including the user have 1.1x Accuracy. Multiple instances of this ability can stack."
   },
   "cartographer": {
     "name": "Cartographer",
-    "shortDesc": "Cartographer ability.",
-    "desc": "Cartographer ability."
+    "shortDesc": "Changes form with the terrain.",
+    "desc": "Changes type and stats depending on the terrain in play. Grassy (+Atk), Psychic (+Def/SpDef), Misty (+Spe), Electric (+SpAtk)."
   },
   "overcoat": {
     "name": "Overcoat",
-    "shortDesc": "Overcoat ability.",
-    "desc": "Overcoat ability."
+    "shortDesc": "Prevents weather damage and 1.1x Def/SpDef stats.",
+    "desc": "User is immune to damage from Hail and Sandstorm, and has 1.1x Defense/Special Defense against physical/special moves respectively. Also gives user immunity to moves with the Powder tag."
   },
   "lightswitch": {
-    "name": "Lightswitch",
-    "shortDesc": "Lightswitch ability.",
-    "desc": "Lightswitch ability."
+    "name": "Light Switch",
+    "shortDesc": "Alternates between modes at the end of each turn.",
+    "desc": "User starts each battle in Powered Mode, and then alternates between Powered and Unpowered Mode at the end of every turn. Powered Mode is pure Light type and Unpowered Mode is pure Dark type, the type of the move Power Cycle changes to match the Mode."
   },
   "blaze": {
     "name": "Blaze",
-    "shortDesc": "Blaze ability.",
-    "desc": "Blaze ability."
+    "shortDesc": "Powers up Fire-type moves in a pinch.",
+    "desc": "User's Fire-type moves deal 1.5x damage when they have 1/3 or less HP remaining."
   },
   "cometstorm": {
-    "name": "Cometstorm",
-    "shortDesc": "Cometstorm ability.",
-    "desc": "Cometstorm ability."
+    "name": "Comet Storm",
+    "shortDesc": "Boosts Spe/SpAtk when hit by a Rock-type move.",
+    "desc": "User is immune to Rock-type moves, when hit by a Rock-type move their Special Attack and Speed is increased by one stage."
   },
   "drought": {
     "name": "Drought",
-    "shortDesc": "Drought ability.",
-    "desc": "Drought ability."
+    "shortDesc": "Turns the sunlight harsh if it is in battle.",
+    "desc": "User summons Harsh Sunlight for 5 turns when entering the field, unless Harsh Sunlight is already present."
+  },
+  "magmaarmor": {
+    "name": "Magma Armor",
+    "shortDesc": "Prevents the Pokémon from becoming frostbitten.",
+    "desc": "User cannot be frostbitten, it also cures frostbite from the user if already inflicted. When user is in the party, eggs hatch twice as fast."
+  },
+  "maestro": {
+    "name": "Maestro",
+    "shortDesc": "Powers up Sound-type moves in a pinch.",
+    "desc": "User's Sound-type moves deal 1.5x damage when they have 1/3 or less HP remaining."
+  },
+  "clayform": {
+    "name": "Clay Form",
+    "shortDesc": "The Pokémon regains 1/8 max HP in a sandstorm.",
+    "desc": "The Pokémon regains 1/8 max HP every turn during a Sandstorm. User takes no damage from Sandstorm."
+  },
+  "aurabreak": {
+    "name": "Aura Break",
+    "shortDesc": "Reverses Aura Abilities to weaken affected moves.",
+    "desc": "When user is on the field, all Aura abilities are reversed, causing affected moves to deal 0.75x damage instead."
+  },
+  "sharpshooter": {
+    "name": "Sharp Shooter",
+    "shortDesc": "All non-contact moves always hit their target.",
+    "desc": "All of the user's damaging moves that do not make contact become never-miss moves, skip accuracy checks, and ignore misdirection from effects such as Follow Me and abilities like Lightning Rod."
+  },
+  "pixilate": {
+    "name": "Pixilate",
+    "shortDesc": "Normal-type moves become Fairy-type and powered up.",
+    "desc": "User's Normal-type moves become Fairy-type and deal 1.2x damage."
+  },
+  "honeygather": {
+    "name": "Honey Gather",
+    "shortDesc": "Gradually regains 1/16 max HP each turn.",
+    "desc": "Gradually regains 1/16 max HP each turn. After a battle, the user has a 5% chance for every 10 levels to generate Honey if they are not already holding an item."
+  },
+  "triage": {
+    "name": "Triage",
+    "shortDesc": "Gives priority to a healing move.",
+    "desc": "Recovery and HP draining moves get +3 priority."
+  },
+  "anticipation": {
+    "name": "Anticipation",
+    "shortDesc": "Senses a foe's dangerous moves.",
+    "desc": "When user enters the field, it will shudder if any opponent has a move that is super-effective against it."
+  },
+  "symbiosis": {
+    "name": "Symbiosis",
+    "shortDesc": "Passes its held item to an ally that has used theirs.",
+    "desc": "Passes its held item to an ally that has used theirs."
+  },
+  "windfury": {
+    "name": "Wind Fury",
+    "shortDesc": "Boosts wind moves 30%/ Reduces Wind dmg 50%.",
+    "desc": "User's moves with the Wind flag deal 1.3x damage. User takes 0.5x damage from moves with the Wind flag."
+  },
+  "nebulacloud": {
+    "name": "Nebula Cloud",
+    "shortDesc": "Protects Cosmic-types from stat/status effects.",
+    "desc": "When user is on the field, all Cosmic-type allies including the user become immune to stat drops inflicted from other Pokémon, as well as non-volatile status effects."
+  },
+  "waterbubble": {
+    "name": "Water Bubble",
+    "shortDesc": "0.5x Fire/2x Water moves, prevent burns",
+    "desc": "User's Water-type moves deal 2x damage. User takes 0.5x damage from Fire-type moves and cannot be burned."
+  },
+  "imposter": {
+    "name": "Imposter",
+    "shortDesc": "It transforms itself into the Pokémon it is facing.",
+    "desc": "It transforms itself into the Pokémon it is facing."
+  },
+  "lightmetal": {
+    "name": "Light Metal",
+    "shortDesc": "Halves the Pokémon's weight.",
+    "desc": "Halves the Pokémon's weight."
+  },
+  "lightbulb": {
+    "name": "Light Bulb",
+    "shortDesc": "Weakens incoming Dark moves, 2x Light moves",
+    "desc": "User's Light-type moves deal 2x damage. User takes 0.5x damage from Dark-type moves."
+  },
+  "magician": {
+    "name": "Magician",
+    "shortDesc": "Steals the held item of a Pokémon it hits.",
+    "desc": "When user is not holding an item and attacks a target, user steals the target's held item."
+  },
+  "zenmode": {
+    "name": "Zen Mode",
+    "shortDesc": "Changes the Pokémon's shape when HP is halved.",
+    "desc": "When HP is reduced to 50% or less, user changes to Zen Mode. This form has reduced Speed but increased defenses."
+  },
+  "tropicalhide": {
+    "name": "Tropical Hide",
+    "shortDesc": "Halves damage from Grass and Water-type moves.",
+    "desc": "Halves damage from Grass and Water-type moves."
+  },
+  "surgesurfer": {
+    "name": "Surge Surfer",
+    "shortDesc": "Doubles Speed on Electric Terrain.",
+    "desc": "Doubles Speed on Electric Terrain."
+  },
+  "propellertail": {
+    "name": "Propeller Tail",
+    "shortDesc": "Ignores effects that change the target of a move.",
+    "desc": "Ignores effects that change the target of a move."
+  },
+  "funeralpyre": {
+    "name": "Funeral Pyre",
+    "shortDesc": "Powers up Ghost & Fire-type moves.",
+    "desc": "User's Ghost-type and Fire-type moves deal 2x damage. Stacks multiplicatively with STAB."
+  },
+  "deltastream": {
+    "name": "Delta Stream",
+    "shortDesc": "Alters weather to remove Flying-type's weaknesses.",
+    "desc": "Alters weather to remove Flying-type's weaknesses."
+  },
+  "thermalexchange": {
+    "name": "Thermal Exchange",
+    "shortDesc": "Fire/Ice ups Atk/SpAtk, prevents Burn/Frostbite.",
+    "desc": "When user is hit by either a Fire-type or Ice-Type move, their Attack and Special Attack both raise by one stage. Prevents the user from being Burned and Frostbitten, it also cures said statuses if already inflicted."
+  },
+  "arsonist": {
+    "name": "Arsonist",
+    "shortDesc": "Powers up Fire-type moves.",
+    "desc": "User's Fire-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
+  },
+  "receiver": {
+    "name": "Receiver",
+    "shortDesc": "Copies the Ability of a defeated ally.",
+    "desc": "Copies the Ability of a defeated ally."
+  },
+  "terrorize": {
+    "name": "Terrorize",
+    "shortDesc": "Weakens incoming Bug moves, 2x Psychic moves",
+    "desc": "User's Psychic-type moves deal 2x damage. User takes 0.5x damage from Bug-type moves."
+  },
+  "affection": {
+    "name": "Affection",
+    "shortDesc": "Powers up Fairy-type moves.",
+    "desc": "User's Fairy-type moves deal 1.5x damage. Stacks multiplicatively with STAB."
+  },
+  "prismarmor": {
+    "name": "Prism Armor",
+    "shortDesc": "Reduces damage from super-effective attacks.",
+    "desc": "User takes 0.75x damage from super-effective attacks."
+  },
+  "queenlymajesty": {
+    "name": "Queenly Majesty",
+    "shortDesc": "Makes foes unable to use priority attacks.",
+    "desc": "When user is on the field, opponent's priority moves that target the user and/or its allies will be nullified."
   }
 }

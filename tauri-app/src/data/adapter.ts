@@ -1088,18 +1088,38 @@ export async function loadShowdownDex(options?: { base?: string }) {
     const s = customMoveMerge.stats;
     console.log(`[adapter] custom moves: +${s.added} new, +${s.variants} retyped duplicates, ${s.skippedSameType} same-type collisions kept canonical`);
   }
+  // Fangame ability packs generated from PBS files often carry placeholder
+  // descriptions ("X ability.") because the source data lacks description text.
+  // Never let such an entry clobber a canonical Showdown ability that has a
+  // real description — keep the canonical entry instead.
+  const isPlaceholderAbilityText = (a: any): boolean => {
+    const d = String(a?.desc || a?.shortDesc || '').trim().toLowerCase();
+    if (!d) return true;
+    if (isSagePlaceholderText(d)) return true;
+    return /^(.+?) ability\.$/.test(d);
+  };
+  const stripPlaceholderAbilityOverrides = (pack: any, base: AbilityIndex): AbilityIndex => {
+    const out: AbilityIndex = {};
+    for (const [k, v] of Object.entries(pack || {})) {
+      const baseEntry = base[normalizeName(k)];
+      if (baseEntry && !isPlaceholderAbilityText(baseEntry) && isPlaceholderAbilityText(v)) continue;
+      out[k] = v as AbilityEntry;
+    }
+    return out;
+  };
+
   const mergedBaseAbilities = {
     ...(abilities as AbilityIndex),
-    ...((sageAbilities || {}) as AbilityIndex),
-    ...((insAbilities || {}) as AbilityIndex),
-    ...((wylinAbilities || {}) as AbilityIndex),
-    ...((uraniumAbilities || {}) as AbilityIndex),
-    ...((infinityAbilities || {}) as AbilityIndex),
-    ...((mariomonAbilities || {}) as AbilityIndex),
+    ...(stripPlaceholderAbilityOverrides(sageAbilities, abilities as AbilityIndex) as AbilityIndex),
+    ...(stripPlaceholderAbilityOverrides(insAbilities, abilities as AbilityIndex) as AbilityIndex),
+    ...(stripPlaceholderAbilityOverrides(wylinAbilities, abilities as AbilityIndex) as AbilityIndex),
+    ...(stripPlaceholderAbilityOverrides(uraniumAbilities, abilities as AbilityIndex) as AbilityIndex),
+    ...(stripPlaceholderAbilityOverrides(infinityAbilities, abilities as AbilityIndex) as AbilityIndex),
+    ...(stripPlaceholderAbilityOverrides(mariomonAbilities, abilities as AbilityIndex) as AbilityIndex),
     // Soulstones Part 1 abilities
-    ...((soulstonePart1Abilities || {}) as AbilityIndex),
+    ...(stripPlaceholderAbilityOverrides(soulstonePart1Abilities, abilities as AbilityIndex) as AbilityIndex),
     // Soulstones 2 abilities (from PBS)
-    ...((soulstonePS2Abilities || {}) as AbilityIndex),
+    ...(stripPlaceholderAbilityOverrides(soulstonePS2Abilities, abilities as AbilityIndex) as AbilityIndex),
   } as AbilityIndex;
   const mergedBaseItems = {
     ...(items as ItemIndex),
