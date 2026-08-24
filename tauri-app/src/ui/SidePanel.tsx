@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { withPublicBase } from '../utils/publicBase';
+import TypeIcon from '../components/TypeIcon';
 import { BattlePokemon, Pokemon } from '../types';
 import { spriteUrl, loadShowdownDex, normalizeName, speciesAbilityOptions, toPokemon, prepareBattle, mapMoves, isMoveLegalForSpecies, formatShowdownSet, parseShowdownTeam, speciesFormesInfo, eligibleMegaFormForItem, computeRealStats, loadTeams, saveTeams, createTeam, iconUrl, placeholderSpriteDataURL, getTeamMaxSize, isTeamFull, DEFAULT_TEAM_SIZE, saveCustomFusionSprite, saveCustomSprite, listPokemonSpriteOptions, fetchFusionVariants, cacheSpriteSelectionLocally, clearCustomSprites, clearSpriteSettings, resyncSpriteCatalog, getFusionApiBases, IFD_CDN_BASE, cacheIfdSprite, nameToDexNum, dexNumToName, type PokemonSpriteOption } from '../data/adapter';
 import { AVAILABLE_HATS, HatId, HatPicker, SpriteWithHat } from './SpriteWithHat';
@@ -2760,7 +2761,7 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
         {(() => {
           const te = computeTypeEffectiveness(selected.types);
           const icon = (t: string) => (
-            <img key={t} className="pixel" src={withPublicBase(`vendor/showdown/sprites/types/${titleCase(t)}.png`)} alt={titleCase(t)} style={{height:18}} />
+            <TypeIcon key={t} type={t} size={18} />
           );
           const renderIcons = (arr: string[], emptyText: string) => (
             arr.length ? (

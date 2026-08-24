@@ -65,7 +65,7 @@ export const BattleTooltip: React.FC<BattleTooltipProps> = ({
           {move && (
             <div className="tooltip-move-section">
               <h4 style={{ color: getTypeColor(move.type), marginBottom: "8px" }}>{move.name}</h4>
-              <div className="tooltip-type-badge" style={{ borderColor: getTypeColor(move.type) }}>
+              <div className="tooltip-type-badge" style={{ borderColor: getTypeColor(move.type), background: getTypeColor(move.type), color: move.type.toLowerCase() === 'light' ? '#333' : '#fff' }}>
                 {move.type}
               </div>
               <div className="tooltip-stats-row" style={{ gap: "12px", flexWrap: "wrap" }}>
@@ -90,7 +90,7 @@ export const BattleTooltip: React.FC<BattleTooltipProps> = ({
               <h4>{pokemonName}</h4>
               <div className="tooltip-type-badges" style={{ display: "flex", gap: "8px" }}>
                 {types.map(t => (
-                  <span key={t} className="type-badge" style={{ borderColor: getTypeColor(t) }}>{t}</span>
+                  <span key={t} className="type-badge" style={{ borderColor: getTypeColor(t), background: getTypeColor(t), color: t.toLowerCase() === 'light' ? '#333' : '#fff' }}>{t}</span>
                 ))}
               </div>
               <p>{spriteSource ? spriteSource.attribution : "Official Pokettrpg Dex"}</p>

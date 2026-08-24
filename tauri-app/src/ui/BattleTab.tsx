@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { withPublicBase } from '../utils/publicBase';
+import TypeIcon from '../components/TypeIcon';
 import { BattlePokemon } from '../types';
 import { spriteUrlWithFallback, loadShowdownDex, normalizeName, speciesFormesInfo, eligibleMegaFormForItem, prepareBattle, toPokemon, loadTeams, computeRealStats } from '../data/adapter';
 
@@ -644,17 +645,11 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
           {/* Type chart for this Pokémon (defending) */}
           <section style={{border:'1px solid #444', borderRadius:6, padding:8, marginTop:8, background:'var(--section-bg)'}}>
             <h4 style={{marginTop:0}}>Type Effectiveness (Defending)</h4>
-            {(() => {
-              const te = computeTypeEffectiveness(active.types);
-              const icon = (t: string) => (
-                <img
-                  key={t}
-                  className="pixel"
-                  src={withPublicBase(`vendor/showdown/sprites/types/${titleCase(t)}.png`)}
-                  alt={titleCase(t)}
-                  style={{height:18}}
-                />
-              );
+          {(() => {
+            const te = computeTypeEffectiveness(active.types);
+            const icon = (t: string) => (
+              <TypeIcon key={t} type={t} size={18} />
+            );
               const renderIcons = (arr: string[]) => (
                 arr.length ? (<div style={{display:'flex', gap:6, flexWrap:'wrap', alignItems:'center'}}>{arr.map(icon)}</div>) : (<span>—</span>)
               );
@@ -744,18 +739,12 @@ export function BattleTab({ friendly, enemy, team, onReplaceTeam }: {
                   {Object.keys(TYPE_CHART).map(t => <option key={t} value={t}>{titleCase(t)}</option>)}
                 </select>
               </div>
-              {(() => { 
-                const def = [typePick1, typePick2].filter(Boolean) as string[]; 
-                const te = def.length ? computeTypeEffectiveness(def) : computeTypeEffectiveness((enemy ?? active).types); 
-                const icon = (t: string) => (
-                  <img
-                    key={t}
-                    className="pixel"
-                    src={withPublicBase(`vendor/showdown/sprites/types/${titleCase(t)}.png`)}
-                    alt={titleCase(t)}
-                    style={{height:18}}
-                  />
-                );
+                {(() => { 
+                  const def = [typePick1, typePick2].filter(Boolean) as string[]; 
+                  const te = def.length ? computeTypeEffectiveness(def) : computeTypeEffectiveness((enemy ?? active).types); 
+                  const icon = (t: string) => (
+                    <TypeIcon key={t} type={t} size={18} />
+                  );
                 const renderIcons = (arr: string[]) => (
                   arr.length ? (<div style={{display:'flex', gap:6, flexWrap:'wrap', alignItems:'center'}}>{arr.map(icon)}</div>) : (<span>—</span>)
                 );

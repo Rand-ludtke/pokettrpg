@@ -352,6 +352,22 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
   };
   applied += createMoveVariants(ss2Moves, battleMovedex, 'ss2', 'SS2');
   applied += createMoveVariants(ss1Moves, battleMovedex, 'ss1', 'Soulstones');
+  // Ensure every custom move has the battle-critical fields Showdown expects.
+  // PBS exports omit pp/target/flags/priority/num, leaving Showdown to treat
+  // them as 0 PP (moves show descriptions but fail with out-of-PP).
+  for (const entry of Object.values(battleMovedex)) {
+    if (!entry || typeof entry !== 'object') continue;
+    const e = entry as any;
+    if (!(Number(e.pp) > 0)) {
+      const category = String(e.category || 'Status').toLowerCase();
+      const bp = Number(e.basePower || e.power || 0);
+      e.pp = category === 'status' ? 15 : (bp > 0 ? 20 : 10);
+    }
+    if (!e.target) e.target = 'normal';
+    if (e.priority == null) e.priority = 0;
+    if (e.num == null) e.num = 0;
+    if (!e.flags) e.flags = {};
+  }
 
   // Keep Dex data pointers in sync for tooltip/species lookups
   if ((window as any).Dex?.data) {

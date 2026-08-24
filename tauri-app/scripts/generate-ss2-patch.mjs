@@ -30,6 +30,20 @@ function normId(s) {
   return String(s || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
 }
 
+// Normalize a prevo display name into a dex key. PBS uses punctuation and
+// spaces (e.g. "Mr-Temporal. Mime", "Mime-Temporal Jr.") that don't match
+// the orion/temporal key naming convention.
+function prevoToKey(prevoName, suffix = '') {
+  if (!prevoName) return '';
+  // Strip punctuation common in PBS prevo names
+  const cleaned = String(prevoName)
+    .replace(/\./g, '')
+    .replace(/-/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return normId(cleaned + (suffix ? ' ' + suffix : ''));
+}
+
 // Title-case a type name: "WATER" → "Water", "COSMIC" → "Cosmic"
 function titleCase(s) {
   if (!s) return s;
@@ -54,7 +68,7 @@ function pbsTypeToDisplay(t) {
 }
 
 // Parse a PBS file (pokemon.txt or pokemon_forms.txt style)
-function parsePBSBlocks(filePath) {
+function parsePBSBlocks(filePath, opts = {}) {
   if (!fs.existsSync(filePath)) {
     console.warn(`File not found: ${filePath}`);
     return [];
@@ -83,6 +97,10 @@ function parsePBSBlocks(filePath) {
 
     if (!current) continue;
 
+    if (opts.keepText) {
+      current._text = (current._text || '') + raw + '\n';
+    }
+
     // Key = Value
     const eqIdx = line.indexOf('=');
     if (eqIdx < 0) continue;
@@ -90,7 +108,10 @@ function parsePBSBlocks(filePath) {
     const val = line.slice(eqIdx + 1).trim();
     current._raw[key] = val;
   }
-  if (current) blocks.push(current);
+  if (current) {
+    if (opts.keepText) current._text = (current._text || '').trim();
+    blocks.push(current);
+  }
   return blocks;
 }
 
@@ -210,6 +231,70 @@ function mergeLearnsets(a, b) {
   return out;
 }
 
+// Parse PBS Evolution lines into PS-style fields.
+// PBS format: EVOLUTIONS = SPECIES,Method,Param,SPECIES,Method,Param,...
+function parseEvolutions(rawText) {
+  if (!rawText) return null;
+  const m = rawText.match(/Evolutions\s*=\s*([^\r\n]+)/i);
+  if (!m) return null;
+  const parts = m[1].split(',').map(s => s.trim());
+  const evos = [];
+  for (let i = 0; i + 1 < parts.length; i += 3) {
+    const evoName = parts[i];
+    const method = parts[i + 1];
+    const param = parts[i + 2];
+    if (!evoName || !method) continue;
+    evos.push({ species: evoName, method, param });
+  }
+  return evos.length ? evos : null;
+}
+
+function pbsEvoToPSEntry(evos) {
+  if (!evos || !evos.length) return {};
+  const first = evos[0];
+  let evoType = 'other';
+  let evoLevel;
+  let evoItem;
+  let evoCondition;
+  const evoNames = evos.map(e => e.species);
+
+  const method = first.method;
+  if (method === 'Level') {
+    evoType = 'levelUp';
+    evoLevel = parseInt(first.param, 10) || undefined;
+  } else if (method.startsWith('Level')) {
+    evoType = 'levelExtra';
+    evoLevel = parseInt(first.param, 10) || undefined;
+    const conds = [];
+    if (method.includes('Day')) conds.push('during the day');
+    if (method.includes('Night')) conds.push('at night');
+    if (method.includes('Female')) conds.push('female');
+    if (method.includes('Male')) conds.push('male');
+    if (method.includes('Happiness')) conds.push('high friendship');
+    if (conds.length) evoCondition = conds.join(', ');
+  } else if (method === 'Item' || method === 'ItemDeprecated' || method.startsWith('Item')) {
+    evoType = 'useItem';
+    evoItem = titleCase(first.param || '').replace(/([a-z])([A-Z])/g, '$1 $2');
+    const conds = [];
+    if (method.includes('Day')) conds.push('during the day');
+    if (method.includes('Night')) conds.push('at night');
+    if (method.includes('Female')) conds.push('female');
+    if (method.includes('Male')) conds.push('male');
+    if (conds.length) evoCondition = conds.join(', ');
+  } else if (method === 'Trade') {
+    evoType = 'trade';
+    if (first.param) evoItem = titleCase(first.param);
+  } else if (method === 'HasMove') {
+    evoType = 'levelMove';
+    evoCondition = `knowing ${titleCase(first.param || '')}`;
+  } else {
+    evoType = 'other';
+    evoCondition = `${method}${first.param ? ` ${first.param}` : ''}`;
+  }
+
+  return { evos: evoNames, evoType, evoLevel, evoItem, evoCondition };
+}
+
 // Parse abilities string: "ABILITY1,ABILITY2" → {0: "Ability1", 1: "Ability2"}
 function parseAbilities(abStr, hiddenStr) {
   const abilities = {};
@@ -323,7 +408,7 @@ for (const [key, entry] of orionTemporalEntries) {
 console.log(`Built ${orionByNameAndTypes.size} name+type lookup entries`);
 
 console.log('Parsing PBS pokemon.txt...');
-const pokemonBlocks = parsePBSBlocks(path.join(PBS_DIR, 'pokemon.txt'));
+const pokemonBlocks = parsePBSBlocks(path.join(PBS_DIR, 'pokemon.txt'), { keepText: true });
 console.log(`Parsed ${pokemonBlocks.length} pokemon blocks`);
 
 console.log('Parsing PBS pokemon_forms.txt...');
@@ -376,6 +461,8 @@ function processBlock(block) {
   // Build species entry (using orionEntry as base, augmented with PBS data)
   const baseStats = parseBaseStats(r.BaseStats);
   const abilities = parseAbilitiesProper(r.Abilities || '', r.HiddenAbilities || '');
+  const evolutions = parseEvolutions(block._text || '');
+  const evoFields = pbsEvoToPSEntry(evolutions);
 
   outPokedex[orionKey] = {
     ...orionEntry,
@@ -385,6 +472,7 @@ function processBlock(block) {
     // Preserve identification fields
     name: orionEntry.name || r.Name || pbsName,
     isNonstandard: 'Custom',
+    ...evoFields,
   };
 
   if (Object.keys(fullLearnset).length > 0) {
@@ -449,6 +537,8 @@ for (const block of formBlocks) {
       const abilities = parseAbilitiesProper(r.Abilities || '', r.HiddenAbilities || '');
       
       // Only update if we have better data
+      const formEvolutions = parseEvolutions(block._text || '');
+      const formEvoFields = pbsEvoToPSEntry(formEvolutions);
       if (!outPokedex[orionKey] || !outPokedex[orionKey]._formProcessed) {
         outPokedex[orionKey] = {
           ...orionEntry,
@@ -458,6 +548,7 @@ for (const block of formBlocks) {
           abilities: Object.keys(abilities).length > 0 ? abilities : (orionEntry.abilities || {}),
           name: orionEntry.name,
           isNonstandard: 'Custom',
+          ...formEvoFields,
           _formProcessed: true,
         };
         formMatchCount++;
@@ -555,6 +646,8 @@ for (const block of pokemonBlocks) {
   if (directMatch && !directMatch[0].endsWith('orion') && !directMatch[0].endsWith('temporal')) {
     const [pokKey, pokEntry] = directMatch;
     // Don't overwrite if already present
+    const directEvolutions = parseEvolutions(block._text || '');
+    const directEvoFields = pbsEvoToPSEntry(directEvolutions);
     if (!outPokedex[pokKey]) {
       outPokedex[pokKey] = {
         ...pokEntry,
@@ -563,6 +656,7 @@ for (const block of pokemonBlocks) {
         types: pbsTypes,
         name: pokEntry.name || r.Name || pbsName,
         isNonstandard: 'Custom',
+        ...directEvoFields,
       };
     }
     if (Object.keys(fullLearnset).length > 0) {
@@ -581,6 +675,8 @@ for (const block of pokemonBlocks) {
     if (orionMatch2) {
       const [orionKey2, orionEntry2] = orionMatch2;
       // Add/update species entry if not already set from first pass
+      const suffix2Evolutions = parseEvolutions(block._text || '');
+      const suffix2EvoFields = pbsEvoToPSEntry(suffix2Evolutions);
       if (!outPokedex[orionKey2]) {
         outPokedex[orionKey2] = {
           ...orionEntry2,
@@ -589,6 +685,7 @@ for (const block of pokemonBlocks) {
           types: pbsTypes,
           name: orionEntry2.name || r.Name || pbsName,
           isNonstandard: 'Custom',
+          ...suffix2EvoFields,
         };
       }
       // Always merge learnsets for alternate forms
@@ -611,6 +708,8 @@ for (const block of pokemonBlocks) {
     const rawName = r.Name || pbsName;
     // Append "(SS2)" if the name doesn't already hint at a variant
     const displayName = rawName.endsWith(')') ? rawName : `${rawName} (SS2)`;
+    const newEvolutions = parseEvolutions(block._text || '');
+    const newEvoFields = pbsEvoToPSEntry(newEvolutions);
     outPokedex[newKey] = {
       name: displayName,
       num: newEntryNum--,
@@ -621,6 +720,7 @@ for (const block of pokemonBlocks) {
       gen: 9,
       color: r.Color || 'White',
       tags: ['Soulstones'],
+      ...newEvoFields,
     };
     if (Object.keys(fullLearnset).length > 0) {
       outLearnsets[newKey] = { learnset: fullLearnset };
@@ -647,6 +747,50 @@ console.log(`\n=== Extended Matching Results ===`);
 console.log(`Strategy 1 - Direct pokeathlon match: ${directMatchCount}`);
 console.log(`Strategy 2 - Suffix-2 orion/temporal match: ${suffix2MatchCount}`);
 console.log(`Strategy 3 - Truly new entries: ${newEntryCount}`);
+
+// ─── Post-process: propagate evolution info from prevo to evolved forms ──────
+// PBS only stores Evolutions on the prevo stage. For every entry with a prevo
+// that still lacks evo fields, copy the evolution method from its prevo stage.
+function findPrevoEntry(prevoName, regionSuffix) {
+  const suffix = regionSuffix || '';
+  const candidateKeys = [
+    prevoToKey(prevoName, suffix),
+    normId(prevoName + suffix),
+    normId(prevoName),
+  ];
+  for (const k of candidateKeys) {
+    if (outPokedex[k]) return outPokedex[k];
+  }
+  // Fuzzy match against all dex keys for the same region suffix
+  const regionKeys = Object.keys(outPokedex).filter(k => k.endsWith(suffix));
+  const targetNorm = normId(prevoName);
+  const fuzzy = regionKeys.find(k => normId(k.replace(new RegExp(suffix + '$'), '')) === targetNorm);
+  if (fuzzy) return outPokedex[fuzzy];
+  // Last resort: match prevo name tokens (minus region words) against entry display names.
+  // Handles PBS prevo names like "Mr-Temporal. Mime" for "Mr. Mime-Temporal".
+  const tokens = targetNorm.replace(/(orion|temporal)/g, '').match(/[a-z]+/g) || [];
+  if (tokens.length) {
+    const nameMatch = regionKeys.find(k => {
+      const nameNorm = normId(outPokedex[k].name || '');
+      return tokens.every(t => nameNorm.includes(t));
+    });
+    if (nameMatch) return outPokedex[nameMatch];
+  }
+  return null;
+}
+
+for (const [key, entry] of Object.entries(outPokedex)) {
+  if (!entry.prevo) continue;
+  if (entry.evoType || entry.evoLevel || entry.evoItem || entry.evoCondition) continue;
+  const regionSuffix = key.endsWith('temporal') ? 'temporal' : key.endsWith('orion') ? 'orion' : '';
+  const prevo = findPrevoEntry(entry.prevo, regionSuffix);
+  if (!prevo) continue;
+  if (prevo.evoType) entry.evoType = prevo.evoType;
+  if (prevo.evoLevel) entry.evoLevel = prevo.evoLevel;
+  if (prevo.evoItem) entry.evoItem = prevo.evoItem;
+  if (prevo.evoCondition) entry.evoCondition = prevo.evoCondition;
+  if (prevo.evoMove) entry.evoMove = prevo.evoMove;
+}
 
 console.log(`\n=== Total Results ===`);
 console.log(`Base pokemon matched (orion/temporal): ${matchedCount}`);
