@@ -120,6 +120,33 @@ function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
 	if (tc.bug) tc.bug.damageTaken.Light = 2;
 	Object.assign(Dex.data.Moves, normalizedCustomMoves);
 	Object.assign(Dex.data.Abilities, customAbilityPatches);
+
+	// Create SS2 retyped move variants (<move>ss2) so battles can resolve
+	// the remapped learnset entries produced by the client adapter.
+	// E.g. SS2 retypes Safeguard from Normal → Light, so we create "safeguardss2".
+	const toPSId = (s: string) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+	for (const [rawKey, rawEntry] of Object.entries(normalizedCustomMoves)) {
+		const keyId = toPSId(rawKey);
+		if (!keyId) continue;
+		const entry = rawEntry || {};
+		const baseEntry = (Dex.data.Moves as Record<string, any>)[keyId];
+		if (!baseEntry) continue; // brand-new moves were added directly above
+		const customType = String(entry.type || '');
+		if (!customType || customType === String(baseEntry.type || '')) continue;
+		const variantKey = `${keyId}ss2`;
+		if ((Dex.data.Moves as Record<string, any>)[variantKey]) continue;
+		(Dex.data.Moves as Record<string, any>)[variantKey] = {
+			...baseEntry,
+			...entry,
+			name: `${entry.name || baseEntry.name} (SS2)`,
+			pp: Number(entry.pp) > 0 ? Number(entry.pp) : (Number(baseEntry.pp) > 0 ? Number(baseEntry.pp) : 15),
+			target: entry.target || baseEntry.target || 'normal',
+			priority: entry.priority ?? baseEntry.priority ?? 0,
+			flags: entry.flags || baseEntry.flags || {},
+			num: entry.num ?? baseEntry.num ?? 0,
+		};
+	}
+
 	// Clear cached lookups so Dex re-reads custom data
 	if (Dex.types?.cache) Dex.types.cache = new Map();
 	if (Dex.moves?.cache) Dex.moves.cache = new Map();
