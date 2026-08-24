@@ -134,12 +134,29 @@ function parsePBSMoves(filePath) {
     const cat = r.Category || 'Status';
     const category = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
     const desc = r.Description || `${type}-type ${category.toLowerCase()} move.`;
+
+    // PBS exports omit pp/target/flags/priority/num. Showdown treats missing pp
+    // as 0 PP, so the move appears in the UI but fails with "no PP left".
+    // Bake sensible defaults into the generated JSON so the runtime patch is
+    // only a safety net, not a requirement.
+    const rawPP = parseInt(r.TotalPP || r.PP || '0', 10);
+    let pp = Number.isFinite(rawPP) && rawPP > 0 ? rawPP : 0;
+    if (!(pp > 0)) {
+      const categoryLower = category.toLowerCase();
+      pp = categoryLower === 'status' ? 15 : (power > 0 ? 20 : 10);
+    }
+
     moves[id] = {
       name,
       type,
       basePower: power,
       category,
       accuracy,
+      pp,
+      target: 'normal',
+      priority: 0,
+      flags: {},
+      num: 0,
       desc,
       shortDesc: desc,
     };
