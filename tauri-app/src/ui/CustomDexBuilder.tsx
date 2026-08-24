@@ -15,6 +15,8 @@ type LearnsetEntry = { id: string; method: 'L' | 'M' | 'T' | 'E'; level?: number
 const TYPE_OPTIONS = [
   'Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying',
   'Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy',
+  // Fangame / Soulstones types
+  'Crystal','Cosmic','Nuclear','Stellar','Sound','Light','Shadow',
 ];
 
 const SPRITE_SLOTS: Array<{ slot: SpriteSlot; label: string; group: string }> = [
