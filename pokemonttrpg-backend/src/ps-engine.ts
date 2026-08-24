@@ -118,6 +118,9 @@ function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
 	if (tc.dark) tc.dark.damageTaken.Light = 1;
 	if (tc.ghost) tc.ghost.damageTaken.Light = 1;
 	if (tc.bug) tc.bug.damageTaken.Light = 2;
+	// Save original base Showdown moves BEFORE injecting custom moves
+	// (needed for SS2 variant creation - we need to compare against original types)
+	const originalBaseMoves = { ...(Dex.data.Moves as Record<string, any>) };
 	Object.assign(Dex.data.Moves, normalizedCustomMoves);
 	Object.assign(Dex.data.Abilities, customAbilityPatches);
 
@@ -129,8 +132,9 @@ function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
 		const keyId = toPSId(rawKey);
 		if (!keyId) continue;
 		const entry = rawEntry || {};
-		const baseEntry = (Dex.data.Moves as Record<string, any>)[keyId];
-		if (!baseEntry) continue; // brand-new moves were added directly above
+		// Use the ORIGINAL base move for comparison (before custom moves overwrote it)
+		const baseEntry = originalBaseMoves[keyId];
+		if (!baseEntry) continue; // brand-new SS2 move, no variant needed
 		const customType = String(entry.type || '');
 		if (!customType || customType === String(baseEntry.type || '')) continue;
 		const variantKey = `${keyId}ss2`;
