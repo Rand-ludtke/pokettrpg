@@ -27,6 +27,10 @@ FILES = [
         f"{PI_ROOT}/pokemonttrpg-backend/dist/sync-ps-engine.js",
     ),
     (
+        REPO_ROOT / "pokemonttrpg-backend/dist/data/moves.js",
+        f"{PI_ROOT}/pokemonttrpg-backend/dist/data/moves.js",
+    ),
+    (
         REPO_ROOT / "pokemonttrpg-backend/dist/server/index.js",
         f"{PI_ROOT}/pokemonttrpg-backend/dist/server/index.js",
     ),

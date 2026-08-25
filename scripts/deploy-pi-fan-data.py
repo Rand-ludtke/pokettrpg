@@ -23,6 +23,10 @@ SINGLE_FILES = [
         REPO_ROOT / "pokemonttrpg-backend/dist/sync-ps-engine.js",
         f"{PI_ROOT}/pokemonttrpg-backend/dist/sync-ps-engine.js",
     ),
+    (
+        REPO_ROOT / "pokemonttrpg-backend/dist/data/moves.js",
+        f"{PI_ROOT}/pokemonttrpg-backend/dist/data/moves.js",
+    ),
 ]
 
 # For each fan-game, upload its moves/abilities/pokedex JSONs only (skip large
