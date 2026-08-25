@@ -12,7 +12,7 @@ const path = require("path");
 // Import Pokemon Showdown simulator
 const ps = require("pokemon-showdown");
 const { Battle: PSBattle, Teams, PRNG, Dex } = ps;
-const customMovesData = require("../data/moves.js");
+const customMovesData = require("./data/moves.js");
 
 const customMoves = customMovesData.default || customMovesData;
 
@@ -124,10 +124,79 @@ function normalizeCustomMoveEntries(rawMoves) {
     }));
 }
 
+// Store normalized custom moves at module level so SyncPSEngine.initializeBattle
+// can inject them into the battle's format-specific Dex after PSBattle construction.
+let moduleNormalizedMoves = {};
+let moduleNormalizedCustomDexMoves = {};
+
 (function injectCustomDexEntries() {
     const customDex = loadCustomDexPayload();
+    // ── Inject custom fangame types into PS's type chart ──
+    // (These types exist in the SS2/fan-game move data but PS doesn't know
+    // about them by default. Without this, moves using custom types crash
+    // the simulator with "Use runStatusImmunity for <Type>".)
+    const tc = Dex.data.TypeChart;
+    // Nuclear type (Uranium fangame)
+    tc.nuclear = {
+        isNonstandard: "Custom",
+        damageTaken: { fallout:3, Bug:1, Cosmic:1, Dark:1, Dragon:1, Electric:1, Fairy:1, Fighting:1, Fire:1, Flying:1, Ghost:1, Grass:1, Ground:1, Ice:1, Normal:1, Nuclear:2, Poison:1, Psychic:1, Rock:1, Steel:1, Stellar:0, Water:1 },
+    };
+    // Cosmic type (Infinity fangame)
+    tc.cosmic = {
+        isNonstandard: "Custom",
+        damageTaken: { Bug:0, Cosmic:0, Dark:0, Dragon:0, Electric:0, Fairy:0, Fighting:0, Fire:3, Flying:0, Ghost:0, Grass:0, Ground:0, Ice:0, Normal:2, Nuclear:1, Poison:0, Psychic:0, Rock:0, Steel:0, Stellar:0, Water:0 },
+    };
+    // Crystal type (Soulstones)
+    tc.crystal = {
+        isNonstandard: "Custom",
+        damageTaken: { Bug:0, Cosmic:0, Dark:0, Dragon:0, Electric:0, Fairy:0, Fighting:1, Fire:0, Flying:0, Ghost:0, Grass:0, Ground:0, Ice:2, Normal:0, Nuclear:0, Poison:0, Psychic:0, Rock:2, Sound:1, Steel:2, Stellar:0, Water:0, Light:0 },
+    };
+    // Stellar type (Soulstones)
+    tc.stellar = {
+        isNonstandard: "Custom",
+        damageTaken: { Bug:0, Cosmic:0, Crystal:0, Dark:1, Dragon:1, Electric:0, Fairy:0, Fighting:0, Fire:0, Flying:0, Ghost:2, Grass:0, Ground:0, Ice:0, Normal:0, Nuclear:0, Poison:0, Psychic:2, Rock:0, Sound:0, Steel:0, Water:0, Light:0 },
+    };
+    // Sound type (Soulstones)
+    tc.sound = {
+        isNonstandard: "Custom",
+        damageTaken: { Bug:0, Cosmic:0, Crystal:0, Dark:0, Dragon:0, Electric:0, Fairy:0, Fighting:1, Fire:0, Flying:0, Ghost:2, Grass:0, Ground:0, Ice:0, Normal:0, Nuclear:0, Poison:0, Psychic:0, Rock:2, Steel:2, Stellar:0, Water:0, Light:0 },
+    };
+    // Light type (Soulstones)
+    tc.light = {
+        isNonstandard: "Custom",
+        damageTaken: { Bug:2, Cosmic:0, Crystal:0, Dark:1, Dragon:0, Electric:0, Fairy:0, Fighting:0, Fire:0, Flying:0, Ghost:2, Grass:0, Ground:0, Ice:0, Normal:0, Nuclear:0, Poison:0, Psychic:0, Rock:0, Sound:0, Steel:0, Stellar:0, Water:0 },
+    };
+    // Add Nuclear/Cosmic to existing types' damageTaken
+    const seFromNuclear = ["bug","dark","dragon","electric","fairy","fighting","fire","flying","ghost","grass","ground","ice","normal","poison","psychic","rock","water"];
+    for (const t of seFromNuclear) { if (tc[t]) tc[t].damageTaken.Nuclear = 1; }
+    if (tc.steel) { tc.steel.damageTaken.Nuclear = 2; tc.steel.damageTaken.fallout = 3; }
+    // Cosmic SE on Fairy & Normal; resisted by Psychic
+    if (tc.fairy) tc.fairy.damageTaken.Cosmic = 1;
+    if (tc.normal) tc.normal.damageTaken.Cosmic = 1;
+    if (tc.psychic) tc.psychic.damageTaken.Cosmic = 2;
+    // Crystal SE on Ice/Rock/Steel (shatters them); resisted by Fighting (blunt force breaks it)
+    if (tc.ice) tc.ice.damageTaken.Crystal = 1;
+    if (tc.rock) tc.rock.damageTaken.Crystal = 1;
+    if (tc.steel) tc.steel.damageTaken.Crystal = 1;
+    if (tc.fighting) tc.fighting.damageTaken.Crystal = 2;
+    // Stellar SE on Psychic/Ghost (cosmic energy pierces the ethereal); resisted by Dark/Dragon
+    if (tc.psychic) tc.psychic.damageTaken.Stellar = 1;
+    if (tc.ghost) tc.ghost.damageTaken.Stellar = 1;
+    if (tc.dark) tc.dark.damageTaken.Stellar = 2;
+    if (tc.dragon) tc.dragon.damageTaken.Stellar = 2;
+    // Sound SE on Rock/Steel (resonance shatters); resisted by Fighting; immune for Ghost is inverted (Ghost weak here)
+    if (tc.rock) tc.rock.damageTaken.Sound = 1;
+    if (tc.steel) tc.steel.damageTaken.Sound = 1;
+    if (tc.ghost) tc.ghost.damageTaken.Sound = 1;
+    if (tc.fighting) tc.fighting.damageTaken.Sound = 2;
+    // Light SE on Dark/Ghost (illuminates); resisted by Bug
+    if (tc.dark) tc.dark.damageTaken.Light = 1;
+    if (tc.ghost) tc.ghost.damageTaken.Light = 1;
+    if (tc.bug) tc.bug.damageTaken.Light = 2;
     const normalizedCustomMoves = normalizeCustomMoveEntries(customMoves);
     const normalizedCustomDexMoves = normalizeCustomMoveEntries(customDex.moves || {});
+    moduleNormalizedMoves = normalizedCustomMoves;
+    moduleNormalizedCustomDexMoves = normalizedCustomDexMoves;
     Object.assign(Dex.data.Pokedex, customDex.species || {});
     for (const [speciesId, speciesData] of Object.entries(customDex.species || {})) {
         if (!Dex.data.FormatsData[speciesId])
@@ -136,11 +205,42 @@ function normalizeCustomMoveEntries(rawMoves) {
         if (battleOnlyId && !Dex.data.FormatsData[battleOnlyId])
             Dex.data.FormatsData[battleOnlyId] = { tier: "Illegal" };
     }
+    // Save original base moves BEFORE injecting custom moves (for SS2 variant creation)
+    const originalBaseMoves = { ...Dex.data.Moves };
     Object.assign(Dex.data.Moves, normalizedCustomMoves);
     Object.assign(Dex.data.Moves, normalizedCustomDexMoves);
     Object.assign(Dex.data.Abilities, customAbilityPatches);
     Object.assign(Dex.data.Abilities, customDex.abilities || {});
     Object.assign(Dex.data.Items, customDex.items || {});
+    // Create SS2 retyped move variants (<move>ss2) so battles can resolve
+    // the remapped learnset entries produced by the client adapter.
+    const toPSId = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    let ss2VariantCount = 0;
+    for (const [rawKey, rawEntry] of Object.entries(normalizedCustomMoves)) {
+        const keyId = toPSId(rawKey);
+        if (!keyId) continue;
+        const entry = rawEntry || {};
+        const baseEntry = originalBaseMoves[keyId];
+        if (!baseEntry) continue;
+        const customType = String(entry.type || '');
+        if (!customType || customType === String(baseEntry.type || '')) continue;
+        const variantKey = `${keyId}ss2`;
+        if (Dex.data.Moves[variantKey]) continue;
+        Dex.data.Moves[variantKey] = {
+            ...baseEntry,
+            ...entry,
+            name: `${entry.name || baseEntry.name} (SS2)`,
+            pp: Number(entry.pp) > 0 ? Number(entry.pp) : (Number(baseEntry.pp) > 0 ? Number(baseEntry.pp) : 15),
+            target: entry.target || baseEntry.target || 'normal',
+            priority: entry.priority ?? baseEntry.priority ?? 0,
+            flags: entry.flags || baseEntry.flags || {},
+            num: entry.num ?? baseEntry.num ?? 0,
+        };
+        ss2VariantCount++;
+    }
+    if (ss2VariantCount > 0) {
+        console.log(`[SyncPSEngine] Created ${ss2VariantCount} SS2 retyped move variants`);
+    }
     if (Dex.species?.cache)
         Dex.species.cache = new Map();
     if (Dex.moves?.cache)
@@ -149,6 +249,8 @@ function normalizeCustomMoveEntries(rawMoves) {
         Dex.abilities.cache = new Map();
     if (Dex.items?.cache)
         Dex.items.cache = new Map();
+    if (Dex.types?.cache)
+        Dex.types.cache = new Map();
 
     // Register a custom Gen 9 triples format so 3v1 boss / triples battles use
     // modern data (gen 6+ moves, fairy type, modern items/abilities) instead of
@@ -253,6 +355,22 @@ class SyncPSEngine {
                 console.error(`[SyncPSEngine] p2 packed: ${p2Team?.slice(0, 500)}`);
             } catch {}
             throw err;
+        }
+        // Inject custom moves into the battle's format-specific Dex instance.
+        // Pokemon Showdown's Battle constructor may create a fresh Dex via
+        // Dex.forFormat() that does NOT inherit our runtime injections into the
+        // global Dex.data.Moves.  We must propagate the normalized custom moves
+        // (including SS2 retyped variants) into this battle's dex and clear its
+        // internal move cache so move lookups succeed during start() / choose().
+        if (this.battle && this.battle.dex) {
+            const bd = this.battle.dex;
+            if (bd.data && bd.data.Moves) {
+                Object.assign(bd.data.Moves, moduleNormalizedMoves);
+                Object.assign(bd.data.Moves, moduleNormalizedCustomDexMoves);
+            }
+            if (bd.moves && bd.moves.cache) bd.moves.cache = new Map();
+            if (bd.species && bd.species.cache) bd.species.cache = new Map();
+            if (bd.types && bd.types.cache) bd.types.cache = new Map();
         }
         // Initialize our state mirror
         this.state = {

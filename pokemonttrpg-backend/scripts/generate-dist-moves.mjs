@@ -2,7 +2,8 @@
  * generate-dist-moves.mjs
  *
  * Generates pokemonttrpg-backend/dist/data/moves.js from the client-side SS2 moves JSON.
- * This is the compiled JS version that the running backend requires.
+ * Also bakes SS2 retyped variants (<move>ss2) directly into the output so battles
+ * resolve them regardless of module load order.
  *
  * Run: node pokemonttrpg-backend/scripts/generate-dist-moves.mjs
  */
@@ -10,8 +11,10 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
 
 const SS2_MOVES_JSON = path.join(__dirname, '..', '..', 'tauri-app', 'public', 'data', 'ss2-patch', 'generated', 'moves.custom.ss2-soulstones.json');
 const OUT_DIR = path.join(__dirname, '..', 'dist', 'data');
@@ -20,7 +23,7 @@ const OUT_FILE = path.join(OUT_DIR, 'moves.js');
 const ss2Moves = JSON.parse(fs.readFileSync(SS2_MOVES_JSON, 'utf8'));
 console.log(`Loaded ${Object.keys(ss2Moves).length} SS2 moves`);
 
-function normalizeMove(moveId, moveData) {
+function normalizeMove(moveData) {
   const normalized = { ...(moveData || {}) };
   if (typeof normalized.pp !== 'number' || !Number.isFinite(normalized.pp) || normalized.pp <= 0) {
     const category = String(normalized.category || 'Status').toLowerCase();
@@ -36,8 +39,40 @@ function normalizeMove(moveId, moveData) {
 
 const allMoves = {};
 for (const [moveId, moveData] of Object.entries(ss2Moves)) {
-  allMoves[moveId] = normalizeMove(moveId, moveData);
+  allMoves[moveId] = normalizeMove(moveData);
 }
+
+// Bake SS2 retyped variants (<move>ss2) using PRISTINE base Showdown movedex.
+// This avoids runtime load-order issues where other modules mutate Dex.data.Moves
+// before the variant creation loop runs.
+let variantCount = 0;
+try {
+  const ps = require('pokemon-showdown');
+  const { Dex } = ps;
+  const pristineBaseMoves = { ...Dex.data.Moves };
+  for (const [moveId, entry] of Object.entries(allMoves)) {
+    const base = pristineBaseMoves[moveId];
+    if (!base) continue; // brand-new SS2 move, no variant needed
+    const customType = String(entry.type || '');
+    if (!customType || customType === String(base.type || '')) continue;
+    const variantKey = `${moveId}ss2`;
+    if (allMoves[variantKey]) continue;
+    allMoves[variantKey] = {
+      ...base,
+      ...entry,
+      name: `${entry.name || base.name} (SS2)`,
+      pp: Number(entry.pp) > 0 ? Number(entry.pp) : (Number(base.pp) > 0 ? Number(base.pp) : 15),
+      target: entry.target || base.target || 'normal',
+      priority: entry.priority ?? base.priority ?? 0,
+      flags: entry.flags || base.flags || {},
+      num: entry.num ?? base.num ?? 0,
+    };
+    variantCount++;
+  }
+} catch (e) {
+  console.warn('Could not load pokemon-showdown for variant baking:', e.message);
+}
+console.log(`Baked ${variantCount} SS2 retyped variants`);
 
 const jsContent = `"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -48,4 +83,4 @@ exports.default = customMoves;
 fs.mkdirSync(OUT_DIR, { recursive: true });
 fs.writeFileSync(OUT_FILE, jsContent, 'utf8');
 console.log(`Wrote ${OUT_FILE} (${(fs.statSync(OUT_FILE).size / 1024).toFixed(1)} KB)`);
-console.log(`Total moves: ${Object.keys(allMoves).length}`);
+console.log(`Total moves (incl. variants): ${Object.keys(allMoves).length}`);
