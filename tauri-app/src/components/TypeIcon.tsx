@@ -3,6 +3,7 @@ import { withPublicBase } from '../utils/publicBase';
 
 const CUSTOM_TYPES = new Set([
   'crystal', 'cosmic', 'nuclear', 'stellar', 'sound', 'light', 'shadow',
+  '???',
 ]);
 
 const TYPE_COLORS: Record<string, string> = {
@@ -13,6 +14,7 @@ const TYPE_COLORS: Record<string, string> = {
   steel: '#B8B8D0', fairy: '#EE99AC',
   crystal: '#A8D8EA', cosmic: '#6B2FA0', nuclear: '#92D050', stellar: '#44698F',
   sound: '#FF66AA', light: '#FFFACD', shadow: '#5A4975',
+  '???': '#68A090',
 };
 
 function titleCase(s: string): string {
