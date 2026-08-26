@@ -2,7 +2,7 @@
 
 This is the exact copy/paste setup for your network:
 
-- Pi backend + sprite storage: `192.168.1.251`
+- Pi backend + sprite storage: `192.168.10.117`
 - Worker (this Windows PC) on-demand generator: `192.168.1.17`
 - Repo path on worker: `D:\GitHub\pokettrpg`
 - Canonical fusion storage: `.fusion-sprites-local`

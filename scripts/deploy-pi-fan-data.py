@@ -10,7 +10,7 @@ from pathlib import Path
 
 import paramiko
 
-HOST = "192.168.1.251"
+HOST = "192.168.10.117"
 USER = "randl"
 PASSWORD = "shark55"
 
