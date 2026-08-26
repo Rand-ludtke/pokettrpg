@@ -1209,6 +1209,10 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
   const [tagFilterMode, setTagFilterMode] = useState<FilterLogic>('any');
   const [bstMin, setBstMin] = useState('');
   const [bstMax, setBstMax] = useState('');
+  const [heightMin, setHeightMin] = useState('');
+  const [heightMax, setHeightMax] = useState('');
+  const [weightMin, setWeightMin] = useState('');
+  const [weightMax, setWeightMax] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dexData, setDexData] = useState<DexData | null>(null);
@@ -1447,7 +1451,15 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
     return Array.from(tags).sort((a, b) => a.localeCompare(b));
   }, [dexData, inferSpeciesTags]);
 
-  const hasAdvancedFilters = selectedTypes.length > 0 || selectedTags.length > 0 || bstMin.trim() !== '' || bstMax.trim() !== '';
+  const hasAdvancedFilters =
+    selectedTypes.length > 0 ||
+    selectedTags.length > 0 ||
+    bstMin.trim() !== '' ||
+    bstMax.trim() !== '' ||
+    heightMin.trim() !== '' ||
+    heightMax.trim() !== '' ||
+    weightMin.trim() !== '' ||
+    weightMax.trim() !== '';
 
   const clearAdvancedFilters = useCallback(() => {
     setSelectedTypes([]);
@@ -1456,6 +1468,10 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
     setTagFilterMode('any');
     setBstMin('');
     setBstMax('');
+    setHeightMin('');
+    setHeightMax('');
+    setWeightMin('');
+    setWeightMax('');
   }, []);
 
   // Random Pokémon finder — picks a random Pokémon matching up to 2 type filters
@@ -1776,6 +1792,32 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
         });
       }
 
+      // Height range filter (meters); species without height data are excluded when active
+      const hMin = heightMin.trim() === '' ? null : Number(heightMin);
+      const hMax = heightMax.trim() === '' ? null : Number(heightMax);
+      if (hMin != null || hMax != null) {
+        list = list.filter(p => {
+          const h = p.heightm;
+          if (h == null || !Number.isFinite(h)) return false;
+          if (hMin != null && Number.isFinite(hMin) && h < hMin) return false;
+          if (hMax != null && Number.isFinite(hMax) && h > hMax) return false;
+          return true;
+        });
+      }
+
+      // Weight range filter (kilograms); species without weight data are excluded when active
+      const wMin = weightMin.trim() === '' ? null : Number(weightMin);
+      const wMax = weightMax.trim() === '' ? null : Number(weightMax);
+      if (wMin != null || wMax != null) {
+        list = list.filter(p => {
+          const w = p.weightkg;
+          if (w == null || !Number.isFinite(w)) return false;
+          if (wMin != null && Number.isFinite(wMin) && w < wMin) return false;
+          if (wMax != null && Number.isFinite(wMax) && w > wMax) return false;
+          return true;
+        });
+      }
+
       return query ? list : list.slice(0, MAX_UNFILTERED_POKEMON);
     }
     
@@ -1853,7 +1895,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
     }
     
     return [];
-  }, [mode, search, dexData, pcList, customList, selectedTypes, typeFilterMode, selectedTags, tagFilterMode, bstMin, bstMax, inferSpeciesTags, getBaseStatTotal]);
+  }, [mode, search, dexData, pcList, customList, selectedTypes, typeFilterMode, selectedTags, tagFilterMode, bstMin, bstMax, heightMin, heightMax, weightMin, weightMax, inferSpeciesTags, getBaseStatTotal]);
 
   // Render result row
   const renderResultRow = (item: any) => {
@@ -2317,7 +2359,7 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
                   })}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10, alignItems: 'end' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                   <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
                     Min BST
                     <input type="number" min={0} value={bstMin} onChange={e => setBstMin(e.target.value)} placeholder="e.g. 400" />
@@ -2326,6 +2368,24 @@ export function PokedexTab({ onAddToPC }: { onAddToPC?: (mons: BattlePokemon[]) 
                     Max BST
                     <input type="number" min={0} value={bstMax} onChange={e => setBstMax(e.target.value)} placeholder="e.g. 650" />
                   </label>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Min Height (m)
+                    <input type="number" min={0} step="0.1" value={heightMin} onChange={e => setHeightMin(e.target.value)} placeholder="e.g. 0.5" />
+                  </label>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Max Height (m)
+                    <input type="number" min={0} step="0.1" value={heightMax} onChange={e => setHeightMax(e.target.value)} placeholder="e.g. 2" />
+                  </label>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Min Weight (kg)
+                    <input type="number" min={0} step="0.1" value={weightMin} onChange={e => setWeightMin(e.target.value)} placeholder="e.g. 10" />
+                  </label>
+                  <label style={{ display: 'grid', gap: 4, fontSize: 11 }}>
+                    Max Weight (kg)
+                    <input type="number" min={0} step="0.1" value={weightMax} onChange={e => setWeightMax(e.target.value)} placeholder="e.g. 100" />
+                  </label>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
                   <button
                     type="button"
                     onClick={clearAdvancedFilters}
