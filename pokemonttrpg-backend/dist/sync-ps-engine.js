@@ -124,6 +124,82 @@ function normalizeCustomMoveEntries(rawMoves) {
     }));
 }
 
+// ── Custom moves that need REAL battle effects ──
+// dist/data/moves.js is generated from JSON, which cannot carry event handler
+// functions. Effects for such moves are attached here, mirroring how
+// customAbilityPatches works for abilities.
+const customMoveEffectPatches = {
+    asteroidbelt: {
+        // Soulstones 2 "Asteroid Belt": protect-style barrier. Blocks attacks
+        // aimed at the user; contact attackers take 1/8 of their max HP and
+        // have a 5% chance to be frozen. Lasts up to 5 turns or until it has
+        // absorbed 5 attacks, whichever comes first.
+        priority: 4,
+        target: "self",
+        stallingMove: true,
+        volatileStatus: 'asteroidbelt',
+        flags: { noassist: 1, failcopycat: 1 },
+        onPrepareHit(pokemon) {
+            return !!this.queue.willAct() && this.runEvent('StallMove', pokemon);
+        },
+        onHit(pokemon) {
+            pokemon.addVolatile('stall');
+        },
+        condition: {
+            duration: 5,
+            onStart(target) {
+                this.add('-start', target, 'Asteroid Belt');
+            },
+            onTryHitPriority: 3,
+            onTryHit(target, source, move) {
+                if (!move.flags['protect']) {
+                    if (['gmaxoneblow', 'gmaxrapidflow'].includes(move.id)) return;
+                    if (move.isZ || move.isMax) target.getMoveHitData(move).zBrokeProtect = true;
+                    return;
+                }
+                this.add('-activate', target, 'move: Asteroid Belt');
+                if (this.checkMoveMakesContact(move, source, target)) {
+                    this.damage(source.maxhp / 8, source, target);
+                    if (this.randomChance(1, 20)) source.trySetStatus('frz', target);
+                }
+                const state = target.volatiles['asteroidbelt'];
+                state.hits = (state.hits || 0) + 1;
+                if (state.hits >= 5) {
+                    delete target.volatiles['asteroidbelt'];
+                    this.add('-end', target, 'Asteroid Belt');
+                }
+                return this.NOT_FAIL;
+            },
+            onEnd(target) {
+                this.add('-end', target, 'Asteroid Belt');
+            },
+        },
+        desc: "Protects the user from attacks for up to 5 turns or 5 blocked attacks. Contact attackers are dealt 1/8 of their max HP and have a 5% chance to freeze.",
+        shortDesc: "Protect; contact attackers take 1/8 max HP, 5% freeze. 5 turns/hits.",
+    },
+};
+
+function applyCustomMoveEffectPatches(movesRecord) {
+    for (const [moveId, patch] of Object.entries(customMoveEffectPatches)) {
+        const existing = movesRecord[moveId];
+        if (existing && typeof existing === 'object') {
+            Object.assign(existing, patch);
+        } else {
+            movesRecord[moveId] = {
+                num: -20034,
+                name: 'Asteroid Belt',
+                type: 'Cosmic',
+                category: 'Status',
+                basePower: 0,
+                accuracy: true,
+                pp: 5,
+                isNonstandard: 'Custom',
+                ...patch,
+            };
+        }
+    }
+}
+
 // Store normalized custom moves at module level so SyncPSEngine.initializeBattle
 // can inject them into the battle's format-specific Dex after PSBattle construction.
 let moduleNormalizedMoves = {};
@@ -207,6 +283,44 @@ let moduleNormalizedCustomDexMoves = {};
     }
     // Save original base moves BEFORE injecting custom moves (for SS2 variant creation)
     const originalBaseMoves = { ...Dex.data.Moves };
+    // Preserve vanilla engine mechanics (multihit, secondary, drain, self,
+    // flags details, etc.) when a custom entry overrides a Showdown move but
+    // omits or empties those fields. Deep-merged so generated placeholder
+    // values like flags:{} do not wipe base flags such as `protect:1`
+    // (which previously made Asteroid Belt / other customs unable to block).
+    const mergePreserveBase = (baseObj, customObj) => {
+        const out = { ...baseObj };
+        for (const key of Object.keys(customObj)) {
+            const value = customObj[key];
+            const baseValue = baseObj ? baseObj[key] : undefined;
+            if (
+                value && typeof value === 'object' && !Array.isArray(value) &&
+                baseValue && typeof baseValue === 'object' && !Array.isArray(baseValue)
+            ) {
+                out[key] = mergePreserveBase(baseValue, value);
+            } else {
+                out[key] = value;
+            }
+        }
+        return out;
+    };
+    const mergeBaseMechanics = (moves) => {
+        for (const key of Object.keys(moves)) {
+            const base = originalBaseMoves[key];
+            if (base && typeof base === 'object') {
+                moves[key] = mergePreserveBase(base, moves[key]);
+            }
+        }
+        return moves;
+    };
+    mergeBaseMechanics(normalizedCustomMoves);
+    mergeBaseMechanics(normalizedCustomDexMoves);
+    // Attach real battle effects to moves whose generated JSON data cannot
+    // carry event handlers (see customMoveEffectPatches above). Applied to the
+    // normalized entries themselves so both the global Dex below AND the
+    // per-battle dex propagation in initializeBattle inherit them.
+    applyCustomMoveEffectPatches(normalizedCustomMoves);
+    applyCustomMoveEffectPatches(normalizedCustomDexMoves);
     Object.assign(Dex.data.Moves, normalizedCustomMoves);
     Object.assign(Dex.data.Moves, normalizedCustomDexMoves);
     Object.assign(Dex.data.Abilities, customAbilityPatches);

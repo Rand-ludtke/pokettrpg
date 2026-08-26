@@ -69,6 +69,38 @@ try {
     };
     variantCount++;
   }
+  // Preserve vanilla engine mechanics (multihit, secondary, drain, self, etc.)
+  // when a generated entry overrides a Showdown move but omits or EMPTIES those
+  // fields. Deep-merged: normalizeMove() stamps flags:{} onto every entry, and a
+  // shallow spread would let that empty object wipe base flags such as
+  // `protect:1` (breaking protect-style custom moves).
+  if (typeof pristineBaseMoves === 'object') {
+    const deepMergeKeepBase = (baseObj, customObj) => {
+      const out = { ...baseObj };
+      for (const key of Object.keys(customObj)) {
+        const value = customObj[key];
+        const baseValue = baseObj ? baseObj[key] : undefined;
+        if (
+          value && typeof value === 'object' && !Array.isArray(value) &&
+          baseValue && typeof baseValue === 'object' && !Array.isArray(baseValue)
+        ) {
+          out[key] = deepMergeKeepBase(baseValue, value);
+        } else {
+          out[key] = value;
+        }
+      }
+      return out;
+    };
+    let mergedCount = 0;
+    for (const moveId of Object.keys(allMoves)) {
+      const base = pristineBaseMoves[moveId];
+      if (base && typeof base === 'object') {
+        allMoves[moveId] = deepMergeKeepBase(base, allMoves[moveId]);
+        mergedCount++;
+      }
+    }
+    console.log(`Merged pristine base mechanics into ${mergedCount} overridden vanilla moves`);
+  }
 } catch (e) {
   console.warn('Could not load pokemon-showdown for variant baking:', e.message);
 }
