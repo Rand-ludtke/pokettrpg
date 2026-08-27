@@ -37,74 +37,77 @@ function normalizeMove(moveData) {
   return normalized;
 }
 
-const allMoves = {};
-for (const [moveId, moveData] of Object.entries(ss2Moves)) {
-  allMoves[moveId] = normalizeMove(moveData);
-}
-
-// Bake SS2 retyped variants (<move>ss2) using PRISTINE base Showdown movedex.
-// This avoids runtime load-order issues where other modules mutate Dex.data.Moves
-// before the variant creation loop runs.
+// Build the FULL table: pristine canonical Showdown moves first, then apply
+// the SS2 pack using the exact rules proven in tauri-app/src/data/adapter.ts
+// (mergeCustomMovePacks). Raw PBS/fangame entries that collide with canonical
+// Showdown moves carry bogus battle-critical defaults (target:'normal',
+// priority:0, flags:{}) which previously wiped real mechanics once injected
+// into Dex.data.Moves (Protect blocked nothing, Dragon Dance gave no boosts,
+// Stealth Rock / Sticky Web / Leech Seed did nothing, priority moves lost
+// their priority, healing moves healed nothing). Therefore:
+//   Rule A: same-type collision -> DO NOT EMIT the custom entry; the pristine
+//           canonical move stays in the table (100% intact mechanics).
+//   Rule B: different-type collision -> emit ONLY a <key>ss2 variant built on
+//           top of the pristine base entry so target/priority/flags/multihit/
+//           drain/handlers all survive; display + typed fields come from the
+//           fan-game entry.
+// Emitting the full canonical table as well preserves this file's historical
+// superset shape (~1400+ entries) for direct-lookup consumers and deployments.
+let droppedCollisions = 0;
 let variantCount = 0;
-try {
-  const ps = require('pokemon-showdown');
-  const { Dex } = ps;
-  const pristineBaseMoves = { ...Dex.data.Moves };
-  for (const [moveId, entry] of Object.entries(allMoves)) {
-    const base = pristineBaseMoves[moveId];
-    if (!base) continue; // brand-new SS2 move, no variant needed
-    const customType = String(entry.type || '');
-    if (!customType || customType === String(base.type || '')) continue;
-    const variantKey = `${moveId}ss2`;
-    if (allMoves[variantKey]) continue;
-    allMoves[variantKey] = {
-      ...base,
-      ...entry,
-      name: `${entry.name || base.name} (SS2)`,
-      pp: Number(entry.pp) > 0 ? Number(entry.pp) : (Number(base.pp) > 0 ? Number(base.pp) : 15),
-      target: entry.target || base.target || 'normal',
-      priority: entry.priority ?? base.priority ?? 0,
-      flags: entry.flags || base.flags || {},
-      num: entry.num ?? base.num ?? 0,
-    };
-    variantCount++;
-  }
-  // Preserve vanilla engine mechanics (multihit, secondary, drain, self, etc.)
-  // when a generated entry overrides a Showdown move but omits or EMPTIES those
-  // fields. Deep-merged: normalizeMove() stamps flags:{} onto every entry, and a
-  // shallow spread would let that empty object wipe base flags such as
-  // `protect:1` (breaking protect-style custom moves).
-  if (typeof pristineBaseMoves === 'object') {
-    const deepMergeKeepBase = (baseObj, customObj) => {
-      const out = { ...baseObj };
-      for (const key of Object.keys(customObj)) {
-        const value = customObj[key];
-        const baseValue = baseObj ? baseObj[key] : undefined;
-        if (
-          value && typeof value === 'object' && !Array.isArray(value) &&
-          baseValue && typeof baseValue === 'object' && !Array.isArray(baseValue)
-        ) {
-          out[key] = deepMergeKeepBase(baseValue, value);
-        } else {
-          out[key] = value;
-        }
-      }
-      return out;
-    };
-    let mergedCount = 0;
-    for (const moveId of Object.keys(allMoves)) {
-      const base = pristineBaseMoves[moveId];
-      if (base && typeof base === 'object') {
-        allMoves[moveId] = deepMergeKeepBase(base, allMoves[moveId]);
-        mergedCount++;
-      }
-    }
-    console.log(`Merged pristine base mechanics into ${mergedCount} overridden vanilla moves`);
-  }
-} catch (e) {
-  console.warn('Could not load pokemon-showdown for variant baking:', e.message);
+let addedNew = 0;
+const ps = require('pokemon-showdown');
+const { Dex } = ps;
+const pristineBaseMoves = { ...Dex.data.Moves };
+const allMoves = {};
+for (const [moveId, moveData] of Object.entries(pristineBaseMoves)) {
+    allMoves[moveId] = moveData;
 }
-console.log(`Baked ${variantCount} SS2 retyped variants`);
+const idOf = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+// Display-only / typed fields a fan-game PBS entry is allowed to override.
+const VARIANT_OVERRIDABLE = new Set(['type', 'name', 'desc', 'shortDesc', 'basePower', 'category', 'accuracy', 'pp']);
+const buildRetypeVariant = (baseEntry, entry) => {
+    const out = { ...baseEntry };
+    for (const k of Object.keys(entry)) {
+        if (!VARIANT_OVERRIDABLE.has(k)) continue;
+        const v = entry[k];
+        if (v == null) continue;
+        out[k] = v;
+    }
+    // Explicitly canonical battle-critical fields: never inherit PBS defaults.
+    out.target = baseEntry.target || 'normal';
+    out.priority = typeof baseEntry.priority === 'number' ? baseEntry.priority : 0;
+    out.flags = { ...(baseEntry.flags || {}) };
+    out.pp = Number(out.pp) > 0 ? Number(out.pp) : Number(baseEntry.pp) > 0 ? Number(baseEntry.pp) : 15;
+    out.num = 0;
+    out.isNonstandard = 'Custom';
+    out.name = `${entry.name || baseEntry.name} (SS2)`;
+    return out;
+};
+for (const [moveId, rawEntry] of Object.entries(ss2Moves)) {
+    const entry = normalizeMove(rawEntry);
+    const base = pristineBaseMoves[moveId];
+    if (!base) {
+        // Brand-new fangame move: add with sane PP/target defaults.
+        if (!allMoves[moveId]) addedNew++;
+        allMoves[moveId] = entry;
+        continue;
+    }
+    const customType = idOf(entry.type || '');
+    if (!customType || customType === idOf(String(base.type || ''))) {
+        // Rule A: same-type collision -> pristine canonical entry stays.
+        droppedCollisions++;
+        continue;
+    }
+    // Rule B: different typing -> retyped variant alongside the canonical move.
+    const variantKey = `${moveId}ss2`;
+    if (!allMoves[variantKey]) {
+        allMoves[variantKey] = buildRetypeVariant(base, entry);
+        variantCount++;
+    }
+}
+console.log(`Canonical collisions kept vanilla: ${droppedCollisions}; new SS2 moves: ${addedNew}; SS2 retyped variants baked: ${variantCount}`);
+
 
 const jsContent = `"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });

@@ -315,6 +315,74 @@ let moduleNormalizedCustomDexMoves = {};
     };
     mergeBaseMechanics(normalizedCustomMoves);
     mergeBaseMechanics(normalizedCustomDexMoves);
+    // ===== Vanilla-collision guard (mirrors tauri-app/src/data/adapter.ts) =====
+    // Raw fan-game/PBS entries sharing a key with a canonical Showdown move used
+    // to be merged/assigned OVER the vanilla entry. PBS exports carry only
+    // {name,type,basePower,category,accuracy,pp,target,priority,flags,num,desc}
+    // — no condition/event-handler functions — so every collided move lost its
+    // real battle effect (Protect blocked nothing, Dragon Dance gave no boosts,
+    // Stealth Rock/Sticky Web/Leech Seed did nothing, priority moves such as
+    // Mach Punch/Bullet Punch/Ice Shard/Extreme Speed lost their priority, and
+    // healing moves healed nothing). Enforce the client adapter's rules:
+    //   Rule A: same-type collision -> DROP the custom entry (canonical wins).
+    //   Rule B: different-type collision -> expose ONLY as a <key>ss2 variant
+    //           rebuilt on top of the pristine base so it inherits the base
+    //           target/priority/flags/handlers; only display + typed fields are
+    //           overridden by the fan-game entry.
+    const toPSId = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const PRISTINE_BASE_MOVES = originalBaseMoves;
+    let droppedCollisionCount = 0;
+    let ss2VariantCount = 0;
+    const buildRetypeVariant = (baseEntry, entry, suffixLabel) => ({
+        // Pristine canonical fields first (target/priority/flags/handlers/
+        // secondary/drain/self/multihit/boosts all survive untouched).
+        ...baseEntry,
+        // Fan-game overrides restricted to display + typed battle fields.
+        type: entry.type,
+        name: `${entry.name || baseEntry.name}${suffixLabel}`,
+        desc: entry.desc || baseEntry.desc,
+        shortDesc: entry.shortDesc || baseEntry.shortDesc,
+        basePower: Number(entry.basePower) > 0 ? Number(entry.basePower) : baseEntry.basePower,
+        category: ["physical", "special", "status"].includes(String(entry.category || "").toLowerCase())
+            ? entry.category : baseEntry.category,
+        accuracy: entry.accuracy != null && !isNaN(Number(entry.accuracy))
+            ? Number(entry.accuracy) : baseEntry.accuracy,
+        pp: Number(entry.pp) > 0 ? Number(entry.pp) : baseEntry.pp,
+        // Explicitly canonical: never inherit PBS defaults for these.
+        target: baseEntry.target,
+        priority: typeof entry.priority === "number" && entry.priority !== 0 ? entry.priority : baseEntry.priority,
+        flags: { ...(baseEntry.flags || {}) },
+        num: 0,
+        isNonstandard: "Custom",
+    });
+    const VANILLA_VARIANT_KEY_RE = /ss1$|ss2$|wylin$|sage$|uranium$|infinity$|mariomon$|insurgence$|extra$/;
+    const filterVanillaCollisions = (moves) => {
+        for (const key of Object.keys(moves)) {
+            const entry = moves[key];
+            if (!entry || typeof entry !== "object") continue;
+            // Never touch pre-suffixed pack variants or already-patched entries.
+            if (VANILLA_VARIANT_KEY_RE.test(key)) continue;
+            const keyId = toPSId(key);
+            const baseEntry = PRISTINE_BASE_MOVES[keyId];
+            if (!baseEntry || typeof baseEntry !== "object") continue; // brand-new move: keep as-is
+            const baseType = toPSId(baseEntry.type);
+            const customType = toPSId(entry.type);
+            // Remove the raw colliding key either way; only variants may exist.
+            delete moves[key];
+            if (!customType || customType === baseType) {
+                droppedCollisionCount++; // Rule A: canonical entry stays untouched
+                continue;
+            }
+            // Rule B: different typing -> rebuild the <key><suffix> variant cleanly.
+            const variantKey = `${keyId}ss2`;
+            Dex.data.Moves[variantKey] = buildRetypeVariant(baseEntry, entry, " (SS2)");
+            moves[variantKey] = Dex.data.Moves[variantKey];
+            ss2VariantCount++;
+        }
+    };
+    filterVanillaCollisions(normalizedCustomMoves);
+    filterVanillaCollisions(normalizedCustomDexMoves);
+    console.log(`[SyncPSEngine] Vanilla-collision guard: dropped ${droppedCollisionCount} canonical-colliding entries, (re)built ${ss2VariantCount} retyped variants`);
     // Attach real battle effects to moves whose generated JSON data cannot
     // carry event handlers (see customMoveEffectPatches above). Applied to the
     // normalized entries themselves so both the global Dex below AND the
@@ -324,37 +392,24 @@ let moduleNormalizedCustomDexMoves = {};
     Object.assign(Dex.data.Moves, normalizedCustomMoves);
     Object.assign(Dex.data.Moves, normalizedCustomDexMoves);
     Object.assign(Dex.data.Abilities, customAbilityPatches);
-    Object.assign(Dex.data.Abilities, customDex.abilities || {});
+    // Abilities: fan-game dumps contain 240+ keys that collide with canonical
+    // abilities and would wipe their handlers (e.g. Magic Bounce, Sturdy).
+    // Only ADD genuinely new abilities; canonical ones stay untouched.
+    {
+        const addOnlyAbilities = {};
+        for (const [abilityKey, abilityData] of Object.entries(customDex.abilities || {})) {
+            const abilityId = toPSId(abilityKey);
+            if (!abilityId || Dex.data.Abilities[abilityId]) continue;
+            addOnlyAbilities[abilityId] = abilityData;
+        }
+        Object.assign(Dex.data.Abilities, addOnlyAbilities);
+    }
     Object.assign(Dex.data.Items, customDex.items || {});
-    // Create SS2 retyped move variants (<move>ss2) so battles can resolve
-    // the remapped learnset entries produced by the client adapter.
-    const toPSId = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    let ss2VariantCount = 0;
-    for (const [rawKey, rawEntry] of Object.entries(normalizedCustomMoves)) {
-        const keyId = toPSId(rawKey);
-        if (!keyId) continue;
-        const entry = rawEntry || {};
-        const baseEntry = originalBaseMoves[keyId];
-        if (!baseEntry) continue;
-        const customType = String(entry.type || '');
-        if (!customType || customType === String(baseEntry.type || '')) continue;
-        const variantKey = `${keyId}ss2`;
-        if (Dex.data.Moves[variantKey]) continue;
-        Dex.data.Moves[variantKey] = {
-            ...baseEntry,
-            ...entry,
-            name: `${entry.name || baseEntry.name} (SS2)`,
-            pp: Number(entry.pp) > 0 ? Number(entry.pp) : (Number(baseEntry.pp) > 0 ? Number(baseEntry.pp) : 15),
-            target: entry.target || baseEntry.target || 'normal',
-            priority: entry.priority ?? baseEntry.priority ?? 0,
-            flags: entry.flags || baseEntry.flags || {},
-            num: entry.num ?? baseEntry.num ?? 0,
-        };
-        ss2VariantCount++;
-    }
-    if (ss2VariantCount > 0) {
-        console.log(`[SyncPSEngine] Created ${ss2VariantCount} SS2 retyped move variants`);
-    }
+
+    // SS2 retyped variants (<move>ss2) are built by filterVanillaCollisions()
+    // above directly from the pristine base entries. The legacy variant loop
+    // was removed: it re-spread raw PBS defaults (target/priority/flags) over
+    // baked variants, which corrupted e.g. extremespeedss2's priority.
     if (Dex.species?.cache)
         Dex.species.cache = new Map();
     if (Dex.moves?.cache)
