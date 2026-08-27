@@ -74,7 +74,7 @@ def main() -> int:
             else:
                 print(f"  !! missing {local}")
 
-        for game in FAN_GAMES:
+        for game, suffix in FAN_GAMES:
             print(f"Uploading {game} fan-game data...")
             local_dir = REPO_ROOT / f"tauri-app/public/data/{game}/generated"
             remote_dir = f"{PI_ROOT}/tauri-app/public/data/{game}/generated"
@@ -82,7 +82,7 @@ def main() -> int:
                 print(f"  !! missing local dir {local_dir}")
                 continue
             for pattern in FAN_FILE_PATTERNS:
-                fname = pattern.format(g=game)
+                fname = pattern.format(g=suffix)
                 local = local_dir / fname
                 if not local.exists():
                     print(f"  -- {fname} not present locally, skip")
