@@ -82,13 +82,39 @@ const buildRetypeVariant = (baseEntry, entry) => {
     out.num = 0;
     out.isNonstandard = 'Custom';
     out.name = `${entry.name || baseEntry.name} (SS2)`;
-    return out;
+        return out;
 };
+
+// Detect fangame healing moves that were stamped with PBS defaults (no heal
+// condition, attacking-style target) and need the canonical 50% self-heal
+// archetype so the engine emits |-heal| instead of |-damage|.
+const SELF_HEAL_MOVE_IDS = new Set(['nagaskin', 'nectartap', 'odetojoy']);
+function isSelfHealMove(entry, moveId) {
+    if (SELF_HEAL_MOVE_IDS.has(moveId)) return true;
+    if (entry && entry.heal) return true;
+    const desc = String(entry && (entry.desc || entry.shortDesc || '')).toLowerCase();
+    if (/\bheals? (user|theirself|them)s? for\b/.test(desc)) return true;
+    if (/restores? its own hp/.test(desc)) return true;
+    if (/restores their own hp/.test(desc)) return true;
+    return false;
+}
+
 for (const [moveId, rawEntry] of Object.entries(ss2Moves)) {
     const entry = normalizeMove(rawEntry);
-    const base = pristineBaseMoves[moveId];
+        const base = pristineBaseMoves[moveId];
     if (!base) {
         // Brand-new fangame move: add with sane PP/target defaults.
+        if (isSelfHealMove(entry, moveId)) {
+            // Healing moves exported from PBS JSON carry no heal condition and an
+            // attacking-style target, so the engine would treat them as attacks.
+            // Stamp the canonical 50% self-heal archetype (mirrors PS's Recover).
+            entry.target = 'self';
+            entry.category = 'Status';
+            entry.basePower = 0;
+            entry.flags = { ...(entry.flags || {}), heal: 1, snatch: 1, metronome: 1 };
+            entry.heal = [1, 2];
+            entry.secondary = null;
+        }
         if (!allMoves[moveId]) addedNew++;
         allMoves[moveId] = entry;
         continue;

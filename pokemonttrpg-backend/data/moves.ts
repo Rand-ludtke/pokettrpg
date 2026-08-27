@@ -10507,16 +10507,17 @@ const customMoves: Record<string, any> = {
     "desc": "This infectious attack does massive damage to a target affected by status problems.",
     "shortDesc": "This infectious attack does massive damage to a target affected by status problems."
   },
-  "nectartap": {
+    "nectartap": {
     "name": "Nectar Tap",
     "type": "Bug",
     "basePower": 0,
     "category": "Status",
     "accuracy": 100,
     "pp": 10,
-    "target": "normal",
+    "target": "self",
     "priority": 0,
-    "flags": {},
+    "flags": { "heal": 1, "snatch": 1, "metronome": 1 },
+    "heal": [1,2],
     "num": 0,
     "desc": "Drinks nectar and restores its own HP by half of its max HP.",
     "shortDesc": "Drinks nectar and restores its own HP by half of its max HP."
@@ -11403,16 +11404,17 @@ const customMoves: Record<string, any> = {
     "desc": "The user generates a shockwave that hits all opponents. +1 crit rate.",
     "shortDesc": "The user generates a shockwave that hits all opponents. +1 crit rate."
   },
-  "nagaskin": {
+    "nagaskin": {
     "name": "Naga Skin",
     "type": "Dragon",
     "basePower": 0,
     "category": "Status",
     "accuracy": 100,
     "pp": 10,
-    "target": "normal",
+    "target": "self",
     "priority": 0,
-    "flags": {},
+    "flags": { "heal": 1, "snatch": 1, "metronome": 1 },
+    "heal": [1,2],
     "num": 0,
     "desc": "Sheds their skin to heal theirself for half of their max HP.",
     "shortDesc": "Sheds their skin to heal theirself for half of their max HP."

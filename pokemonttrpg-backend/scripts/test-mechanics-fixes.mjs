@@ -330,6 +330,41 @@ async function testDestinyBond() {
     return ok;
 }
 
+// ── Test 10: SS2 brand-new healing moves (Nectar Tap / Naga Skin) heal 50% ──────
+// Previously these fangame moves were stamped with PBS defaults (target:'normal',
+// no heal condition) so PS treated them as attacks emitting |-damage. They must
+// now emit |-heal|p1a and restore HP in engine state.
+async function testSS2Healing() {
+    console.log('=== Test 10: SS2 healing moves emit |-heal| (Nectar Tap / Naga Skin) ===');
+    const p1Team = [mon({ name: 'Snorlax', species: 'Snorlax', ability: 'Guts', moves: ['celebrate', 'nectartap', 'nagaskin', 'tackle'] })];
+    const p2Team = [mon({ name: 'Garchomp', species: 'Garchomp', ability: 'Sand Veil', moves: ['crunch', 'tackle', 'celebrate', 'crunch'] })];
+    const script = [
+        [move('p1', 'snorlax', 'celebrate'), move('p2', 'garchomp', 'crunch')],
+        [move('p1', 'snorlax', 'nectartap'), move('p2', 'garchomp', 'celebrate')],
+        [move('p1', 'snorlax', 'nagaskin'), move('p2', 'garchomp', 'crunch')],
+    ];
+    const { allEvents, states } = await runBattle({ p1Team, p2Team, script });
+    const t1 = eventsForTurn(allEvents, 1, 2);
+    const t2 = eventsForTurn(allEvents, 2, 3);
+    const t3 = eventsForTurn(allEvents, 3, 4);
+    let ok = true;
+    ok = check('T1 Garchomp crunch actually damaged Snorlax (|-damage|p1a)', t1.some((l) => l.startsWith('|-damage|p1a'))) && ok;
+    const nectarHeal = t2.find((l) => l.startsWith('|-heal|p1a'));
+    ok = check('T2 |-heal|p1a emitted on Nectar Tap turn (not |-damage)', !!nectarHeal) && ok;
+    ok = check('T2 no attack line on Snorlax for Nectar Tap', !t2.some((l) => l.startsWith('|-damage|p1a'))) && ok;
+    const nagaskinHeal = t3.find((l) => l.startsWith('|-heal|p1a'));
+    ok = check('T3 |-heal|p1a emitted on Naga Skin turn (not |-damage)', !!nagaskinHeal) && ok;
+    // State-mirror: HP must not decrease after healing turns.
+    const hpT1 = states[0]?.players?.[0]?.team?.[0]?.currentHP;
+    const hpT2 = states[1]?.players?.[0]?.team?.[0]?.currentHP;
+    const hpT3 = states[2]?.players?.[0]?.team?.[0]?.currentHP;
+    console.log(`   info: state-mirror HP T1->T2->T3 (${hpT1} -> ${hpT2} -> ${hpT3}); heal lines: ${nectarHeal || 'none'} | ${nagaskinHeal || 'none'}`);
+    ok = check('HP did not decrease T1->T2 (Nectar Tap healed)', typeof hpT1 !== 'number' || typeof hpT2 !== 'number' || hpT2 >= hpT1) && ok;
+    ok = check('HP did not decrease T2->T3 after Naga Skin', typeof hpT2 !== 'number' || typeof hpT3 !== 'number' || hpT3 >= hpT2) && ok;
+    if (!ok) { console.log('--- T1 ---'); t1.forEach((l) => console.log('   ', l)); console.log('--- T2 ---'); t2.forEach((l) => console.log('   ', l)); console.log('--- T3 ---'); t3.forEach((l) => console.log('   ', l)); }
+    return ok;
+}
+
 // ── Test 9: no double-execution of chosen moves ─────────────────────────────
 function sweepNoDoubleExecution() {
     console.log('=== Test 9: every submitted move produces exactly one |move| event ===');
@@ -372,6 +407,7 @@ function sweepNoDoubleExecution() {
         hazards: testHazards,
         leechSeed: testLeechSeed,
         destinyBond: testDestinyBond,
+        ss2Healing: testSS2Healing,
     };
     for (const [name, fn] of Object.entries(battles)) {
         try {

@@ -36,6 +36,7 @@ out.push(['protect', 'stealthrock', 'stickyweb', 'leechseed', 'dragondance', 'ma
 out.push('destinybond-handler=' + (typeof (M['destinybond']||{}).onPrepareHit === 'function' || typeof (M['destinybond']||{}).beforeTurnCallback === 'function' ? 'yes' : JSON.stringify(Object.keys(M['destinybond']||{}))));
 out.push('magicbounce-onTryHit=' + (typeof ((A['magicbounce']||{}).onTryHit) === 'function'));
 out.push('sturdy-key=' + ('onAnyDamage' in (A['sturdy']||{}) || 'onTryHit' in (A['sturdy']||{}) ? 'yes' : Object.keys(A['sturdy']||{}).join(',')));
+out.push(['nectartap','nagaskin','odetojoy'].map(id => id + '=heal:' + JSON.stringify((M[id]||{}).heal) + ' tgt:' + (M[id]&&M[id].target) + ' flags:' + JSON.stringify((M[id]||{}).flags)).join(' | '));
 console.log(out.join('\n'));
 """
 

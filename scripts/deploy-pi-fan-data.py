@@ -52,11 +52,26 @@ def run(ssh: paramiko.SSHClient, cmd: str, *, sudo: bool = False) -> tuple[int, 
     return code, out, err
 
 
-def upload(sftp, ssh, local: Path, remote: str) -> None:
+def upload(sftp, ssh, local: Path, remote: str) -> bool:
     size = local.stat().st_size
     print(f"  {local.name} ({size/1024:.1f} KB) -> {remote}")
-    run(ssh, f"mkdir -p {os.path.dirname(remote)}")
-    sftp.put(str(local), remote)
+    rdir = os.path.dirname(remote)
+    mcode, _mout, merr = run(ssh, f"mkdir -p '{rdir}'")
+    if mcode != 0:
+        print(f"  !! mkdir rc={mcode}: {merr.strip()[:200]}")
+    try:
+        sftp.put(str(local), remote)
+        return True
+    except Exception as e:
+        print(f"  !! first attempt failed ({e}); fixing ownership and retrying...")
+        run(ssh, f"chown -R {USER}:{USER} '{rdir}'", sudo=True)
+        try:
+            sftp.put(str(local), remote)
+            print("  ++ retry succeeded after chown")
+            return True
+        except Exception as e2:
+            print(f"  !! GIVING UP on {local.name}: {e2}")
+            return False
 
 
 def main() -> int:
@@ -87,7 +102,10 @@ def main() -> int:
                 if not local.exists():
                     print(f"  -- {fname} not present locally, skip")
                     continue
-                upload(sftp, ssh, local, f"{remote_dir}/{fname}")
+                try:
+                    upload(sftp, ssh, local, f"{remote_dir}/{fname}")
+                except Exception as exc:
+                    print(f"  !! EXCEPTION uploading {fname}: {exc} -- continuing")
     finally:
         sftp.close()
 

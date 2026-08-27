@@ -179,12 +179,50 @@ const customMoveEffectPatches = {
                 }
                 return this.NOT_FAIL;
             },
-            onEnd(target) {
+                        onEnd(target) {
                 this.add('-end', target, 'Asteroid Belt');
             },
         },
         desc: "Protects the user from attacks for up to 5 turns or 5 blocked attacks. Contact attackers are dealt 1/8 of their max HP and have a 5% chance to freeze.",
         shortDesc: "Protect; contact attackers take 1/8 max HP, 5% freeze. 5 turns/hits.",
+    },
+
+    // ── Brand-new fangame healing moves (SS2) ──
+    // Raw PBS data for these carries no heal condition and an attacking-style
+    // target, so PS treats them as attacks. Force them onto the canonical
+    // 50% self-heal archetype so battles emit |-heal| instead of |-damage|.
+    nectartap: {
+        target: "self",
+        category: "Status",
+        basePower: 0,
+        accuracy: true,
+        flags: { snatch: 1, heal: 1, metronome: 1 },
+        heal: [1, 2],
+        secondary: null,
+        desc: "Drinks nectar and restores its own HP by half of its max HP.",
+        shortDesc: "Drinks nectar and restores its own HP by half of its max HP.",
+    },
+    nagaskin: {
+        target: "self",
+        category: "Status",
+        basePower: 0,
+        accuracy: true,
+        flags: { snatch: 1, heal: 1, metronome: 1 },
+        heal: [1, 2],
+        secondary: null,
+        desc: "Sheds their skin to heal theirself for half of their max HP.",
+        shortDesc: "Sheds their skin to heal theirself for half of their max HP.",
+    },
+    odetojoy: {
+        target: "self",
+        category: "Status",
+        basePower: 0,
+        accuracy: true,
+        flags: { snatch: 1, heal: 1, metronome: 1 },
+        heal: [1, 2],
+        secondary: null,
+        desc: "Sings a beautiful melody that heals the user for half of its total HP.",
+        shortDesc: "Sings a beautiful melody that heals the user for half of its total HP.",
     },
 };
 
