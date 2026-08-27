@@ -56,19 +56,28 @@ function loadCustomDexPayload() {
 
     // (2) Per fan-game custom data: moves / abilities / pokedex split across files.
     // Each entry is a directory under tauri-app/public/data/<game>/generated/.
-    const fanGameDirs = ["infinity", "uranium", "mariomon", "insurgence", "sage"];
+    // Tuple form: [directoryName, fileNameSuffix] — they differ for ss2-patch,
+    // whose files are named *.ss2-soulstones.json.
+    const fanGameDirs = [
+        ["infinity", "infinity"],
+        ["uranium", "uranium"],
+        ["mariomon", "mariomon"],
+        ["insurgence", "insurgence"],
+        ["sage", "sage"],
+        ["ss2-patch", "ss2-soulstones"],
+    ];
     const baseRoots = [
         path.resolve(__dirname, "../../tauri-app/public/data"),
         path.resolve(process.cwd(), "tauri-app/public/data"),
     ];
     for (const root of baseRoots) {
         if (!fs.existsSync(root)) continue;
-        for (const game of fanGameDirs) {
+        for (const [game, suffix] of fanGameDirs) {
             const genDir = path.join(root, game, "generated");
             if (!fs.existsSync(genDir)) continue;
-            const movesFile = path.join(genDir, `moves.custom.${game}.json`);
-            const abilitiesFile = path.join(genDir, `abilities.custom.${game}.json`);
-            const pokedexFile = path.join(genDir, `pokedex.${game}.json`);
+            const movesFile = path.join(genDir, `moves.custom.${suffix}.json`);
+            const abilitiesFile = path.join(genDir, `abilities.custom.${suffix}.json`);
+            const pokedexFile = path.join(genDir, `pokedex.${suffix}.json`);
             const moves = loadJsonSafe(movesFile);
             const abilities = loadJsonSafe(abilitiesFile);
             const pokedex = loadJsonSafe(pokedexFile);

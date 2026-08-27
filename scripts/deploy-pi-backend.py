@@ -13,6 +13,9 @@ from pathlib import Path
 
 import paramiko
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 HOST = "192.168.10.117"
 USER = "randl"
 PASSWORD = "shark55"

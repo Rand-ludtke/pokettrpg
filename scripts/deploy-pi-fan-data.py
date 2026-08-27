@@ -29,9 +29,16 @@ SINGLE_FILES = [
     ),
 ]
 
-# For each fan-game, upload its moves/abilities/pokedex JSONs only (skip large
-# learnsets files — those aren't consumed by the backend).
-FAN_GAMES = ["infinity", "uranium", "mariomon", "insurgence"]
+# Fan-games to sync: tuples of (localDirectory, fileNameSuffix).
+# They differ for ss2-patch, whose generated files end in .ss2-soulstones.json.
+FAN_GAMES = [
+    ("infinity", "infinity"),
+    ("uranium", "uranium"),
+    ("mariomon", "mariomon"),
+    ("insurgence", "insurgence"),
+    ("sage", "sage"),
+    ("ss2-patch", "ss2-soulstones"),
+]
 FAN_FILE_PATTERNS = ["moves.custom.{g}.json", "abilities.custom.{g}.json", "pokedex.{g}.json"]
 
 
