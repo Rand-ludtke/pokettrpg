@@ -381,8 +381,8 @@
   },
   "windrider": {
     "name": "Wind Rider",
-    "shortDesc": "No damage from wind, ups Atk/SpAtk instead.",
-    "desc": "User is immune to moves with the Wind flag, when hit by a move with the Wind flag or entering Tailwind, their Attack and Special Attack is increased by one stage."
+    "shortDesc": "Absorbs Flying moves: heals 1/4 max HP instead.",
+    "desc": "If user is targeted by a Flying-type move, it is immune to that move and heals 1/4 of its maximum HP instead."
   },
   "unburden": {
     "name": "Unburden",

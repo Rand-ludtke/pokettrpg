@@ -121,6 +121,26 @@ const customAbilityPatches = {
             return this.chainModify([maxBasePower, basePower]);
         },
     },
+
+    // ── Wind Rider (game config): absorb Flying-type moves ──
+    // Instead of the canonical wind-flag Attack boost, this game's Wind Rider
+    // absorbs Flying-type attacks: the user is immune and heals 1/4 of its
+    // max HP (mirrors Volt Absorb / Motor Drive semantics).
+    windrider: {
+        name: "Wind Rider",
+        shortDesc: "Absorbs Flying moves: heals 1/4 max HP instead.",
+        desc: "If this Pokemon is targeted by a Flying-type move, it is immune to the move and heals 1/4 of its maximum HP instead.",
+        flags: { breakable: 1 },
+        rating: 3,
+        onTryHit(target, source, move) {
+            if (target !== source && move.type === 'Flying') {
+                if (!this.heal(target.baseMaxhp / 4)) {
+                    this.add('-immune', target, '[from] ability: Wind Rider');
+                }
+                return null;
+            }
+        },
+    },
 };
 
 function normalizeCustomMoveEntries(rawMoves) {
@@ -438,7 +458,14 @@ let moduleNormalizedCustomDexMoves = {};
     applyCustomMoveEffectPatches(normalizedCustomDexMoves);
     Object.assign(Dex.data.Moves, normalizedCustomMoves);
     Object.assign(Dex.data.Moves, normalizedCustomDexMoves);
-    Object.assign(Dex.data.Abilities, customAbilityPatches);
+    // Merge (not replace) so patched abilities keep canonical metadata
+    // (num/gen/etc.) while overriding behaviour handlers and text.
+    for (const [patchId, patchData] of Object.entries(customAbilityPatches)) {
+        const existingAbility = Dex.data.Abilities[patchId];
+        Dex.data.Abilities[patchId] = existingAbility && typeof existingAbility === "object"
+            ? { ...existingAbility, ...patchData }
+            : patchData;
+    }
     // Abilities: fan-game dumps contain 240+ keys that collide with canonical
     // abilities and would wipe their handlers (e.g. Magic Bounce, Sturdy).
     // Only ADD genuinely new abilities; canonical ones stay untouched.

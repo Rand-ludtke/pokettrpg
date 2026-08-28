@@ -43,6 +43,26 @@ const customAbilityPatches = {
 			return this.chainModify([maxBasePower, basePower]);
 		},
 	},
+
+	// ── Wind Rider (game config): absorb Flying-type moves ──
+	// Instead of the canonical wind-flag Attack boost, this game's Wind Rider
+	// absorbs Flying-type attacks: the user is immune and heals 1/4 of its
+	// max HP (mirrors Volt Absorb / Motor Drive semantics).
+	windrider: {
+		name: "Wind Rider",
+		shortDesc: "Absorbs Flying moves: heals 1/4 max HP instead.",
+		desc: "If this Pokemon is targeted by a Flying-type move, it is immune to the move and heals 1/4 of its maximum HP instead.",
+		flags: { breakable: 1 },
+		rating: 3,
+		onTryHit(this: any, target: any, source: any, move: any) {
+			if (target !== source && move.type === 'Flying') {
+				if (!this.heal(target.baseMaxhp / 4)) {
+					this.add('-immune', target, '[from] ability: Wind Rider');
+				}
+				return null;
+			}
+		},
+	},
 };
 
 function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
@@ -122,7 +142,14 @@ function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
 	// (needed for SS2 variant creation - we need to compare against original types)
 	const originalBaseMoves = { ...(Dex.data.Moves as Record<string, any>) };
 	Object.assign(Dex.data.Moves, normalizedCustomMoves);
-	Object.assign(Dex.data.Abilities, customAbilityPatches);
+	// Merge (not replace) so patched abilities keep canonical metadata
+	// (num/gen/etc.) while overriding behaviour handlers and text.
+	for (const [patchId, patchData] of Object.entries(customAbilityPatches)) {
+		const existingAbility = (Dex.data.Abilities as Record<string, any>)[patchId];
+		(Dex.data.Abilities as Record<string, any>)[patchId] = existingAbility && typeof existingAbility === "object"
+			? { ...existingAbility, ...patchData }
+			: patchData;
+	}
 
 	// Create SS2 retyped move variants (<move>ss2) so battles can resolve
 	// the remapped learnset entries produced by the client adapter.

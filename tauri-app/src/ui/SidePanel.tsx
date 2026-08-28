@@ -609,9 +609,29 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
     const entry = dex.pokedex[speciesId];
     if (!entry?.evos || entry.evos.length === 0) return [];
 
+    // PBS-derived packs (Soulstones) list evolutions with bare canonical
+    // species names ("CONKELDURR") next to the forme-specific target
+    // ("Conkeldurr-Orion"). Drop the bare duplicate when a same-suffix
+    // target exists so no misleading plain-species option is offered.
+    const nameOf = (n: string) => String(dex.pokedex[normalizeName(n)]?.name || n);
+    const suffixOf = (n: string) => {
+      const s = String(n || '');
+      const i = s.lastIndexOf('-');
+      return i > 0 ? s.slice(i + 1) : '';
+    };
+    const curSuffix = suffixOf(String((entry as any).name || ''));
+    const evoNames = curSuffix
+      ? entry.evos.filter((n: string) => {
+          if (suffixOf(nameOf(n))) return true;
+          const bareBase = nameOf(n);
+          return !entry.evos.some((o: string) => o !== n && nameOf(o) === `${bareBase}-${curSuffix}`);
+        })
+      : entry.evos;
+    if (evoNames.length === 0) return [];
+
     const currentLevel = selected.level;
 
-    return entry.evos.map((evoName: string) => {
+    return evoNames.map((evoName: string) => {
       const evoId = normalizeName(evoName);
       const evoEntry = dex.pokedex[evoId];
       if (!evoEntry) return null;
@@ -624,12 +644,17 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
       let requiredItem: string | undefined;
       let consumeItem = false;
 
-      // Check evolution type
-      const evoType = evoEntry.evoType || (evoEntry.evoLevel ? 'levelUp' : 'other');
-      const evoLevel = evoEntry.evoLevel;
-      const evoItem = evoEntry.evoItem;
-      const evoCondition = evoEntry.evoCondition;
-      const evoMove = evoEntry.evoMove;
+      // Check evolution type. SS2-style packs store evolution fields on the
+      // pre-evolution species rather than on the evolution target — fall back
+      // to the current species entry when the target carries no evo data,
+      // otherwise the UI shows "Special method: other" gibberish.
+      const hasOwnEvoData = !!(evoEntry.evoType || evoEntry.evoLevel || evoEntry.evoItem || evoEntry.evoCondition || evoEntry.evoMove);
+      const evoSource: any = hasOwnEvoData ? evoEntry : (entry as any);
+      const evoType = evoSource.evoType || (evoSource.evoLevel ? 'levelUp' : 'other');
+      const evoLevel = evoSource.evoLevel;
+      const evoItem = evoSource.evoItem;
+      const evoCondition = evoSource.evoCondition;
+      const evoMove = evoSource.evoMove;
 
       if (evoType === 'levelUp' || evoType === 'levelExtra' || evoType === undefined) {
         if (evoLevel) {
@@ -698,8 +723,8 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
         if (!canEvolve) reason = `Needs move ${evoMove}`;
         status = canEvolve ? 'green' : 'red';
       } else {
-        method = evoCondition || evoType || 'Special';
-        detail = evoCondition || `Special method: ${evoType || 'unknown'}`;
+        method = evoCondition || 'Special method';
+        detail = evoCondition || 'Evolves through a special method defined in the species data';
         canEvolve = false;
         reason = detail;
         status = 'gray';

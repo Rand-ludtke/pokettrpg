@@ -369,6 +369,18 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
     if (!e.flags) e.flags = {};
   }
 
+  // Keep client-side ability text in sync with engine behaviour patches:
+  // this game's Wind Rider absorbs Flying-type moves (heal 1/4 max HP) instead
+  // of the canonical wind-flag Attack boost, so battle tooltips must match.
+  if (battleAbilities.windrider) {
+    battleAbilities.windrider = {
+      ...battleAbilities.windrider,
+      name: 'Wind Rider',
+      shortDesc: 'Absorbs Flying moves: heals 1/4 max HP instead.',
+      desc: 'If this Pokemon is targeted by a Flying-type move, it is immune to the move and heals 1/4 of its maximum HP instead.',
+    };
+  }
+
   // Keep Dex data pointers in sync for tooltip/species lookups
   if ((window as any).Dex?.data) {
     (window as any).Dex.data.Pokedex = battleDex;

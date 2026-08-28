@@ -376,20 +376,61 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
     setPokemonSpriteUrl(next.src);
   }, [spriteId]);
   
-  // Get evolution method text
+  // PBS-derived packs (Soulstones) list evolutions with bare canonical species
+  // names ("CONKELDURR") next to the forme-specific target ("Conkeldurr-Orion").
+  // When the viewed species carries a form suffix (e.g. "Orion") and another
+  // candidate is "<bare>-<suffix>", drop the bare one so the chain does not
+  // show misleading plain-species stages.
+  const dedupeFormeEvos = (evos: string[] | undefined, currentName?: string): string[] => {
+    if (!Array.isArray(evos) || evos.length < 2) return evos || [];
+    const nameOf = (n: string) => String(dexData.pokedex[toID(n)]?.name || n);
+    const suffixOf = (n: string) => {
+      const s = String(n || '');
+      const i = s.lastIndexOf('-');
+      return i > 0 ? s.slice(i + 1) : '';
+    };
+    const curSuffix = suffixOf(String(currentName || ''));
+    if (!curSuffix) return evos;
+    return evos.filter((n) => {
+      if (suffixOf(nameOf(n))) return true; // forme-specific targets always kept
+      const bareBase = nameOf(n);
+      return !evos.some((o) => o !== n && nameOf(o) === `${bareBase}-${curSuffix}`);
+    });
+  };
+
+  // Evolution-condition fields live in different places depending on the data
+  // pack: canonical Showdown stores them on the evolved species, while
+  // PBS-derived packs (Soulstones) store them on the pre-evolution (and copy
+  // them onto final forms). Resolve in this order:
+  //   1. own fields, unless this species still evolves AND the prevo carries
+  //      its own evo fields (PBS style — the prevo's fields describe the
+  //      evolution INTO this species),
+  //   2. the prevo entry's fields (PBS style),
+  //   3. default "Level up".
+  const hasEvoData = (s: Species) =>
+    !!(s.evoType || s.evoLevel || s.evoItem || s.evoCondition || s.evoMove);
   const getEvoMethod = (evo: Species) => {
-    const condition = evo.evoCondition ? ` (${evo.evoCondition})` : '';
-    const lvl = evo.evoLevel ? `Lv. ${evo.evoLevel}` : '';
-    switch (evo.evoType) {
+    const prevoEntry = evo.prevo ? dexData.pokedex[toID(evo.prevo)] : undefined;
+    const ownHas = hasEvoData(evo);
+    const prevoHas = !!(prevoEntry && hasEvoData(prevoEntry));
+    let source: Species = evo;
+    if (!ownHas && prevoHas) {
+      source = prevoEntry!;
+    } else if (ownHas && prevoHas && (evo.evos?.length || 0) > 0) {
+      source = prevoEntry!; // PBS style: fields live on the pre-evolution
+    }
+    const condition = source.evoCondition ? ` (${source.evoCondition})` : '';
+    const lvl = source.evoLevel ? `Lv. ${source.evoLevel}` : '';
+    switch (source.evoType) {
       case 'levelExtra': return lvl ? `${lvl}${condition}` : `Level up${condition}`;
       case 'levelFriendship': return lvl ? `${lvl} with high friendship${condition}` : `Level up with high friendship${condition}`;
-      case 'levelHold': return `${lvl ? lvl + ' ' : 'Level up '}while holding ${evo.evoItem || 'required item'}${condition}`;
-      case 'useItem': return `Use ${evo.evoItem || 'required evolution item'}${condition}`;
-      case 'levelMove': return evo.evoMove ? `${lvl ? lvl + ' while' : 'Level up while'} knowing ${evo.evoMove}${condition}` : `${lvl || 'Level up'}${condition}`;
-      case 'trade': return evo.evoItem
-        ? `Trade while holding ${evo.evoItem}${condition}`
+      case 'levelHold': return `${lvl ? lvl + ' ' : 'Level up '}while holding ${source.evoItem || 'required item'}${condition}`;
+      case 'useItem': return `Use ${source.evoItem || 'required evolution item'}${condition}`;
+      case 'levelMove': return source.evoMove ? `${lvl ? lvl + ' while' : 'Level up while'} knowing ${source.evoMove}${condition}` : `${lvl || 'Level up'}${condition}`;
+      case 'trade': return source.evoItem
+        ? `Trade while holding ${source.evoItem}${condition}`
         : `Trade${condition}`;
-      case 'other': return evo.evoCondition ? `Special: ${evo.evoCondition}` : 'Special evolution condition';
+      case 'other': return source.evoCondition ? `Special: ${source.evoCondition}` : 'Special evolution condition';
       default: return lvl ? `${lvl}${condition}` : `Level up${condition}`;
     }
   };
@@ -412,7 +453,7 @@ function PokemonDetail({ pokemon, dexData, onNavigate, onMakeForme, onAddToPC }:
       const nextSeen = new Set<string>();
       for (const mon of current) {
         if (mon.evos) {
-          for (const evo of mon.evos) {
+          for (const evo of dedupeFormeEvos(mon.evos, mon.name)) {
             const evoMon = dexData.pokedex[toID(evo)];
             if (evoMon && !nextSeen.has(evoMon.id) && !allSeen.has(evoMon.id)) {
               nextSeen.add(evoMon.id);

@@ -1267,7 +1267,10 @@ export async function loadShowdownDex(options?: { base?: string }) {
   const mergedLs = { ...mergedBaseLearnsets, ...customLearnsets } as LearnsetsIndex;
   const mergedItems = { ...mergedBaseItems, ...customItems } as ItemIndex;
   const mergedMoves = { ...mergedBaseMoves, ...customMoves } as MoveIndex;
-  const mergedAbilities = { ...mergedBaseAbilities, ...customAbilities } as AbilityIndex;
+  // User-saved custom abilities must not clobber real descriptions coming
+  // from the data packs: only let a custom entry override when it carries
+  // usable text (or the merged entry itself is a placeholder).
+  const mergedAbilities = { ...mergedBaseAbilities, ...stripPlaceholderAbilityOverrides(customAbilities, mergedBaseAbilities) } as AbilityIndex;
 
   applyWylinRaltsLineFixes(mergedDex, mergedLs, mergedMoves, mergedAbilities, pokedex as DexIndex);
 
@@ -1279,6 +1282,31 @@ export async function loadShowdownDex(options?: { base?: string }) {
     return `${type}-type ${category.toLowerCase()} move with ${power} base power.`;
   });
   fillMissingDescriptions(mergedItems, () => 'Custom item. Full effect text is not available in this data pack.');
+  // Backfill placeholder ability text ("X ability." / missing) from the fetched
+  // data packs (SS2, Sage, Mariomon, ...) which carry real descriptions for
+  // fangame abilities like Conductor. Must run BEFORE the generic fallback
+  // below so no entry can end up as "X ability." gibberish.
+  const packAbilityTextSources = [
+    sageAbilities, insAbilities, wylinAbilities, uraniumAbilities,
+    infinityAbilities, mariomonAbilities, soulstonePart1Abilities, soulstonePS2Abilities,
+  ].filter((p): p is Record<string, any> => !!p && typeof p === 'object');
+  for (const [abilityKey, abilityEntry] of Object.entries(mergedAbilities)) {
+    if (!abilityEntry || typeof abilityEntry !== 'object') continue;
+    if (!isPlaceholderAbilityText(abilityEntry)) continue;
+    const wantedName = normalizeName(String(abilityEntry.name || abilityKey));
+    for (const pack of packAbilityTextSources) {
+      const packRecord = pack as Record<string, any>;
+      const direct = packRecord[abilityKey] || packRecord[wantedName];
+      const byName = direct || Object.values(packRecord).find((p: any) => p && normalizeName(String(p.name || '')) === wantedName);
+      if (byName && !isPlaceholderAbilityText(byName as any)) {
+        const cand = byName as any;
+        abilityEntry.name = String(cand.name || abilityEntry.name || abilityKey);
+        abilityEntry.desc = String(cand.desc || cand.shortDesc || '');
+        abilityEntry.shortDesc = String(cand.shortDesc || cand.desc || '');
+        break;
+      }
+    }
+  }
   fillMissingDescriptions(mergedAbilities, (ability) => `${String(ability?.name || 'Custom Ability')} ability.`);
   // Cache aliases globally for species resolution
   try {
