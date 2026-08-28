@@ -37,7 +37,32 @@ out.push('destinybond-handler=' + (typeof (M['destinybond']||{}).onPrepareHit ==
 out.push('magicbounce-onTryHit=' + (typeof ((A['magicbounce']||{}).onTryHit) === 'function'));
 out.push('sturdy-key=' + ('onAnyDamage' in (A['sturdy']||{}) || 'onTryHit' in (A['sturdy']||{}) ? 'yes' : Object.keys(A['sturdy']||{}).join(',')));
 out.push(['nectartap','nagaskin','odetojoy'].map(id => id + '=heal:' + JSON.stringify((M[id]||{}).heal) + ' tgt:' + (M[id]&&M[id].target) + ' flags:' + JSON.stringify((M[id]||{}).flags)).join(' | '));
-console.log(out.join('\n'));
+const bb = Dex.species.get('Boss Brolder'), mo = Dex.species.get('Mothim-Orion');
+out.push('weights: bossbrolder=' + (bb && bb.exists ? bb.weightkg : 'MISSING') + ' mothimorion=' + (mo && mo.exists ? mo.weightkg : 'MISSING'));
+
+// End-to-end battle probe: Boss Brolder Heat Crash vs Mothim-Orion on the Pi.
+(async () => {
+  try {
+    const mk = (o) => Object.assign({ name:'Mon', species:'Mon', level:50, ability:'Immunity', item:'', nature:'Hardy', gender:'M', shiny:false, evs:{}, ivs:{}, moves:[] }, o);
+    const eng2 = new Eng({ seed: [7,13,29,51], format: 'gen9customgame' });
+    await eng2.initializeBattle([
+      { id: 'p1', name: 'T1', team: [mk({ name:'Mothim-Orion', species:'Mothim-Orion', level:54, ability:'Attunement', item:'Flame Orb', moves:['stickyweb'] })], activeIndex: 0 },
+      { id: 'p2', name: 'T2', team: [mk({ name:'Boss Brolder', species:'Boss Brolder', level:55, ability:'Steam Engine', moves:['heatcrash'] })], activeIndex: 0 },
+    ], { seed: [7,13,29,51], autoTeamPreview: true });
+    eng2.processTurn([
+      { type: 'move', actorPlayerId: 'p1', playerId: 'p1', pokemonId: 'mothimorion', moveId: 'stickyweb' },
+      { type: 'move', actorPlayerId: 'p2', playerId: 'p2', pokemonId: 'bossbrolder', moveId: 'heatcrash' },
+    ]);
+    const log = eng2.getState().log || [];
+    const bp = log.find(l => l.includes('|debug|BP:'));
+    const dmg = log.find(l => l.startsWith('|-damage|p1a: Mothim-Orion|'));
+    out.push('battle: ' + (bp ? bp.trim() : 'NO-BP-LINE') + ' | ' + (dmg ? dmg.trim() : 'NO-DMG-LINE'));
+    const nan = log.find(l => /NaN|undefined/.test(l));
+    if (nan) out.push('battle-NAN-LINE: ' + nan);
+  } catch (e) { out.push('battle-error: ' + (e && e.message)); }
+  console.log(out.join('\n'));
+})();
+
 """
 
 

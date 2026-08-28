@@ -43,6 +43,40 @@ FILES = [
     ),
 ]
 
+# Fan-game generated data the engine loads at boot (see loadCustomDexPayload in
+# dist/sync-ps-engine.js): per game it reads moves.custom.<suffix>.json,
+# abilities.custom.<suffix>.json and pokedex.<suffix>.json from
+# <PI_ROOT>/tauri-app/public/data/<game>/generated/.
+# Without these, custom species (e.g. Boss Brolder, Mothim-Orion) fall back to
+# a synthetic dex entry — historically with NO weightkg, which made weight-based
+# moves (Heat Crash, Heavy Slam, Low Kick, ...) resolve to NaN and hit their
+# lowest power tier. Learnsets are intentionally NOT pushed (the engine never
+# reads them and they are large).
+FAN_GAME_DIRS = {
+    "infinity": "infinity",
+    "uranium": "uranium",
+    "mariomon": "mariomon",
+    "insurgence": "insurgence",
+    "sage": "sage",
+    "ss2-patch": "ss2-soulstones",
+}
+DATA_FILENAMES = ("pokedex.{suffix}.json", "moves.custom.{suffix}.json", "abilities.custom.{suffix}.json")
+
+
+def collect_data_files() -> list[tuple[Path, str]]:
+    out: list[tuple[Path, str]] = []
+    for game, suffix in FAN_GAME_DIRS.items():
+        gen_local = REPO_ROOT / "tauri-app/public/data" / game / "generated"
+        for template in DATA_FILENAMES:
+            local = gen_local / template.format(suffix=suffix)
+            if local.exists() and local.stat().st_size > 0:
+                remote = f"{PI_ROOT}/tauri-app/public/data/{game}/generated/{local.name}"
+                out.append((local, remote))
+    return out
+
+
+FILES += collect_data_files()
+
 
 def run(ssh: paramiko.SSHClient, cmd: str, *, sudo: bool = False) -> tuple[int, str, str]:
     if sudo:

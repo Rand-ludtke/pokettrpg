@@ -394,6 +394,48 @@ function sweepNoDoubleExecution() {
     return ok;
 }
 
+// ── Test 11: weight-based moves use real fan-game species data ──────────────
+// Regression: when the server dex lacks a fan-game species, the engine's
+// fallback registration used to omit weightkg entirely, so Showdown's
+// getWeight() returned NaN. Weight-tier moves (Heat Crash, Heavy Slam, Low
+// Kick...) silently resolved to their lowest power tier and HP fraction
+// rendering glitched ("said it fainted but only did ~1% each hit" — Boss
+// Brolder's Heat Crash vs Mothim-Orion). Boss Brolder (240kg, Mariomon) vs
+// Mothim-Orion (23.3kg, SS2) must hit the 120 BP tier and deal heavy damage.
+async function testHeatCrashWeight() {
+    console.log('=== Test 11: Heat Crash weight tiers use real fan-game species data ===');
+    const PS = require('pokemon-showdown');
+    let ok = true;
+    const brolder = PS.Dex.species.get('Boss Brolder');
+    const mothim = PS.Dex.species.get('Mothim-Orion');
+    ok = check('Boss Brolder registered with weightkg 240 (Mariomon dex loaded)', !!brolder?.exists && brolder.weightkg === 240) && ok;
+    ok = check('Mothim-Orion registered with weightkg 23.3 (SS2 dex loaded)', !!mothim?.exists && mothim.weightkg === 23.3) && ok;
+    if (!ok) {
+        console.log('   info: fan-game dex data missing from this runtime — weight checks cannot pass here');
+        return false;
+    }
+    const boss = mon({ name: 'Boss Brolder', species: 'Boss Brolder', level: 55, ability: 'Steam Engine', moves: ['heatcrash'] });
+    const victim = mon({ name: 'Mothim-Orion', species: 'Mothim-Orion', level: 54, ability: 'Attunement', item: 'Flame Orb', moves: ['stickyweb'] });
+    const { allEvents } = await runBattle({
+        p1Team: [victim],
+        p2Team: [boss],
+        script: [[
+            move('p1', 'mothimorion', 'stickyweb'),
+            move('p2', 'bossbrolder', 'heatcrash'),
+        ]],
+    });
+    const badEvent = allEvents.find((l) => /NaN|undefined/.test(l));
+    ok = check('no NaN/undefined leaked into battle events', !badEvent) && ok;
+    const dmgLine = allEvents.find((l) => l.startsWith('|-damage|p1a: Mothim-Orion|'));
+    ok = check('Heat Crash connected (|-damage| on Mothim-Orion)', !!dmgLine) && ok;
+    const fainted = !!dmgLine && dmgLine.includes('0 fnt');
+    const mt = dmgLine && dmgLine.match(/\|(\d+)\/(\d+)/);
+    const pct = mt ? (Number(mt[2]) - Number(mt[1])) / Number(mt[2]) : null;
+    const heavy = fainted || (pct != null && pct >= 0.15);
+    ok = check(`Heat Crash damage was heavy (${fainted ? 'OHKO' : `${Math.round((pct || 0) * 100)}%`} ≥ 15%)`, heavy) && ok;
+    return ok;
+}
+
 // ── Runner ───────────────────────────────────────────────────────────────────
 (async () => {
     let overall = true;
@@ -408,6 +450,7 @@ function sweepNoDoubleExecution() {
         leechSeed: testLeechSeed,
         destinyBond: testDestinyBond,
         ss2Healing: testSS2Healing,
+        heatCrashWeight: testHeatCrashWeight,
     };
     for (const [name, fn] of Object.entries(battles)) {
         try {

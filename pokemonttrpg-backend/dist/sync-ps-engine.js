@@ -721,14 +721,22 @@ class SyncPSEngine {
             ? mon.types.map(t => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase())
             : ['Normal'];
         const ability = mon.ability || 'No Ability';
+        // Weight is critical for weight-based moves (Heat Crash, Heavy Slam,
+        // Low Kick, Sky Drop, etc.). A missing weightkg makes Showdown's
+        // getWeight() return NaN, which silently pushes every weight-comparison
+        // move to its lowest power tier and breaks weight checks. Use the mon's
+        // supplied weight when the client provides one; otherwise fall back to
+        // a neutral mid-range weight (50kg) rather than leaving it undefined.
+        const weight = Number(mon.weightkg ?? mon.weight);
         Dex.data.Pokedex[id] = {
             num: -1,
             name: speciesName,
             types,
             baseStats,
             abilities: { '0': ability },
+            weightkg: Number.isFinite(weight) && weight > 0 ? weight : 50,
         };
-        console.log(`[SyncPSEngine] Registered custom species "${speciesName}" with PS Dex`);
+        console.log(`[SyncPSEngine] Registered custom species "${speciesName}" with PS Dex (weightkg ${Dex.data.Pokedex[id].weightkg})`);
     }
     /**
      * Convert our Pokemon team to PS packed format

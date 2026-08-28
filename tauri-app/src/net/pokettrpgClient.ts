@@ -634,9 +634,28 @@ export class PoketTRPGClient {
       const isHttpsPage = typeof window !== 'undefined' && window.location?.protocol === 'https:';
       const isHttpServer = this.socketEndpoint.startsWith('http://');
       const fallbackMessage = err?.message || 'Connection error';
-      const message = (isHttpsPage && isHttpServer)
-        ? 'HTTPS page cannot connect to an HTTP server. Use an HTTPS/WSS backend or a tunnel.'
-        : fallbackMessage;
+      let message: string;
+      if (isHttpsPage && isHttpServer) {
+        message = 'HTTPS page cannot connect to an HTTP server. Use an HTTPS/WSS backend or a tunnel.';
+      } else if (/ERR_NAME_NOT_RESOLVED|getaddrinfo|ENOTFOUND|EAI_AGAIN/i.test(fallbackMessage)) {
+        // DNS failure — the device cannot resolve the server's hostname at all.
+        // Common causes: flaky router/ISP DNS, captive portals, or ISP DNS that
+        // has not cached a recently-created domain. The socket keeps retrying,
+        // so recovery is automatic once the network stabilizes.
+        message =
+          'Cannot reach the game server (domain lookup failed). ' +
+          'Check your internet connection, or try switching your DNS to 1.1.1.1 or 8.8.8.8. ' +
+          'Retrying automatically — it will reconnect as soon as the network allows. ' +
+          `(${fallbackMessage})`;
+      } else if (/ECONNREFUSED/.test(fallbackMessage)) {
+        message = `Server refused the connection (it may be restarting). Retrying automatically. (${fallbackMessage})`;
+      } else if (/ETIMEDOUT|ECONNRESET|timeout/i.test(fallbackMessage)) {
+        message = `Connection timed out or dropped — your internet may be unstable. Retrying automatically. (${fallbackMessage})`;
+      } else if (/xhr poll error|transport error|Invalid frame header/i.test(fallbackMessage)) {
+        message = `Network hiccup reaching the server. Retrying automatically — if this persists, check your connection. (${fallbackMessage})`;
+      } else {
+        message = fallbackMessage;
+      }
       this.emitter.emit('error', { message });
       this.updateStatus('error');
     });
