@@ -73,27 +73,7 @@ Every BRAND-NEW SS2 move currently executes as either raw damage (attacking) or 
 | all classes (see move-audit-results.json byRule) | 1280 | ✅ via generate-dist-moves.mjs | ✅ 16/16 representative battles |
 | plain-attack (unmatched) | 26 | n/a (correct by default) | ✅ smoke-tested via class |
 
-## Phases
-- [x] Phase 0: Scope + root cause confirmed (1306 SS2 moves; 0 mechanics fields; engine
-      injection path = dist/data/moves.js → Dex.data.Moves; client display-only).
-- [x] Phase 1: Checklist + shared inference module (`scripts/move-intent.mjs`).
-- [ ] Phase 2: Audit all moves → classification counts + ambiguous list reviewed by hand
-      (`scripts/audit-ss2-moves.mjs` → `scripts/move-audit-results.json`).
-- [ ] Phase 3: Wire inference + explicit overrides into `generate-dist-moves.mjs`;
-      regenerate `dist/data/moves.js`; Macabre Dance among fixed.
-- [ ] Phase 4: Mass battle verification — one real engine battle per SS2-specific move
-      asserting observed events match intended mechanics
-      (`scripts/test-all-moves.mjs`); iterate to all-PASS.
-- [ ] Phase 5: Regression suites green (`test-mechanics-fixes.mjs`, `test-ss2-battle.mjs`,
-      `tsc` client if touched).
-- [ ] Phase 6: Commit + push (GitHub Pages PWA auto-deploys) + deploy backend to Pi
-      (`python scripts/deploy-pi-backend.py`) + live verification.
-- [ ] Phase 7: Final checklist statuses written below.
 
-## Category status (updated by audit script; counts are targets for Phase 4)
-| Intent class | Count | Fixed | Battle-tested PASS |
-|---|---|---|---|
-| (pending audit) | | | |
 
 ## Known-broken list (user reports / audit finds)
 | Move | Reported | Fix | Status |
