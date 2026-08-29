@@ -1,0 +1,8752 @@
+{
+  "counts": {
+    "canonical-kept": 670,
+    "retyped-variant": 94,
+    "new": 542
+  },
+  "byRule": {
+    "engine-bespoke:double-vs-submerge": 1,
+    "damage-flinch+attack-chance-status-broad": 14,
+    "two-turn-dive": 3,
+    "engine-bespoke:revenge": 2,
+    "attack-chance-status-broad": 10,
+    "drain-half-alt+attack-drain-broad": 4,
+    "numeric-priority+recoil-percent": 1,
+    "cure-status-self": 2,
+    "engine-bespoke:outrage": 3,
+    "engine-bespoke:hex": 6,
+    "heal-self-half+status-heal-broad": 1,
+    "damage-confuse+attack-chance-status-broad": 14,
+    "attack-self-lower-broad": 16,
+    "strike-first": 6,
+    "paralyze-chance+damage-paralyze+attack-chance-status-broad+recoil-percent": 2,
+    "engine-bespoke:clearsmite": 7,
+    "engine-bespoke:protect-contact-punish (existing handler)": 1,
+    "engine-bespoke:thousandarrows": 1,
+    "self-boost-two-stat+status-boost-broad": 11,
+    "pivot+pivot-switches-places": 2,
+    "status-boost-broad": 9,
+    "crit-boost": 14,
+    "engine-bespoke:healblock": 1,
+    "attack-self-boost-guaranteed": 7,
+    "paralyze-chance+damage-paralyze+attack-chance-status-broad": 11,
+    "engine-bespoke:suckerpunch": 3,
+    "attack-lower-target-broad": 17,
+    "burn-chance+damage-burn+attack-chance-status-broad": 13,
+    "engine-bespoke:beatup": 1,
+    "status-lower-both+status-lower-broad": 1,
+    "engine-bespoke:storedpower": 3,
+    "recoil-percent": 8,
+    "multihit": 12,
+    "status-lower-target+status-lower-broad": 2,
+    "priority-phrase": 6,
+    "engine-bespoke:light-damage-reduction-field": 1,
+    "damage-lower-target+chance-lower-target-broad": 31,
+    "guaranteed-lower-target+attack-lower-target-broad": 3,
+    "attack-chance-status-broad+se-vs-type": 1,
+    "cant-miss": 8,
+    "status-lower-both+lowers-two-stats+status-lower-broad": 4,
+    "engine-bespoke:double-if-ally-fainted": 3,
+    "engine-bespoke:chipaway": 5,
+    "spread-move": 9,
+    "poison-status": 1,
+    "drain-percent+attack-drain-broad": 3,
+    "random-status": 1,
+    "crit-boost+spread-move": 1,
+    "status-heal-broad": 2,
+    "pivot-switches-places": 2,
+    "poison-chance+damage-poison+attack-chance-status-broad": 5,
+    "chance-raise-self-broad": 30,
+    "spread-enemy-side": 4,
+    "attack-chance-self-stat+chance-raise-self-broad": 3,
+    "stat-swap": 1,
+    "spread-everyone": 2,
+    "attack-self-lower-broad+numeric-priority": 2,
+    "type-change": 1,
+    "engine-bespoke:weaken-as-user-hp-drops": 1,
+    "flinch-only": 4,
+    "trap": 10,
+    "attack-drain-broad": 5,
+    "engine-bespoke:miss-recoil-gravity-fail": 3,
+    "status-boost-ally": 1,
+    "chance-lower-target-broad": 20,
+    "se-vs-type": 6,
+    "unmatched": 26,
+    "crit-boost+chance-raise-self-broad": 2,
+    "engine-bespoke:furycutter": 4,
+    "charge-attack": 3,
+    "guaranteed-status-on-hit": 6,
+    "freeze-chance+damage-freeze+attack-chance-status-broad": 1,
+    "engine-bespoke:electroball": 1,
+    "engine-bespoke:knockoff": 6,
+    "trap+self-boost-two-stat+status-boost-broad": 1,
+    "trap+se-vs-type": 1,
+    "engine-bespoke:fairylock": 2,
+    "engine-bespoke:ignore-ability-physpec-swap": 1,
+    "fixed-damage-weight": 3,
+    "engine-bespoke:healbell": 2,
+    "engine-bespoke:dragontail": 5,
+    "engine-bespoke:defog-plus-remove-screens-terrain": 1,
+    "engine-bespoke:brine": 3,
+    "engine-bespoke:futuresight": 3,
+    "engine-bespoke:safeguard": 1,
+    "engine-bespoke:matblock": 1,
+    "engine-bespoke:ko-boost": 4,
+    "burn-status": 2,
+    "always-boost-self+attack-self-boost-guaranteed": 3,
+    "heal-party-status+heal-25-percent": 3,
+    "drain-half-damage+drain-half-alt+attack-drain-broad": 3,
+    "engine-bespoke:bellydrum-spa-hp-cost": 1,
+    "confuse-status": 2,
+    "status-lower-broad": 7,
+    "status-sleep-broad": 1,
+    "numeric-priority": 1,
+    "ability-negate": 1,
+    "engine-bespoke:bodypress": 2,
+    "cant-miss+spread-enemy-side": 1,
+    "guaranteed-lower-target": 1,
+    "spread-move+spread-everyone": 1,
+    "engine-bespoke:ban-sound-moves": 1,
+    "sleep-status+two-turn-dive+status-sleep-broad": 1,
+    "status-lower-target+lowers-two-stats+status-lower-broad": 1,
+    "engine-bespoke:boost-highest-lowest": 2,
+    "engine-bespoke:double-if-lowered-this-turn": 1,
+    "engine-bespoke:mist": 1,
+    "burn-chance+damage-burn+crit-boost+attack-chance-status-broad": 1,
+    "engine-bespoke:spdef-bodypress": 3,
+    "engine-bespoke:physpec-swap": 2,
+    "engine-bespoke:brickbreak": 5,
+    "engine-bespoke:double-if-berry-eaten": 1,
+    "heal-self-half+status-cure-heal+status-heal-broad": 1,
+    "always-crit": 1,
+    "engine-bespoke:topsyturvy": 1,
+    "engine-bespoke:lastresort": 1,
+    "engine-bespoke:spectralthief": 1,
+    "engine-bespoke:speed-boost-clear-hazards": 1,
+    "engine-bespoke:boost-if-faster": 2,
+    "multihit+damage-flinch+attack-chance-status-broad": 1,
+    "engine-bespoke:double-if-previous-failed": 3,
+    "engine-bespoke:protect-contact-defense-lower": 1,
+    "attack-lower-target-broad+spread-enemy-side": 1,
+    "engine-bespoke:torment": 1,
+    "engine-bespoke:gastroacid": 1,
+    "engine-bespoke:wideguard": 1,
+    "engine-bespoke:pursuit": 1,
+    "status-lower-both+lowers-two-stats": 1,
+    "multihit+priority-phrase": 2,
+    "burn-chance+damage-burn+attack-chance-status-broad+spread-enemy-side": 1,
+    "multihit+chance-raise-self-broad": 1,
+    "engine-bespoke:punishment": 1,
+    "trap+status-lower-both+lowers-two-stats+status-lower-broad": 1,
+    "multihit+damage-lower-target+chance-lower-target-broad": 1,
+    "spread-move+attack-self-lower-broad": 1,
+    "frostbite": 1,
+    "protection+frostbite": 1
+  },
+  "unmatched": [
+    {
+      "id": "bruteforce",
+      "desc": "The target is pushed around with brute force.",
+      "category": "Physical",
+      "type": "Fighting",
+      "basePower": 80
+    },
+    {
+      "id": "deadlyreach",
+      "desc": "The user project lines of pure force over a short distance.",
+      "category": "Special",
+      "type": "Fighting",
+      "basePower": 75
+    },
+    {
+      "id": "shadowray",
+      "desc": "The user emits a sinister ray.",
+      "category": "Special",
+      "type": "Ghost",
+      "basePower": 85
+    },
+    {
+      "id": "genesis",
+      "desc": "Extends the duration of existing weather and terrain by one turn when KO-ing a target.",
+      "category": "Special",
+      "type": "Normal",
+      "basePower": 100
+    },
+    {
+      "id": "acidrain",
+      "desc": "Dark clouds approach and a downpour of acid hits the battlefield.",
+      "category": "Special",
+      "type": "Poison",
+      "basePower": 100
+    },
+    {
+      "id": "mindblast",
+      "desc": "The user sends a telekinetic blast towards the target.",
+      "category": "Physical",
+      "type": "Psychic",
+      "basePower": 40
+    },
+    {
+      "id": "hellbullet",
+      "desc": "Ignores all attempts at redirection allowing this move to hit the chosen target.",
+      "category": "Special",
+      "type": "Steel",
+      "basePower": 80
+    },
+    {
+      "id": "missileshot",
+      "desc": "The user fires a projectile towards the target. This attack does physical damage.",
+      "category": "Special",
+      "type": "Steel",
+      "basePower": 50
+    },
+    {
+      "id": "oceanblast",
+      "desc": "Ignores all attempts at redirection allowing this move to hit the chosen target.",
+      "category": "Special",
+      "type": "Water",
+      "basePower": 80
+    },
+    {
+      "id": "bewitch",
+      "desc": "The user bewitches the target. This attack does special damage.",
+      "category": "Physical",
+      "type": "Fairy",
+      "basePower": 50
+    },
+    {
+      "id": "alkalinebomb",
+      "desc": "The user throws a chemical mixture at the target. This attack does special damage.",
+      "category": "Physical",
+      "type": "Poison",
+      "basePower": 50
+    },
+    {
+      "id": "mixedwaves",
+      "desc": "The user emits psychic waves that do special damage.",
+      "category": "Physical",
+      "type": "Psychic",
+      "basePower": 50
+    },
+    {
+      "id": "sonicwave",
+      "desc": "The target is attacked with a wave of sound energy. The attack varies in intensity.",
+      "category": "Physical",
+      "type": "Sound",
+      "basePower": 1
+    },
+    {
+      "id": "glitch",
+      "desc": "Bugs and glitches ravage the opponent. This move deals inverse Bug damage.",
+      "category": "Special",
+      "type": "Bug",
+      "basePower": 95
+    },
+    {
+      "id": "hiddenpowernormal",
+      "desc": "A unique attack that varies in type and intensity depending on the Pokémon using it.",
+      "category": "Special",
+      "type": "Normal",
+      "basePower": 60
+    },
+    {
+      "id": "hiddenpowerfairy",
+      "desc": "A unique attack that varies in type and intensity depending on the Pokémon using it.",
+      "category": "Special",
+      "type": "Fairy",
+      "basePower": 60
+    },
+    {
+      "id": "hiddenpowercosmic",
+      "desc": "A unique attack that varies in type and intensity depending on the Pokémon using it.",
+      "category": "Special",
+      "type": "Cosmic",
+      "basePower": 60
+    },
+    {
+      "id": "hiddenpowersound",
+      "desc": "A unique attack that varies in type and intensity depending on the Pokémon using it.",
+      "category": "Special",
+      "type": "Sound",
+      "basePower": 60
+    },
+    {
+      "id": "hiddenpowerlight",
+      "desc": "A unique attack that varies in type and intensity depending on the Pokémon using it.",
+      "category": "Special",
+      "type": "Light",
+      "basePower": 60
+    },
+    {
+      "id": "soulrip",
+      "desc": "The user rips into the target's soul. This attack does special damage.",
+      "category": "Physical",
+      "type": "Ghost",
+      "basePower": 50
+    },
+    {
+      "id": "soulflay",
+      "desc": "The user flays the target's soul. This attack does special damage.",
+      "category": "Physical",
+      "type": "Ghost",
+      "basePower": 75
+    },
+    {
+      "id": "snowball",
+      "desc": "Throws a snowball towards the target.",
+      "category": "Physical",
+      "type": "Ice",
+      "basePower": 40
+    },
+    {
+      "id": "gutturalroar",
+      "desc": "The user shakes the target with a deep, rumbling roar. This attack does physical damage.",
+      "category": "Special",
+      "type": "Sound",
+      "basePower": 85
+    },
+    {
+      "id": "shotput",
+      "desc": "Throws a metallic orb towards the target.",
+      "category": "Physical",
+      "type": "Steel",
+      "basePower": 40
+    },
+    {
+      "id": "torrent",
+      "desc": "Sprays the target in a torrent of water.",
+      "category": "Physical",
+      "type": "Water",
+      "basePower": 40
+    },
+    {
+      "id": "balancerchangerequired",
+      "desc": "Move change required.",
+      "category": "Physical",
+      "type": "Normal",
+      "basePower": 1
+    }
+  ],
+  "inferred": {
+    "megahorn": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bugbuzz": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "pollenpuff": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "leechlife": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lunge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "uturn": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bugbite": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fellstinger": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "defendorder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "healorder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "quiverdance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "ragepowder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spiderweb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stickyweb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stringshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "skittersmack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hyperspacefury": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "foulplay": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "darkestlariat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "nightdaze": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "crunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "darkpulse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "throatchop": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "suckerpunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "knockoff": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "assurance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bite": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "brutalswing": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "feintattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thief": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "snarl": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "payback": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "pursuit": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "beatup": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fling": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "powertrip": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "punishment": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "embargo": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "faketears": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flatter": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "nastyplot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "partingshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "quash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "snatch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "switcheroo": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "taunt": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "topsyturvy": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "torment": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "jawlock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "obstruct": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wickedblow": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lashout": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "roaroftime": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dracometeor": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "outrage": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "clangingscales": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "coreenforcer": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragonrush": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spacialrend": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragonhammer": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragonpulse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragontail": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dualchop": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragonrage": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragondance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragondarts": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dynamaxcannon": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "eternabeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "clangoroussoul": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "dragonenergy": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "boltstrike": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "volttackle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "zapcannon": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thunder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fusionbolt": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "plasmafists": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thunderbolt": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wildcharge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "discharge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "zingzap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thunderpunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "voltswitch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thunderfang": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "electroweb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thundershock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "nuzzle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "electroball": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "eerieimpulse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "electricterrain": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "electrify": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "iondeluge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "magnetrise": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "magneticflux": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thunderwave": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "boltbeak": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "risingvoltage": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lightofruin": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aromaticmist": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "babydolleyes": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "charm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "craftyshield": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fairylock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mistyterrain": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "naturesmadness": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spiritbreak": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "decorate": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mistyexplosion": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "focuspunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "highjumpkick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "closecombat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "focusblast": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "superpower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "crosschop": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dynamicpunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flyingpress": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hammerarm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "jumpkick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sacredsword": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "secretsword": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "submission": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "drainpunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "vitalthrow": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wakeupslap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lowsweep": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "circlethrow": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "forcepalm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "revenge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stormthrow": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "karatechop": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "machpunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "poweruppunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rocksmash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "vacuumwave": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "counter": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "finalgambit": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lowkick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "reversal": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "seismictoss": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bulkup": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "detect": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "matblock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "quickguard": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "noretreat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "coaching": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bodypress": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "vcreate": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "blastburn": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "eruption": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mindblown": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shelltrap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "blueflare": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "burnup": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "overheat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flareblitz": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fireblast": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fusionflare": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "inferno": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "magmastorm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "searingshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "heatwave": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flamethrower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fierydance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "firelash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "firepledge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lavaplume": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "firepunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mysticalfire": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "firefang": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flamewheel": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "incinerate": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flamecharge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "ember": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "heatcrash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sunnyday": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "pyroball": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "skyattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bravebird": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragonascent": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hurricane": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "beakblast": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fly": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aerialace": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "pluck": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "skydrop": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wingattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "acrobatics": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "defog": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "featherdance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mirrormove": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "roost": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tailwind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dualwingbeat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shadowforce": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "moongeistbeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "phantomforce": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shadowball": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spiritshackle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hex": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shadowsneak": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "nightshade": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "curse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "destinybond": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "grudge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "nightmare": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spite": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "poltergeist": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "frenzyplant": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "leafstorm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "solarblade": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "petaldance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "powerwhip": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "seedflare": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "solarbeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "woodhammer": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "energyball": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "leafblade": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "petalblizzard": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "grasspledge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "seedbomb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "gigadrain": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hornleech": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "leaftornado": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "vinewhip": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "megadrain": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "absorb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "grassknot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aromatherapy": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "cottonguard": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "cottonspore": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "grasswhistle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "grassyterrain": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "leechseed": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spikyshield": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spore": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "strengthsap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stunspore": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "synthesis": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "worryseed": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "branchpoke": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "gravapple": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "appleacid": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "grassyglide": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "junglehealing": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "precipiceblades": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "earthquake": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "earthpower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "landswrath": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thousandarrows": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thousandwaves": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "drillrun": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stompingtantrum": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mudbomb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bulldoze": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mudshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bonemerang": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sandtomb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fissure": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "magnitude": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mudsport": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rototiller": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sandattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shoreup": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spikes": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "scorchingsands": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "freezeshock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "iceburn": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "blizzard": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "icehammer": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "icebeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "icepunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "freezedry": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "glaciate": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "icefang": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "avalanche": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "frostbreath": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "icywind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "iceshard": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "powdersnow": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sheercold": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hail": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "haze": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mist": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tripleaxel": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "glaciallance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "explosion": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "selfdestruct": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "gigaimpact": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hyperbeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lastresort": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "skullbash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "doubleedge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "headcharge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "megakick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thrash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "eggbomb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "judgment": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "multiattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "revelationdance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "takedown": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bodyslam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "razorwind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "slam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "strength": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "triattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "chipaway": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "facade": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "headbutt": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "retaliate": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "secretpower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "smellingsalts": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hornattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stomp": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "cut": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "struggle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "weatherball": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "falseswipe": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "holdback": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "payday": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "quickattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "scratch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tackle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rage": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "furyswipes": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "barrage": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "doubleslap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "furyattack": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wrap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "constrict": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bide": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "crushgrip": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "endeavor": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flail": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "frustration": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "naturalgift": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "present": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "return": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spitup": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "superfang": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "trumpcard": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wringout": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "acupressure": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "afteryou": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "assist": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "batonpass": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bestow": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "camouflage": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "celebrate": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "confide": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "conversion": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "conversion2": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "copycat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "defensecurl": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "disable": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "doubleteam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "encore": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "endure": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "entrainment": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "focusenergy": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "followme": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "foresight": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "glare": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "happyhour": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "helpinghand": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "holdhands": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "howl": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "leer": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lockon": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "luckychant": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mefirst": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "metronome": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "milkdrink": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mimic": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mindreader": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "minimize": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "naturepower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "odorsleuth": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "painsplit": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "playnice": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "protect": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psychup": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "recover": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "recycle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "reflecttype": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "refresh": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "scaryface": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shellsmash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "simplebeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sketch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "slackoff": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "softboiled": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stockpile": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "substitute": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "swallow": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tailwhip": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tearfullook": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "teeterdance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tickle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "transform": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "whirlwind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "workup": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "yawn": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "courtchange": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stuffcheeks": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "terrainpulse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "belch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "gunkshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sludgebomb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "poisonjab": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "venoshock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "clearsmog": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "acid": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "acidspray": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "smog": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "acidarmor": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "banefulbunker": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "gastroacid": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "poisongas": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "poisonpowder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "purify": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "toxic": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "toxicspikes": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "toxicthread": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "venomdrench": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "corrosivegas": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shellsidearm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "futuresight": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "synchronoise": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dreameater": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psystrike": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psychic": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psychicfangs": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "extrasensory": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hyperspacehole": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "psyshock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "zenheadbutt": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psybeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "storedpower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mirrorcoat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psywave": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "agility": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "allyswitch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "amnesia": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "barrier": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "calmmind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "guardsplit": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "guardswap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "healblock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "healpulse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "heartswap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "imprison": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "kinesis": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lightscreen": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "magiccoat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "magicroom": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "meditate": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "miracleeye": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "powersplit": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "powerswap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "powertrick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psychicterrain": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psychoshift": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "reflect": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "roleplay": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "skillswap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "speedswap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "telekinesis": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "teleport": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "trickroom": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wonderroom": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "magicpowder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "expandingforce": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "headsmash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rockwrecker": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stoneedge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "powergem": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rocktomb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "smackdown": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "accelerock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rockpolish": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sandstorm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "stealthrock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wideguard": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "doomdesire": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "irontail": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sunsteelstrike": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "ironhead": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "smartstrike": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "doubleironbash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "geargrind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bulletpunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "gyroball": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "heavyslam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "metalburst": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "autotomize": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "gearup": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "irondefense": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "kingsshield": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shiftgear": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "behemothbash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "behemothblade": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "steelbeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hydrocannon": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "waterspout": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "originpulse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "steameruption": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "crabhammer": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aquatail": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "surf": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dive": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "scald": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "waterpledge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "waterfall": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "razorshell": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bubblebeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "octazooka": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "waterpulse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aquajet": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bubble": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "watershuriken": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aquaring": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "raindance": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "watersport": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "withdraw": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "snipeshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fishiousrend": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lifedew": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "surgingstrikes": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tidalwave": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-vs-submerge"
+    },
+    "cascade": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 20
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "submerge": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "chargeMove": true,
+        "custom": "two-turn-semivulnerable"
+      },
+      "rule": "two-turn-dive"
+    },
+    "attackorder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "firstimpression": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "furycutter": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "infestation": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "pinmissile": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "powder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "silverwind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "strugglebug": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "twineedle": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "xscissor": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "cometpunch": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "cosmicpower": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "gravity": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "lunardance": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "meteorassault": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "meteorbeam": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "swift": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "wish": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "healingwish": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "meteormash": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "moonblast": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "moonlight": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "darkvoid": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fakeout": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "falsesurrender": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "feint": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "fierywrath": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "honeclaws": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "nightslash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "swagger": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "trick": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "breakingswipe": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragonbreath": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dragonclaw": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "scaleshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "twister": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "charge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "chargebeam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "paraboliccharge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shockwave": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spark": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thundercage": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "attract": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "captivate": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "covet": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "dizzypunch": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "drainingkiss": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fairywind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "fleurcannon": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "heartstamp": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "lovelykiss": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "mistball": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "playrough": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "strangesteam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sweetkiss": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "armthrust": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "block": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "brickbreak": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "doublekick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rollingkick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "skyuppercut": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thunderouskick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "triplekick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "blazekick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "burningjealousy": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "firespin": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flameburst": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sacredfire": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "willowisp": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aircutter": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "airslash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aeroblast": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bounce": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "drillpeck": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "gust": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "oblivionwing": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "peck": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "astonish": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spiritbarrage": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:revenge"
+    },
+    "confuseray": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "meanlook": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "memento": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "ominouswind": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shadowbone": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shadowclaw": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "shadowpunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spectralthief": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "trickortreat": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bulletseed": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "floralhealing": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "flowershield": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "forestscurse": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "growth": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "ingrain": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "leafage": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "magicalleaf": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "needlearm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "razorleaf": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sleeppowder": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sweetscent": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "tropkick": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "boneclub": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bonerush": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "dig": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "highhorsepower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "horndrill": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "mudslap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "steamroller": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "iceball": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "iciclecrash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "iciclespear": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "aurasphere": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "aurawheel": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "aurorabeam": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "auroraveil": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "dazzlinggleam": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "extremespeed": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "flash": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "flashcannon": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "mirrorshot": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "laserfocus": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "morningsun": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "photongeyser": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "safeguard": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "signalbeam": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "spotlight": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "tailglow": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "coil": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "crushclaw": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "doublehit": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "freezingglare": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "hyperfang": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "megapunch": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "pound": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rapidspin": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rest": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "slash": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "snore": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tailslap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "crosspoison": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "poisonsting": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "poisonfang": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "poisontail": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sludge": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sludgewave": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "smokescreen": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "confusion": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hypnosis": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "lusterpurge": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "prismaticlaser": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "psychoboost": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psychocut": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "ancientpower": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "diamondstorm": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "geomancy": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "harden": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "rockblast": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rockclimb": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "rockslide": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rockthrow": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "rollout": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tarshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "bellydrum": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "boomburst": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "chatter": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "disarmingvoice": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "drumbeating": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "eeriespell": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "echoedvoice": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "growl": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "healbell": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "hypervoice": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "instruct": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "metalsound": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "nobleroar": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "overdrive": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "perishsong": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "relicsong": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "roar": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "round": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "screech": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "sing": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "sleeptalk": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "sonicboom": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "supersonic": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "uproar": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "anchorshot": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "guillotine": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "magnetbomb": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "metalclaw": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sharpen": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "snaptrap": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "steelroller": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "steelwing": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "swordsdance": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "technoblast": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "visegrip": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "brine": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "clamp": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "flipturn": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hydropump": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "liquidation": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "muddywater": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "octolock": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "soak": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "sparklingaria": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "spikecannon": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "splash": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "teatime": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "watergun": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "whirlpool": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "arcticparasite": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 30
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "butterflykiss": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "drain-half-alt+attack-drain-broad"
+    },
+    "dragonflycharge": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 2,
+        "recoil": [
+          25,
+          100
+        ]
+      },
+      "rule": "numeric-priority+recoil-percent"
+    },
+    "flutter": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "custom": "cure-status"
+      },
+      "rule": "cure-status-self"
+    },
+    "hivemind": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:outrage"
+    },
+    "infection": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:hex"
+    },
+    "nectartap": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "heal": [
+          1,
+          2
+        ],
+        "flags": {
+          "heal": 1
+        }
+      },
+      "rule": "heal-self-half+status-heal-broad"
+    },
+    "pheromonestream": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 20
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "pollenblast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spa": -2
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "strafe": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "strike-first"
+    },
+    "swarmoverload": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 10
+        },
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad+recoil-percent"
+    },
+    "antimatter": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:clearsmite"
+    },
+    "asteroidbelt": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:protect-contact-punish (existing handler)"
+    },
+    "blackhole": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:thousandarrows"
+    },
+    "comet": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 30
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "corecollapse": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "def": -1,
+          "atk": 2,
+          "spe": 2
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "dimensionwarp": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "selfSwitch": true
+      },
+      "rule": "pivot+pivot-switches-places"
+    },
+    "dimensionalrush": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spe": 2
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "gammaray": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "icecomet": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 10
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "innervate": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:healblock"
+    },
+    "meteordrive": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spe": 1
+          }
+        }
+      },
+      "rule": "attack-self-boost-guaranteed"
+    },
+    "orbitalstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 10
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "quantumstar": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "shootingstar": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:suckerpunch"
+    },
+    "solareclipse": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "accuracy": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "solarflare": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 10
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "solarmeteor": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 20
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "spaceinvaders": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:beatup"
+    },
+    "spatialgrip": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "stardash": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "strike-first"
+    },
+    "stardust": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "accuracy": -1
+        }
+      },
+      "rule": "status-lower-both+status-lower-broad"
+    },
+    "stardustreverie": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 20
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "starfall": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "starsaligned": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:storedpower"
+    },
+    "stellarrush": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "recoil-percent"
+    },
+    "supernova": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 30
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "trivega": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          3,
+          3
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "twinstars": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          2
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "uranometria": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "chargeMove": true,
+        "custom": "two-turn-semivulnerable"
+      },
+      "rule": "two-turn-dive"
+    },
+    "voiddrift": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -2
+        }
+      },
+      "rule": "status-lower-target+status-lower-broad"
+    },
+    "backstabbing": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "priority-phrase"
+    },
+    "blackout": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:light-damage-reduction-field"
+    },
+    "cheapshot": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "selfSwitch": true
+      },
+      "rule": "pivot+pivot-switches-places"
+    },
+    "darkrecital": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spd": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "deathgate": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spd": -1
+        }
+      },
+      "rule": "guaranteed-lower-target+attack-lower-target-broad"
+    },
+    "deathreap": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "def": -1
+        }
+      },
+      "rule": "guaranteed-lower-target+attack-lower-target-broad"
+    },
+    "evilthorn": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "slp",
+          "chance": 10
+        },
+        "seAgainst": "Fairy"
+      },
+      "rule": "attack-chance-status-broad+se-vs-type"
+    },
+    "feign": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss"
+    },
+    "heartbreak": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "def": -1,
+          "spd": -1
+        }
+      },
+      "rule": "status-lower-both+lowers-two-stats+status-lower-broad"
+    },
+    "obfuscate": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "accuracy": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "prankcall": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 30
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "scoresettler": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-if-ally-fainted"
+    },
+    "sinfulsmite": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:clearsmite"
+    },
+    "vendetta": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:chipaway"
+    },
+    "frenzy": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "execution": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": -2
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "vitalitydrain": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "drain-half-alt+attack-drain-broad"
+    },
+    "wickedstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 30
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "ancientglare": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "atk": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "dracarys": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 10
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "dracoshred": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "dragonblood": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "status": "psn"
+      },
+      "rule": "poison-status"
+    },
+    "dragongale": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 10
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "dragongnaw": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          75,
+          100
+        ]
+      },
+      "rule": "drain-percent+attack-drain-broad"
+    },
+    "dragonmagic": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "custom": "random-status"
+      },
+      "rule": "random-status"
+    },
+    "draconiccrash": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 10
+        },
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad+recoil-percent"
+    },
+    "dragonwing": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "dracosurge": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spd": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "endershock": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost+spread-move"
+    },
+    "nagaskin": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "heal": [
+          1,
+          2
+        ],
+        "flags": {
+          "heal": 1
+        }
+      },
+      "rule": "status-heal-broad"
+    },
+    "salamandertoss": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "selfSwitch": true
+      },
+      "rule": "pivot-switches-places"
+    },
+    "wyvernslash": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "batteryacid": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "psn",
+          "chance": 30
+        }
+      },
+      "rule": "poison-chance+damage-poison+attack-chance-status-broad"
+    },
+    "chainlightning": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spa": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "electroncrush": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-enemy-side"
+    },
+    "magnetforce": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spd": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "attack-chance-self-stat+chance-raise-self-broad"
+    },
+    "protoncrash": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spe": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "shortfuse": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "priority-phrase"
+    },
+    "staticshock": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spe": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "aphroditesmirror": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "changelings": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "custom": "stat-swap"
+      },
+      "rule": "stat-swap"
+    },
+    "cupidsarrow": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "strike-first"
+    },
+    "etherealburst": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacent"
+      },
+      "rule": "spread-everyone"
+    },
+    "excalibur": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "fabledrush": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "def": -1
+          }
+        },
+        "priority": 2
+      },
+      "rule": "attack-self-lower-broad+numeric-priority"
+    },
+    "faesblessing": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spa": 2
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "fairyring": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "fairytale": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "custom": "type-change",
+        "newType": "Fairy"
+      },
+      "rule": "type-change"
+    },
+    "goblinstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "attack-chance-self-stat+chance-raise-self-broad"
+    },
+    "loveburst": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 10
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "mysticpulse": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-enemy-side"
+    },
+    "nymphsspell": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "atk": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "oberonswrath": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:weaken-as-user-hp-drops"
+    },
+    "peekaboo": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "flinch"
+      },
+      "rule": "flinch-only"
+    },
+    "pixiewave": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss"
+    },
+    "sirenssong": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "sylphshorn": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "attack-drain-broad"
+    },
+    "titaniaslaw": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spd": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "valkyriechariot": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:miss-recoil-gravity-fail"
+    },
+    "wildimagination": {
+      "class": "new",
+      "patch": {
+        "target": "allies",
+        "boosts": {}
+      },
+      "rule": "status-boost-ally"
+    },
+    "wooinghug": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "athenaswisdom": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spd": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "battleofwits": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "seAgainst": "Psychic"
+      },
+      "rule": "se-vs-type"
+    },
+    "bruteforce": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "chakrablast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -2
+        }
+      },
+      "rule": "guaranteed-lower-target+attack-lower-target-broad"
+    },
+    "chidori": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 30
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "chiorb": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 10
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "deadlyreach": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "edgestrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2,
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 50
+        }
+      },
+      "rule": "crit-boost+chance-raise-self-broad"
+    },
+    "gigasmash": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "chargeMove": true,
+        "custom": "two-turn-semivulnerable"
+      },
+      "rule": "two-turn-dive"
+    },
+    "magicpalm": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss"
+    },
+    "parry": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-if-ally-fainted"
+    },
+    "sweepingwind": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spe": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "ancientfire": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 10
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "crimsongate": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "atk": 1,
+          "spd": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "fireball": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:furycutter"
+    },
+    "flamevolley": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "flaresweep": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "atk": -1,
+          "spe": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "heatsiphon": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "drain-half-alt+attack-drain-broad"
+    },
+    "infernalblade": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "chargeMove": true,
+        "custom": "solarbeam-family"
+      },
+      "rule": "charge-attack"
+    },
+    "meltinghorn": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "recoil": [
+          25,
+          100
+        ]
+      },
+      "rule": "recoil-percent"
+    },
+    "sizzle": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 100
+        }
+      },
+      "rule": "guaranteed-status-on-hit"
+    },
+    "boreasbreath": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frz",
+          "chance": 10
+        }
+      },
+      "rule": "freeze-chance+damage-freeze+attack-chance-status-broad"
+    },
+    "deathvortex": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "erosion": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "seAgainst": "Rock"
+      },
+      "rule": "se-vs-type"
+    },
+    "flock": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "galehold": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "glide": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spe": 1
+          }
+        }
+      },
+      "rule": "attack-self-boost-guaranteed"
+    },
+    "jetdive": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "strike-first"
+    },
+    "skydive": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:chipaway"
+    },
+    "streamrush": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:electroball"
+    },
+    "swansong": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {},
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "tornado": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-enemy-side"
+    },
+    "turbulence": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:knockoff"
+    },
+    "typhoon": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spa": 1
+            }
+          },
+          "chance": 50
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "burningofuda": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          2
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "deathwaltz": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 10
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "ectoplasm": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spd": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "goosebump": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 10
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "grimreaper": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": 2
+          }
+        }
+      },
+      "rule": "attack-self-boost-guaranteed"
+    },
+    "haunt": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spe": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "necrophagy": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          75,
+          100
+        ]
+      },
+      "rule": "drain-percent+attack-drain-broad"
+    },
+    "macabredance": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spa": 1,
+          "spe": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "possession": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "recoil-percent"
+    },
+    "shadowray": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "soulshield": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "def": 1,
+          "spd": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "edenfruit": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped",
+        "boosts": {
+          "def": 1,
+          "spd": 1
+        }
+      },
+      "rule": "trap+self-boost-two-stat+status-boost-broad"
+    },
+    "flytrap": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped",
+        "seAgainst": "Bug"
+      },
+      "rule": "trap+se-vs-type"
+    },
+    "forestleap": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": 1,
+            "spe": 1
+          }
+        }
+      },
+      "rule": "attack-self-boost-guaranteed"
+    },
+    "mossypunch": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "slp",
+          "chance": 10
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "natureswrath": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 100
+        }
+      },
+      "rule": "guaranteed-status-on-hit"
+    },
+    "pepperburst": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 30
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "strandingroots": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "thornprison": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "vexingvines": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:fairylock"
+    },
+    "continentalrift": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:ignore-ability-physpec-swap"
+    },
+    "gaiapulse": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spa": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "goldrush": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:clearsmite"
+    },
+    "mudshackles": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "mudslide": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "accuracy": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "sandjet": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "priority-phrase"
+    },
+    "seismicshift": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "weightPower": true,
+        "custom": "heatcrash-family"
+      },
+      "rule": "fixed-damage-weight"
+    },
+    "stampede": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:outrage"
+    },
+    "wildroots": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "frostbite": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "frozenheart": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:healbell"
+    },
+    "hypothermia": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:hex"
+    },
+    "icetomb": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 10
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "icevortex": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:dragontail"
+    },
+    "liquidnitrogen": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 30
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "loveloop": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 30
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "polarspear": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 100
+        }
+      },
+      "rule": "guaranteed-status-on-hit"
+    },
+    "snowflakes": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "accuracy": -1
+        }
+      },
+      "rule": "status-lower-both+lowers-two-stats+status-lower-broad"
+    },
+    "wintershowl": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": -1,
+            "def": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "cleanse": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:defog-plus-remove-screens-terrain"
+    },
+    "consecrate": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "atk": 1,
+          "def": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "coupdegrace": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:brine"
+    },
+    "divinepunishment": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spa": -2
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "divinevision": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:futuresight"
+    },
+    "finalstand": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "recoil-percent"
+    },
+    "guardianangel": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:safeguard"
+    },
+    "hallowedground": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:matblock"
+    },
+    "heavensknuckle": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:ko-boost"
+    },
+    "holybolt": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "strike-first"
+    },
+    "holyfire": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "status": "brn"
+      },
+      "rule": "burn-status"
+    },
+    "lightsaber": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 10
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "lostheaven": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "luminousblade": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "chargeMove": true,
+        "custom": "solarbeam-family"
+      },
+      "rule": "charge-attack"
+    },
+    "luminousscales": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "accuracy": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "purge": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:hex"
+    },
+    "rainbowbeam": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spa": 1
+          }
+        }
+      },
+      "rule": "always-boost-self+attack-self-boost-guaranteed"
+    },
+    "rayoflight": {
+      "class": "new",
+      "patch": {
+        "target": "allies",
+        "custom": "heal-party-status",
+        "heal": [
+          1,
+          4
+        ]
+      },
+      "rule": "heal-party-status+heal-25-percent"
+    },
+    "rebuke": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:revenge"
+    },
+    "rejuvenate": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "drain-half-damage+drain-half-alt+attack-drain-broad"
+    },
+    "renewal": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "drain-half-damage+drain-half-alt+attack-drain-broad"
+    },
+    "repentance": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:bellydrum-spa-hp-cost"
+    },
+    "revitalize": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "drain-half-damage+drain-half-alt+attack-drain-broad"
+    },
+    "shinyplumes": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "skyblessing": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "def": 1,
+          "spd": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "sparkle": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 10
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "strobelight": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "confusion"
+      },
+      "rule": "confuse-status"
+    },
+    "sweetnothings": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -1,
+          "spd": -1
+        }
+      },
+      "rule": "status-lower-broad"
+    },
+    "zeal": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spe": 1
+          }
+        }
+      },
+      "rule": "always-boost-self+attack-self-boost-guaranteed"
+    },
+    "achillesheel": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "spa": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "bearhug": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "clonesurge": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:furycutter"
+    },
+    "curbstomp": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "weightPower": true,
+        "custom": "heatcrash-family"
+      },
+      "rule": "fixed-damage-weight"
+    },
+    "determination": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:outrage"
+    },
+    "fantasyseal": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "seAgainst": "Ghost"
+      },
+      "rule": "se-vs-type"
+    },
+    "genesis": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "lazybreak": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "status": "slp"
+      },
+      "rule": "status-sleep-broad"
+    },
+    "powernap": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:healbell"
+    },
+    "primalwave": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-enemy-side"
+    },
+    "pulse": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss"
+    },
+    "maim": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "attack-chance-self-stat+chance-raise-self-broad"
+    },
+    "rapidstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 2
+      },
+      "rule": "numeric-priority"
+    },
+    "shutdown": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "flinch"
+      },
+      "rule": "flinch-only"
+    },
+    "slicingtail": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          3,
+          3
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "twinbeam": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "weaponmastery": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "atk": 1,
+          "spa": 1,
+          "spe": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "acidrain": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "allergy": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:hex"
+    },
+    "corrode": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "seAgainst": "Steel"
+      },
+      "rule": "se-vs-type"
+    },
+    "neurotoxin": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "plague": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "poisonspit": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "psn",
+          "chance": 100
+        }
+      },
+      "rule": "guaranteed-status-on-hit"
+    },
+    "spoil": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:knockoff"
+    },
+    "venomdrain": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "attack-drain-broad"
+    },
+    "vilefumes": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "gastroacid"
+      },
+      "rule": "ability-negate"
+    },
+    "arcaneenergy": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spa": 1
+            }
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "bloodritual": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "recoil-percent"
+    },
+    "checkmate": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:ko-boost"
+    },
+    "karmaspell": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:dragontail"
+    },
+    "manicoverload": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": -1,
+            "spe": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "memoryblock": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "accuracy": -1
+          },
+          "chance": 30
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "mindblast": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "minddrain": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "attack-drain-broad"
+    },
+    "mindspasm": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 100
+        }
+      },
+      "rule": "guaranteed-status-on-hit"
+    },
+    "nurturingchant": {
+      "class": "new",
+      "patch": {
+        "target": "allies",
+        "custom": "heal-party-status",
+        "heal": [
+          1,
+          4
+        ]
+      },
+      "rule": "heal-party-status+heal-25-percent"
+    },
+    "pyrokinesis": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 30
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "quickspell": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "priority-phrase"
+    },
+    "amberwave": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 10
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "bejeweled": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 20
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "boulderhurl": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:bodypress"
+    },
+    "catapult": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spe": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "crystaldust": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "accuracy": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "diamondblade": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2,
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "crit-boost+chance-raise-self-broad"
+    },
+    "diamondshard": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "priority-phrase"
+    },
+    "gemstorm": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss+spread-enemy-side"
+    },
+    "glisten": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spa": 1,
+          "spd": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "mineralwave": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -1
+        }
+      },
+      "rule": "guaranteed-lower-target"
+    },
+    "moonstoneray": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "chargeMove": true,
+        "custom": "solarbeam-family"
+      },
+      "rule": "charge-attack"
+    },
+    "battlecry": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "boombox": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move+spread-everyone"
+    },
+    "crescendo": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:furycutter"
+    },
+    "darkwhispers": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -1
+        }
+      },
+      "rule": "status-lower-both+lowers-two-stats+status-lower-broad"
+    },
+    "deadsilence": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:ban-sound-moves"
+    },
+    "fortissimo": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": -2
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "gentlechimes": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "slp",
+          "chance": 20
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "gossip": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -1,
+          "spd": -1
+        }
+      },
+      "rule": "status-lower-broad"
+    },
+    "hallelujah": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spd": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "hyperacusis": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spd": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "lullaby": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "status": "slp",
+        "chargeMove": true,
+        "custom": "two-turn-semivulnerable"
+      },
+      "rule": "sleep-status+two-turn-dive+status-sleep-broad"
+    },
+    "megaphone": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "noisepollution": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "psn",
+          "chance": 30
+        }
+      },
+      "rule": "poison-chance+damage-poison+attack-chance-status-broad"
+    },
+    "odetojoy": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "heal": [
+          1,
+          2
+        ],
+        "flags": {
+          "heal": 1
+        }
+      },
+      "rule": "status-heal-broad"
+    },
+    "perfectpitch": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1,
+              "def": 1,
+              "spa": 1,
+              "spd": 1,
+              "spe": 1
+            }
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "philharmonic": {
+      "class": "new",
+      "patch": {
+        "target": "allies",
+        "custom": "heal-party-status",
+        "heal": [
+          1,
+          4
+        ]
+      },
+      "rule": "heal-party-status+heal-25-percent"
+    },
+    "rallentando": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "atk": -1,
+          "spa": -1
+        }
+      },
+      "rule": "status-lower-target+lowers-two-stats+status-lower-broad"
+    },
+    "reverb": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "schizophrenia": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:boost-highest-lowest"
+    },
+    "songofpassion": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spa": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "songofsilence": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:clearsmite"
+    },
+    "soniccrash": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "recoil-percent"
+    },
+    "sonicpunch": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "strike-first"
+    },
+    "staccato": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "flinch"
+      },
+      "rule": "flinch-only"
+    },
+    "talksmack": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "wail": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-if-lowered-this-turn"
+    },
+    "chromeray": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 10
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "goldenbullet": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:suckerpunch"
+    },
+    "hellbullet": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "magneticcannon": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spd": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "missileshot": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "nervesofsteel": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:mist"
+    },
+    "quicksilver": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "priority-phrase"
+    },
+    "shieldbash": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:bodypress"
+    },
+    "smartblade": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "swordstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "timebomb": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-if-ally-fainted"
+    },
+    "titanhammer": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": -2
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "coralbomb": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 30
+        },
+        "critRatio": 2
+      },
+      "rule": "burn-chance+damage-burn+crit-boost+attack-chance-status-broad"
+    },
+    "hypertorrent": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:dragontail"
+    },
+    "oceanblast": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "oceanwrath": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "surgingblow": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:suckerpunch"
+    },
+    "waterpressure": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "recoil-percent"
+    },
+    "waterwhip": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:dragontail"
+    },
+    "quicksand": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -2
+        }
+      },
+      "rule": "status-lower-both+lowers-two-stats+status-lower-broad"
+    },
+    "dragonfury": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "sweepingtalon": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "satelliteray": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "seAgainst": "Cosmic"
+      },
+      "rule": "se-vs-type"
+    },
+    "holyward": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:spdef-bodypress"
+    },
+    "bewitch": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "alkalinebomb": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "mixedwaves": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "concoction": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:physpec-swap"
+    },
+    "cruelwhip": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:hex"
+    },
+    "bombardment": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:physpec-swap"
+    },
+    "scentedshield": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:spdef-bodypress"
+    },
+    "ironsparks": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 30
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "shrapnel": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss"
+    },
+    "clusterrockets": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "powerdrill": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:brickbreak"
+    },
+    "overclock": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": 1,
+            "spe": 1
+          }
+        }
+      },
+      "rule": "always-boost-self+attack-self-boost-guaranteed"
+    },
+    "sonicblast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss"
+    },
+    "sonicwave": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "deafen": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "def": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "shatter": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:brickbreak"
+    },
+    "penance": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "selfSwitch": true
+      },
+      "rule": "pivot-switches-places"
+    },
+    "stargaze": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "atk": 1,
+          "spa": 1
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "gravitypress": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "weightPower": true,
+        "custom": "heatcrash-family"
+      },
+      "rule": "fixed-damage-weight"
+    },
+    "bigbang": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spa": -2
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "meteorshower": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "celestialfury": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "radiowaves": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "psn",
+          "chance": 30
+        }
+      },
+      "rule": "poison-chance+damage-poison+attack-chance-status-broad"
+    },
+    "radiation": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "spd": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "cosmicavatar": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": -1,
+            "def": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "astralbarrage": {
+      "class": "retyped-variant",
+      "patch": null
+    },
+    "astralwind": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1,
+              "def": 1,
+              "spa": 1,
+              "spd": 1,
+              "spe": 1
+            }
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "soundbarrier": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:spdef-bodypress"
+    },
+    "flatulence": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-if-berry-eaten"
+    },
+    "darkomen": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:futuresight"
+    },
+    "duneblast": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:ko-boost"
+    },
+    "sandsnare": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "rattletail": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "def": -1,
+          "spd": -1
+        }
+      },
+      "rule": "status-lower-target+status-lower-broad"
+    },
+    "stonegaze": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "flinch"
+      },
+      "rule": "flinch-only"
+    },
+    "boil": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "seAgainst": "Water"
+      },
+      "rule": "se-vs-type"
+    },
+    "meltaway": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spe": 2
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "kindle": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "atk": 1
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "hotsprings": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "heal": [
+          1,
+          2
+        ],
+        "flags": {
+          "heal": 1
+        },
+        "custom": "purify"
+      },
+      "rule": "heal-self-half+status-cure-heal+status-heal-broad"
+    },
+    "ignite": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spa": 1
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "heatstroke": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "confusion"
+      },
+      "rule": "confuse-status"
+    },
+    "chaosblast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "willCrit": true
+      },
+      "rule": "always-crit"
+    },
+    "phobia": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:hex"
+    },
+    "siphon": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "drain-half-alt+attack-drain-broad"
+    },
+    "manipulation": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spd": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "judoflip": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:topsyturvy"
+    },
+    "elegy": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {},
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "boomingbeats": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:storedpower"
+    },
+    "psychobreak": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "bonechill": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 30
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "refraction": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:chipaway"
+    },
+    "zephyrpurge": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:lastresort"
+    },
+    "glitch": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "sonicnova": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "luminescence": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "accuracy": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "bouldercrush": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "atk": -1,
+          "def": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "stonesurge": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 20
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "plasmaforge": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 10
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "cobaltray": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:clearsmite"
+    },
+    "mudblast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "mudsurge": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spd": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "grabandgo": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:spectralthief"
+    },
+    "aquafang": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "powerwash": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:knockoff"
+    },
+    "energysurge": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "dirtybomb": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "psn",
+          "chance": 20
+        }
+      },
+      "rule": "poison-chance+damage-poison+attack-chance-status-broad"
+    },
+    "tempestflare": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "def": -1,
+            "spd": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "sacredstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "rainbowscales": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "accuracy": -1
+          },
+          "chance": 30
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "scorch": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "aerialpulse": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss"
+    },
+    "arrowflurry": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "hiddenpowernormal": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "hiddenpowerfire": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerwater": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowergrass": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerelectric": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerice": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerpoison": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerfighting": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerground": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerflying": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerpsychic": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerbug": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerrock": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerghost": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerdragon": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowersteel": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerdark": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "hiddenpowerfairy": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "hiddenpowercosmic": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "hiddenpowersound": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "hiddenpowerlight": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "piddle": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "def": -1,
+          "spd": -1
+        }
+      },
+      "rule": "status-lower-broad"
+    },
+    "overflow": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:speed-boost-clear-hazards"
+    },
+    "quakeslam": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:knockoff"
+    },
+    "throwingstar": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "tremor": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "trample": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 10
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "wraithpulse": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:boost-if-faster"
+    },
+    "chitinousstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spe": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "radiantlance": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:miss-recoil-gravity-fail"
+    },
+    "fabledslam": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "recoil": [
+          33,
+          100
+        ]
+      },
+      "rule": "recoil-percent"
+    },
+    "doublescoop": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          2
+        ],
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "multihit+damage-flinch+attack-chance-status-broad"
+    },
+    "slurp": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "attack-drain-broad"
+    },
+    "suckblood": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          1,
+          2
+        ]
+      },
+      "rule": "attack-drain-broad"
+    },
+    "bugsting": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "irritant": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spa": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "clackaclack": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "atk": 1,
+            "spa": 1
+          }
+        }
+      },
+      "rule": "attack-self-boost-guaranteed"
+    },
+    "signaloverload": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "gloom": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "spd": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "darkprism": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "umbralwave": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spa": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "dracotempest": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:brine"
+    },
+    "ancientroar": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 10
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "wyrmsrage": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-if-previous-failed"
+    },
+    "draconicwave": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "draconicmight": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "atk": -2
+        }
+      },
+      "rule": "status-lower-broad"
+    },
+    "draconicmajesty": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -2
+        }
+      },
+      "rule": "status-lower-broad"
+    },
+    "dragonsoul": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "custom": "cure-status"
+      },
+      "rule": "cure-status-self"
+    },
+    "stormshield": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:protect-contact-defense-lower"
+    },
+    "enchantment": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spe": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "pixiedust": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -1
+        }
+      },
+      "rule": "attack-lower-target-broad+spread-enemy-side"
+    },
+    "fleetingblow": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "accuracy": true
+      },
+      "rule": "cant-miss"
+    },
+    "gracefulstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 10
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "unlockchi": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:storedpower"
+    },
+    "chiwave": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spe": 1
+          }
+        }
+      },
+      "rule": "attack-self-boost-guaranteed"
+    },
+    "rasengan": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 30
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "kamehameha": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spd": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "aurablock": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:torment"
+    },
+    "suppressaura": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:gastroacid"
+    },
+    "flamepillar": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "firewall": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:wideguard"
+    },
+    "huntdown": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:pursuit"
+    },
+    "swoopattack": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "def": -1
+          }
+        },
+        "priority": 2
+      },
+      "rule": "attack-self-lower-broad+numeric-priority"
+    },
+    "divebomb": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "quillvolley": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:furycutter"
+    },
+    "stalkprey": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "def": -1,
+          "spd": -1
+        }
+      },
+      "rule": "status-lower-both+lowers-two-stats"
+    },
+    "encircle": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:fairylock"
+    },
+    "birdofprey": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "atk": 1,
+          "accuracy": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "soulrip": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "soulflay": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "disturb": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:knockoff"
+    },
+    "maleficact": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:chipaway"
+    },
+    "seance": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "shiver": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "spitefulchant": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:dragontail"
+    },
+    "ghastlyflood": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "accuracy": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "dirge": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spa": 1,
+          "accuracy": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "spectrallash": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:brine"
+    },
+    "essencearrow": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spa": 1
+            }
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "essencebloom": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "autumnblast": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:brickbreak"
+    },
+    "primordialbeam": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "spa": -1
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "petaltempest": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 10
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "dustdevils": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 20
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "sandwave": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "multihit+priority-phrase"
+    },
+    "sandspray": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spd": -2
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "sandflurry": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 10
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad+spread-enemy-side"
+    },
+    "sandpit": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "sandshroud": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spd": 3
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "snowball": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "iciclestrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "tundrarush": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spe": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "polarpummel": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          2
+        ],
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 20
+        }
+      },
+      "rule": "multihit+chance-raise-self-broad"
+    },
+    "icydeluge": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:boost-if-faster"
+    },
+    "permafrost": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 30
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "chillingblast": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:ko-boost"
+    },
+    "numbingwind": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "coldsnap": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spa": -1
+          },
+          "chance": 30
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "winterwarning": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:futuresight"
+    },
+    "coldfront": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "atk": 1,
+          "spa": 1
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "wintersgrasp": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -2
+        }
+      },
+      "rule": "status-lower-broad"
+    },
+    "rapture": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 20
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "blessedhammer": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          2
+        ],
+        "target": "normal"
+      },
+      "rule": "multihit"
+    },
+    "fanaticism": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-if-previous-failed"
+    },
+    "blindingflash": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 10
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "willpower": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "kineticblast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "harness": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "drain": [
+          50,
+          100
+        ]
+      },
+      "rule": "drain-percent+attack-drain-broad"
+    },
+    "balancedbeam": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "fluxwave": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 20
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "manablast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "spa": -1
+          },
+          "chance": 30
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "septicstrike": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "malady": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spe": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "virus": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "spa": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "contagion": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "miasma": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1,
+              "spa": 1
+            }
+          },
+          "chance": 50
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "blight": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:brickbreak"
+    },
+    "causticacid": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "par",
+          "chance": 10
+        }
+      },
+      "rule": "paralyze-chance+damage-paralyze+attack-chance-status-broad"
+    },
+    "mindcrush": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:punishment"
+    },
+    "mindmeld": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:knockoff"
+    },
+    "scramblemind": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 10
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "arcaneblast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "spa": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "arcanebarrage": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          2,
+          5
+        ],
+        "target": "normal",
+        "priority": 1
+      },
+      "rule": "multihit+priority-phrase"
+    },
+    "hexbolt": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:chipaway"
+    },
+    "psyblast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "fortify": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "def": 1,
+          "spd": 1
+        }
+      },
+      "rule": "self-boost-two-stat+status-boost-broad"
+    },
+    "weardown": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped",
+        "boosts": {
+          "def": -1,
+          "spd": -1
+        }
+      },
+      "rule": "trap+status-lower-both+lowers-two-stats+status-lower-broad"
+    },
+    "vibrato": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "percussionblast": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "gutturalroar": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "glorioushymn": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spa": -2
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "shotput": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "bulletcharge": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spe": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "chainsweep": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spe": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "spikedram": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "def": -1
+        }
+      },
+      "rule": "attack-lower-target-broad"
+    },
+    "vanguard": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "refurbish": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:boost-highest-lowest"
+    },
+    "weld": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "status": "brn"
+      },
+      "rule": "burn-status"
+    },
+    "drench": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "flinch",
+          "chance": 30
+        }
+      },
+      "rule": "damage-flinch+attack-chance-status-broad"
+    },
+    "crashingwave": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "atk": 1
+            }
+          },
+          "chance": 20
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "tidalshift": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "boosts": {
+          "spe": 2
+        }
+      },
+      "rule": "status-boost-broad"
+    },
+    "swarmattack": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "volatileStatus": "trapped"
+      },
+      "rule": "trap"
+    },
+    "ambush": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "dragonfear": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spa": 1
+            }
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "arcingblow": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "overwhelm": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "cursedtouch": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "metallicgleam": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "accuracy": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "ironimpact": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "def": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "torrent": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    },
+    "riptide": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "hydrosteam": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "burningbulwark": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "thunderclap": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "psyblade": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "mightycleave": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "tachyoncutter": {
+      "class": "canonical-kept",
+      "patch": null
+    },
+    "wildfire": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "chance-lower-target-broad"
+    },
+    "hellbrand": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:brickbreak"
+    },
+    "nebulastrike": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:double-if-previous-failed"
+    },
+    "earthenlance": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "def": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "cataclysm": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spe": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "weakspot": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1
+          },
+          "chance": 20
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "radiantburst": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spe": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "prismaticfury": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "brn",
+          "chance": 10
+        }
+      },
+      "rule": "burn-chance+damage-burn+attack-chance-status-broad"
+    },
+    "neutralize": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:clearsmite"
+    },
+    "savagery": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "def": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "obsidianshards": {
+      "class": "new",
+      "patch": {
+        "multihit": [
+          3,
+          3
+        ],
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spa": -1
+          },
+          "chance": 30
+        }
+      },
+      "rule": "multihit+damage-lower-target+chance-lower-target-broad"
+    },
+    "ironcascade": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "eclipsenova": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "psn",
+          "chance": 10
+        }
+      },
+      "rule": "poison-chance+damage-poison+attack-chance-status-broad"
+    },
+    "scalestorm": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "critRatio": 2
+      },
+      "rule": "crit-boost"
+    },
+    "wyrmbeam": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:clearsmite"
+    },
+    "seismicchant": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "boosts": {
+          "spa": -2
+        }
+      },
+      "rule": "status-lower-broad"
+    },
+    "blastfreeze": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes"
+      },
+      "rule": "spread-move"
+    },
+    "boltcrash": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spe": -1
+          }
+        }
+      },
+      "rule": "attack-self-lower-broad"
+    },
+    "balllightning": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "self": {
+            "boosts": {
+              "spe": 1
+            }
+          },
+          "chance": 30
+        }
+      },
+      "rule": "chance-raise-self-broad"
+    },
+    "divinejudgment": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "spd": -1
+          },
+          "chance": 10
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "holynova": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacentFoes",
+        "self": {
+          "boosts": {
+            "spa": -1
+          }
+        }
+      },
+      "rule": "spread-move+attack-self-lower-broad"
+    },
+    "crystalshower": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "boosts": {
+            "atk": -1,
+            "accuracy": -1
+          },
+          "chance": 30
+        }
+      },
+      "rule": "damage-lower-target+chance-lower-target-broad"
+    },
+    "crystallinebeam": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 10
+        }
+      },
+      "rule": "attack-chance-status-broad"
+    },
+    "beatdrop": {
+      "class": "new",
+      "patch": {
+        "custom": "engine-bespoke"
+      },
+      "rule": "engine-bespoke:miss-recoil-gravity-fail"
+    },
+    "tapdance": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "volatileStatus": "confusion",
+          "chance": 10
+        }
+      },
+      "rule": "damage-confuse+attack-chance-status-broad"
+    },
+    "irontempest": {
+      "class": "new",
+      "patch": {
+        "target": "allAdjacent"
+      },
+      "rule": "spread-everyone"
+    },
+    "chillingtouch": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "status": "frb",
+        "custom": "frostbite"
+      },
+      "rule": "frostbite"
+    },
+    "frostnip": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "secondary": {
+          "status": "frb",
+          "chance": 100
+        }
+      },
+      "rule": "guaranteed-status-on-hit"
+    },
+    "bitterbastion": {
+      "class": "new",
+      "patch": {
+        "target": "self",
+        "custom": "protect-family",
+        "status": "frb"
+      },
+      "rule": "protection+frostbite"
+    },
+    "powercycle": {
+      "class": "new",
+      "patch": {
+        "target": "normal",
+        "self": {
+          "boosts": {
+            "spe": 1
+          }
+        }
+      },
+      "rule": "attack-self-boost-guaranteed"
+    },
+    "balancerchangerequired": {
+      "class": "new",
+      "patch": null,
+      "rule": "unmatched"
+    }
+  }
+}

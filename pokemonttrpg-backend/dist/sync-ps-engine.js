@@ -244,10 +244,42 @@ const customMoveEffectPatches = {
         desc: "Sings a beautiful melody that heals the user for half of its total HP.",
         shortDesc: "Sings a beautiful melody that heals the user for half of its total HP.",
     },
+    // corecollapse: applies mixed boosts (def -1, atk +2, spe +2) to self
+    corecollapse: {
+        target: "self",
+        boosts: { def: -1, atk: 2, spe: 2 },
+        flags: { snatch: 1, metronome: 1 },
+        onHit(pokemon) {
+            this.boost({ def: -1, atk: 2, spe: 2 }, pokemon);
+        },
+    },
+    // dragonflycharge: +2 priority (already via priority field); apply the
+    // 25% recoil as a post-hit self-damage. Uses the damage dealt this turn
+    // via getMoveHitData so 25% of dealt damage is the recoil (matches
+    // "takes 25% recoil damage").
+    dragonflycharge: {
+        onAfterMoveSecondarySelf(pokemon, target, move) {
+            const dealt = target ? target.getMoveHitData(move) : null;
+            const dmg = dealt && typeof dealt.damage === 'number' ? dealt.damage : 0;
+            if (dmg > 0 && pokemon.hp > 0) {
+                this.damage(this.calcRecoilMove ? Math.ceil((dmg * 25) / 100) : Math.max(1, Math.floor((dmg * 25) / 100)), pokemon, pokemon, 'recoil');
+            }
+        },
+    },
+    // lazybreak: puts the target to sleep
+    lazybreak: {
+        target: "normal",
+        status: "slp",
+        flags: { protect: 1, reflectable: 1, metronome: 1 },
+        onHit(target) {
+            if (!target.setStatus("slp", this.activePokemon)) return false;
+        },
+    },
 };
 
-function applyCustomMoveEffectPatches(movesRecord) {
-    for (const [moveId, patch] of Object.entries(customMoveEffectPatches)) {
+function applyCustomMoveEffectPatches(movesRecord, patches) {
+    const map = patches || customMoveEffectPatches;
+    for (const [moveId, patch] of Object.entries(map)) {
         const existing = movesRecord[moveId];
         if (existing && typeof existing === 'object') {
             Object.assign(existing, patch);
@@ -265,6 +297,191 @@ function applyCustomMoveEffectPatches(movesRecord) {
             };
         }
     }
+}
+
+// ---- SS2 bespoke move mechanics -------------------------------------------
+// (a) CLONES: SS2 moves whose descriptions match a canonical mechanic exactly
+//     (Hex/Revenge/Clear Smite/Knock Off/Dragon Tail/Fury Cutter/...). The
+//     canonical entry carries the real handlers; display fields come from the
+//     fan-game record so dex text stays correct.
+const customMoveClones = {
+    innervate: "healblock", suppressaura: "gastroacid", aurablock: "torment",
+    nervesofsteel: "mist", guardianangel: "safeguard", firewall: "wideguard",
+    hallowedground: "matblock", vexingvines: "fairylock", encircle: "fairylock",
+    judoflip: "topsyturvy", frozenheart: "healbell", powernap: "healbell",
+    deadsilence: "throatchop", heavensknuckle: "fellstinger",
+    shootingstar: "suckerpunch", goldenbullet: "suckerpunch", surgingblow: "suckerpunch",
+    coupdegrace: "brine", dracotempest: "brine", spectrallash: "brine",
+    huntdown: "pursuit", grabandgo: "spectralthief", mindcrush: "punishment",
+    unlockchi: "storedpower", starsaligned: "storedpower", boomingbeats: "storedpower",
+    quillvolley: "furycutter", fireball: "furycutter", clonesurge: "furycutter", crescendo: "furycutter",
+    spitefulchant: "dragontail", icevortex: "dragontail", karmaspell: "dragontail",
+    hypertorrent: "dragontail", waterwhip: "dragontail",
+    maleficact: "chipaway", hexbolt: "chipaway", vendetta: "chipaway", refraction: "chipaway", skydive: "chipaway",
+    antimatter: "clearsmog", sinfulsmite: "clearsmog", songofsilence: "clearsmog",
+    cobaltray: "clearsmog", goldrush: "clearsmog", neutralize: "clearsmog", wyrmbeam: "clearsmog",
+    autumnblast: "brickbreak", blight: "brickbreak", hellbrand: "brickbreak",
+    powerdrill: "brickbreak", shatter: "brickbreak",
+    quakeslam: "knockoff", disturb: "knockoff", mindmeld: "knockoff",
+    spoil: "knockoff", powerwash: "knockoff", turbulence: "knockoff",
+    infection: "hex", hypothermia: "hex", purge: "hex", allergy: "hex", cruelwhip: "hex", phobia: "hex",
+    spiritbarrage: "revenge", rebuke: "revenge",
+    spaceinvaders: "beatup", hivemind: "outrage", determination: "outrage", stampede: "outrage",
+    blackhole: "thousandarrows",
+    divinevision: "futuresight", darkomen: "futuresight", winterwarning: "futuresight",
+    zephyrpurge: "lastresort",
+    boulderhurl: "bodypress", shieldbash: "bodypress",
+    streamrush: "electroball",
+};
+function applyCustomMoveClones(movesRecord) {
+    let n = 0;
+    for (const [moveId, cloneId] of Object.entries(customMoveClones)) {
+        const clone = Dex.data.Moves[cloneId];
+        if (!clone || typeof clone !== "object") continue;
+        const ss2 = movesRecord[moveId] && typeof movesRecord[moveId] === "object" ? movesRecord[moveId] : {};
+        const merged = Object.assign({}, clone);
+        for (const k of ["name", "desc", "shortDesc"]) if (ss2[k]) merged[k] = ss2[k];
+        if (ss2.type) merged.type = ss2.type;
+        if (Number(ss2.pp) > 0) merged.pp = Number(ss2.pp);
+        // Preserve the fan-game's game-accurate combat profile while inheriting
+        // the canonical handler. Without this, cloning a Status move (e.g.
+        // clearsmog) stampedes category/basePower/accuracy and the move either
+        // does 0 damage (no basePower) or gains the wrong category.
+        if (ss2.category) merged.category = ss2.category;
+        if (Number(ss2.basePower) > 0 || (ss2.basePower === 0 && Number(ss2.basePower) === 0)) {
+            merged.basePower = Number(ss2.basePower);
+        }
+        if (ss2.accuracy != null && !isNaN(Number(ss2.accuracy))) merged.accuracy = Number(ss2.accuracy);
+        // Status moves cloned from another Status move keep the target from the
+        // SS2 entry if it's sane; attacking clones keep the canonical target.
+        if (ss2.target && String(ss2.target) !== 'normal') merged.target = ss2.target;
+        merged.num = 0;
+        merged.isNonstandard = "Custom";
+        movesRecord[moveId] = merged;
+        n++;
+    }
+    return n;
+}
+// (b) FIELD INTERPRETER: converts JSON-only convention fields emitted by the
+//     move-intent generator (hazard/weather/terrain/custom/critRatio) into real
+//     mechanics by borrowing the canonical implementation's handlers.
+function copyMoveMechanics(entry, src) {
+    for (const k of Object.keys(src)) {
+        if (k === "name" || k === "desc" || k === "shortDesc" || k === "num" || k === "isNonstandard") continue;
+        if (k === "type" || k === "basePower" || k === "category") continue;
+        const v = src[k];
+        if (typeof v === "function" || k === "condition" || k === "priority" || k === "flags") entry[k] = v;
+    }
+}
+function applyCustomFieldInterpreters(movesRecord) {
+    let n = 0;
+    for (const [moveId, entry] of Object.entries(movesRecord)) {
+        if (!entry || typeof entry !== "object") continue;
+        if (entry.hazard) {
+            const src = Dex.data.Moves[entry.hazard];
+            if (src) { copyMoveMechanics(entry, src); entry.target = src.target || "foeSide"; delete entry.hazard; n++; }
+            continue;
+        }
+        if (entry.weather) {
+            const wmap = { sunnyday: "sunnyday", raindance: "raindance", sandstorm: "sandstorm", snowscape: "snowscape", eclipse: "sunnyday" };
+            const src = Dex.data.Moves[wmap[entry.weather] || entry.weather];
+            if (src) { copyMoveMechanics(entry, src); entry.target = src.target || "field"; delete entry.weather; n++; }
+            continue;
+        }
+        if (entry.terrain) {
+            const src = Dex.data.Moves[entry.terrain];
+            if (src) { copyMoveMechanics(entry, src); entry.target = src.target || "field"; delete entry.terrain; n++; }
+            continue;
+        }
+        if (entry.critRatio) {
+            const cr = entry.critRatio;
+            entry.onModifyCritRatio = function () { return cr; };
+            delete entry.critRatio;
+            n++;
+        }
+        if (entry.custom) {
+            switch (entry.custom) {
+                case "protect-family": { const src = Dex.data.Moves["protect"]; if (src) { copyMoveMechanics(entry, src); entry.target = "self"; delete entry.custom; n++; } break; }
+                case "wish": { const src = Dex.data.Moves["wish"]; if (src) { copyMoveMechanics(entry, src); entry.target = "self"; delete entry.custom; n++; } break; }
+                case "purify": { const src = Dex.data.Moves["purify"]; if (src) { copyMoveMechanics(entry, src); entry.target = "normal"; delete entry.custom; n++; } break; }
+                case "cure-status": { const src = Dex.data.Moves["refresh"]; if (src) { copyMoveMechanics(entry, src); entry.target = "self"; delete entry.custom; n++; } break; }
+                case "heal-party-status": { const src = Dex.data.Moves["aromatherapy"]; if (src) { copyMoveMechanics(entry, src); entry.target = "self"; delete entry.custom; n++; } break; }
+                case "heal-bell-plus": { const src = Dex.data.Moves["lifedew"]; if (src) { copyMoveMechanics(entry, src); entry.target = "self"; delete entry.custom; n++; } break; }
+                case "stat-swap": { const src = Dex.data.Moves["powerswap"]; if (src) { copyMoveMechanics(entry, src); entry.target = "normal"; delete entry.custom; n++; } break; }
+                case "type-change": {
+                    const nt = entry.newType || "Normal";
+                    entry.target = "normal";
+                    entry.onHit = function (target) { if (!target) return false; target.setType(nt); this.add("-start", target, "typechange", nt); };
+                    delete entry.custom; delete entry.newType; n++;
+                    break;
+                }
+                case "solarbeam-family": { const src = Dex.data.Moves["solarbeam"]; if (src) { copyMoveMechanics(entry, src); delete entry.custom; delete entry.chargeMove; n++; } break; }
+                case "two-turn-semivulnerable": { const src = Dex.data.Moves["dig"]; if (src) { copyMoveMechanics(entry, src); delete entry.custom; delete entry.chargeMove; n++; } break; }
+                case "heatcrash-family": { const src = Dex.data.Moves["heatcrash"]; if (src) { copyMoveMechanics(entry, src); delete entry.custom; delete entry.weightPower; n++; } break; }
+            }
+        }
+    }
+    return n;
+}
+// (c) EXTRA PATCHES: bespoke behaviours that are neither pure clones nor JSON
+//     expressible. Built lazily so canonical handler objects are available.
+function buildExtraMovePatches() {
+    const physpecSwap = Dex.data.Moves.photongeyser && Dex.data.Moves.photongeyser.onModifyMove
+        ? Dex.data.Moves.photongeyser.onModifyMove
+        : function (move, pokemon) { if (pokemon.getStat("atk", false) > pokemon.getStat("spa", false)) move.category = "Physical"; };
+    return {
+        holyward: { overrideOffensiveStat: "spd" },
+        scentedshield: { overrideOffensiveStat: "spd" },
+        soundbarrier: { overrideOffensiveStat: "spd" },
+        checkmate: { onAfterMoveSecondarySelf(pokemon, target) { if (target && target.hp <= 0) this.boost({ spa: 2 }); } },
+        duneblast: { onAfterMoveSecondarySelf(pokemon, target) { if (target && target.hp <= 0) this.boost({ spa: 2 }); } },
+        chillingblast: { onAfterMoveSecondarySelf(pokemon, target) { if (target && target.hp <= 0) this.boost({ spa: 2 }); } },
+        parry: { onBasePower(basePower, attacker) { if (attacker.side && attacker.side.pokemon.some((p) => p.fainted)) return this.chainModify(2); } },
+        timebomb: { onBasePower(basePower, attacker) { if (attacker.side && attacker.side.pokemon.some((p) => p.fainted)) return this.chainModify(2); } },
+        scoresettler: { onBasePower(basePower, attacker) { if (attacker.side && attacker.side.pokemon.some((p) => p.fainted)) return this.chainModify(2); } },
+        wail: { onBasePower(basePower, attacker) { if (Object.values(attacker.boosts).some((v) => v < 0)) return this.chainModify(2); } },
+        flatulence: { onBasePower(basePower, attacker) { if (!attacker.item) return this.chainModify(2); } },
+        oberonswrath: { onBasePower(basePower, attacker) { return this.chainModify(0.5 + attacker.hp / attacker.maxhp); } },
+        wraithpulse: { onBasePower(basePower, attacker, defender) { if (attacker.getStat("spe") > defender.getStat("spe")) return this.chainModify(1.5); } },
+        icydeluge: { onBasePower(basePower, attacker, defender) { if (attacker.getStat("spe") > defender.getStat("spe")) return this.chainModify(1.5); } },
+        valkyriechariot: {
+            onTryMove() { if (this.field.getPseudoWeather("gravity")) { this.add("-fail", this.activeTarget || "p1a"); return null; } },
+            onMoveFail(target, pokemon) { this.damage(pokemon.maxhp / 2, pokemon, pokemon); },
+        },
+        radiantlance: {
+            onTryMove() { if (this.field.getPseudoWeather("gravity")) { this.add("-fail", this.activeTarget || "p1a"); return null; } },
+            onMoveFail(target, pokemon) { this.damage(pokemon.maxhp / 2, pokemon, pokemon); },
+        },
+        beatdrop: {
+            onTryMove() { if (this.field.getPseudoWeather("gravity")) { this.add("-fail", this.activeTarget || "p1a"); return null; } },
+            onMoveFail(target, pokemon) { this.damage(pokemon.maxhp / 2, pokemon, pokemon); },
+        },
+        continentalrift: { ignoreAbility: true, onModifyMove: physpecSwap },
+        concoction: { onModifyMove: physpecSwap },
+        bombardment: { onModifyMove: physpecSwap },
+        overflow: {
+            onAfterMove(pokemon) {
+                if (pokemon.hp > 0) {
+                    this.boost({ spe: 1 }, pokemon);
+                    for (const sc of ["stealthrock", "spikes", "toxicspikes", "stickyweb"]) pokemon.side.removeSideCondition(sc);
+                }
+            },
+        },
+        stormshield: {
+            priority: 4, target: "self", stallingMove: true,
+            volatileStatus: "stormshield",
+            flags: { noassist: 1, failcopycat: 1 },
+            onPrepareHit(pokemon) { return !!this.queue.willAct() && this.runEvent("StallMove", pokemon); },
+            onHit(pokemon) { pokemon.addVolatile("stall"); },
+            condition: Object.assign({}, Dex.data.Moves.protect && Dex.data.Moves.protect.condition ? Dex.data.Moves.protect.condition : {}, {
+                onAfterHit(target, source, move) {
+                    if (source && source !== target && move && move.flags && move.flags.contact) {
+                        this.boost({ def: -2 }, source, target, this.effect);
+                    }
+                },
+            }),
+        },
+    };
 }
 
 // Store normalized custom moves at module level so SyncPSEngine.initializeBattle
@@ -454,10 +671,33 @@ let moduleNormalizedCustomDexMoves = {};
     // carry event handlers (see customMoveEffectPatches above). Applied to the
     // normalized entries themselves so both the global Dex below AND the
     // per-battle dex propagation in initializeBattle inherit them.
+    applyCustomMoveClones(normalizedCustomMoves);
+    applyCustomMoveClones(normalizedCustomDexMoves);
+    applyCustomFieldInterpreters(normalizedCustomMoves);
+    applyCustomFieldInterpreters(normalizedCustomDexMoves);
+    const extraMovePatches = buildExtraMovePatches();
+    // Core hand-written patches (healing moves, Asteroid Belt, Wind Rider, ...)
     applyCustomMoveEffectPatches(normalizedCustomMoves);
     applyCustomMoveEffectPatches(normalizedCustomDexMoves);
-    Object.assign(Dex.data.Moves, normalizedCustomMoves);
+    // Bespoke audit patches (SS2 move overhaul)
+    applyCustomMoveEffectPatches(normalizedCustomMoves, extraMovePatches);
+    applyCustomMoveEffectPatches(normalizedCustomDexMoves, extraMovePatches);
+    // Raw fan-game payload first, generated moves.js LAST: moves.js entries carry
+    // the inferred SS2 mechanics (boosts/heal/drain/...) and must win over the
+    // raw PBS records. Neither record contains canonical entries at this point
+    // (filterVanillaCollisions dropped them), so no function-less JSON can
+    // overwrite pristine canonical handlers.
     Object.assign(Dex.data.Moves, normalizedCustomDexMoves);
+    Object.assign(Dex.data.Moves, normalizedCustomMoves);
+    // When a custom move id collides with a Showdown ALIAS (e.g. id 'goldrush'
+    // is aliased to 'G-Max Gold Rush' in data.Aliases), Dex.moves.get(id)
+    // resolves the alias FIRST and returns the G-Max move instead of our
+    // custom entry. Remove those alias entries so the custom move wins.
+    for (const moveId of Object.keys(normalizedCustomMoves)) {
+        if (Dex.data.Aliases && Object.prototype.hasOwnProperty.call(Dex.data.Aliases, moveId)) {
+            delete Dex.data.Aliases[moveId];
+        }
+    }
     // Merge (not replace) so patched abilities keep canonical metadata
     // (num/gen/etc.) while overriding behaviour handlers and text.
     for (const [patchId, patchData] of Object.entries(customAbilityPatches)) {
@@ -484,16 +724,20 @@ let moduleNormalizedCustomDexMoves = {};
     // above directly from the pristine base entries. The legacy variant loop
     // was removed: it re-spread raw PBS defaults (target/priority/flags) over
     // baked variants, which corrupted e.g. extremespeedss2's priority.
-    if (Dex.species?.cache)
-        Dex.species.cache = new Map();
-    if (Dex.moves?.cache)
-        Dex.moves.cache = new Map();
-    if (Dex.abilities?.cache)
-        Dex.abilities.cache = new Map();
-    if (Dex.items?.cache)
-        Dex.items.cache = new Map();
-    if (Dex.types?.cache)
-        Dex.types.cache = new Map();
+    if (Dex.species?.speciesCache)
+        Dex.species.speciesCache = new Map();
+    if (Dex.moves?.moveCache)
+        Dex.moves.moveCache = new Map();
+    if (Dex.abilities?.abilityCache)
+        Dex.abilities.abilityCache = new Map();
+    if (Dex.items?.itemCache)
+        Dex.items.itemCache = new Map();
+    if (Dex.types?.typeCache)
+        Dex.types.typeCache = new Map();
+    if (Dex.formats?.rulesetCache)
+        Dex.formats.rulesetCache = new Map();
+    if (Dex.formats?.formatsListCache)
+        Dex.formats.formatsListCache = null;
 
     // Register a custom Gen 9 triples format so 3v1 boss / triples battles use
     // modern data (gen 6+ moves, fairy type, modern items/abilities) instead of
@@ -608,12 +852,21 @@ class SyncPSEngine {
         if (this.battle && this.battle.dex) {
             const bd = this.battle.dex;
             if (bd.data && bd.data.Moves) {
-                Object.assign(bd.data.Moves, moduleNormalizedMoves);
+                // IMPORTANT: apply the RAW fan-game payload FIRST, then the
+                // generated/normalized moves LAST so the richer entries (which
+                // carry boosts/heal/recoil/cloned handlers) WIN. The raw PBS
+                // records are thin (display fields only) and would otherwise
+                // stamp over mechanics — the exact same failure mode as the
+                // per-battle dex propagation used to trigger for Gossip's
+                // boosts and Gold Rush's handler.
                 Object.assign(bd.data.Moves, moduleNormalizedCustomDexMoves);
+                Object.assign(bd.data.Moves, moduleNormalizedMoves);
             }
-            if (bd.moves && bd.moves.cache) bd.moves.cache = new Map();
-            if (bd.species && bd.species.cache) bd.species.cache = new Map();
-            if (bd.types && bd.types.cache) bd.types.cache = new Map();
+            if (bd.moves && bd.moves.moveCache) bd.moves.moveCache = new Map();
+            if (bd.species && bd.species.speciesCache) bd.species.speciesCache = new Map();
+            if (bd.abilities && bd.abilities.abilityCache) bd.abilities.abilityCache = new Map();
+            if (bd.items && bd.items.itemCache) bd.items.itemCache = new Map();
+            if (bd.types && bd.types.typeCache) bd.types.typeCache = new Map();
         }
         // Initialize our state mirror
         this.state = {

@@ -12,6 +12,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+import { inferMoveIntent } from './move-intent.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -56,6 +57,8 @@ function normalizeMove(moveData) {
 let droppedCollisions = 0;
 let variantCount = 0;
 let addedNew = 0;
+let patchedNew = 0;
+
 const ps = require('pokemon-showdown');
 const { Dex } = ps;
 const pristineBaseMoves = { ...Dex.data.Moves };
@@ -104,10 +107,14 @@ for (const [moveId, rawEntry] of Object.entries(ss2Moves)) {
         const base = pristineBaseMoves[moveId];
     if (!base) {
         // Brand-new fangame move: add with sane PP/target defaults.
-        if (isSelfHealMove(entry, moveId)) {
-            // Healing moves exported from PBS JSON carry no heal condition and an
-            // attacking-style target, so the engine would treat them as attacks.
-            // Stamp the canonical 50% self-heal archetype (mirrors PS's Recover).
+        // Merge inferred mechanics from move-intent.mjs (desc is the spec) so
+        // boosts/status/heal/drain/multihit/recoil/secondary etc. actually fire.
+        const intent = inferMoveIntent(moveId, entry, pristineBaseMoves);
+        if (intent.patch && intent.class === 'new') {
+            Object.assign(entry, intent.patch);
+            patchedNew++;
+        } else if (isSelfHealMove(entry, moveId)) {
+            // Fallback healing archetype for entries move-intent didn't classify as heal.
             entry.target = 'self';
             entry.category = 'Status';
             entry.basePower = 0;
@@ -132,7 +139,7 @@ for (const [moveId, rawEntry] of Object.entries(ss2Moves)) {
         variantCount++;
     }
 }
-console.log(`Canonical collisions kept vanilla: ${droppedCollisions}; new SS2 moves: ${addedNew}; SS2 retyped variants baked: ${variantCount}`);
+console.log(`Canonical collisions kept vanilla: ${droppedCollisions}; new SS2 moves: ${addedNew}; SS2 retyped variants baked: ${variantCount}; new moves with inferred mechanics: ${patchedNew}`);
 
 
 const jsContent = `"use strict";
