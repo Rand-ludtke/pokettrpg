@@ -34,6 +34,10 @@ FILES = [
         f"{PI_ROOT}/pokemonttrpg-backend/dist/data/moves.js",
     ),
     (
+        REPO_ROOT / "pokemonttrpg-backend/dist/data/ss2-ability-handlers.js",
+        f"{PI_ROOT}/pokemonttrpg-backend/dist/data/ss2-ability-handlers.js",
+    ),
+    (
         REPO_ROOT / "pokemonttrpg-backend/dist/server/index.js",
         f"{PI_ROOT}/pokemonttrpg-backend/dist/server/index.js",
     ),

@@ -92,3 +92,80 @@ Every BRAND-NEW SS2 move currently executes as either raw damage (attacking) or 
   still unresolvable is listed in `move-audit-results.json` as `manual` and flagged here.
 - Canonical moves are NOT re-verified for game-accuracy; they are smoke-tested (execute,
   no crash) since they come pristine from pokemon-showdown.
+
+---
+
+# ABILITY AUDIT (SS2) — "every ability must do what its description says"
+
+**Resume instructions for agents:** The ability audit mirrors the move audit. All work lives
+in `pokemonttrpg-backend/dist/data/ss2-ability-handlers.js` (77 handlers, factory-built) +
+wiring in `dist/sync-ps-engine.js` (require + `Object.assign(customAbilityPatches, …)` +
+`Object.assign(Dex.data.Conditions, …)`). Behavior tests: `scripts/test-ss2-abilities.mjs`.
+`scripts/deploy-pi-backend.py` uploads the handler file alongside the engine.
+
+## Root cause
+SS2 packs (`abilities.custom.ss2-soulstones.json`, 319 abilities) carry ONLY text
+(name/shortDesc/desc). Engine injection is ADD-ONLY for abilities (240 canonical-overlap ids
+keep pristine Showdown handlers — those always worked). The remaining **79 custom-only ids
+were silent no-ops** in battle (only `fullforce` + `windrider` had been hand-patched before).
+
+## Status: ✅ COMPLETE — 77/79 handlers implemented, 2 inert (documented below)
+- [x] Enumerate custom-only ids (79) via `Dex.data.Abilities` diff.
+- [x] Implement handlers in `dist/data/ss2-ability-handlers.js` (factories for repeated
+      families: typeBoost / soundBoost / blaze / halveIncoming / galvanize / berserk /
+      specialRetaliate / absorbBoost / blockDrop / priorityFirst).
+- [x] Register volatile conditions (etherealshield, telefaceshield, rebelliousflag,
+      leadershipfirst) — PS rejects unknown volatile ids in addVolatile.
+- [x] Wire into `customAbilityPatches` merge loop + `Dex.data.Conditions` in sync-ps-engine.js.
+- [x] Behavior suite `scripts/test-ss2-abilities.mjs` — **23/23 PASS** (real battles).
+- [x] Move-suite Part C added: all 94 `(SS2)` retyped variants battle-resolve (`test-all-moves.mjs`
+      17/17 PASS incl. Part C) — covers the "moves with ss2 in the name" report.
+- [x] Regression suites green: mechanics / battle-fixes / ss2-battle all PASS.
+- [x] User-reported **Ethereal** verified in real battles: first contact move → `|-immune`,
+      zero damage; shield restored after switch-out; re-blocks on return (B1/B1b).
+- [x] Deploy: new file added to `scripts/deploy-pi-backend.py` FILES; pushed to Pi.
+
+## Coverage by family (77 implemented)
+| Family | Abilities |
+|---|---|
+| Shields/immunity | ethereal, opaqueness |
+| Stat-drop blocks | impenetrable, intuition, unbreakable |
+| Type multipliers | requiem, bonecollector, hivemind, haunted, arsonist, affection, virtuoso, maestro, irradiate, starstruck, spellcaster, lightbulb, terrorize, funeralpyre |
+| Type conversions | blacklight, darkmatter, whiteout |
+| Incoming reducers | realism, irredeemable, astralmajesty, tropicalhide |
+| Berserk family | vengeful, fortification, terminator |
+| Special retaliation | forcefield, feedback, retribution |
+| Switch-in | leadership, pounce, dishearten, orbit, disarray |
+| Contact triggers | leechingfangs, deepchill, scorchscale, hivebody, maelstrom |
+| Stat modifiers | genius, tormented, attunement, impulsive, vitality |
+| Weather | icyveins, packedsnow, synthesize, clayform, wintergift |
+| Type-absorb | cometstorm, cacophony, conductor, antigravity |
+| KO/residual | charisma, reaper, regrowth, pureheart |
+| Damage-condition | gorging, vandal, flexible, resonant, lightaura, superconductive, precision, rebellious |
+| Modes/redirection | nobility, teleface, destructivecore, cartographer, lightswitch, sharpshooter, windfury, nebulacloud, cannonfire |
+
+## Inert (2) + partial gaps (pack data cannot drive them — NOT regressed, documented)
+- `darkswarm`, `symphony`: "At Lv20+ forms a swarm/symphony" — fan-game FIELD FORM with no
+  formes/mechanics in any pack. Inert.
+- Forme-change halves of `wintergift`, `teleface`, `destructivecore` (their behavioral parts
+  ARE implemented: hail ally-boosts/hail immunity, physical shield + terrain restore,
+  status immunity).
+- `lightswitch` implements the Light/Dark type alternation; only its "Power Cycle move type
+  matches mode" line is inert (custom move, no forme link).
+- `windfury` handlers are live but no engine move carries the `wind` flag (PS has none) —
+  dormant until wind-flag moves exist. `cannonfire` same for a `bomb` flag.
+- `antigravity`: Ground half live (ignoreImmunity); "Sound-type" half is a no-op (Sound is a
+  flag, and no Cosmic-vs-Sound resist exists in the engine type chart).
+- `sharpshooter`: never-miss implemented; "ignore redirection" is not expressible (redirect
+  abilities don't consult attacker-side bypass flags in this PS version).
+
+## Gotchas discovered (keep for future work)
+- `faintMessages()` runs `AfterFaint` (→ onSourceAfterFaint) only when `checkWin` does NOT
+  end the battle — battle-ending KOs never fire it (vanilla PS behavior). Tests must keep a
+  2nd mon alive on the fainted side.
+- `this.heal(amount)` inside an event defaults its heal TARGET to `this.event.target` — in
+  AfterFaint that is the FAINTED mon → silent no-op. Always pass the holder explicitly
+  (Reaper does: `this.heal(amount, source, source)`).
+- Side labels vs roster indexes: after a switch the active slot is labelled `p1a` whatever
+  roster member occupies it; `switch N` choices target the REORDERED roster.
+

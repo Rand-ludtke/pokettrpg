@@ -65,6 +65,15 @@ const customAbilityPatches = {
 	},
 };
 
+// ── SS2 (Soulstones 2) custom ability behavior ──
+// Handlers for every custom-only SS2 ability live in dist/data/ss2-ability-handlers.js
+// (the fan-game packs carry text only). dist/sync-ps-engine.js is the deployed
+// source of truth; this require keeps the TS wrapper aligned with it.
+// @ts-ignore - plain-JS handler module without type declarations
+const ss2AbilityModule = require("../dist/data/ss2-ability-handlers");
+Object.assign(customAbilityPatches, ss2AbilityModule.patches);
+
+
 function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
 	return Object.fromEntries(
 		Object.entries(rawMoves || {}).map(([moveId, moveData]) => {
@@ -150,6 +159,11 @@ function normalizeCustomMoveEntries(rawMoves: Record<string, any>) {
 			? { ...existingAbility, ...patchData }
 			: patchData;
 	}
+	// Volatile conditions referenced by SS2 ability handlers (Ethereal shield,
+	// Teleface shield, Leadership first-move, Rebellious). PS rejects unknown
+	// volatile ids in addVolatile, so register them explicitly.
+	Object.assign(Dex.data.Conditions as Record<string, any>, ss2AbilityModule.conditions);
+
 
 	// Create SS2 retyped move variants (<move>ss2) so battles can resolve
 	// the remapped learnset entries produced by the client adapter.

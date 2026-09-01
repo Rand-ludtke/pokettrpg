@@ -129,6 +129,30 @@ console.log('=== Part B: real-engine class battles ===');
     check('B12: Lazybreak puts foe to sleep (|-status|p2a|slp)', ev.some((l) => l.startsWith('|-status|p2a') && /slp/.test(l)));
 }
 
+// ---------- Part C: every (SS2) retyped variant must resolve in a real battle ----------
+console.log('=== Part C: (SS2) retyped variant battles ===');
+const variantIds = Object.keys(generatedMoves).filter((id) => /ss2$/.test(id) && generatedMoves[id] && generatedMoves[id].isNonstandard === 'Custom');
+const esc = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+let variantBad = 0;
+for (const vid of variantIds) {
+    const vName = generatedMoves[vid].name;
+    const ev = await runBattle({
+        p1Team: [mon({ species: 'Snorlax', level: 55, moves: [vid], ability: 'Immunity', evs: { hp: 252 } })],
+        // Magnemite: genderless + Levitate so gender/ground-based variants never behave oddly
+        p2Team: [mon({ species: 'Magnemite', level: 55, moves: ['tackle'], ability: 'Levitate', evs: { hp: 252 } })],
+        script: [[move('p1', 'p1a', vid), move('p2', 'p2a', 'tackle')]],
+    });
+    const nameRe = new RegExp('\\|move\\|p1a: Mon\\|' + esc(vName) + '(\\||$)');
+    const used = ev.some((l) => nameRe.test(l));
+    const errored = ev.some((l) => l.startsWith('|error|'));
+    if (!used || errored) {
+        variantBad++;
+        if (variantBad <= 15) console.log('  BAD ' + vid + ' (' + vName + '): used=' + used + ' error=' + errored);
+    }
+}
+check('C: all ' + variantIds.length + ' (SS2) variants resolve in real battles', variantBad === 0);
+
+
 console.log('');
 console.log('================================');
 console.log('PASS: ' + pass + '  FAIL: ' + fail);

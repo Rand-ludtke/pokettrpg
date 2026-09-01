@@ -143,6 +143,16 @@ const customAbilityPatches = {
     },
 };
 
+// ── SS2 (Soulstones 2) custom ability behavior ──
+// dist/data/ss2-ability-handlers.js carries handlers for every custom-only SS2
+// ability (the fan-game packs provide text only). Merged into
+// customAbilityPatches so the loop in the injection block registers them into
+// Dex.data.Abilities; its volatile conditions are registered into
+// Dex.data.Conditions alongside.
+const { patches: ss2AbilityPatches, conditions: ss2AbilityConditions } = require("./data/ss2-ability-handlers");
+Object.assign(customAbilityPatches, ss2AbilityPatches);
+
+
 function normalizeCustomMoveEntries(rawMoves) {
     return Object.fromEntries(Object.entries(rawMoves || {}).map(([moveId, moveData]) => {
         const normalized = { ...(moveData || {}) };
@@ -706,6 +716,11 @@ let moduleNormalizedCustomDexMoves = {};
             ? { ...existingAbility, ...patchData }
             : patchData;
     }
+    // Volatile conditions referenced by SS2 ability handlers (Ethereal shield,
+    // Teleface shield, Leadership first-move, Rebellious). PS rejects unknown
+    // volatile ids in addVolatile, so register them explicitly.
+    Object.assign(Dex.data.Conditions, ss2AbilityConditions);
+
     // Abilities: fan-game dumps contain 240+ keys that collide with canonical
     // abilities and would wipe their handlers (e.g. Magic Bounce, Sturdy).
     // Only ADD genuinely new abilities; canonical ones stay untouched.
