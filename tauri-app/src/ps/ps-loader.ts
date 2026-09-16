@@ -246,13 +246,21 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
     }
   };
 
-  const [sagePokedex, sageMoves, sageAbilities, sageItems,
+  const [pokeathlonPokedex, extraPokemonDex,
+         sagePokedex, sageMoves, sageAbilities, sageItems,
          insPokedex, insAbilities, insItems,
          uraniumPokedex, uraniumMoves, uraniumAbilities,
          infinityPokedex, infinityMoves, infinityAbilities,
          mariomonPokedex, mariomonMoves, mariomonAbilities,
          ss2Pokedex, ss2Moves, ss2Abilities,
          ss1Pokedex, ss1Moves, ss1Abilities] = await Promise.all([
+    // Merged FIRST so its entries win — mirrors the client adapter's
+    // mergedBaseDex (adapter.ts), which spreads the pokeathlon snapshot last as
+    // the authoritative source for Orion/Temporal Soulstone forms. Without it
+    // battle tooltips disagreed with the engine (Chandelure-Orion-Mega was
+    // missing → ??? types; Greninja-Orion showed stale ss2 stats).
+    fetchOptionalJson(withPublicBase('data/pokeathlon/generated/pokedex.pokeathlon.json')),
+    fetchOptionalJson(withPublicBase('data/custom-overrides/generated/extra-pokemon.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/pokedex.sage.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/moves.custom.sage.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/abilities.custom.sage.json')),
@@ -307,6 +315,10 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
     return count;
   };
 
+  // mergeEntries is first-wins (it never overwrites an existing key), so the
+  // authoritative override packs must be merged before the fan-game packs.
+  applied += mergeEntries(pokeathlonPokedex, battleDex, 'Pokeathlon dex', true);
+  applied += mergeEntries(extraPokemonDex, battleDex, 'Extra Pokemon dex', true);
   applied += mergeEntries(sagePokedex, battleDex, 'Sage dex', true);
   applied += mergeEntries(insPokedex, battleDex, 'Insurgence dex', true);
   applied += mergeEntries(uraniumPokedex, battleDex, 'Uranium dex', true);

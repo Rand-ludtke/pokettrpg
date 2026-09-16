@@ -516,6 +516,14 @@ type CustomMovePack = {
   /** Key suffix for type-variant duplicates (e.g. 'ss2' -> 'swiftss2'). */
   suffix: string;
   moves: MoveIndex | null | undefined;
+  /**
+   * When true, this pack's brand-new moves OVERWRITE the same key from earlier
+   * packs instead of first-wins. Used for the campaign packs (SS1/SS2/Extra):
+   * the backend engine's curated move table is generated from exactly these
+   * packs, so their definitions must win or battle types diverge from what the
+   * UI shows (e.g. Gamma Ray was Nuclear in tooltips but Cosmic in battle).
+   */
+  overwrites?: boolean;
 };
 
 export type CustomMoveMergeResult = {
@@ -568,8 +576,9 @@ export function mergeCustomMovePacks(baseMoves: MoveIndex, packs: CustomMovePack
 
       const baseKey = baseKeyByNorm.get(norm);
       if (!baseKey) {
-        // Rule 1: brand-new fangame move.
-        if (!merged[norm]) {
+        // Rule 1: brand-new fangame move. First pack wins unless this pack is
+        // flagged as an overwriting campaign pack (see CustomMovePack.overwrites).
+        if (!merged[norm] || pack.overwrites) {
           // PBS exports carry no pp/target/flags/priority/num. Without them the
           // move is unusable in battle (0 PP, no target). Fill sensible defaults.
           const category = String(entry.category || 'Status').toLowerCase() as 'physical'|'special'|'status';
@@ -1052,11 +1061,13 @@ export async function loadShowdownDex(options?: { base?: string }) {
     { label: 'Infinity', suffix: 'infinity', moves: infinityMoves as MoveIndex },
     { label: 'Mariomon', suffix: 'mariomon', moves: mariomonMoves as MoveIndex },
     // Soulstones Part 1 custom moves (Crystal Beam, Cosmic Pulse, Starfall, etc.)
-    { label: 'Soulstones', suffix: 'ss1', moves: soulstonePart1Moves as MoveIndex },
+    // Campaign packs overwrite earlier packs' same-named moves: the backend's
+    // curated move table is generated from these packs, so their types must win.
+    { label: 'Soulstones', suffix: 'ss1', moves: soulstonePart1Moves as MoveIndex, overwrites: true },
     // Soulstones 2 custom moves (Sound, Cosmic, Light type moves)
-    { label: 'SS2', suffix: 'ss2', moves: soulstonePS2Moves as MoveIndex },
+    { label: 'SS2', suffix: 'ss2', moves: soulstonePS2Moves as MoveIndex, overwrites: true },
     // Extra Pokémon custom moves
-    { label: 'Extra', suffix: 'extra', moves: extraPokemonMoves as MoveIndex },
+    { label: 'Extra', suffix: 'extra', moves: extraPokemonMoves as MoveIndex, overwrites: true },
   ]);
 
   const mergedBaseLearnsets = {

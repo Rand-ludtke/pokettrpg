@@ -30,6 +30,24 @@ function loadCustomDexPayload() {
     // Aggregate species/moves/abilities/items across all fan-game / custom datasets.
     const aggregated = { species: {}, moves: {}, abilities: {}, items: {} };
 
+    // Moves from two fan-game packs sometimes share an id with different typings
+    // (e.g. 'gammaray' is Nuclear in uranium but Cosmic in ss2-patch). The client
+    // adapter keeps the FIRST pack's version for brand-new moves; surface every
+    // silent retyping here so battle behaviour never diverges invisibly.
+    const warnRetypedOverride = (target, source, label) => {
+        for (const [key, entry] of Object.entries(source || {})) {
+            const prev = target[key];
+            if (prev && typeof prev === "object" && entry && typeof entry === "object"
+                && String(prev.type || "") !== String(entry.type || "")) {
+                console.warn(`[SyncPSEngine] Move pack conflict: '${key}' redefined by ${label} as ${entry.type || "?"} (was ${prev.type || "?"}) — ${label} version wins`);
+            }
+        }
+    };
+    const mergeMoves = (source, label) => {
+        warnRetypedOverride(aggregated.moves, source, label);
+        Object.assign(aggregated.moves, source || {});
+    };
+
     // (1) Primary unified customdex.json sources (optional). Later entries take
     // precedence so the canonical tauri-app dataset wins over any stale legacy
     // copy under "more pokemon/".
@@ -48,7 +66,7 @@ function loadCustomDexPayload() {
         const items = parsed.items || {};
         if (!Object.keys(species).length && !Object.keys(moves).length && !Object.keys(abilities).length && !Object.keys(items).length) continue;
         Object.assign(aggregated.species, species);
-        Object.assign(aggregated.moves, moves);
+        mergeMoves(moves, candidate);
         Object.assign(aggregated.abilities, abilities);
         Object.assign(aggregated.items, items);
         console.log(`[SyncPSEngine] Loaded custom dex payload from ${candidate} (species:${Object.keys(species).length} moves:${Object.keys(moves).length} abilities:${Object.keys(abilities).length})`);
@@ -58,6 +76,7 @@ function loadCustomDexPayload() {
     // Each entry is a directory under tauri-app/public/data/<game>/generated/.
     // Tuple form: [directoryName, fileNameSuffix] — they differ for ss2-patch,
     // whose files are named *.ss2-soulstones.json.
+    // Order mirrors the client adapter's mergedBaseDex (tauri-app/src/data/adapter.ts).
     const fanGameDirs = [
         ["infinity", "infinity"],
         ["uranium", "uranium"],
@@ -65,6 +84,7 @@ function loadCustomDexPayload() {
         ["insurgence", "insurgence"],
         ["sage", "sage"],
         ["ss2-patch", "ss2-soulstones"],
+        ["soulstones-part1", "soulstones-part1"],
     ];
     const baseRoots = [
         path.resolve(__dirname, "../../tauri-app/public/data"),
@@ -83,7 +103,7 @@ function loadCustomDexPayload() {
             const pokedex = loadJsonSafe(pokedexFile);
             let movesCount = 0, abilitiesCount = 0, speciesCount = 0;
             if (moves && typeof moves === "object") {
-                Object.assign(aggregated.moves, moves);
+                mergeMoves(moves, game);
                 movesCount = Object.keys(moves).length;
             }
             if (abilities && typeof abilities === "object") {
@@ -96,6 +116,51 @@ function loadCustomDexPayload() {
             }
             if (movesCount || abilitiesCount || speciesCount) {
                 console.log(`[SyncPSEngine] Loaded ${game} custom data (species:${speciesCount} moves:${movesCount} abilities:${abilitiesCount})`);
+            }
+        }
+        break; // Found a working root; do not load duplicates from another.
+    }
+
+    // (3) Override packs — loaded LAST so they win, mirroring the client adapter's
+    // mergedBaseDex tail (adapter.ts spreads pokeathlon last). pokeathlon is the
+    // authoritative snapshot for the Orion/Temporal Soulstone forms; without it the
+    // engine ran stale ss2 stats (e.g. Greninja-Orion spe 81 vs 122) and was missing
+    // newer forms entirely (e.g. Chandelure-Orion-Mega → ??? types in battle).
+    const overridePacks = [
+        {
+            label: "custom-overrides",
+            genDir: "custom-overrides/generated",
+            files: [
+                { file: "pokedex.extra-pokemon.json", target: "species" },
+                { file: "moves.extra-pokemon.json", target: "moves" },
+            ],
+        },
+        {
+            label: "pokeathlon",
+            genDir: "pokeathlon/generated",
+            files: [
+                { file: "pokedex.pokeathlon.json", target: "species" },
+            ],
+        },
+    ];
+    for (const root of baseRoots) {
+        if (!fs.existsSync(root)) continue;
+        for (const pack of overridePacks) {
+            const genDir = path.join(root, pack.genDir);
+            if (!fs.existsSync(genDir)) continue;
+            let loaded = 0;
+            for (const { file, target } of pack.files) {
+                const parsed = loadJsonSafe(path.join(genDir, file));
+                if (!parsed || typeof parsed !== "object") continue;
+                if (target === "moves") {
+                    mergeMoves(parsed, pack.label);
+                } else {
+                    Object.assign(aggregated[target], parsed);
+                }
+                loaded += Object.keys(parsed).length;
+            }
+            if (loaded) {
+                console.log(`[SyncPSEngine] Loaded ${pack.label} override pack (${loaded} entries, wins over fan-game packs)`);
             }
         }
         break; // Found a working root; do not load duplicates from another.
@@ -498,6 +563,9 @@ function buildExtraMovePatches() {
 // can inject them into the battle's format-specific Dex after PSBattle construction.
 let moduleNormalizedMoves = {};
 let moduleNormalizedCustomDexMoves = {};
+
+// Dedup set so unknown-move warnings log once per process, not once per battle.
+const warnedUnknownMoves = new Set();
 
 (function injectCustomDexEntries() {
     const customDex = loadCustomDexPayload();
@@ -1040,6 +1108,22 @@ class SyncPSEngine {
         // Register any custom/unknown species before packing
         for (const mon of team) {
             this.ensureSpeciesRegistered(mon);
+            // Visible data-gap diagnostics: a species the dex fabricated or a move
+            // id the dex never heard of means the client and engine dexes diverged
+            // (this class of gap caused ???-type damage and wrong base stats).
+            const speciesName = mon.species || mon.name || "";
+            const speciesId = String(speciesName).toLowerCase().replace(/[^a-z0-9]/g, "");
+            if (speciesId && !Dex.data.Pokedex[speciesId]) {
+                console.warn(`[SyncPSEngine] Team references unknown species "${speciesName}" — registered ad-hoc from client stats`);
+            }
+            for (const m of mon.moves || []) {
+                const rawMove = typeof m === "string" ? m : (m?.name || m?.id || "");
+                const moveId = canonicalizeMoveId(rawMove);
+                if (moveId && !Dex.data.Moves[moveId] && !warnedUnknownMoves.has(moveId)) {
+                    warnedUnknownMoves.add(moveId);
+                    console.warn(`[SyncPSEngine] Team references unknown move "${rawMove}" (id '${moveId}') — battle may resolve it via fuzzy matching or fail`);
+                }
+            }
         }
         const sets = team.map((mon) => ({
             name: mon.nickname || mon.name,
