@@ -303,8 +303,8 @@ app.get("/api/health", (_req, res) => {
 });
 app.get("/api/trainer-sprites/:filename", (req, res) => {
     const safeName = path_1.default.basename(String(req.params.filename || ""));
-    if (!safeName)
-        return res.status(400).json({ error: "missing filename" });
+    if (!safeName || !/^[a-z0-9._-]+\.(png|gif|webp|jpg|jpeg)$/i.test(safeName))
+        return res.status(400).json({ error: "invalid filename" });
     const target = path_1.default.join(TRAINER_SPRITES_DIR, safeName);
     if (!fs_1.default.existsSync(target))
         return res.status(404).json({ error: "not found" });
@@ -381,6 +381,20 @@ const DEFAULT_FUSION_SUBDIRS = [
     "Other",
     "sprites",
 ];
+// Defense-in-depth: true when `candidate` resolves to `root` or inside it.
+// The sprite walkers below only ever join server-configured roots with
+// readdir() entries (never raw user input), but the containment check makes
+// that invariant explicit at every hop.
+function isPathInsideRoot(root, candidate) {
+    try {
+        const resolvedRoot = path_1.default.resolve(root);
+        const resolved = path_1.default.resolve(candidate);
+        return resolved === resolvedRoot || resolved.startsWith(resolvedRoot + path_1.default.sep);
+    }
+    catch {
+        return false;
+    }
+}
 // Recursively discover directories that contain head-XXXX-XXXX bucket dirs.
 // This finds sprites in nested structures like generated/sage-sdxl/<date>/head-XXXX-XXXX/
 // as well as top-level head-XXXX buckets.
@@ -407,7 +421,10 @@ function discoverSpriteRoots(dir, maxDepth = 4, depth = 0) {
                 continue;
             if (entry.name === 'node_modules' || entry.name === '.git')
                 continue;
-            roots.push(...discoverSpriteRoots(path_1.default.join(dir, entry.name), maxDepth, depth + 1));
+            const next = path_1.default.join(dir, entry.name);
+            if (!isPathInsideRoot(dir, next))
+                continue;
+            roots.push(...discoverSpriteRoots(next, maxDepth, depth + 1));
         }
     }
     catch { }
@@ -419,7 +436,7 @@ function buildFusionExtraDirs(root, configured) {
         // Add well-known subdirectories
         for (const rel of DEFAULT_FUSION_SUBDIRS) {
             const abs = path_1.default.resolve(root, rel);
-            if (fs_1.default.existsSync(abs))
+            if (fs_1.default.existsSync(abs) && isPathInsideRoot(root, abs))
                 discovered.push(abs);
         }
         // Recursively discover all directories that contain head-* buckets
@@ -501,6 +518,8 @@ function addSpritesFromDirRecursive(target, dirPath, maxDepth = 3) {
             const entries = fs_1.default.readdirSync(current, { withFileTypes: true });
             for (const entry of entries) {
                 const next = path_1.default.join(current, entry.name);
+                if (!isPathInsideRoot(dirPath, next))
+                    continue;
                 if (entry.isDirectory()) {
                     walk(next, depth + 1);
                     continue;
@@ -619,6 +638,8 @@ const gDeltaNameToNum = (() => {
 })();
 function tryCacheSpriteToUnified(folder, filename) {
     const target = path_1.default.join(UNIFIED_SPRITES_ROOT, folder, filename);
+    if (!isPathInsideRoot(UNIFIED_SPRITES_ROOT, target))
+        return "";
     if (fs_1.default.existsSync(target))
         return target;
     const sourceCandidates = [];

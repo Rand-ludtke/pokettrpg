@@ -402,7 +402,9 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 app.get("/api/trainer-sprites/:filename", (req: Request, res: Response) => {
   const safeName = path.basename(String(req.params.filename || ""));
-  if (!safeName) return res.status(400).json({ error: "missing filename" });
+  if (!safeName || !/^[a-z0-9._-]+\.(png|gif|webp|jpg|jpeg)$/i.test(safeName)) {
+    return res.status(400).json({ error: "invalid filename" });
+  }
   const target = path.join(TRAINER_SPRITES_DIR, safeName);
   if (!fs.existsSync(target)) return res.status(404).json({ error: "not found" });
   return res.sendFile(target);
@@ -481,6 +483,20 @@ const DEFAULT_FUSION_SUBDIRS = [
   "Other",
   "sprites",
 ];
+// Defense-in-depth: true when `candidate` resolves to `root` or inside it.
+// The sprite walkers below only ever join server-configured roots with
+// readdir() entries (never raw user input), but the containment check makes
+// that invariant explicit at every hop.
+function isPathInsideRoot(root: string, candidate: string): boolean {
+  try {
+    const resolvedRoot = path.resolve(root);
+    const resolved = path.resolve(candidate);
+    return resolved === resolvedRoot || resolved.startsWith(resolvedRoot + path.sep);
+  } catch {
+    return false;
+  }
+}
+
 // Recursively discover directories that contain head-XXXX-XXXX bucket dirs.
 // This finds sprites in nested structures like generated/sage-sdxl/<date>/head-XXXX-XXXX/
 // as well as top-level head-XXXX buckets.
@@ -502,7 +518,9 @@ function discoverSpriteRoots(dir: string, maxDepth = 4, depth = 0): string[] {
     for (const entry of entries) {
       if (!entry.isDirectory() || /^head-/.test(entry.name)) continue;
       if (entry.name === 'node_modules' || entry.name === '.git') continue;
-      roots.push(...discoverSpriteRoots(path.join(dir, entry.name), maxDepth, depth + 1));
+      const next = path.join(dir, entry.name);
+      if (!isPathInsideRoot(dir, next)) continue;
+      roots.push(...discoverSpriteRoots(next, maxDepth, depth + 1));
     }
   } catch {}
   return roots;
@@ -514,7 +532,7 @@ function buildFusionExtraDirs(root: string, configured: string[]): string[] {
     // Add well-known subdirectories
     for (const rel of DEFAULT_FUSION_SUBDIRS) {
       const abs = path.resolve(root, rel);
-      if (fs.existsSync(abs)) discovered.push(abs);
+      if (fs.existsSync(abs) && isPathInsideRoot(root, abs)) discovered.push(abs);
     }
     // Recursively discover all directories that contain head-* buckets
     discovered.push(...discoverSpriteRoots(root));
@@ -587,6 +605,7 @@ function addSpritesFromDirRecursive(target: Set<string>, dirPath: string, maxDep
       const entries = fs.readdirSync(current, { withFileTypes: true });
       for (const entry of entries) {
         const next = path.join(current, entry.name);
+        if (!isPathInsideRoot(dirPath, next)) continue;
         if (entry.isDirectory()) {
           walk(next, depth + 1);
           continue;
@@ -704,6 +723,7 @@ const gDeltaNameToNum: Record<string, string> = (() => {
 
 function tryCacheSpriteToUnified(folder: string, filename: string): string {
   const target = path.join(UNIFIED_SPRITES_ROOT, folder, filename);
+  if (!isPathInsideRoot(UNIFIED_SPRITES_ROOT, target)) return "";
   if (fs.existsSync(target)) return target;
 
   const sourceCandidates: string[] = [];

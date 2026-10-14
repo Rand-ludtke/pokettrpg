@@ -206,6 +206,59 @@ const customAbilityPatches = {
             }
         },
     },
+
+    // ── Spectrum (Pokemon Sage, Royjibiv) ──
+    // Changes this Pokemon's PRIMARY type to match the colour of the opposing
+    // Pokemon it is facing (CAPX/Sage colour chart below). Re-evaluated on its
+    // own switch-in and whenever anything else switches in (Commander-style
+    // onAnySwitchIn -> onUpdate delegation), so the prism re-colours each time
+    // the opponent sends a new Pokemon. Works with Prism Beam, whose type
+    // copies the user's primary type.
+    spectrum: {
+        onAnySwitchInPriority: -2,
+        onAnySwitchIn() {
+            this.effect.onUpdate.call(this, this.effectState.target);
+        },
+        onStart(pokemon) {
+            this.effect.onUpdate.call(this, pokemon);
+        },
+        onUpdate(pokemon) {
+            if (!pokemon.isActive || pokemon.fainted) return;
+            const foeActive = (pokemon.side && pokemon.side.foe && pokemon.side.foe.active) || [];
+            const foe = foeActive.find((mon) => mon && !mon.fainted);
+            if (!foe) return;
+            // NOTE: this PS version has no Pokemon#getSpecies(); .species holds
+            // the Species template object directly (sim/pokemon.js:100).
+            const species = foe.species;
+            const rawColor = species && typeof species === "object" ? species.color : "";
+            const color = String(rawColor || "").trim();
+            const mapped = SPECTRUM_COLOR_TYPES[color.toLowerCase()];
+            if (!mapped) return;
+            const currentTypes = pokemon.getTypes();
+            if (currentTypes[0] === mapped) return;
+            const nextTypes = [mapped, currentTypes[1]].filter(Boolean);
+            pokemon.setType(nextTypes);
+            this.add('-start', pokemon, 'typechange', nextTypes.join('/'), '[from] ability: Spectrum');
+        },
+    },
+};
+
+// CAPX/Sage Spectrum colour chart: opposing Pokemon's Pokedex colour -> new
+// primary type. Colours not on the chart leave the type unchanged.
+const SPECTRUM_COLOR_TYPES = {
+    white: "Normal",
+    red: "Fire",
+    orange: "Fighting",
+    gold: "Ground",
+    yellow: "Electric",
+    green: "Grass",
+    "light blue": "Ice",
+    blue: "Water",
+    purple: "Poison",
+    pink: "Psychic",
+    gray: "Steel",
+    brown: "Rock",
+    black: "Dark",
 };
 
 // ── SS2 (Soulstones 2) custom ability behavior ──
@@ -350,6 +403,23 @@ const customMoveEffectPatches = {
             if (!target.setStatus("slp", this.activePokemon)) return false;
         },
     },
+    // Prism Beam (Pokemon Sage, Royjibiv signature): beam of prismatic light —
+    // its type is the same as the user's PRIMARY type (mirrors Revelation
+    // Dance). Synergises with Spectrum: the beam takes the spectrum-shifted
+    // type. Sage spec: unaffected by Normalize, so undo Normalize's retype
+    // flag (it runs earlier at priority 1) to drop its +20% boosted power.
+    prismbeam: {
+        onModifyType(move, pokemon) {
+            const types = pokemon.getTypes();
+            let type = types[0];
+            if (type === "Bird") type = "???";
+            if (type === "???" && types[1]) type = types[1];
+            move.type = type;
+            if (String(move.typeChangerBoosted?.name || "") === "Normalize") {
+                delete move.typeChangerBoosted;
+            }
+        },
+    },
 };
 
 function applyCustomMoveEffectPatches(movesRecord, patches) {
@@ -358,7 +428,12 @@ function applyCustomMoveEffectPatches(movesRecord, patches) {
         const existing = movesRecord[moveId];
         if (existing && typeof existing === 'object') {
             Object.assign(existing, patch);
-        } else {
+        } else if (moveId === 'asteroidbelt') {
+            // Asteroid Belt exists only as hand-written patch data (no payload
+            // JSON) — synthesize its full entry. For any OTHER move id, a
+            // missing entry here means the payload record is the authoritative
+            // one (e.g. sage prismbeam) and it gets this same patch applied on
+            // its own record — never synthesize placeholder data over it.
             movesRecord[moveId] = {
                 num: -20034,
                 name: 'Asteroid Belt',

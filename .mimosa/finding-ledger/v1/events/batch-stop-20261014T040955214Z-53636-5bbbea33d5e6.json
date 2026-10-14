@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "mimosa-finding-ledger-batch/v1",
+  "batchId": "stop-20261014T040955214Z-53636-5bbbea33d5e6",
+  "runId": "20261014T040955214Z-53636-5bbbea33d5e6",
+  "runStatus": "completed",
+  "coverage": {
+    "status": "complete",
+    "reasons": [
+      {
+        "code": "baseline_partial",
+        "stage": "baseline",
+        "target": ".",
+        "detail": "baseline capture had enumeration or snapshot errors",
+        "affectsCompletion": false
+      }
+    ]
+  },
+  "source": {
+    "component": "zcode-hook",
+    "operationId": "Stop"
+  },
+  "revision": "68842f4a94ac9df230fcf795e90e44259ae0d7b2",
+  "diffHash": "c5d4960e1a6f70828f47b635ccd9d71842471b4043a9209c3e710c77805e40a5",
+  "rulesVersion": "unavailable",
+  "sessionHash": "7da8cc273de2f23dac48c5227cb38b702c915c71f1c9f3aeed4306c8500088ac",
+  "reportRef": ".mimosa/reports/task-review-sess_a90a5beb-3581-49ec-bffc-412b4febfccc-20261014T040955214Z-53636-5bbbea33d5e6.json",
+  "events": [
+    {
+      "eventId": "hook-f7fa64027d81dc3dcaedcf432147ebb1",
+      "findingId": "mimosa-5468db50e824f406db47af5d",
+      "type": "finding_observed",
+      "at": "2026-10-14T04:07:57.619Z",
+      "identity": {
+        "projectRelativeFile": "scripts/pi-probe-royjibiv.py",
+        "ruleId": "security",
+        "codeEvidenceHash": "4560dd6d221d53d29cee72a564068e9a154abfd14fc84ba15dddcb506569b940",
+        "confidence": "stable"
+      },
+      "scope": "direct",
+      "line": 26,
+      "endLine": 26,
+      "reasonCode": "advisory",
+      "reportedToAgent": true,
+      "evidence": {
+        "kind": "source",
+        "boundary": "candidate",
+        "producer": "deterministic",
+        "evidenceHash": "4560dd6d221d53d29cee72a564068e9a154abfd14fc84ba15dddcb506569b940"
+      },
+      "sequence": 0
+    },
+    {
+      "eventId": "hook-abf1b05f5ef7c74ef5669420d026edac",
+      "findingId": "mimosa-7f286b19c1113ddf696c0a05",
+      "type": "finding_observed",
+      "at": "2026-10-14T04:07:57.619Z",
+      "identity": {
+        "projectRelativeFile": "scripts/pi-probe-royjibiv.py",
+        "ruleId": "security",
+        "codeEvidenceHash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894",
+        "confidence": "stable"
+      },
+      "scope": "direct",
+      "line": 34,
+      "endLine": 34,
+      "reasonCode": "advisory",
+      "reportedToAgent": true,
+      "evidence": {
+        "kind": "source",
+        "boundary": "candidate",
+        "producer": "deterministic",
+        "evidenceHash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894"
+      },
+      "sequence": 1
+    },
+    {
+      "eventId": "hook-7ed317d54902058c1eeff8151848a616",
+      "findingId": "mimosa-7f286b19c1113ddf696c0a05",
+      "type": "finding_observed",
+      "at": "2026-10-14T04:08:27.356Z",
+      "identity": {
+        "projectRelativeFile": "scripts/pi-probe-royjibiv.py",
+        "ruleId": "security",
+        "codeEvidenceHash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894",
+        "confidence": "stable"
+      },
+      "scope": "direct",
+      "line": 3,
+      "endLine": 3,
+      "reasonCode": "advisory",
+      "reportedToAgent": true,
+      "evidence": {
+        "kind": "source",
+        "boundary": "candidate",
+        "producer": "deterministic",
+        "evidenceHash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894"
+      },
+      "sequence": 2
+    },
+    {
+      "eventId": "hook-a125c02fa404bc92403cc010d88bb1d2",
+      "findingId": "mimosa-5468db50e824f406db47af5d",
+      "type": "finding_observed",
+      "at": "2026-10-14T04:09:55.214Z",
+      "identity": {
+        "projectRelativeFile": "scripts/pi-probe-royjibiv.py",
+        "ruleId": "security",
+        "codeEvidenceHash": "4560dd6d221d53d29cee72a564068e9a154abfd14fc84ba15dddcb506569b940",
+        "confidence": "stable"
+      },
+      "scope": "direct",
+      "line": 28,
+      "endLine": 28,
+      "reasonCode": "observe",
+      "reportedToAgent": false,
+      "evidence": {
+        "kind": "source",
+        "boundary": "candidate",
+        "producer": "deterministic",
+        "evidenceHash": "4560dd6d221d53d29cee72a564068e9a154abfd14fc84ba15dddcb506569b940"
+      },
+      "sequence": 3
+    },
+    {
+      "eventId": "hook-93440ef2a53bc29fa2c0fd7676b0f383",
+      "findingId": "mimosa-7f286b19c1113ddf696c0a05",
+      "type": "finding_observed",
+      "at": "2026-10-14T04:09:55.214Z",
+      "identity": {
+        "projectRelativeFile": "scripts/pi-probe-royjibiv.py",
+        "ruleId": "security",
+        "codeEvidenceHash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894",
+        "confidence": "stable"
+      },
+      "scope": "direct",
+      "line": 36,
+      "endLine": 36,
+      "reasonCode": "observe",
+      "reportedToAgent": false,
+      "evidence": {
+        "kind": "source",
+        "boundary": "candidate",
+        "producer": "deterministic",
+        "evidenceHash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894"
+      },
+      "sequence": 4
+    }
+  ],
+  "observedFindingIds": [
+    "mimosa-5468db50e824f406db47af5d",
+    "mimosa-7f286b19c1113ddf696c0a05"
+  ],
+  "verifiedFiles": [
+    {
+      "file": "pokemonttrpg-backend/dist/sync-ps-engine.js",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "scripts/pi-probe-royjibiv.py",
+      "direct": "complete",
+      "projectContext": "partial"
+    }
+  ],
+  "recordedAt": "2026-10-14T04:09:55.665Z"
+}

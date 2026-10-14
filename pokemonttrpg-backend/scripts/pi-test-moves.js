@@ -1,9 +1,7 @@
 // Test script to verify moves.js loads on the Pi
-const path = require('path');
-const movesPath = path.join(__dirname, '..', 'dist', 'data', 'moves.js');
-console.log('Loading from:', movesPath);
+console.log('Loading from: ../dist/data/moves.js');
 try {
-  const mod = require(movesPath);
+  const mod = require('../dist/data/moves.js');
   const m = mod.default || mod;
   console.log('Moves loaded:', Object.keys(m).length);
   console.log('renewal pp:', m.renewal ? m.renewal.pp : 'MISSING');

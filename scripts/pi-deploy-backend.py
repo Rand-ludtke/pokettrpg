@@ -34,6 +34,7 @@ REMOTE_DATA_ROOTS = [
 REQUIRED_PACKS = [
     ("custom-overrides/generated", ["extra-pokemon.json", "moves.extra-pokemon.json"]),
     ("pokeathlon/generated", ["pokedex.pokeathlon.json"]),
+    ("sage/generated", ["moves.custom.sage.json"]),
 ]
 
 LOCAL_DATA_ROOT = r"D:\GitHub\pokettrpg\tauri-app\public\data"
@@ -81,9 +82,9 @@ def main() -> int:
     for sub, files in REQUIRED_PACKS:
         for fn in files:
             remote_path = f"{data_root}/{sub}/{fn}"
-            exists = run(ssh, f"[ -f {remote_path} ] && echo yes").startswith("yes")
-            if not exists:
-                local_path = os.path.join(LOCAL_DATA_ROOT, *sub.split("/"), fn)
+            local_path = os.path.join(LOCAL_DATA_ROOT, *sub.split("/"), fn)
+            remote_hash = run(ssh, f"sha256sum '{remote_path}' 2>/dev/null | cut -d' ' -f1")
+            if not remote_hash or remote_hash != sha256_of(local_path):
                 missing.append((f"{data_root}/{sub}", fn, local_path))
     if missing:
         print(f"[pi] missing data files: {[m[1] for m in missing]}")

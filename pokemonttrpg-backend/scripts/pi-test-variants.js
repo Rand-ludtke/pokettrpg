@@ -1,10 +1,9 @@
 // Test SS2 variant creation on the Pi
 const ps = require('pokemon-showdown');
 const { Dex } = ps;
-const path = require('path');
 
 // Load moves like sync-ps-engine does
-const customMovesData = require(path.join(__dirname, '..', 'dist', 'data', 'moves.js'));
+const customMovesData = require('../dist/data/moves.js');
 const customMoves = customMovesData.default || customMovesData;
 console.log('Loaded moves:', Object.keys(customMoves).length);
 

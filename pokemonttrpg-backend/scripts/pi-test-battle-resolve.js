@@ -1,10 +1,9 @@
 // End-to-end: verify an ss2 variant move resolves through the PS engine (like a real battle)
 const ps = require('pokemon-showdown');
 const { Dex } = ps;
-const path = require('path');
 
 // Load moves exactly like sync-ps-engine does at runtime
-const customMovesData = require(path.join(__dirname, '..', 'dist', 'data', 'moves.js'));
+const customMovesData = require('../dist/data/moves.js');
 const customMoves = customMovesData.default || customMovesData;
 
 function normalizeCustomMoveEntries(rawMoves) {

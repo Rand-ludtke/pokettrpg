@@ -1,1 +1,21 @@
-{}
+{
+  "prismbeam": {
+    "name": "Prism Beam",
+    "type": "Normal",
+    "basePower": 90,
+    "category": "Special",
+    "accuracy": 100,
+    "pp": 10,
+    "target": "normal",
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "num": 0,
+    "isNonstandard": "Custom",
+    "desc": "Inflicts damage. Its type is the same as the primary type of the user. It is unaffected by Normalize.",
+    "shortDesc": "Type matches the user's primary type."
+  }
+}
