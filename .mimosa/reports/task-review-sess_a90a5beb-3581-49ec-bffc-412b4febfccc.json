@@ -1,6 +1,6 @@
 {
   "schema_version": "mimosa-task-review/v2",
-  "run_id": "20261014T040955214Z-53636-5bbbea33d5e6",
+  "run_id": "20261014T045521283Z-52808-f11a92c8598b",
   "run_status": "completed",
   "errors": [],
   "coverage": {
@@ -40,10 +40,10 @@
       "project_checks_completed": 0
     },
     "notification": {
-      "eligible_findings": 2,
+      "eligible_findings": 0,
       "detailed_findings": 0,
       "detail_limit": 3,
-      "truncated": true
+      "truncated": false
     },
     "reason_counts": {
       "baseline_partial": 1
@@ -59,52 +59,88 @@
     ],
     "reasons_truncated": false
   },
-  "generated_at": "2026-10-14T04:09:55.214Z",
+  "generated_at": "2026-10-14T04:55:21.283Z",
   "session_id": "sess_a90a5beb-3581-49ec-bffc-412b4febfccc",
   "target": ".",
-  "revision": "68842f4a94ac9df230fcf795e90e44259ae0d7b2",
+  "revision": "b52871e24ebbddf21353b04b5f8bf326faf21d0f",
   "rules_version": "unavailable",
-  "diff_hash": "c5d4960e1a6f70828f47b635ccd9d71842471b4043a9209c3e710c77805e40a5",
+  "diff_hash": "372122210974e07fbf4601bf49f2b8d0ad3350d525dd4cad6ac53e6b85b86c3d",
   "diff": {
     "algorithm": "sha256",
     "changed_file_count": 2,
     "changed_files": [
       {
-        "file": "pokemonttrpg-backend/dist/sync-ps-engine.js",
+        "file": "pokemonttrpg-backend/src/server/index.ts",
         "ranges": [
           {
-            "start": 209,
-            "end": 261
+            "start": 2276,
+            "end": 2309
           },
           {
-            "start": 406,
-            "end": 422
+            "start": 2928,
+            "end": 2928
           },
           {
-            "start": 431,
-            "end": 436
+            "start": 2930,
+            "end": 2940
+          },
+          {
+            "start": 3142,
+            "end": 3146
+          },
+          {
+            "start": 3227,
+            "end": 3231
+          },
+          {
+            "start": 3370,
+            "end": 3371
+          },
+          {
+            "start": 3374,
+            "end": 3378
+          },
+          {
+            "start": 3507,
+            "end": 3516
+          },
+          {
+            "start": 3551,
+            "end": 3559
+          },
+          {
+            "start": 3607,
+            "end": 3636
+          },
+          {
+            "start": 4086,
+            "end": 4092
           }
         ],
-        "before_hash": "77ad40244c1cb8df9fbad2e3254f45620adfefa05d2dd0174a44b699ab51ba00",
-        "after_hash": "2630006c7a3036a22eb355584768e76e8f31fbd860f73e87409d01a481dd74ad"
+        "before_hash": "b52eb77e990d0e0ccf042d254ece8f15dc846d37a2a4564fda598fc878125419",
+        "after_hash": "7f97262096273c22c0e5c6d3591ab480be7041791a76aeb7388e8b23d0aa989e"
       },
       {
-        "file": "scripts/pi-probe-royjibiv.py",
+        "file": "tauri-app/src/ps/PSBattlePanel.tsx",
         "ranges": [
           {
-            "start": 1,
-            "end": 53
+            "start": 699,
+            "end": 700
+          },
+          {
+            "start": 2836,
+            "end": 2859
           }
         ],
-        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "after_hash": "eb2e11d13ec03cca856a08d410274062eec74d93c70ad4f041b30aa2d6e19a56"
+        "before_hash": "990c092dee3a1dd5272e18d9b1bf66315c14018e900607b76f64058056b53de1",
+        "after_hash": "5d19d4ea54f1e0ec2a28f0696155cbc6ace5c85efd6c8204d7a7180ad78a8958"
       }
     ]
   },
   "timing": {
-    "started_at": "2026-10-14T04:09:53.389Z",
-    "completed_at": "2026-10-14T04:09:55.214Z",
-    "duration_ms": 1825,
+    "started_at": "2026-10-14T04:55:19.297Z",
+    "completed_at": "2026-10-14T04:55:21.283Z",
+    "duration_ms": 1986,
     "measurement": "hook_wall_clock"
   },
   "tokens": {
@@ -119,8 +155,8 @@
     "profile": "gate",
     "operation": "Stop",
     "outcome": "complete",
-    "latencyMs": 1825,
-    "peakMemoryBytes": 151973888,
+    "latencyMs": 1986,
+    "peakMemoryBytes": 184172544,
     "memoryMeasurement": "max-observed-process-rss",
     "scannedFiles": 2,
     "cache": {
@@ -137,165 +173,18 @@
       "measurement": "known-zero"
     }
   },
-  "finding_count": 2,
+  "finding_count": 0,
   "rewake_finding_count": 0,
   "evidence_boundary": {
     "scan": "candidate",
     "static_fix_verification": "observed_static_only",
     "runtime_verification": "not_performed"
   },
-  "finding_events": [
-    {
-      "finding_id": "mimosa-5468db50e824f406db47af5d",
-      "file": "scripts/pi-probe-royjibiv.py",
-      "line": 26,
-      "rule_id": "security",
-      "severity": "medium",
-      "category": "证书校验缺失",
-      "status": "candidate",
-      "decision": "advisory",
-      "at": "2026-10-14T04:07:57.619Z",
-      "evidence": {
-        "kind": "source",
-        "boundary": "candidate",
-        "producer": "deterministic",
-        "source": "semgrep",
-        "evidence_hash": "4560dd6d221d53d29cee72a564068e9a154abfd14fc84ba15dddcb506569b940",
-        "runtime_oracle": false
-      }
-    },
-    {
-      "finding_id": "mimosa-7f286b19c1113ddf696c0a05",
-      "file": "scripts/pi-probe-royjibiv.py",
-      "line": 34,
-      "rule_id": "security",
-      "severity": "medium",
-      "category": "命令注入",
-      "status": "candidate",
-      "decision": "advisory",
-      "at": "2026-10-14T04:07:57.619Z",
-      "evidence": {
-        "kind": "source",
-        "boundary": "candidate",
-        "producer": "deterministic",
-        "source": "semgrep",
-        "evidence_hash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894",
-        "runtime_oracle": false
-      }
-    },
-    {
-      "finding_id": "mimosa-7f286b19c1113ddf696c0a05",
-      "file": "scripts/pi-probe-royjibiv.py",
-      "line": 3,
-      "rule_id": "security",
-      "severity": "medium",
-      "category": "命令注入",
-      "status": "candidate",
-      "decision": "advisory",
-      "at": "2026-10-14T04:08:27.356Z",
-      "evidence": {
-        "kind": "source",
-        "boundary": "candidate",
-        "producer": "deterministic",
-        "source": "semgrep",
-        "evidence_hash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894",
-        "runtime_oracle": false
-      }
-    },
-    {
-      "finding_id": "mimosa-5468db50e824f406db47af5d",
-      "file": "scripts/pi-probe-royjibiv.py",
-      "line": 28,
-      "severity": "medium",
-      "category": "证书校验缺失",
-      "status": "candidate",
-      "decision": "observe",
-      "at": "2026-10-14T04:09:55.214Z",
-      "evidence": {
-        "kind": "static_scan",
-        "boundary": "candidate",
-        "producer": "deterministic",
-        "source": "semgrep",
-        "evidence_hash": "4560dd6d221d53d29cee72a564068e9a154abfd14fc84ba15dddcb506569b940",
-        "runtime_oracle": false
-      }
-    },
-    {
-      "finding_id": "mimosa-7f286b19c1113ddf696c0a05",
-      "file": "scripts/pi-probe-royjibiv.py",
-      "line": 36,
-      "severity": "medium",
-      "category": "命令注入",
-      "status": "candidate",
-      "decision": "observe",
-      "at": "2026-10-14T04:09:55.214Z",
-      "evidence": {
-        "kind": "static_scan",
-        "boundary": "candidate",
-        "producer": "deterministic",
-        "source": "semgrep",
-        "evidence_hash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894",
-        "runtime_oracle": false
-      }
-    }
-  ],
-  "findings": [
-    {
-      "finding_id": "mimosa-5468db50e824f406db47af5d",
-      "file": "scripts/pi-probe-royjibiv.py",
-      "line": 28,
-      "end_line": 28,
-      "severity": "medium",
-      "category": "证书校验缺失",
-      "kind": "semgrep",
-      "advisory": true,
-      "status": "candidate",
-      "evidence_boundary": "candidate",
-      "evidence": [
-        {
-          "kind": "static_scan",
-          "boundary": "candidate",
-          "producer": "deterministic",
-          "source": "semgrep",
-          "file": "scripts/pi-probe-royjibiv.py",
-          "line": 28,
-          "evidence_hash": "4560dd6d221d53d29cee72a564068e9a154abfd14fc84ba15dddcb506569b940",
-          "runtime_oracle": false
-        }
-      ],
-      "already_reported_to_agent": false,
-      "selected_for_rewake": false
-    },
-    {
-      "finding_id": "mimosa-7f286b19c1113ddf696c0a05",
-      "file": "scripts/pi-probe-royjibiv.py",
-      "line": 36,
-      "end_line": 36,
-      "severity": "medium",
-      "category": "命令注入",
-      "kind": "semgrep",
-      "advisory": true,
-      "status": "candidate",
-      "evidence_boundary": "candidate",
-      "evidence": [
-        {
-          "kind": "static_scan",
-          "boundary": "candidate",
-          "producer": "deterministic",
-          "source": "semgrep",
-          "file": "scripts/pi-probe-royjibiv.py",
-          "line": 36,
-          "evidence_hash": "4766ccf50cb02889a530f736e4585bb1eddb1effe22e069933be6e64b6f7c894",
-          "runtime_oracle": false
-        }
-      ],
-      "already_reported_to_agent": false,
-      "selected_for_rewake": false
-    }
-  ],
+  "finding_events": [],
+  "findings": [],
   "artifacts": {
-    "immutable_report": ".mimosa/reports/task-review-sess_a90a5beb-3581-49ec-bffc-412b4febfccc-20261014T040955214Z-53636-5bbbea33d5e6.json",
+    "immutable_report": ".mimosa/reports/task-review-sess_a90a5beb-3581-49ec-bffc-412b4febfccc-20261014T045521283Z-52808-f11a92c8598b.json",
     "latest_report": ".mimosa/reports/task-review-sess_a90a5beb-3581-49ec-bffc-412b4febfccc.json",
-    "history_summary": ".mimosa/history/run-20261014T040955214Z-53636-5bbbea33d5e6.json"
+    "history_summary": ".mimosa/history/run-20261014T045521283Z-52808-f11a92c8598b.json"
   }
 }

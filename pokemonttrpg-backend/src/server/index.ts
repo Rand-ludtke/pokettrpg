@@ -2273,6 +2273,40 @@ function emitMovePrompts(room: Room, state: BattleState): number {
         continue;
       }
 
+      // A raw PS request carrying forceSwitch is a FAINT-SWITCH request
+      // (active: [{moves: []}]). It must never be reshaped into a move prompt:
+      // the stale version of it stays in the engine until the whole turn
+      // resolves, and stamping requestType:"move" on it (and deleting
+      // forceSwitch) produced the "blank move request" soft-lock where every
+      // recovery re-prompt re-sent a move UI with zero moves. Pass it through
+      // as a switch prompt; when the room is already in the force-switch phase
+      // emitForceSwitchPrompts owns the player, so skip here.
+      if (Array.isArray((psRequest as any).forceSwitch) && (psRequest as any).forceSwitch.some((f: boolean) => !!f)) {
+        if (room.phase === "force-switch") {
+          continue;
+        }
+        const switchPrompt = {
+          ...(psRequest as any),
+          requestType: "switch" as const,
+          playerId: player.id,
+          rqid: (psRequest as any).rqid || Date.now(),
+          side: baseSide,
+        };
+        sock.emit("promptAction", {
+          roomId: room.id,
+          playerId: player.id,
+          prompt: switchPrompt,
+          state: state,
+        });
+        promptedPlayers.push(player.id);
+        room.lastPromptByPlayer[player.id] = {
+          turn,
+          type: "move",
+          rqid: (switchPrompt as any).rqid,
+        };
+        continue;
+      }
+
       const prompt = alreadyActed
         ? { wait: true, side: baseSide, rqid: psRequest.rqid || Date.now() }
         : {
@@ -2891,9 +2925,19 @@ function startForceSwitchTimer(room: Room) {
   room.forceSwitchDeadline = Date.now() + FORCE_SWITCH_TIMEOUT_MS;
   room.forceSwitchTimer = setTimeout(() => {
     if (!room.engine || !room.forceSwitchNeeded || room.forceSwitchNeeded.size === 0) return;
-    console.log(`[ForceSwitch] Timer fired (auto-switch DISABLED). Remaining: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
+    console.log(`[ForceSwitch] Timer fired. Re-prompting: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
     // Auto-switch is disabled — players must manually choose their replacement.
-    // Just log and keep waiting; the server will re-prompt periodically.
+    // Re-emit the switch prompts (with a fresh deadline) so a lost/raced prompt
+    // can never soft-lock the battle.
+    room.lastPromptByPlayer = {};
+    try {
+      emitForceSwitchPrompts(room, room.engine.getState(), Array.from(room.forceSwitchNeeded));
+    } catch (err: any) {
+      console.error(`[ForceSwitch] timer re-prompt THREW:`, err?.stack || err);
+    }
+    room.forceSwitchDeadline = Date.now() + FORCE_SWITCH_TIMEOUT_MS;
+    io.to(room.id).emit("phase", { phase: room.phase, deadline: room.forceSwitchDeadline });
+    startForceSwitchTimer(room);
   }, FORCE_SWITCH_TIMEOUT_MS);
 }
 
@@ -3095,7 +3139,11 @@ function processTurnWithBuffer(room: Room) {
     if (room.engine) {
       try {
         const freshState = room.engine.getState();
-        emitMovePrompts(room, freshState);
+        if (room.phase === "force-switch" && room.forceSwitchNeeded?.size) {
+          emitForceSwitchPrompts(room, freshState, Array.from(room.forceSwitchNeeded));
+        } else {
+          emitMovePrompts(room, freshState);
+        }
       } catch {}
     }
   }
@@ -3176,7 +3224,11 @@ io.on("connection", (socket: Socket) => {
       if (room.battleStarted && room.engine) {
         const state = room.engine.getState();
         socket.emit("battleStarted", { roomId: room.id, state });
-        emitMovePrompts(room, state);
+        if (room.phase === "force-switch" && room.forceSwitchNeeded?.size) {
+          emitForceSwitchPrompts(room, state, Array.from(room.forceSwitchNeeded));
+        } else {
+          emitMovePrompts(room, state);
+        }
       }
       return;
     }
@@ -3315,11 +3367,15 @@ io.on("connection", (socket: Socket) => {
       if (room.turnBuffer[data.playerId]) {
         delete room.turnBuffer[data.playerId];
         console.log(`[Server] Action cancelled by ${data.playerId}`);
-        socket.emit("actionCancelled", { playerId: data.playerId, roomId: data.roomId });
-        // Re-send move prompt to this player
+        socket.emit("actionCancelled", { playerId: data.playerId, roomId: room.id });
+        // Re-send prompt to this player (switch prompts during force-switch phase)
         if (room.engine) {
           const state = room.engine.getState();
-          emitMovePrompts(room, state);
+          if (room.phase === "force-switch" && room.forceSwitchNeeded?.has(data.playerId)) {
+            emitForceSwitchPrompts(room, state, [data.playerId]);
+          } else {
+            emitMovePrompts(room, state);
+          }
         }
       }
       return;
@@ -3448,7 +3504,16 @@ io.on("connection", (socket: Socket) => {
           usedBench.add(c.toIndex);
         }
 
-        let res = room.engine.forceSwitch(splitMergedPlayerId, choices[0]?.toIndex, choices);
+        let res;
+        try {
+          res = room.engine.forceSwitch(splitMergedPlayerId, choices[0]?.toIndex, choices);
+        } catch (err: any) {
+          console.error(`[ForceSwitch] engine.forceSwitch THREW for merged ${splitMergedPlayerId}:`, err?.stack || err);
+          room.lastPromptByPlayer = {};
+          for (const pid of requiredForMerged) delete room.turnBuffer[pid];
+          emitForceSwitchPrompts(room, room.engine.getState(), requiredForMerged);
+          return;
+        }
         if (Array.isArray(res.events)) {
           res = { ...res, events: deduplicateSwitchLines(res.events) };
         }
@@ -3483,7 +3548,15 @@ io.on("connection", (socket: Socket) => {
       if (isAutoPass) {
         // Auto-pass: no bench pokemon available, tell engine to pass all force-switch slots
         console.log(`[ForceSwitch] Auto-pass for ${data.playerId} (empty choices array)`);
-        let res = room.engine.forceSwitch(data.playerId, 0, []);
+        let res;
+        try {
+          res = room.engine.forceSwitch(data.playerId, 0, []);
+        } catch (err: any) {
+          console.error(`[ForceSwitch] engine.forceSwitch THREW for ${data.playerId} (auto-pass):`, err?.stack || err);
+          room.lastPromptByPlayer = {};
+          emitForceSwitchPrompts(room, room.engine.getState(), [data.playerId]);
+          return;
+        }
         if (Array.isArray(res.events)) {
           res = { ...res, events: deduplicateSwitchLines(res.events) };
         }
@@ -3531,7 +3604,36 @@ io.on("connection", (socket: Socket) => {
         }
       }
       // Perform immediate forced switch via engine (supports multi-slot choices array)
-      let res = room.engine.forceSwitch(data.playerId, (data.action as any).toIndex, Array.isArray(switchChoices) ? switchChoices : undefined);
+      let res;
+      try {
+        res = room.engine.forceSwitch(data.playerId, (data.action as any).toIndex, Array.isArray(switchChoices) ? switchChoices : undefined);
+      } catch (err: any) {
+        // An engine throw must not kill the handler: the player stays in
+        // forceSwitchNeeded and gets the switch prompt again instead of a
+        // silent soft-lock.
+        console.error(`[ForceSwitch] engine.forceSwitch THREW for ${data.playerId}:`, err?.stack || err);
+        room.lastPromptByPlayer = {};
+        emitForceSwitchPrompts(room, room.engine.getState(), [data.playerId]);
+        return;
+      }
+      // A failed choose (engine returns but the switch didn't take) leaves the
+      // stale forceSwitch request in place — keep the player in the set and
+      // re-prompt rather than pretending the switch happened.
+      const switchedState = room.engine.getState();
+      const switchedPlayer = switchedState.players.find(p => p.id === data.playerId);
+      const switchTookEffect = (() => {
+        if (!switchedPlayer) return true;
+        const toIndex = (data.action as any).toIndex;
+        if (!Number.isFinite(toIndex)) return true;
+        const target = switchedPlayer.team[toIndex];
+        return !!target && target.currentHP > 0 && switchedPlayer.activeIndex === toIndex;
+      })();
+      if (!switchTookEffect) {
+        console.error(`[ForceSwitch] switch did not take effect for ${data.playerId} (toIndex=${(data.action as any).toIndex}) — re-prompting`);
+        room.lastPromptByPlayer = {};
+        emitForceSwitchPrompts(room, switchedState, [data.playerId]);
+        return;
+      }
       // Deduplicate switch lines (PS sends private + public copies)
       if (Array.isArray(res.events)) {
         res = { ...res, events: deduplicateSwitchLines(res.events) };
@@ -3981,7 +4083,13 @@ io.on("connection", (socket: Socket) => {
     socket.emit("battleStarted", { roomId: room.id, state });
     // Clear dedup so re-prompt isn't blocked
     room.lastPromptByPlayer = {};
-    emitMovePrompts(room, state);
+    if (room.phase === "force-switch" && room.forceSwitchNeeded?.size) {
+      // Re-send switch prompts, never move prompts — a move prompt in this
+      // phase is always the stale-request blank that soft-locks the client.
+      emitForceSwitchPrompts(room, state, Array.from(room.forceSwitchNeeded));
+    } else {
+      emitMovePrompts(room, state);
+    }
   });
 
   socket.on("disconnect", () => {

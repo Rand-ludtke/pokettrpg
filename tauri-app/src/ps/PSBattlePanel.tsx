@@ -696,6 +696,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const latestPromptRqidRef = useRef<number | null>(null);
   const blankActionRecoveryKeyRef = useRef<string>('');
   const blankActionRecoveryAtRef = useRef<number>(0);
+  // Rate-limits the blank-move-prompt guard's requestBattleState calls.
+  const blankMovePromptGuardAtRef = useRef<number>(0);
   const turnPromptRecoveryTimerRef = useRef<number | null>(null);
   const teamSubmittedRef = useRef(false);
   const lastActiveBySideRef = useRef<{ p1?: string; p2?: string }>({});
@@ -2831,6 +2833,30 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         ? 'team'
         : (hasForceSwitch ? 'switch' : (prompt?.requestType || (prompt?.wait ? 'wait' : 'move')));
       const effectiveTeamPreview = !!prompt?.teamPreview && requestType === 'team' && !teamSubmittedRef.current;
+
+      // Guard against the stale force-switch request being re-sent as a "move"
+      // prompt: PS faint-switch requests carry active:[{moves:[]}] and no real
+      // move request ever has zero moves. Accepting it here used to erase the
+      // switch UI (options vanish, refresh loops forever). Ask the server for a
+      // fresh state instead — it now re-sends the proper switch prompt.
+      const blankMovePrompt = requestType === 'move'
+        && Array.isArray(prompt?.active)
+        && prompt.active.length > 0
+        && prompt.active.every((slot: any) => !Array.isArray(slot?.moves) || slot.moves.length === 0);
+      if (blankMovePrompt) {
+        const now = Date.now();
+        if (now - blankMovePromptGuardAtRef.current > 2000) {
+          blankMovePromptGuardAtRef.current = now;
+          console.warn('[PSBattlePanel] Ignoring blank move prompt (fainted active, no moves) - requesting switch prompt', {
+            turn: data.state?.turn,
+            rqid: (prompt as any)?.rqid,
+          });
+          client?.requestBattleState(roomId);
+        } else {
+          PS_DEBUG && console.log('[PSBattlePanel] Ignoring blank move prompt (rate-limited)');
+        }
+        return;
+      }
       
       // FIX: Rebuild active array using correct Pokemon from protocol/state (server sometimes sends wrong or missing active)
       // Prefer protocol-derived active, fall back to state.activeIndex

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "mimosa-hook-status/v1",
+  "recordedAt": "2026-10-14T04:54:20.203Z",
+  "sessionId": "sess_a90a5beb-3581-49ec-bffc-412b4febfccc",
+  "event": "PostToolUse",
+  "toolName": "Edit",
+  "file": "D:\\GitHub\\pokettrpg\\scripts\\pi-deploy-backend.py",
+  "outcome": "inconclusive",
+  "coverage": "partial",
+  "findingCount": 0,
+  "durationMs": 10,
+  "hostState": "hook_complete",
+  "reportHint": ".mimosa/reports/"
+}

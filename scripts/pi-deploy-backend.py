@@ -26,6 +26,8 @@ PASSWORD = "shark55"
 
 LOCAL_ENGINE = r"D:\GitHub\pokettrpg\pokemonttrpg-backend\dist\sync-ps-engine.js"
 REMOTE_ENGINE = "/home/randl/pokettrpg/pokemonttrpg-backend/dist/sync-ps-engine.js"
+LOCAL_SERVER = r"D:\GitHub\pokettrpg\pokemonttrpg-backend\dist\server\index.js"
+REMOTE_SERVER = "/home/randl/pokettrpg/pokemonttrpg-backend/dist/server/index.js"
 # Loader baseRoots on the Pi resolve to these (relative to dist/ and cwd):
 REMOTE_DATA_ROOTS = [
     "/home/randl/pokettrpg/tauri-app/public/data",
@@ -67,6 +69,8 @@ def main() -> int:
     # ── 1. Probe ────────────────────────────────────────────────────────────
     remote_hash = run(ssh, f"sha256sum {REMOTE_ENGINE} 2>/dev/null | cut -d' ' -f1")
     print(f"[pi] deployed engine sha256 = {remote_hash[:16] if remote_hash else 'NONE'}...")
+    remote_server_hash = run(ssh, f"sha256sum {REMOTE_SERVER} 2>/dev/null | cut -d' ' -f1")
+    print(f"[pi] deployed server sha256 = {remote_server_hash[:16] if remote_server_hash else 'NONE'}...")
     if remote_hash == local_hash:
         print("[pi] engine already up to date — will still verify packs + restart")
 
@@ -96,6 +100,8 @@ def main() -> int:
     run(ssh, f"mkdir -p /home/randl/pokettrpg/pokemonttrpg-backend/dist")
     sftp.put(LOCAL_ENGINE, REMOTE_ENGINE)
     print(f"[pi] uploaded engine ({REMOTE_ENGINE})")
+    sftp.put(LOCAL_SERVER, REMOTE_SERVER)
+    print(f"[pi] uploaded server ({REMOTE_SERVER})")
 
     for remote_dir, fn, local_path in missing:
         run(ssh, f"mkdir -p '{remote_dir}'")
@@ -107,7 +113,11 @@ def main() -> int:
     if uploaded_hash != local_hash:
         print("[!!] hash mismatch after upload — aborting restart")
         return 1
-    print("[pi] uploaded engine hash verified")
+    uploaded_server_hash = run(ssh, f"sha256sum {REMOTE_SERVER} | cut -d' ' -f1")
+    if uploaded_server_hash != sha256_of(LOCAL_SERVER):
+        print("[!!] server hash mismatch after upload — aborting restart")
+        return 1
+    print("[pi] uploaded hashes verified")
 
     # ── 4. Restart service ──────────────────────────────────────────────────
     print("[pi] restarting pokettrpg-backend...")
