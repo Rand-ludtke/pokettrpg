@@ -207,40 +207,49 @@ const customAbilityPatches = {
         },
     },
 
-    // ── Spectrum (Pokemon Sage, Royjibiv) ──
-    // Changes this Pokemon's PRIMARY type to match the colour of the opposing
-    // Pokemon it is facing (CAPX/Sage colour chart below). Re-evaluated on its
-    // own switch-in and whenever anything else switches in (Commander-style
-    // onAnySwitchIn -> onUpdate delegation), so the prism re-colours each time
-    // the opponent sends a new Pokemon. Works with Prism Beam, whose type
-    // copies the user's primary type.
-    spectrum: {
-        onAnySwitchInPriority: -2,
-        onAnySwitchIn() {
-            this.effect.onUpdate.call(this, this.effectState.target);
-        },
-        onStart(pokemon) {
-            this.effect.onUpdate.call(this, pokemon);
-        },
-        onUpdate(pokemon) {
-            if (!pokemon.isActive || pokemon.fainted) return;
-            const foeActive = (pokemon.side && pokemon.side.foe && pokemon.side.foe.active) || [];
-            const foe = foeActive.find((mon) => mon && !mon.fainted);
-            if (!foe) return;
-            // NOTE: this PS version has no Pokemon#getSpecies(); .species holds
-            // the Species template object directly (sim/pokemon.js:100).
-            const species = foe.species;
-            const rawColor = species && typeof species === "object" ? species.color : "";
-            const color = String(rawColor || "").trim();
-            const mapped = SPECTRUM_COLOR_TYPES[color.toLowerCase()];
-            if (!mapped) return;
-            const currentTypes = pokemon.getTypes();
-            if (currentTypes[0] === mapped) return;
-            const nextTypes = [mapped, currentTypes[1]].filter(Boolean);
-            pokemon.setType(nextTypes);
-            this.add('-start', pokemon, 'typechange', nextTypes.join('/'), '[from] ability: Spectrum');
-        },
-    },
+	// ── Spectrum (Pokemon Sage, Royjibiv) ──
+	// Changes this Pokemon's PRIMARY type to match the colour of the opposing
+	// Pokemon it is facing (CAPX/Sage colour chart below). Re-evaluated on its
+	// own switch-in and whenever anything else switches in (Commander-style
+	// onAnySwitchIn -> onUpdate delegation), so the prism re-colours each time
+	// the opponent sends a new Pokemon. Works with Prism Beam, whose type
+	// copies the user's primary type.
+	spectrum: {
+		onAnySwitchInPriority: -2,
+		onAnySwitchIn() {
+			this.effect.onUpdate.call(this, this.effectState.target);
+		},
+		onStart(pokemon) {
+			this.effect.onUpdate.call(this, pokemon);
+		},
+		onUpdate(pokemon) {
+			if (!pokemon.isActive || pokemon.fainted) return;
+			const foeActive = (pokemon.side && pokemon.side.foe && pokemon.side.foe.active) || [];
+			const foe = foeActive.find((mon) => mon && !mon.fainted);
+			if (!foe) return;
+			// NOTE: this PS version has no Pokemon#getSpecies(); .species holds
+			// the Species template object directly (sim/pokemon.js:100).
+			const species = foe.species;
+			const rawColor = species && typeof species === "object" ? species.color : "";
+			const color = String(rawColor || "").trim();
+			const mapped = SPECTRUM_COLOR_TYPES[color.toLowerCase()];
+			if (!mapped) return;
+			const currentTypes = pokemon.getTypes();
+			if (currentTypes[0] === mapped) return;
+			const nextTypes = [mapped, currentTypes[1]].filter(Boolean);
+			pokemon.setType(nextTypes);
+			this.add('-start', pokemon, 'typechange', nextTypes.join('/'), '[from] ability: Spectrum');
+		},
+	},
+
+	// ── Stormbringer (Uranium, Yatagaryu line) ──
+	// Drizzle-style summoner for Uranium's unique Thunderstorm weather
+	// (see Dex.data.Conditions.thunderstorm below for the weather's effects).
+	stormbringer: {
+		onStart(source) {
+			this.field.setWeather("thunderstorm");
+		},
+	},
 };
 
 // CAPX/Sage Spectrum colour chart: opposing Pokemon's Pokedex colour -> new
@@ -863,6 +872,85 @@ const warnedUnknownMoves = new Set();
     // Teleface shield, Leadership first-move, Rebellious). PS rejects unknown
     // volatile ids in addVolatile, so register them explicitly.
     Object.assign(Dex.data.Conditions, ss2AbilityConditions);
+
+    // ── Thunderstorm (Uranium's unique weather) ──
+    // Summoned by Yatagaryu's Stormbringer ability or the Thunderstorm move
+    // (the move's weather:"thunderstorm" data field is applied natively by
+    // battle-actions once this condition exists). Per the Uranium spec:
+    //   - lasts 5 turns
+    //   - Electric-type moves deal 1.5x damage
+    //   - at the end of every ODD turn, each active Pokemon that is neither
+    //     Electric- nor Ground-type is struck by lightning for damage scaled
+    //     by its Electric weakness (x4: 1/2, x2: 1/4, x1: 1/8, x0.5: 1/16,
+    //     x0.25: 1/32 of max HP); Motor Drive / Volt Absorb / Lightning Rod /
+    //     Magic Guard, Safety Goggles and semi-invulnerability are exempt
+    //   - Thunder never misses (patched onto the move below)
+    Dex.data.Conditions.thunderstorm = {
+        name: "Thunderstorm",
+        effectType: "Weather",
+        duration: 5,
+        onFieldStart(field, source, effect) {
+            if (effect && effect.effectType === "Ability") {
+                this.add("-weather", "Thunderstorm", "[from] ability: " + effect.name, `[of] ${source}`);
+            } else {
+                this.add("-weather", "Thunderstorm");
+            }
+        },
+        onFieldResidualOrder: 1,
+        onFieldResidual() {
+            this.add("-weather", "Thunderstorm", "[upkeep]");
+            if (typeof this.turn === "number" && this.turn % 2 === 0) return; // odd turns only
+            this.eachEvent("Weather");
+        },
+        onWeather(target) {
+            if (!target || target.fainted) return;
+            if (target.hasType("Electric") || target.hasType("Ground")) return;
+            const abilityId = target.getAbility().id;
+            if (abilityId === "motordrive" || abilityId === "voltabsorb" || abilityId === "lightningrod" || abilityId === "magicguard") return;
+            if (target.hasItem("safetygoggles")) return;
+            const volatiles = target.volatiles || {};
+            if (volatiles.dig || volatiles.dive || volatiles.fly || volatiles.shadowforce) return;
+            // Electric-type effectiveness straight from the (custom-aware) typechart.
+            const typeData = this.dex && this.dex.data ? this.dex.data.TypeChart : null;
+            let mod = 1;
+            for (const typeName of target.getTypes()) {
+                const typeId = String(typeName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+                const dt = typeData && typeData[typeId] && typeData[typeId].damageTaken
+                    ? typeData[typeId].damageTaken["Electric"]
+                    : undefined;
+                if (dt === 3) return; // immune to Electric -> exempt from strikes
+                if (dt === 1) mod *= 2;
+                else if (dt === 2) mod *= 0.5;
+                else if (dt === 0 && dt !== undefined) mod *= 1;
+            }
+            const frac = mod >= 4 ? 0.5 : mod >= 2 ? 0.25 : mod >= 1 ? 0.125 : mod >= 0.5 ? 0.0625 : 0.03125;
+            this.damage(target.baseMaxhp * frac);
+            this.add("-message", `${target.name} was struck by lightning!`);
+        },
+        onWeatherModifyDamage(damage, attacker, defender, move) {
+            if (move.type === "Electric") {
+                this.debug("thunderstorm electric boost");
+                return this.chainModify(1.5);
+            }
+        },
+        onFieldEnd() {
+            this.add("-weather", "none");
+        },
+    };
+
+    // Thunder never misses during Thunderstorm (chain any existing handler).
+    {
+        const thunderMove = Dex.data.Moves["thunder"];
+        if (thunderMove && typeof thunderMove === "object") {
+            const prevOnModifyMove = typeof thunderMove.onModifyMove === "function" ? thunderMove.onModifyMove : null;
+            thunderMove.onModifyMove = function (move, pokemon) {
+                if (prevOnModifyMove) prevOnModifyMove.call(this, move, pokemon);
+                if (this.field && this.field.isWeather && this.field.isWeather("thunderstorm")) {
+                    move.accuracy = true;
+                }
+            };
+        }
+    }
 
     // Abilities: fan-game dumps contain 240+ keys that collide with canonical
     // abilities and would wipe their handlers (e.g. Magic Bounce, Sturdy).
