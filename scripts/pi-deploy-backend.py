@@ -34,7 +34,7 @@ REMOTE_DATA_ROOTS = [
 ]
 # Override packs the fixed loader needs on the Pi (relative to data root):
 REQUIRED_PACKS = [
-    ("custom-overrides/generated", ["extra-pokemon.json", "moves.extra-pokemon.json"]),
+    ("custom-overrides/generated", ["extra-pokemon.json", "moves.extra-pokemon.json", "items.extra-pokemon.json"]),
     ("pokeathlon/generated", ["pokedex.pokeathlon.json"]),
     ("sage/generated", ["moves.custom.sage.json"]),
 ]

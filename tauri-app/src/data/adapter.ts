@@ -953,10 +953,11 @@ export async function loadShowdownDex(options?: { base?: string }) {
     fetchOptionalJson(withPublicBase('data/ss2-patch/generated/abilities.custom.ss2-soulstones.json')),
   ]);
   // ── Custom extra Pokémon (Obliteryx / newer CAP / etc.) ──────────────────────
-  const [extraPokemonDex, extraPokemonLearnsets, extraPokemonMoves] = await Promise.all([
+  const [extraPokemonDex, extraPokemonLearnsets, extraPokemonMoves, extraPokemonItems] = await Promise.all([
     fetchOptionalJson(withPublicBase('data/custom-overrides/generated/extra-pokemon.json')),
     fetchOptionalJson(withPublicBase('data/custom-overrides/generated/learnsets.extra-pokemon.json')),
     fetchOptionalJson(withPublicBase('data/custom-overrides/generated/moves.extra-pokemon.json')),
+    fetchOptionalJson(withPublicBase('data/custom-overrides/generated/items.extra-pokemon.json')),
   ]);
 
   // ── Pokeathlon DLC – load Soulstone CAP data ────────────────────────
@@ -1137,6 +1138,8 @@ export async function loadShowdownDex(options?: { base?: string }) {
     ...((sageItems || {}) as ItemIndex),
     ...((insItems || {}) as ItemIndex),
     ...((wylinItems || {}) as ItemIndex),
+    // Custom extra items (Deep Cold Shard, etc.) — campaign pack wins.
+    ...((extraPokemonItems || {}) as ItemIndex),
   } as ItemIndex;
 
   const sourceTags: Record<string, Set<string>> = {};

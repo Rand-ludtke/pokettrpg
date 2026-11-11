@@ -1,1 +1,23 @@
-{}
+{
+  "iceburncustom": {
+    "name": "Ice Burn (Custom)",
+    "type": "Ice",
+    "basePower": 180,
+    "category": "Special",
+    "accuracy": 90,
+    "pp": 5,
+    "target": "normal",
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1
+    },
+    "self": {
+      "volatileStatus": "mustrecharge"
+    },
+    "num": 0,
+    "isNonstandard": "Custom",
+    "desc": "The user fires an ice-cold beam of tremendous power. The target has a 50% chance to be burned or a 50% chance to be frostbitten. The user must recharge next turn.",
+    "shortDesc": "180 BP; user must recharge; 50% burn / 50% frostbite."
+  }
+}

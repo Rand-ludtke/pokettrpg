@@ -133,6 +133,7 @@ function loadCustomDexPayload() {
             files: [
                 { file: "pokedex.extra-pokemon.json", target: "species" },
                 { file: "moves.extra-pokemon.json", target: "moves" },
+                { file: "items.extra-pokemon.json", target: "items" },
             ],
         },
         {
@@ -428,6 +429,26 @@ const customMoveEffectPatches = {
                 delete move.typeChangerBoosted;
             }
         },
+    },
+    // Ice Burn (Custom): 180 BP Hyper-Beam-style Ice attack — fires, then the
+    // user must recharge (self.volatileStatus:'mustrecharge' in the payload
+    // JSON, applied natively by PS). The 50% burn / 50% frostbite split needs
+    // a code handler: roll once, and if the picked status fails (type immunity
+    // or a pre-existing status), try the other one.
+    iceburncustom: {
+        secondaries: [{
+            chance: 100,
+            onHit(target, source, move) {
+                if (!target || target.fainted) return true;
+                const roll = this.random(2);
+                const first = roll === 0 ? "brn" : "frb";
+                target.setStatus(first, source, move);
+                if (!target.status) {
+                    target.setStatus(first === "brn" ? "frb" : "brn", source, move);
+                }
+                return true;
+            },
+        }],
     },
 };
 
@@ -952,6 +973,46 @@ const warnedUnknownMoves = new Set();
         }
     }
 
+    // ── Frostbite ('frb') — the ice analogue of burn (Legends Arceus style) ──
+    // Not present in this PS build. 1/8 max HP residual damage per turn and the
+    // victim's Special Attack is halved (burn halves Attack; frostbite halves
+    // Special Attack). Needed by Ice Burn (Custom)'s 50% burn / 50% frostbite
+    // secondary.
+    if (!Dex.data.Conditions["frb"]) {
+        const frostbite = {
+            name: "Frostbite",
+            effectType: "Status",
+            onStart(target, source, sourceEffect) {
+                this.add("-status", target, "frb", sourceEffect ? `[from] ${sourceEffect.name}` : "");
+            },
+            onSwitchIn(pokemon) {
+                this.add("-status", pokemon, "frb", "[silent]");
+            },
+            onResidualOrder: 10,
+            onResidualSubOrder: 1,
+            onResidual(pokemon) {
+                // Target must be passed explicitly (canonical psn/brn pattern);
+                // the implicit damage target is unreliable in residual context.
+                this.damage(pokemon.baseMaxhp / 8, pokemon, '[from] frostbite');
+            },
+            onModifySpAPriority: 15,
+            onModifySpA(spa, pokemon) {
+                return this.chainModify(0.5);
+            },
+        };
+        // PS derives a condition's runtime id from its NAME (BasicEffect:
+        // id = toID(name)), so after setStatus('frb') the status state id is
+        // 'frostbite' and every later getStatus() looks up THAT key. Register
+        // the same object under both keys so onset and residual resolve to one
+        // condition.
+        Dex.data.Conditions["frb"] = frostbite;
+        Dex.data.Conditions["frostbite"] = frostbite;
+    }
+
+    // ── Deep Cold Shard (custom held item) ──
+    // Holder's Ice-type attacks have their Base Power raised by a flat +20.
+    // Attached AFTER the items assign below so the payload entry exists first.
+
     // Abilities: fan-game dumps contain 240+ keys that collide with canonical
     // abilities and would wipe their handlers (e.g. Magic Bounce, Sturdy).
     // Only ADD genuinely new abilities; canonical ones stay untouched.
@@ -965,6 +1026,20 @@ const warnedUnknownMoves = new Set();
         Object.assign(Dex.data.Abilities, addOnlyAbilities);
     }
     Object.assign(Dex.data.Items, customDex.items || {});
+
+    // ── Deep Cold Shard (custom held item) ──
+    // Holder's Ice-type attacks have their Base Power raised by a flat +20.
+    // Attached after the items assign above so the payload entry exists.
+    {
+        const deepColdShard = Dex.data.Items["deepcoldshard"];
+        if (deepColdShard && typeof deepColdShard === "object") {
+            deepColdShard.onBasePower = function (basePower, holder, target, move) {
+                if (move && move.type === "Ice" && move.category !== "Status") {
+                    return basePower + 20;
+                }
+            };
+        }
+    }
 
     // SS2 retyped variants (<move>ss2) are built by filterVanillaCollisions()
     // above directly from the pristine base entries. The legacy variant loop

@@ -246,7 +246,7 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
     }
   };
 
-  const [pokeathlonPokedex, extraPokemonDex,
+  const [pokeathlonPokedex, extraPokemonDex, extraPokemonItems,
          sagePokedex, sageMoves, sageAbilities, sageItems,
          insPokedex, insAbilities, insItems,
          uraniumPokedex, uraniumMoves, uraniumAbilities,
@@ -261,6 +261,7 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
     // missing → ??? types; Greninja-Orion showed stale ss2 stats).
     fetchOptionalJson(withPublicBase('data/pokeathlon/generated/pokedex.pokeathlon.json')),
     fetchOptionalJson(withPublicBase('data/custom-overrides/generated/extra-pokemon.json')),
+    fetchOptionalJson(withPublicBase('data/custom-overrides/generated/items.extra-pokemon.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/pokedex.sage.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/moves.custom.sage.json')),
     fetchOptionalJson(withPublicBase('data/sage/generated/abilities.custom.sage.json')),
@@ -319,6 +320,7 @@ async function patchSageAndInsurgenceDexEntries(): Promise<void> {
   // authoritative override packs must be merged before the fan-game packs.
   applied += mergeEntries(pokeathlonPokedex, battleDex, 'Pokeathlon dex', true);
   applied += mergeEntries(extraPokemonDex, battleDex, 'Extra Pokemon dex', true);
+  applied += mergeEntries(extraPokemonItems, battleItems, 'Extra Pokemon items');
   applied += mergeEntries(sagePokedex, battleDex, 'Sage dex', true);
   applied += mergeEntries(insPokedex, battleDex, 'Insurgence dex', true);
   applied += mergeEntries(uraniumPokedex, battleDex, 'Uranium dex', true);

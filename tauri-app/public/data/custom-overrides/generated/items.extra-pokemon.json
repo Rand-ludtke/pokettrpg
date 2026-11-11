@@ -1,0 +1,10 @@
+{
+  "deepcoldshard": {
+    "name": "Deep Cold Shard",
+    "flingPower": 90,
+    "num": 0,
+    "isNonstandard": "Custom",
+    "desc": "An eternal-ice shard held by a Pokemon. The holder's Ice-type attacks have their Base Power raised by 20.",
+    "shortDesc": "Holder's Ice-type moves: +20 Base Power."
+  }
+}
