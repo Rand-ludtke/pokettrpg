@@ -2,16 +2,31 @@
   "obliteryx": {
     "name": "Obliteryx",
     "num": -50001,
-    "types": ["Flying", "Grass"],
-    "baseStats": { "hp": 70, "atk": 120, "def": 75, "spa": 85, "spd": 80, "spe": 160 },
-    "abilities": { "0": "Hurricane Force", "H": "Levitate" },
+    "types": [
+      "Flying",
+      "Grass"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "atk": 120,
+      "def": 75,
+      "spa": 85,
+      "spd": 80,
+      "spe": 160
+    },
+    "abilities": {
+      "0": "Hurricane Force",
+      "H": "Levitate"
+    },
     "heightm": 1.2,
     "weightkg": 34.0,
     "color": "Green",
     "gen": 9,
     "tier": "NDOU",
     "isNonstandard": "CAP",
-    "tags": ["CAP"]
+    "tags": [
+      "CAP"
+    ]
   },
   "jolteonrevy": {
     "name": "Jolteon-Revy",
@@ -19,9 +34,23 @@
     "baseSpecies": "Jolteon",
     "forme": "Revy",
     "baseForme": "Base",
-    "types": ["Electric", "Ice"],
-    "baseStats": { "hp": 90, "atk": 75, "def": 90, "spa": 150, "spd": 100, "spe": 145 },
-    "abilities": { "0": "Mold Breaker", "1": "Levitate", "H": "Volt Absorb" },
+    "types": [
+      "Electric",
+      "Ice"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "atk": 75,
+      "def": 90,
+      "spa": 150,
+      "spd": 100,
+      "spe": 145
+    },
+    "abilities": {
+      "0": "Mold Breaker",
+      "1": "Levitate",
+      "H": "Volt Absorb"
+    },
     "heightm": 1.0,
     "weightkg": 26.5,
     "color": "Yellow",
@@ -29,6 +58,43 @@
     "gen": 9,
     "tier": "Custom",
     "isNonstandard": "Custom",
-    "tags": ["Custom"]
+    "tags": [
+      "Custom"
+    ]
+  },
+  "conductree": {
+    "num": 3019,
+    "name": "Conductree",
+    "types": [
+      "Fire",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 102,
+      "atk": 75,
+      "def": 88,
+      "spa": 135,
+      "spd": 88,
+      "spe": 96
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Sheer Force",
+      "H": "Electric Surge"
+    },
+    "heightm": 2.4,
+    "weightkg": 130,
+    "color": "Brown",
+    "eggGroups": [
+      "Pokeathlon",
+      "POA"
+    ],
+    "tier": "Custom",
+    "isNonstandard": "Custom",
+    "tags": [
+      "Pokeathlon",
+      "Custom"
+    ],
+    "prevo": "Ashenash"
   }
 }

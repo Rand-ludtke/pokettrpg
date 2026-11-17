@@ -53839,5 +53839,40 @@
     ],
     "tier": "Custom",
     "isNonstandard": "Custom"
+  },
+  "conductree": {
+    "num": 3019,
+    "name": "Conductree",
+    "types": [
+      "Fire",
+      "Electric"
+    ],
+    "baseStats": {
+      "hp": 102,
+      "atk": 75,
+      "def": 88,
+      "spa": 135,
+      "spd": 88,
+      "spe": 96
+    },
+    "abilities": {
+      "0": "Lightning Rod",
+      "1": "Sheer Force",
+      "H": "Electric Surge"
+    },
+    "heightm": 2.4,
+    "weightkg": 130,
+    "color": "Brown",
+    "eggGroups": [
+      "Pokeathlon",
+      "POA"
+    ],
+    "tier": "Custom",
+    "isNonstandard": "Custom",
+    "tags": [
+      "Pokeathlon",
+      "Custom"
+    ],
+    "prevo": "Ashenash"
   }
 }

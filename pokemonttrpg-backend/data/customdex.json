@@ -3,7 +3,10 @@
     "jolteonrevy": {
       "id": "jolteonrevy",
       "name": "Jolteon-Revy",
-      "types": ["Electric", "Ice"],
+      "types": [
+        "Electric",
+        "Ice"
+      ],
       "baseStats": {
         "hp": 90,
         "atk": 75,
@@ -38,6 +41,51 @@
         "agility",
         "thunderwave",
         "toxic",
+        "protect",
+        "substitute",
+        "weatherball"
+      ]
+    },
+    "conductree": {
+      "id": "conductree",
+      "name": "Conductree",
+      "types": [
+        "Fire",
+        "Electric"
+      ],
+      "baseStats": {
+        "hp": 102,
+        "atk": 75,
+        "def": 88,
+        "spa": 135,
+        "spd": 88,
+        "spe": 96
+      },
+      "abilities": {
+        "0": "Lightning Rod",
+        "1": "Sheer Force",
+        "H": "Electric Surge"
+      },
+      "moves": [
+        "flamethrower",
+        "fireblast",
+        "overheat",
+        "heatwave",
+        "lavaplume",
+        "thunderbolt",
+        "thunder",
+        "voltswitch",
+        "discharge",
+        "electroweb",
+        "energyball",
+        "gigadrain",
+        "solarbeam",
+        "earthpower",
+        "scorchingsands",
+        "willowisp",
+        "nastyplot",
+        "calmmind",
+        "growth",
         "protect",
         "substitute",
         "weatherball"

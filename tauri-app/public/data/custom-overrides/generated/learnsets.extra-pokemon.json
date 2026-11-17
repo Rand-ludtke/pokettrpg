@@ -1,55 +1,215 @@
 {
   "obliteryx": {
     "learnset": {
-      "hurricane": ["9L1"],
-      "leafstorm": ["9L1"],
-      "airslash": ["9L5"],
-      "gigadrain": ["9L10"],
-      "tailwind": ["9L15"],
-      "aerialace": ["9L20"],
-      "leafblade": ["9L25"],
-      "bravebird": ["9L30"],
-      "powerwhip": ["9L40"],
-      "woodhammer": ["9L50"],
-      "fly": ["9M"],
-      "acrobatics": ["9M"],
-      "energyball": ["9M"],
-      "protect": ["9M"],
-      "roost": ["9M"],
-      "swordsdance": ["9M"],
-      "uturn": ["9M"],
-      "defog": ["9M"],
-      "roar": ["9M"]
+      "hurricane": [
+        "9L1"
+      ],
+      "leafstorm": [
+        "9L1"
+      ],
+      "airslash": [
+        "9L5"
+      ],
+      "gigadrain": [
+        "9L10"
+      ],
+      "tailwind": [
+        "9L15"
+      ],
+      "aerialace": [
+        "9L20"
+      ],
+      "leafblade": [
+        "9L25"
+      ],
+      "bravebird": [
+        "9L30"
+      ],
+      "powerwhip": [
+        "9L40"
+      ],
+      "woodhammer": [
+        "9L50"
+      ],
+      "fly": [
+        "9M"
+      ],
+      "acrobatics": [
+        "9M"
+      ],
+      "energyball": [
+        "9M"
+      ],
+      "protect": [
+        "9M"
+      ],
+      "roost": [
+        "9M"
+      ],
+      "swordsdance": [
+        "9M"
+      ],
+      "uturn": [
+        "9M"
+      ],
+      "defog": [
+        "9M"
+      ],
+      "roar": [
+        "9M"
+      ]
     }
   },
   "jolteonrevy": {
     "learnset": {
-      "thunderbolt": ["9L1"],
-      "icebeam": ["9L1"],
-      "freezedry": ["9L1"],
-      "voltswitch": ["9L1"],
-      "blizzard": ["9L1"],
-      "iceshard": ["9L1"],
-      "discharge": ["9L1"],
-      "thunder": ["9L1"],
-      "shadowball": ["9L1"],
-      "earthpower": ["9L1"],
-      "hydropump": ["9L1"],
-      "scald": ["9L1"],
-      "energyball": ["9L1"],
-      "gigadrain": ["9L1"],
-      "auroraveil": ["9L1"],
-      "calmmind": ["9L1"],
-      "nastyplot": ["9L1"],
-      "agility": ["9L1"],
-      "thunderwave": ["9L1"],
-      "toxic": ["9L1"],
-      "protect": ["9M"],
-      "substitute": ["9M"],
-      "weatherball": ["9M"],
-      "pinmissile": ["9M"],
-      "fakeout": ["9M"],
-      "roar": ["9M"]
+      "thunderbolt": [
+        "9L1"
+      ],
+      "icebeam": [
+        "9L1"
+      ],
+      "freezedry": [
+        "9L1"
+      ],
+      "voltswitch": [
+        "9L1"
+      ],
+      "blizzard": [
+        "9L1"
+      ],
+      "iceshard": [
+        "9L1"
+      ],
+      "discharge": [
+        "9L1"
+      ],
+      "thunder": [
+        "9L1"
+      ],
+      "shadowball": [
+        "9L1"
+      ],
+      "earthpower": [
+        "9L1"
+      ],
+      "hydropump": [
+        "9L1"
+      ],
+      "scald": [
+        "9L1"
+      ],
+      "energyball": [
+        "9L1"
+      ],
+      "gigadrain": [
+        "9L1"
+      ],
+      "auroraveil": [
+        "9L1"
+      ],
+      "calmmind": [
+        "9L1"
+      ],
+      "nastyplot": [
+        "9L1"
+      ],
+      "agility": [
+        "9L1"
+      ],
+      "thunderwave": [
+        "9L1"
+      ],
+      "toxic": [
+        "9L1"
+      ],
+      "protect": [
+        "9M"
+      ],
+      "substitute": [
+        "9M"
+      ],
+      "weatherball": [
+        "9M"
+      ],
+      "pinmissile": [
+        "9M"
+      ],
+      "fakeout": [
+        "9M"
+      ],
+      "roar": [
+        "9M"
+      ]
+    }
+  },
+  "conductree": {
+    "learnset": {
+      "flamethrower": [
+        "9L1"
+      ],
+      "fireblast": [
+        "9L1"
+      ],
+      "overheat": [
+        "9L1"
+      ],
+      "heatwave": [
+        "9L1"
+      ],
+      "lavaplume": [
+        "9L1"
+      ],
+      "thunderbolt": [
+        "9L1"
+      ],
+      "thunder": [
+        "9L1"
+      ],
+      "voltswitch": [
+        "9L1"
+      ],
+      "discharge": [
+        "9L1"
+      ],
+      "electroweb": [
+        "9L1"
+      ],
+      "energyball": [
+        "9L1"
+      ],
+      "gigadrain": [
+        "9L1"
+      ],
+      "solarbeam": [
+        "9L1"
+      ],
+      "earthpower": [
+        "9L1"
+      ],
+      "scorchingsands": [
+        "9L1"
+      ],
+      "willowisp": [
+        "9L1"
+      ],
+      "nastyplot": [
+        "9L1"
+      ],
+      "calmmind": [
+        "9L1"
+      ],
+      "growth": [
+        "9L1"
+      ],
+      "protect": [
+        "9M"
+      ],
+      "substitute": [
+        "9M"
+      ],
+      "weatherball": [
+        "9M"
+      ]
     }
   }
 }
