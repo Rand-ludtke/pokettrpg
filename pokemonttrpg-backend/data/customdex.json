@@ -1,0 +1,50 @@
+{
+  "species": {
+    "jolteonrevy": {
+      "id": "jolteonrevy",
+      "name": "Jolteon-Revy",
+      "types": ["Electric", "Ice"],
+      "baseStats": {
+        "hp": 90,
+        "atk": 75,
+        "def": 90,
+        "spa": 150,
+        "spd": 100,
+        "spe": 145
+      },
+      "abilities": {
+        "0": "Mold Breaker",
+        "1": "Levitate",
+        "H": "Volt Absorb"
+      },
+      "moves": [
+        "freezedry",
+        "icebeam",
+        "blizzard",
+        "iceshard",
+        "thunderbolt",
+        "thunder",
+        "voltswitch",
+        "discharge",
+        "shadowball",
+        "earthpower",
+        "hydropump",
+        "scald",
+        "energyball",
+        "gigadrain",
+        "auroraveil",
+        "calmmind",
+        "nastyplot",
+        "agility",
+        "thunderwave",
+        "toxic",
+        "protect",
+        "substitute",
+        "weatherball"
+      ]
+    }
+  },
+  "moves": {},
+  "abilities": {},
+  "items": {}
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "mimosa-hook-status/v1",
+  "recordedAt": "2026-11-11T05:35:30.773Z",
+  "sessionId": "sess_a90a5beb-3581-49ec-bffc-412b4febfccc",
+  "event": "PostToolUse",
+  "toolName": "Edit",
+  "file": "D:\\GitHub\\pokettrpg\\pokemonttrpg-backend\\dist\\sync-ps-engine.js",
+  "outcome": "inconclusive",
+  "coverage": "partial",
+  "findingCount": 0,
+  "durationMs": 12,
+  "hostState": "hook_complete",
+  "reportHint": ".mimosa/reports/"
+}

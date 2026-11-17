@@ -1,0 +1,34 @@
+{
+  "obliteryx": {
+    "name": "Obliteryx",
+    "num": -50001,
+    "types": ["Flying", "Grass"],
+    "baseStats": { "hp": 70, "atk": 120, "def": 75, "spa": 85, "spd": 80, "spe": 160 },
+    "abilities": { "0": "Hurricane Force", "H": "Levitate" },
+    "heightm": 1.2,
+    "weightkg": 34.0,
+    "color": "Green",
+    "gen": 9,
+    "tier": "NDOU",
+    "isNonstandard": "CAP",
+    "tags": ["CAP"]
+  },
+  "jolteonrevy": {
+    "name": "Jolteon-Revy",
+    "num": -50002,
+    "baseSpecies": "Jolteon",
+    "forme": "Revy",
+    "baseForme": "Base",
+    "types": ["Electric", "Ice"],
+    "baseStats": { "hp": 90, "atk": 75, "def": 90, "spa": 150, "spd": 100, "spe": 145 },
+    "abilities": { "0": "Mold Breaker", "1": "Levitate", "H": "Volt Absorb" },
+    "heightm": 1.0,
+    "weightkg": 26.5,
+    "color": "Yellow",
+    "spriteid": "jolteon",
+    "gen": 9,
+    "tier": "Custom",
+    "isNonstandard": "Custom",
+    "tags": ["Custom"]
+  }
+}

@@ -21,5 +21,35 @@
       "defog": ["9M"],
       "roar": ["9M"]
     }
+  },
+  "jolteonrevy": {
+    "learnset": {
+      "thunderbolt": ["9L1"],
+      "icebeam": ["9L1"],
+      "freezedry": ["9L1"],
+      "voltswitch": ["9L1"],
+      "blizzard": ["9L1"],
+      "iceshard": ["9L1"],
+      "discharge": ["9L1"],
+      "thunder": ["9L1"],
+      "shadowball": ["9L1"],
+      "earthpower": ["9L1"],
+      "hydropump": ["9L1"],
+      "scald": ["9L1"],
+      "energyball": ["9L1"],
+      "gigadrain": ["9L1"],
+      "auroraveil": ["9L1"],
+      "calmmind": ["9L1"],
+      "nastyplot": ["9L1"],
+      "agility": ["9L1"],
+      "thunderwave": ["9L1"],
+      "toxic": ["9L1"],
+      "protect": ["9M"],
+      "substitute": ["9M"],
+      "weatherball": ["9M"],
+      "pinmissile": ["9M"],
+      "fakeout": ["9M"],
+      "roar": ["9M"]
+    }
   }
 }

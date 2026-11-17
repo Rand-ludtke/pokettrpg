@@ -1909,6 +1909,10 @@ function spriteIdCandidates(speciesName: string, cosmetic?: string): string[] {
     if (/ice/i.test(speciesName)) pushId('calyrex-ice');
     if (/shadow/i.test(speciesName)) pushId('calyrex-shadow');
   }
+  const hyphenIdx = speciesName.indexOf('-');
+  if (hyphenIdx > 0) {
+    pushId(normalizeName(toAscii(speciesName.slice(0, hyphenIdx))));
+  }
   return ids;
 }
 
