@@ -55,10 +55,7 @@ function buildPlayerPayload(username: string, playerId: string | undefined, team
     const normalizedId = normalizeName(idSource);
     const fallbackBase = `slot${index + 1}`;
     const baseId = normalizedId || (idSource ? idSource.replace(/\s+/g, '-').toLowerCase() : '');
-    const payloadId = hasNickname
-      ? (baseId || fallbackBase)
-      : (baseId ? `${baseId}-${index + 1}` : fallbackBase);
-    const finalId = payloadId || fallbackBase;
+    const finalId = mon.id || (baseId ? `${baseId}-${index + 1}` : fallbackBase);
     return {
       id: finalId,
       name: speciesName,

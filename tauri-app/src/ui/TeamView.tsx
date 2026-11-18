@@ -4,7 +4,7 @@ import { SpriteWithHat, HatId } from './SpriteWithHat';
 
 export function TeamView({ team, onRemove, onMove }: {
   team: BattlePokemon[];
-  onRemove: (name: string) => void;
+  onRemove: (index: number) => void;
   onMove?: (from: number, to: number) => void;
 }) {
   return (
@@ -31,7 +31,7 @@ export function TeamView({ team, onRemove, onMove }: {
             if (onMove && Number.isFinite(from) && from !== idx) onMove(from, idx);
           };
           return (
-            <li key={p.name}
+            <li key={p.id || `${p.name}-${idx}`}
                 draggable={!!onMove}
                 onDragStart={onDragStart}
                 onDragOver={onDragOver}
@@ -61,7 +61,7 @@ export function TeamView({ team, onRemove, onMove }: {
                     <button className="secondary" onClick={()=> onMove(idx, Math.max(0, idx-1))} disabled={idx===0}>↑</button>
                     <button className="secondary" onClick={()=> onMove(idx, Math.min(team.length-1, idx+1))} disabled={idx===team.length-1}>↓</button>
                   </>}
-                  <button onClick={() => onRemove(p.name)}>- Remove</button>
+                  <button onClick={() => onRemove(idx)}>- Remove</button>
                 </div>
               </div>
             </li>

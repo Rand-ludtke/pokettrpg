@@ -22,7 +22,14 @@ export function normalizePcBoxes(raw: unknown): Array<Array<BattlePokemon | null
     const sourceBox = Array.isArray(parsed[boxIndex]) ? parsed[boxIndex] : [];
     return Array.from({ length: PC_BOX_SIZE }, (_, slotIndex) => {
       const value = sourceBox[slotIndex];
-      return value && typeof value === 'object' ? value as BattlePokemon : null;
+      if (value && typeof value === 'object') {
+        const mon = value as BattlePokemon;
+        if (!mon.id) {
+          mon.id = `box_${boxIndex}_${slotIndex}_${Math.random().toString(36).slice(2, 7)}`;
+        }
+        return mon;
+      }
+      return null;
     });
   });
 }

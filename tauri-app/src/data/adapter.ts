@@ -1451,6 +1451,7 @@ export function toPokemon(id: string, dex: DexIndex, level = 50): Pokemon | null
   // Default teraType to the Pokemon's primary type for Gen 9 Terastallization
   const defaultTeraType = s.types?.[0] || 'Normal';
   return {
+    id: `mon_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
     name: s.name,
     species: s.name,
     level,
@@ -1482,6 +1483,9 @@ export function speciesAbilityOptions(id: string, dex: DexIndex): string[] {
 }
 
 export function prepareBattle(p: Pokemon): BattlePokemon {
+  if (!p.id) {
+    p.id = `mon_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  }
   const computed = computeRealStats(p);
   // Use TTRPG HP formula instead of Showdown's during battles
   const maxHp = calculateHp(p.baseStats.hp, p.level || 1);
@@ -2973,6 +2977,15 @@ export function loadTeams(): { teams: TeamRecord[]; activeId: string | null } {
   try {
     const raw = localStorage.getItem(LS_TEAMS) || '[]';
     const teams: TeamRecord[] = JSON.parse(raw);
+    for (const t of teams) {
+      if (Array.isArray(t.members)) {
+        t.members.forEach((m, idx) => {
+          if (!m.id) {
+            m.id = `team_${t.id}_${idx}_${Math.random().toString(36).slice(2, 7)}`;
+          }
+        });
+      }
+    }
     const activeId = localStorage.getItem(LS_ACTIVE_TEAM);
     return { teams, activeId };
   } catch {
@@ -3003,8 +3016,11 @@ export function isTeamFull(team: TeamRecord): boolean {
   return team.members.length >= max;
 }
 export function cloneForTeam(p: Pokemon): BattlePokemon {
-  // Ensure mechanics fields are carried through and computed
-  const bp = prepareBattle({ ...p });
+  // Ensure mechanics fields are carried through, computed, and given a fresh unique ID for this team slot
+  const bp = prepareBattle({
+    ...p,
+    id: `team_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
+  });
   return bp;
 }
 

@@ -162,15 +162,15 @@ function getLocalTrainerSpriteId(client?: { getTrainerSprite?: () => string | nu
   }
 }
 
-function parseActiveSwitchLine(line: string): { side: 'p1' | 'p2'; name: string } | null {
+function parseActiveSwitchLine(line: string): { side: 'p1' | 'p2'; slot: string; name: string; rawLine: string } | null {
   if (!line.startsWith('|switch|') && !line.startsWith('|drag|') && !line.startsWith('|replace|')) {
     return null;
   }
   const parts = line.split('|');
   const ident = parts[2] || '';
-  const match = ident.match(/^(p1|p2)[a-z]?:\s*(.+)$/);
+  const match = ident.match(/^(p1|p2)([a-z]?):\s*(.+)$/);
   if (!match) return null;
-  return { side: match[1] as 'p1' | 'p2', name: match[2].trim() };
+  return { side: match[1] as 'p1' | 'p2', slot: match[2] || 'a', name: match[3].trim(), rawLine: line };
 }
 
 /**
@@ -700,7 +700,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
   const blankMovePromptGuardAtRef = useRef<number>(0);
   const turnPromptRecoveryTimerRef = useRef<number | null>(null);
   const teamSubmittedRef = useRef(false);
-  const lastActiveBySideRef = useRef<{ p1?: string; p2?: string }>({});
+  const lastActiveBySideRef = useRef<Record<string, string>>({});
   const lastActiveUpdateRef = useRef<number>(0);
   const hasReceivedProtocolRef = useRef(false);
   const mySideRef = useRef<'p1' | 'p2' | null>(null); // Ref for mySide to use in callbacks
@@ -1972,8 +1972,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           const redundantSwitches = switchLines.length === 0 || switchLines.every((line) => {
             const parsed = parseActiveSwitchLine(line);
             if (!parsed) return false;
-            const lastActive = lastActiveBySideRef.current[parsed.side];
-            return lastActive && toID(parsed.name) === toID(lastActive);
+            const slotKey = `${parsed.side}${parsed.slot}`;
+            const lastActive = lastActiveBySideRef.current[slotKey];
+            return lastActive && lastActive === line;
           });
           if (redundantSwitches) {
             diagLogProtocol('battleUpdate', 'Dropping redundant split/switch batch (no real active change)');
@@ -2023,8 +2024,7 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         diagLogProtocol('battleUpdate', `NOT dropping batch: recentlySentAction=${recentlySentAction} isEarlyGame=${isEarlyGame} timeSinceAction=${timeSinceAction}ms`);
       }
 
-      // Deduplicate repeated switch lines for the same side+pokemon within a single batch
-      // AND filter switches for Pokemon that are already on the field
+      // Deduplicate repeated identical switch lines (e.g. from split protocol) within a single batch
       if (protocolLines.length > 0) {
         const seenSwitches = new Set<string>();
         const dedupedSwitches: string[] = [];
@@ -2032,17 +2032,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           if (line.startsWith('|switch|') || line.startsWith('|drag|') || line.startsWith('|replace|')) {
             const parsed = parseActiveSwitchLine(line);
             if (parsed) {
-              const key = `${parsed.side}:${toID(parsed.name)}`;
-              // Drop if we've already seen this switch in this batch
+              const key = `${parsed.side}${parsed.slot}:${line}`;
+              // Drop if we've already seen this exact switch line in this batch
               if (seenSwitches.has(key)) {
                 diagLogProtocol('battleUpdate', `Dropping duplicate switch line for ${key}`);
-                continue;
-              }
-              // Drop if this Pokemon is ALREADY the active Pokemon on this side
-              const side = parsed.side === 'p1' ? battle.p1 : battle.p2;
-              const alreadyActive = side?.active?.some((a: any) => a && toID(a.name) === toID(parsed.name));
-              if (alreadyActive) {
-                diagLogProtocol('battleUpdate', `Dropping redundant switch for ${key} (already active)`);
                 continue;
               }
               seenSwitches.add(key);
@@ -2140,9 +2133,10 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
       if (protocolLines.length > 0) {
         const activeUpdates = protocolLines
           .map(parseActiveSwitchLine)
-          .filter((v): v is { side: 'p1' | 'p2'; name: string } => !!v);
+          .filter((v): v is { side: 'p1' | 'p2'; slot: string; name: string; rawLine: string } => !!v);
         if (activeUpdates.length > 0) {
           for (const update of activeUpdates) {
+            lastActiveBySideRef.current[`${update.side}${update.slot}`] = update.rawLine;
             lastActiveBySideRef.current[update.side] = update.name;
           }
           lastActiveUpdateRef.current = Date.now();
@@ -2535,8 +2529,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             const redundantSwitches = switchLines.length === 0 || switchLines.every((line: string) => {
               const parsed = parseActiveSwitchLine(line);
               if (!parsed) return false;
-              const lastActive = lastActiveBySideRef.current[parsed.side];
-              return lastActive && toID(parsed.name) === toID(lastActive);
+              const slotKey = `${parsed.side}${parsed.slot}`;
+              const lastActive = lastActiveBySideRef.current[slotKey];
+              return lastActive && lastActive === line;
             });
             const turnLines = filteredLines.filter((line: string) => line.startsWith('|turn|'));
             const maxTurn = turnLines.reduce((acc: number, line: string) => {
@@ -2753,7 +2748,9 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         const battle = battleRef.current;
         // Find matching Pokemon in state to get full stats (name-based, not index-based)
         const stateTeam = playerFromState?.team || [];
-        const statePoke = findMatchingStatePoke(poke, stateTeam);
+        const statePoke = (stateTeam[idx] && (stateTeam[idx].name === poke.name || stateTeam[idx].species === poke.species || stateTeam[idx].id === poke.id))
+          ? stateTeam[idx]
+          : findMatchingStatePoke(poke, stateTeam);
         // Derive a stable ID for this pokemon
         const derivedId = derivePokemonId(poke) || statePoke?.id || statePoke?.pokemonId || `poke-${idx}`;
 
@@ -2761,16 +2758,17 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
         // battle.myPokemon is the array of user's pokemon in the PS client
         let clientPoke: any = null;
         if (battle && battle.myPokemon) {
-           clientPoke = battle.myPokemon.find((p: any) => 
-             p && (p.name === poke.name || p.species === poke.species || p.originalName === poke.name)
-           );
-           // Fallback to index if reliable
-           if (!clientPoke && battle.myPokemon[idx]) {
-             // Only use index if name/species at least loosely matches
+           // First match by slot index so duplicate species in different slots remain properly aligned
+           if (battle.myPokemon[idx]) {
              const byIdx = battle.myPokemon[idx];
-             if (byIdx.name === poke.name || byIdx.species === poke.species) {
+             if (byIdx.name === poke.name || byIdx.species === poke.species || !byIdx.name) {
                clientPoke = byIdx;
              }
+           }
+           if (!clientPoke) {
+             clientPoke = battle.myPokemon.find((p: any) => 
+               p && (p.name === poke.name || p.species === poke.species || p.originalName === poke.name)
+             );
            }
         }
 

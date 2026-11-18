@@ -28,6 +28,7 @@ export function ImportExport({
     for (const s of sets) {
       const p = toPokemon(s.species, dex.pokedex, s.level ?? 50);
       if (!p) continue;
+      p.id = `mon_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
       p.name = s.name || p.name;
       p.ability = s.ability || p.ability;
       (p as any).item = s.item || (p as any).item;

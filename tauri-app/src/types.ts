@@ -11,6 +11,7 @@ export interface Move {
 }
 
 export interface Pokemon {
+  id?: string;
   name: string;
   // canonical species name (distinct from nickname 'name')
   species?: string;

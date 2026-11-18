@@ -183,18 +183,24 @@ export function App() {
   const confirmPcMultiDelete = () => {
     const toDel = pcMulti.indices.slice().sort((a, b) => b - a);
     if (toDel.length === 0) return;
-    const names: string[] = [];
+    const deletedIds = new Set<string>();
     const box = currentBox();
-    for (const i of toDel) { const p = box[i]; if (p && p.name) names.push(p.name); }
+    for (const i of toDel) {
+      const p = box[i];
+      if (p?.id) deletedIds.add(p.id);
+    }
     setBoxes(prev => prev.map((b, i) => {
       if (i !== boxIndex) return b;
       const nb = b.slice();
       for (const idx of toDel) { if (idx >= 0 && idx < nb.length) nb[idx] = null; }
       return nb;
     }));
-    if (names.length) {
+    if (deletedIds.size > 0) {
       setTeams(prev => {
-        const updated = prev.teams.map(t => ({ ...t, members: t.members.filter(m => !names.includes(m.name)) }));
+        const updated = prev.teams.map(t => ({
+          ...t,
+          members: t.members.filter(m => !m.id || !deletedIds.has(m.id))
+        }));
         const state = { teams: updated, activeId: prev.activeId };
         saveTeams(updated, prev.activeId);
         return state;
@@ -349,9 +355,15 @@ export function App() {
     saveTeams(newTeams, targetId);
   }
 
-  function removeFromTeam(name: string) {
+  function removeFromTeam(target: number | string) {
     const active = activeTeam; if (!active) return;
-    const newTeams = teams.teams.map(t => (t.id === active.id ? { ...t, members: t.members.filter(x => x.name !== name) } : t));
+    const newTeams = teams.teams.map(t => {
+      if (t.id !== active.id) return t;
+      if (typeof target === 'number') {
+        return { ...t, members: t.members.filter((_, idx) => idx !== target) };
+      }
+      return { ...t, members: t.members.filter(x => x.name !== target && x.id !== target) };
+    });
     setTeams({ teams: newTeams, activeId: active.id });
     saveTeams(newTeams, active.id);
   }
@@ -425,7 +437,14 @@ export function App() {
       return nb;
     }));
     setTeams(prev => {
-      const updated = prev.teams.map(t => ({ ...t, members: t.members.map(m => (m.name === selected.name ? { ...m, ability: nextAbility } : m)) }));
+      const targetId = selected.id;
+      const updated = prev.teams.map(t => ({
+        ...t,
+        members: t.members.map(m => {
+          if (targetId && m.id) return m.id === targetId ? { ...m, ability: nextAbility } : m;
+          return m;
+        })
+      }));
       const state = { teams: updated, activeId: prev.activeId };
       saveTeams(updated, prev.activeId);
       return state;
@@ -578,10 +597,10 @@ export function App() {
                   });
                   setBoxes(prev => prev.map(box => box.map(p => {
                     if (!p) return p;
-                    const match = healed.find(h => h.name === p.name);
+                    const match = healed.find(h => (h.id && p.id ? h.id === p.id : h.name === p.name));
                     return match ? { ...p, currentHp: p.maxHp } : p;
                   })));
-                  if (selected && healed.find(h => h.name === selected.name)) setSelected({ ...selected, currentHp: selected.maxHp });
+                  if (selected && healed.find(h => (h.id && selected.id ? h.id === selected.id : h.name === selected.name))) setSelected({ ...selected, currentHp: selected.maxHp });
                 }}>Full Heal Team</button>
                 <button onClick={() => {
                   setBoxes(prev => prev.map(box => box.map(p => p ? { ...p, currentHp: p.maxHp } : p)));
@@ -686,7 +705,7 @@ export function App() {
                 </div>
               </section>
               <div style={{ marginTop: 8 }}>
-                <ImportExport onImport={(t) => { const active = activeTeam; if (!active) return; const newTeams = teams.teams.map(x => x.id === active.id ? { ...x, members: t.slice(0, 6) } : x); setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id); }} maxCount={6} exportList={team} exportLabel="Export Team" />
+                <ImportExport onImport={(t) => { const active = activeTeam; if (!active) return; const newTeams = teams.teams.map(x => x.id === active.id ? { ...x, members: t.slice(0, 6).map(m => cloneForTeam(m)) } : x); setTeams({ teams: newTeams, activeId: active.id }); saveTeams(newTeams, active.id); }} maxCount={6} exportList={team} exportLabel="Export Team" />
               </div>
             </CollapsiblePanel>
             <CollapsiblePanel title="Import / Export" icon="📥">
@@ -699,7 +718,7 @@ export function App() {
                   addAcrossBoxes(mons);
                   // Create a new team with these Pokemon
                   const newTeam = createTeam(teamName, { type: 'standard' });
-                  const newTeams = [...teams.teams, { ...newTeam, members: mons.slice(0, 6) }];
+                  const newTeams = [...teams.teams, { ...newTeam, members: mons.slice(0, 6).map(m => cloneForTeam(m)) }];
                   setTeams({ teams: newTeams, activeId: newTeam.id });
                   saveTeams(newTeams, newTeam.id);
                 }}
@@ -800,8 +819,14 @@ export function App() {
               }));
               setSelected(p);
               setTeams(prev => {
-                const beforeName = selected?.name ?? '';
-                const updated = prev.teams.map(t => ({ ...t, members: t.members.map(m => (m.name === beforeName ? { ...p } as BattlePokemon : m)) }));
+                const targetId = selected?.id;
+                const updated = prev.teams.map(t => ({
+                  ...t,
+                  members: t.members.map(m => {
+                    if (targetId && m.id) return m.id === targetId ? ({ ...p, id: m.id } as BattlePokemon) : m;
+                    return m;
+                  })
+                }));
                 const state = { teams: updated, activeId: prev.activeId };
                 saveTeams(updated, prev.activeId); return state;
               });
@@ -815,7 +840,13 @@ export function App() {
                 return nb;
               }));
               if (selected) setTeams(prev => {
-                const updated = prev.teams.map(t => ({ ...t, members: t.members.filter(m => m.name !== selected.name) }));
+                const targetId = selected.id;
+                const updated = prev.teams.map(t => ({
+                  ...t,
+                  members: targetId
+                    ? t.members.filter(m => m.id !== targetId)
+                    : t.members
+                }));
                 const state = { teams: updated, activeId: prev.activeId };
                 saveTeams(updated, prev.activeId); return state;
               });
@@ -824,6 +855,7 @@ export function App() {
             }}
             onHeal={(amount) => {
               if (!selected || selectedIndex == null) return;
+              const targetId = selected.id;
               const healed = { ...selected, currentHp: amount === 'full' ? selected.maxHp : Math.max(0, Math.min(selected.maxHp, selected.currentHp + amount)) };
               setBoxes(prev => prev.map((box, i) => {
                 if (i !== boxIndex) return box;
@@ -832,7 +864,13 @@ export function App() {
                 return nb;
               }));
               setTeams(prev => {
-                const updated = prev.teams.map(t => ({ ...t, members: t.members.map(m => m.name === selected.name ? { ...m, currentHp: healed.currentHp } as BattlePokemon : m) }));
+                const updated = prev.teams.map(t => ({
+                  ...t,
+                  members: t.members.map(m => {
+                    if (targetId && m.id) return m.id === targetId ? ({ ...m, currentHp: healed.currentHp } as BattlePokemon) : m;
+                    return m;
+                  })
+                }));
                 saveTeams(updated, prev.activeId);
                 return { teams: updated, activeId: prev.activeId };
               });
