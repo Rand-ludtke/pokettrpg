@@ -179,7 +179,7 @@ function AbilityPicker({ value, onChange, onCommit, onCancel, legalAbilities, de
   );
 }
 
-export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected, onHeal }: {
+export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot, onReplaceSelected, onDeleteSelected, onHeal, onDefuse, onAddToPC }: {
   selected: BattlePokemon | null;
   boxes?: Array<Array<BattlePokemon | null>>;
   onAdd: (p: BattlePokemon, teamId?: string) => void;
@@ -188,9 +188,11 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
   onReplaceSelected?: (p: BattlePokemon) => void;
   onDeleteSelected?: () => void;
   onHeal?: (amount: number | 'full') => void;
+  onDefuse?: (components: BattlePokemon[]) => void;
+  onAddToPC?: (mons: BattlePokemon[]) => void;
 }) {
   if (!selected) return (
-    <NoSelectionPanel onAddToSlot={onAddToSlot} onAdd={onAdd} />
+    <NoSelectionPanel onAddToSlot={onAddToSlot} onAdd={onAdd} onAddToPC={onAddToPC} />
   );
 
   const [dex, setDex] = useState<any>(null);
@@ -1374,7 +1376,11 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
         <div style={{ border: '1px solid var(--accent)', borderRadius: 8, padding: 10, background: 'var(--panel-bg-dark)' }}>
           <FusionCreator
             initialHead={selected.species || selected.name}
-            onAdd={(p) => { onAdd(p); setShowFusePanel(false); }}
+            onAdd={(p) => {
+              if (onReplaceSelected) onReplaceSelected(p);
+              else onAdd(p);
+              setShowFusePanel(false);
+            }}
             onClose={() => setShowFusePanel(false)}
           />
         </div>
@@ -1391,7 +1397,11 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
               initialHead={selected.species || selected.name}
               tripleUnlockedByDefault
               allowedThirdSpecies={pcSpeciesPool}
-              onAdd={(p) => { onAdd(p); setShowSecretTriplePanel(false); }}
+              onAdd={(p) => {
+                if (onReplaceSelected) onReplaceSelected(p);
+                else onAdd(p);
+                setShowSecretTriplePanel(false);
+              }}
               onClose={() => setShowSecretTriplePanel(false)}
             />
           </div>
@@ -1499,24 +1509,90 @@ export function SidePanel({ selected, boxes, onAdd, onChangeAbility, onAddToSlot
               >
                 Use {fusion.bodyName} Sprite
               </button>
+              {fusion.thirdName && (
+                <button
+                  className="mini"
+                  onClick={() => {
+                    const thirdSp = spriteUrl(fusion.thirdName || String(fusion.thirdId || ''));
+                    const next = { ...selected, sprite: thirdSp, spriteChoiceId: `base:${fusion.thirdId}`, spriteChoiceLabel: `Use ${fusion.thirdName} sprite` } as any;
+                    onReplaceSelected && onReplaceSelected(next);
+                  }}
+                  title={`Use ${fusion.thirdName}'s sprite as fallback`}
+                >
+                  Use {fusion.thirdName} Sprite
+                </button>
+              )}
             </div>
 
             {/* Defuse Button */}
-            <button
-              className="mini"
-              onClick={() => {
-                if (!onReplaceSelected || !onAdd || !dex) return;
-                const headMon = toPokemon(fusion.headName, dex.pokedex, selected.level);
-                const bodyMon = toPokemon(fusion.bodyName, dex.pokedex, selected.level);
-                if (headMon) onAdd(prepareBattle(headMon));
-                if (bodyMon) onAdd(prepareBattle(bodyMon));
-                onDeleteSelected?.();
-              }}
-              title="Split this fusion back into its two component Pokémon"
-              style={{ marginTop: 4, padding: '4px 12px', fontSize: '0.85em' }}
-            >
-              🔓 Defuse → {fusion.headName} + {fusion.bodyName}
-            </button>
+            {(() => {
+              const isTriple = !!(fusion.triple && (fusion.thirdName || fusion.thirdId));
+              const headSpeciesName = fusion.headName || (fusion.headId ? dexNumToName(fusion.headId) : '');
+              const bodySpeciesName = fusion.bodyName || (fusion.bodyId ? dexNumToName(fusion.bodyId) : '');
+              const thirdSpeciesName = isTriple ? (fusion.thirdName || (fusion.thirdId ? dexNumToName(fusion.thirdId) : '')) : '';
+
+              const handleDefuse = () => {
+                if (!dex) return;
+                const makeComponent = (speciesName: string, idNum?: number): BattlePokemon | null => {
+                  const targetName = speciesName || (idNum ? dexNumToName(idNum) : '');
+                  if (!targetName) return null;
+                  const mon = toPokemon(targetName, dex.pokedex, selected.level);
+                  if (!mon) return null;
+                  if (selected.shiny) mon.shiny = true;
+
+                  // Distribute / preserve legal moves from the fusion
+                  const sid = normalizeName(mon.species || mon.name);
+                  const ls = dex.learnsets?.[sid]?.learnset;
+                  if (ls && selected.moves?.length) {
+                    const legal = selected.moves.filter(m => {
+                      const mid = normalizeName(m.name);
+                      return !!ls[mid];
+                    });
+                    if (legal.length > 0) {
+                      mon.moves = legal;
+                    }
+                  }
+                  return prepareBattle(mon);
+                };
+
+                const headMon = makeComponent(headSpeciesName, fusion.headId);
+                const bodyMon = makeComponent(bodySpeciesName, fusion.bodyId);
+                const thirdMon = isTriple ? makeComponent(thirdSpeciesName, fusion.thirdId) : null;
+                const components = [headMon, bodyMon, thirdMon].filter((m): m is BattlePokemon => !!m);
+
+                if (components.length === 0) return;
+
+                if (onDefuse) {
+                  onDefuse(components);
+                } else {
+                  if (onReplaceSelected) {
+                    onReplaceSelected(components[0]);
+                  }
+                  if (components.length > 1) {
+                    if (onAddToPC) {
+                      onAddToPC(components.slice(1));
+                    } else if (onAdd) {
+                      for (const extra of components.slice(1)) onAdd(extra);
+                    }
+                  }
+                }
+              };
+
+              const label = isTriple
+                ? `🔓 Defuse → ${headSpeciesName} + ${bodySpeciesName} + ${thirdSpeciesName}`
+                : `🔓 Defuse → ${headSpeciesName} + ${bodySpeciesName}`;
+
+              return (
+                <button
+                  className="mini"
+                  onClick={handleDefuse}
+                  title="Split this fusion back into its component Pokémon"
+                  style={{ marginTop: 4, padding: '4px 12px', fontSize: '0.85em' }}
+                >
+                  {label}
+                </button>
+              );
+            })()}
 
             {/* Evolve Head / Body */}
             {dex && (() => {
@@ -3147,9 +3223,10 @@ function computeTypeEffectiveness(defenderTypes: string[]): { quadWeak: string[]
 }
 
 /** No-selection view: toggle between "Add Pokémon" and "Create Fusion" */
-function NoSelectionPanel({ onAddToSlot, onAdd }: {
+function NoSelectionPanel({ onAddToSlot, onAdd, onAddToPC }: {
   onAddToSlot?: (p: BattlePokemon) => void;
   onAdd: (p: BattlePokemon, teamId?: string) => void;
+  onAddToPC?: (mons: BattlePokemon[]) => void;
 }) {
   const [mode, setMode] = useState<'add' | 'fuse'>('add');
   const [showSecretCreativeTriple, setShowSecretCreativeTriple] = useState(false);
@@ -3179,7 +3256,11 @@ function NoSelectionPanel({ onAddToSlot, onAdd }: {
       {mode === 'fuse' && (
         <FusionCreator
           creative
-          onAdd={(p) => onAdd(p)}
+          onAdd={(p) => {
+            if (onAddToSlot) onAddToSlot(p);
+            else if (onAddToPC) onAddToPC([p]);
+            else onAdd(p);
+          }}
           onClose={() => setMode('add')}
         />
       )}
@@ -3193,7 +3274,12 @@ function NoSelectionPanel({ onAddToSlot, onAdd }: {
             <FusionCreator
               creative
               tripleUnlockedByDefault
-              onAdd={(p) => { onAdd(p); setShowSecretCreativeTriple(false); }}
+              onAdd={(p) => {
+                if (onAddToSlot) onAddToSlot(p);
+                else if (onAddToPC) onAddToPC([p]);
+                else onAdd(p);
+                setShowSecretCreativeTriple(false);
+              }}
               onClose={() => setShowSecretCreativeTriple(false)}
             />
           </div>

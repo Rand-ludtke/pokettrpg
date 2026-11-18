@@ -7,6 +7,7 @@ import {
   IFD_CDN_BASE, cacheIfdSprite,
 } from '../data/adapter';
 import { SpritePainter } from './SpritePainter';
+import { SpriteWithHat } from './SpriteWithHat';
 import type { BattlePokemon, Pokemon, Move } from '../types';
 
 /* ──────────────────────────── constants ──────────────────────────── */
@@ -164,7 +165,7 @@ async function uploadFusionSpriteToBackend(headNum: number, bodyNum: number, dat
   }
 }
 
-type FusionMode = 'pc' | 'creative';
+type FusionMode = 'pc' | 'creative' | 'defuse';
 type ComboSide = 'ab' | 'ba';
 type FusionStep = 'select' | 'preview' | 'moves';
 
@@ -250,6 +251,10 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
   const [level, setLevel] = useState(50);
   const [chosenAbility, setChosenAbility] = useState('');
 
+  // Defuse mode state
+  const [selectedDefuseIdx, setSelectedDefuseIdx] = useState<number | null>(null);
+  const [defuseSuccessMsg, setDefuseSuccessMsg] = useState<string>('');
+
   // Stat overrides — user-edited custom stats for the fusion
   const [statOverride, setStatOverride] = useState<FusionStatBlock | null>(null);
 
@@ -311,6 +316,73 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
     });
     return result;
   }, [boxes]);
+
+  const fusedPcPokemon = useMemo(() => {
+    return pcPokemon.filter(p => !!(p.mon as any).fusion);
+  }, [pcPokemon]);
+
+  const selectedDefuseEntry = selectedDefuseIdx != null && fusedPcPokemon[selectedDefuseIdx]
+    ? fusedPcPokemon[selectedDefuseIdx]
+    : null;
+
+  const defuseHeadName = useMemo(() => {
+    if (!selectedDefuseEntry) return '';
+    const f = (selectedDefuseEntry.mon as any).fusion;
+    return f?.headName || (f?.headId ? dexNumToName(f.headId) : '');
+  }, [selectedDefuseEntry]);
+
+  const defuseBodyName = useMemo(() => {
+    if (!selectedDefuseEntry) return '';
+    const f = (selectedDefuseEntry.mon as any).fusion;
+    return f?.bodyName || (f?.bodyId ? dexNumToName(f.bodyId) : '');
+  }, [selectedDefuseEntry]);
+
+  const defuseThirdName = useMemo(() => {
+    if (!selectedDefuseEntry) return '';
+    const f = (selectedDefuseEntry.mon as any).fusion;
+    return f?.triple && (f.thirdName || f.thirdId) ? (f.thirdName || (f.thirdId ? dexNumToName(f.thirdId) : '')) : '';
+  }, [selectedDefuseEntry]);
+
+  const handleDefuseInTab = useCallback(() => {
+    if (!selectedDefuseEntry || !dex) return;
+    const f = (selectedDefuseEntry.mon as any).fusion;
+    if (!f) return;
+    const isTriple = !!(f.triple && (f.thirdName || f.thirdId));
+    const hName = f.headName || (f.headId ? dexNumToName(f.headId) : '');
+    const bName = f.bodyName || (f.bodyId ? dexNumToName(f.bodyId) : '');
+    const tName = isTriple ? (f.thirdName || (f.thirdId ? dexNumToName(f.thirdId) : '')) : '';
+
+    const makeMon = (spName: string, idNum?: number): BattlePokemon | null => {
+      const targetSp = spName || (idNum ? dexNumToName(idNum) : '');
+      if (!targetSp) return null;
+      const p = toPokemon(targetSp, dex.pokedex, selectedDefuseEntry.mon.level);
+      if (!p) return null;
+      if (selectedDefuseEntry.mon.shiny) p.shiny = true;
+      const sid = normalizeName(p.species || p.name);
+      const ls = dex.learnsets?.[sid]?.learnset;
+      if (ls && selectedDefuseEntry.mon.moves?.length) {
+        const legal = selectedDefuseEntry.mon.moves.filter(m => ls[normalizeName(m.name)]);
+        if (legal.length) p.moves = legal;
+      }
+      return prepareBattle(p);
+    };
+
+    const headMon = makeMon(hName, f.headId);
+    const bodyMon = makeMon(bName, f.bodyId);
+    const thirdMon = isTriple ? makeMon(tName, f.thirdId) : null;
+    const components = [headMon, bodyMon, thirdMon].filter((m): m is BattlePokemon => !!m);
+
+    if (components.length === 0) return;
+
+    if (onReplaceInPC) {
+      onReplaceInPC(selectedDefuseEntry.box, selectedDefuseEntry.slot, components[0]);
+    }
+    if (components.length > 1 && onAddToPC) {
+      onAddToPC(components.slice(1));
+    }
+    setDefuseSuccessMsg(`Successfully defused ${selectedDefuseEntry.mon.name} into ${hName} and ${bName}${tName ? ` and ${tName}` : ''}!`);
+    setSelectedDefuseIdx(null);
+  }, [selectedDefuseEntry, dex, onReplaceInPC, onAddToPC]);
 
   // Filtered lists for selectors
   const availableList = useMemo(() => {
@@ -544,7 +616,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
       types: activeCombo.types,
       gender: 'N',
       ability: chosenAbility || activeCombo.abilities[0] || undefined,
-      shiny: false,
+      shiny: !!(headPokemon.shiny || bodyPokemon.shiny),
       baseStats: statOverride || activeCombo.stats,
       moves: mapMoves(selectedMoves.filter(Boolean), dex.moves),
       fusion: {
@@ -590,29 +662,171 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
         <div style={{ display: 'flex', gap: 4, background: 'var(--panel-bg-dark, #111)', borderRadius: 8, padding: 2 }}>
           <button
             className={mode === 'pc' ? 'active' : 'mini'}
-            onClick={() => setMode('pc')}
+            onClick={() => { setMode('pc'); setDefuseSuccessMsg(''); }}
             style={{ borderRadius: 6, padding: '6px 14px', fontSize: '0.85em' }}
           >
             📦 PC Mode
           </button>
           <button
             className={mode === 'creative' ? 'active' : 'mini'}
-            onClick={() => setMode('creative')}
+            onClick={() => { setMode('creative'); setDefuseSuccessMsg(''); }}
             style={{ borderRadius: 6, padding: '6px 14px', fontSize: '0.85em' }}
           >
             🎨 Creative Mode
           </button>
+          <button
+            className={mode === 'defuse' ? 'active' : 'mini'}
+            onClick={() => { setMode('defuse'); setDefuseSuccessMsg(''); }}
+            style={{ borderRadius: 6, padding: '6px 14px', fontSize: '0.85em' }}
+          >
+            🔓 Defuse Mode
+          </button>
         </div>
       </div>
 
-      {mode === 'pc' && pcPokemon.length === 0 && (
+      {mode !== 'defuse' && mode === 'pc' && pcPokemon.length === 0 && (
         <div style={{ padding: 24, textAlign: 'center', color: '#888' }}>
           No Pokémon in your PC boxes yet. Add some from the PC tab first, or switch to Creative Mode to fuse any Pokémon.
         </div>
       )}
 
+      {/* ── Defuse Mode ── */}
+      {mode === 'defuse' && (
+        <div style={{ padding: 16, display: 'grid', gap: 16 }}>
+          {defuseSuccessMsg && (
+            <div style={{ background: 'rgba(76,175,80,0.15)', border: '1px solid #4caf50', borderRadius: 8, padding: '10px 14px', color: '#81c784', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>{defuseSuccessMsg}</span>
+              <button className="mini" onClick={() => setDefuseSuccessMsg('')}>✕</button>
+            </div>
+          )}
+          {fusedPcPokemon.length === 0 ? (
+            <div style={{ padding: 32, textAlign: 'center', color: '#888' }}>
+              <div style={{ fontSize: '2em', marginBottom: 8 }}>🔓</div>
+              <h3>No fused Pokémon in your PC boxes</h3>
+              <p>Fused Pokémon in your PC boxes will appear here for you to safely unfuse back into their component Pokémon.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 320px) 1fr', gap: 16 }}>
+              {/* Left: list of fused Pokemon */}
+              <div style={{ border: '1px solid #333', borderRadius: 8, padding: 8, maxHeight: 520, overflowY: 'auto' }}>
+                <div style={{ fontWeight: 600, fontSize: '0.9em', padding: '4px 8px', borderBottom: '1px solid #333', marginBottom: 8 }}>
+                  Fused Pokémon in PC ({fusedPcPokemon.length})
+                </div>
+                <div style={{ display: 'grid', gap: 4 }}>
+                  {fusedPcPokemon.map((entry, idx) => {
+                    const isSelected = selectedDefuseIdx === idx;
+                    const f = (entry.mon as any).fusion;
+                    return (
+                      <div
+                        key={`${entry.box}-${entry.slot}-${idx}`}
+                        onClick={() => setSelectedDefuseIdx(idx)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          padding: '6px 10px',
+                          borderRadius: 6,
+                          cursor: 'pointer',
+                          background: isSelected ? 'var(--accent, #3b82f6)' : 'rgba(255,255,255,0.03)',
+                          border: isSelected ? '1px solid var(--accent, #3b82f6)' : '1px solid transparent',
+                        }}
+                      >
+                        <SpriteWithHat
+                          species={entry.mon.species || entry.mon.name}
+                          fusion={f}
+                          shiny={!!entry.mon.shiny}
+                          size={40}
+                        />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.9em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {entry.mon.name}
+                          </div>
+                          <div className="dim" style={{ fontSize: '0.75em' }}>
+                            Box {entry.box + 1}, Slot {entry.slot + 1} • Lv {entry.mon.level}
+                          </div>
+                          {f && (
+                            <div className="dim" style={{ fontSize: '0.72em', color: '#aaa' }}>
+                              {f.headName} + {f.bodyName}{f.triple && f.thirdName ? ` + ${f.thirdName}` : ''}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Right: Selected Fusion details & Defuse action */}
+              {selectedDefuseEntry ? (
+                <div style={{ border: '1px solid #333', borderRadius: 8, padding: 16, display: 'grid', gap: 16, alignContent: 'start' }}>
+                  <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                    <SpriteWithHat
+                      species={selectedDefuseEntry.mon.species || selectedDefuseEntry.mon.name}
+                      fusion={(selectedDefuseEntry.mon as any).fusion}
+                      shiny={!!selectedDefuseEntry.mon.shiny}
+                      size={96}
+                    />
+                    <div>
+                      <h3 style={{ margin: 0 }}>{selectedDefuseEntry.mon.name}</h3>
+                      <div className="dim" style={{ fontSize: '0.85em', marginTop: 2 }}>
+                        Level {selectedDefuseEntry.mon.level} • Box {selectedDefuseEntry.box + 1}, Slot {selectedDefuseEntry.slot + 1}
+                      </div>
+                      <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
+                        {selectedDefuseEntry.mon.types.map(t => (
+                          <TypeBadge key={t} type={t} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: 8, padding: 12, border: '1px solid #222' }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.9em', marginBottom: 8 }}>Component Pokémon to be restored:</div>
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: 6 }}>
+                        <SpriteWithHat species={defuseHeadName} shiny={!!selectedDefuseEntry.mon.shiny} size={48} />
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.85em' }}>Head: {defuseHeadName}</div>
+                          <div className="dim" style={{ fontSize: '0.75em' }}>Replaces fusion in Box {selectedDefuseEntry.box + 1}, Slot {selectedDefuseEntry.slot + 1}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: 6 }}>
+                        <SpriteWithHat species={defuseBodyName} shiny={!!selectedDefuseEntry.mon.shiny} size={48} />
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.85em' }}>Body: {defuseBodyName}</div>
+                          <div className="dim" style={{ fontSize: '0.75em' }}>Restored to next open PC slot</div>
+                        </div>
+                      </div>
+                      {defuseThirdName && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: 6 }}>
+                          <SpriteWithHat species={defuseThirdName} shiny={!!selectedDefuseEntry.mon.shiny} size={48} />
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: '0.85em' }}>Third: {defuseThirdName}</div>
+                            <div className="dim" style={{ fontSize: '0.75em' }}>Restored to next open PC slot</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleDefuseInTab}
+                    style={{ padding: '10px 20px', fontWeight: 700, fontSize: '1em', borderRadius: 8, justifySelf: 'start' }}
+                  >
+                    🔓 Defuse → {defuseHeadName} + {defuseBodyName}{defuseThirdName ? ` + ${defuseThirdName}` : ''}
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#777', border: '1px dashed #333', borderRadius: 8, padding: 32 }}>
+                  Select a fused Pokémon from the list to defuse it.
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Step 1: Selection ── */}
-      {(step === 'select' || step === 'preview') && (
+      {mode !== 'defuse' && (step === 'select' || step === 'preview') && (
         <div style={{ display: 'grid', gap: 12, padding: 16 }}>
 
           {/* Head & Body pickers side by side */}
@@ -806,7 +1020,7 @@ export function FusionTab({ onAddToPC, boxes, onReplaceInPC, onRemoveFromPC }: P
       )}
 
       {/* ── Step 3: Move selection & finalize ── */}
-      {step === 'moves' && activeCombo && (
+      {mode !== 'defuse' && step === 'moves' && activeCombo && (
         <div style={{ display: 'grid', gap: 12, padding: 16 }}>
           <button className="mini" onClick={() => setStep('preview')} style={{ justifySelf: 'start' }}>← Back to Preview</button>
 

@@ -270,7 +270,7 @@ export function App() {
         }
         if (queue.length) boxPtr++;
         if (boxPtr >= out.length && queue.length && out.length < PC_MAX_BOXES) {
-          out.push(Array.from({ length: PC_BOX_SIZE }, () => null));
+          out.push(Array.from({ length: PC_BOX_SIZE }, () => null) as (BattlePokemon | null)[]);
         }
         if (boxPtr > 200) break;
       }
@@ -799,15 +799,115 @@ export function App() {
             boxes={boxes}
             onAdd={addToTeam}
             onChangeAbility={changeSelectedAbility}
+            onAddToPC={(mons) => addAcrossBoxes(mons)}
             onAddToSlot={(p) => {
-              if (selectedIndex == null) return;
-              setBoxes(prev => prev.map((box, i) => {
-                if (i !== boxIndex) return box;
-                const nb = box.slice();
-                nb[selectedIndex] = p;
-                return nb;
-              }));
-              setSelected(p);
+              if (selectedIndex != null) {
+                setBoxes(prev => prev.map((box, i) => {
+                  if (i !== boxIndex) return box;
+                  const nb = box.slice();
+                  nb[selectedIndex] = p;
+                  return nb;
+                }));
+                setSelected(p);
+              } else {
+                addAcrossBoxes([p]);
+              }
+            }}
+            onDefuse={(components: BattlePokemon[]) => {
+              if (components.length === 0) return;
+              const [headMon, ...restComponents] = components;
+              const targetId = selected?.id;
+
+              let targetBox = boxIndex;
+              let targetSlot = selectedIndex;
+
+              if (targetSlot == null && selected) {
+                for (let b = 0; b < boxes.length; b++) {
+                  const s = boxes[b].findIndex(p => p && (selected.id ? p.id === selected.id : p === selected));
+                  if (s !== -1) {
+                    targetBox = b;
+                    targetSlot = s;
+                    break;
+                  }
+                }
+              }
+
+              setBoxes(prev => {
+                const out = prev.map(b => b.slice());
+
+                if (targetSlot != null && targetBox >= 0 && targetBox < out.length) {
+                  out[targetBox][targetSlot] = headMon;
+                } else {
+                  let placedHead = false;
+                  for (let b = 0; b < out.length && !placedHead; b++) {
+                    for (let s = 0; s < PC_BOX_SIZE; s++) {
+                      if (!out[b][s]) {
+                        out[b][s] = headMon;
+                        placedHead = true;
+                        targetBox = b;
+                        targetSlot = s;
+                        break;
+                      }
+                    }
+                  }
+                  if (!placedHead && out.length < PC_MAX_BOXES) {
+                    const newBox: (BattlePokemon | null)[] = Array.from({ length: PC_BOX_SIZE }, () => null);
+                    newBox[0] = headMon;
+                    out.push(newBox);
+                    targetBox = out.length - 1;
+                    targetSlot = 0;
+                  }
+                }
+
+                if (restComponents.length > 0) {
+                  let queue = restComponents.slice();
+                  let bIdx = targetBox >= 0 && targetBox < out.length ? targetBox : 0;
+                  let sIdx = targetSlot != null ? (targetSlot + 1) % PC_BOX_SIZE : 0;
+                  let scans = 0;
+                  const maxScans = Math.max(out.length, PC_MAX_BOXES) * PC_BOX_SIZE * 2;
+
+                  while (queue.length > 0 && scans < maxScans) {
+                    if (!out[bIdx]) {
+                      out[bIdx] = Array.from({ length: PC_BOX_SIZE }, () => null);
+                    }
+                    if (!out[bIdx][sIdx]) {
+                      out[bIdx][sIdx] = queue.shift()!;
+                    }
+                    sIdx++;
+                    if (sIdx >= PC_BOX_SIZE) {
+                      sIdx = 0;
+                      bIdx = (bIdx + 1) % out.length;
+                      if (bIdx === targetBox && queue.length > 0 && out.length < PC_MAX_BOXES) {
+                        bIdx = out.length;
+                        out.push(Array.from({ length: PC_BOX_SIZE }, () => null) as (BattlePokemon | null)[]);
+                      }
+                    }
+                    scans++;
+                  }
+                }
+                return out;
+              });
+
+              setSelected(headMon);
+              if (targetSlot != null) {
+                setSelectedIndex(targetSlot);
+              }
+
+              if (targetId) {
+                setTeams(prev => {
+                  const updated = prev.teams.map(t => ({
+                    ...t,
+                    members: t.members.map(m => {
+                      if (m.id && m.id === targetId) {
+                        return { ...headMon, id: m.id } as BattlePokemon;
+                      }
+                      return m;
+                    })
+                  }));
+                  saveTeams(updated, prev.activeId);
+                  return { teams: updated, activeId: prev.activeId };
+                });
+              }
             }}
             onReplaceSelected={(p) => {
               if (selectedIndex == null) return;
