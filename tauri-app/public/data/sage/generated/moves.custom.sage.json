@@ -17,5 +17,26 @@
     "isNonstandard": "Custom",
     "desc": "Inflicts damage. Its type is the same as the primary type of the user. It is unaffected by Normalize.",
     "shortDesc": "Type matches the user's primary type."
+  },
+  "atomsplit": {
+    "name": "Atom Split",
+    "type": "Normal",
+    "basePower": 250,
+    "category": "Special",
+    "accuracy": 100,
+    "pp": 5,
+    "target": "allAdjacent",
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "noparentalbond": 1
+    },
+    "selfdestruct": "always",
+    "num": -20033,
+    "isNonstandard": "Custom",
+    "desc": "The user faints after using this move, even if this move fails for having no target. This move is prevented from executing if any active Pokemon has the Damp Ability. Hits all adjacent Pokemon.",
+    "shortDesc": "Hits adjacent Pokemon. The user faints."
   }
 }

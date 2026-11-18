@@ -303,8 +303,9 @@ app.get("/api/health", (_req, res) => {
 });
 app.get("/api/trainer-sprites/:filename", (req, res) => {
     const safeName = path_1.default.basename(String(req.params.filename || ""));
-    if (!safeName || !/^[a-z0-9._-]+\.(png|gif|webp|jpg|jpeg)$/i.test(safeName))
+    if (!safeName || !/^[a-z0-9._-]+\.(png|gif|webp|jpg|jpeg)$/i.test(safeName)) {
         return res.status(400).json({ error: "invalid filename" });
+    }
     const target = path_1.default.join(TRAINER_SPRITES_DIR, safeName);
     if (!fs_1.default.existsSync(target))
         return res.status(404).json({ error: "not found" });
@@ -2138,14 +2139,13 @@ function emitMovePrompts(room, state) {
                 continue;
             }
             // A raw PS request carrying forceSwitch is a FAINT-SWITCH request
-            // (active: [{moves: []}]). It must never be reshaped into a move
-            // prompt: the stale version of it stays in the engine until the
-            // whole turn resolves, and stamping requestType:"move" on it (and
-            // deleting forceSwitch) produced the "blank move request" soft-lock
-            // where every recovery re-prompt re-sent a move UI with zero moves.
-            // Pass it through as a switch prompt; when the room is already in
-            // the force-switch phase emitForceSwitchPrompts owns the player, so
-            // skip here.
+            // (active: [{moves: []}]). It must never be reshaped into a move prompt:
+            // the stale version of it stays in the engine until the whole turn
+            // resolves, and stamping requestType:"move" on it (and deleting
+            // forceSwitch) produced the "blank move request" soft-lock where every
+            // recovery re-prompt re-sent a move UI with zero moves. Pass it through
+            // as a switch prompt; when the room is already in the force-switch phase
+            // emitForceSwitchPrompts owns the player, so skip here.
             if (Array.isArray(psRequest.forceSwitch) && psRequest.forceSwitch.some((f) => !!f)) {
                 if (room.phase === "force-switch") {
                     continue;
@@ -2738,21 +2738,21 @@ function startForceSwitchTimer(room) {
     room.forceSwitchTimer = setTimeout(() => {
         if (!room.engine || !room.forceSwitchNeeded || room.forceSwitchNeeded.size === 0)
             return;
-    console.log(`[ForceSwitch] Timer fired. Re-prompting: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
-    // Auto-switch is disabled — players must manually choose their replacement.
-    // Re-emit the switch prompts (with a fresh deadline) so a lost/raced prompt
-    // can never soft-lock the battle.
-    room.lastPromptByPlayer = {};
-    try {
-        emitForceSwitchPrompts(room, room.engine.getState(), Array.from(room.forceSwitchNeeded));
-    }
-    catch (err) {
-        console.error(`[ForceSwitch] timer re-prompt THREW:`, err?.stack || err);
-    }
-    room.forceSwitchDeadline = Date.now() + FORCE_SWITCH_TIMEOUT_MS;
-    io.to(room.id).emit("phase", { phase: room.phase, deadline: room.forceSwitchDeadline });
-    startForceSwitchTimer(room);
-}, FORCE_SWITCH_TIMEOUT_MS);
+        console.log(`[ForceSwitch] Timer fired. Re-prompting: ${JSON.stringify(Array.from(room.forceSwitchNeeded))}`);
+        // Auto-switch is disabled — players must manually choose their replacement.
+        // Re-emit the switch prompts (with a fresh deadline) so a lost/raced prompt
+        // can never soft-lock the battle.
+        room.lastPromptByPlayer = {};
+        try {
+            emitForceSwitchPrompts(room, room.engine.getState(), Array.from(room.forceSwitchNeeded));
+        }
+        catch (err) {
+            console.error(`[ForceSwitch] timer re-prompt THREW:`, err?.stack || err);
+        }
+        room.forceSwitchDeadline = Date.now() + FORCE_SWITCH_TIMEOUT_MS;
+        io.to(room.id).emit("phase", { phase: room.phase, deadline: room.forceSwitchDeadline });
+        startForceSwitchTimer(room);
+    }, FORCE_SWITCH_TIMEOUT_MS);
 }
 function clearForceSwitchTimer(room) {
     if (room.forceSwitchTimer) {
@@ -3316,7 +3316,8 @@ io.on("connection", (socket) => {
                 catch (err) {
                     console.error(`[ForceSwitch] engine.forceSwitch THREW for merged ${splitMergedPlayerId}:`, err?.stack || err);
                     room.lastPromptByPlayer = {};
-                    for (const pid of requiredForMerged) delete room.turnBuffer[pid];
+                    for (const pid of requiredForMerged)
+                        delete room.turnBuffer[pid];
                     emitForceSwitchPrompts(room, room.engine.getState(), requiredForMerged);
                     return;
                 }
@@ -3400,11 +3401,17 @@ io.on("connection", (socket) => {
                     }
                 }
                 else {
-                    const targetMon = forceSwitchPlayer.team[data.action.toIndex];
+                    const toIdx = data.action.toIndex;
+                    const targetMon = (room.engine instanceof sync_ps_engine_1.default && typeof room.engine.getPokemonAtSideIndex === 'function')
+                        ? room.engine.getPokemonAtSideIndex(data.playerId, toIdx)
+                        : forceSwitchPlayer.team[toIdx];
                     if (!targetMon || targetMon.currentHP <= 0) {
                         return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
                     }
-                    if (data.action.toIndex === forceSwitchPlayer.activeIndex) {
+                    const isSameMon = (room.engine instanceof sync_ps_engine_1.default && typeof room.engine.isSideIndexActive === 'function')
+                        ? room.engine.isSideIndexActive(data.playerId, toIdx)
+                        : (toIdx === forceSwitchPlayer.activeIndex);
+                    if (isSameMon) {
                         return socket.emit("error", { error: "cannot switch to the same Pokemon" });
                     }
                 }
@@ -3427,10 +3434,23 @@ io.on("connection", (socket) => {
             // stale forceSwitch request in place — keep the player in the set and
             // re-prompt rather than pretending the switch happened.
             const switchedState = room.engine.getState();
-            const switchedPlayer = switchedState.players.find((p) => p.id === data.playerId);
+            const switchedPlayer = switchedState.players.find(p => p.id === data.playerId);
             const switchTookEffect = (() => {
                 if (!switchedPlayer)
                     return true;
+                if (room.engine instanceof sync_ps_engine_1.default) {
+                    if (res && res.success === false)
+                        return false;
+                    if (room.engine.needsForceSwitch(data.playerId)) {
+                        const side = room.engine.playerIdToSide?.get(data.playerId);
+                        const psSide = side ? room.engine.battle?.sides?.find((s) => s.id === side) : null;
+                        if (psSide && typeof psSide.isChoiceDone === 'function' && psSide.isChoiceDone()) {
+                            return true;
+                        }
+                        return false;
+                    }
+                    return true;
+                }
                 const toIndex = data.action.toIndex;
                 if (!Number.isFinite(toIndex))
                     return true;
@@ -3522,14 +3542,18 @@ io.on("connection", (socket) => {
             }
             const normalPlayer = normalState.players.find(p => p.id === normalLookupPlayerId);
             if (normalPlayer) {
-                const targetMon = normalPlayer.team[remappedToIndex];
+                const targetMon = (room.engine instanceof sync_ps_engine_1.default && typeof room.engine.getPokemonAtSideIndex === 'function')
+                    ? room.engine.getPokemonAtSideIndex(normalLookupPlayerId, remappedToIndex)
+                    : normalPlayer.team[remappedToIndex];
                 if (!targetMon || targetMon.currentHP <= 0) {
                     return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
                 }
-                const activeIdx = typeof normalSplitSlot === "number"
-                    ? (normalPlayer.activeIndices?.[normalSplitSlot] ?? normalPlayer.activeIndex)
-                    : normalPlayer.activeIndex;
-                if (remappedToIndex === activeIdx) {
+                const isSameMon = (room.engine instanceof sync_ps_engine_1.default && typeof room.engine.isSideIndexActive === 'function')
+                    ? room.engine.isSideIndexActive(normalLookupPlayerId, remappedToIndex)
+                    : (remappedToIndex === (typeof normalSplitSlot === "number"
+                        ? (normalPlayer.activeIndices?.[normalSplitSlot] ?? normalPlayer.activeIndex)
+                        : normalPlayer.activeIndex));
+                if (isSameMon) {
                     return socket.emit("error", { error: "cannot switch to the same Pokemon" });
                 }
             }
@@ -3984,3 +4008,4 @@ function startServer(port = Number(process.env.PORT) || 3000) {
 if (require.main === module) {
     startServer();
 }
+//# sourceMappingURL=index.js.map

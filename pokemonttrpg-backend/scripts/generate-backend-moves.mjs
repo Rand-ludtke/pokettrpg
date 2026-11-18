@@ -15,8 +15,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SS2_MOVES_JSON = path.join(__dirname, '..', '..', 'tauri-app', 'public', 'data', 'ss2-patch', 'generated', 'moves.custom.ss2-soulstones.json');
 const SS1_MOVES_JSON = path.join(__dirname, '..', '..', 'tauri-app', 'public', 'data', 'soulstones-part1', 'generated', 'moves.custom.soulstones.json');
+const SAGE_MOVES_JSON = path.join(__dirname, '..', '..', 'tauri-app', 'public', 'data', 'sage', 'generated', 'moves.custom.sage.json');
 const OUT_DIR = path.join(__dirname, '..', 'data');
 const OUT_FILE = path.join(OUT_DIR, 'moves.ts');
+
+// Load Sage moves
+let sageMoves = {};
+if (fs.existsSync(SAGE_MOVES_JSON)) {
+  sageMoves = JSON.parse(fs.readFileSync(SAGE_MOVES_JSON, 'utf8'));
+  console.log(`Loaded ${Object.keys(sageMoves).length} Sage moves`);
+}
 
 // Load SS2 moves
 let ss2Moves = {};
@@ -57,6 +65,11 @@ function normalizeMove(moveId, moveData) {
 }
 
 const allMoves = {};
+
+// Add Sage moves
+for (const [moveId, moveData] of Object.entries(sageMoves)) {
+  allMoves[moveId] = normalizeMove(moveId, moveData);
+}
 
 // Add SS1 moves first (SS2 will override if same key)
 for (const [moveId, moveData] of Object.entries(ss1Moves)) {

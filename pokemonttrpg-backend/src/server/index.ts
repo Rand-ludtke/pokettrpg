@@ -3594,17 +3594,23 @@ io.on("connection", (socket: Socket) => {
             usedIndices.add(c.toIndex);
           }
         } else {
-          const targetMon = forceSwitchPlayer.team[(data.action as any).toIndex];
+          const toIdx = (data.action as any).toIndex;
+          const targetMon = (room.engine instanceof SyncPSEngine && typeof (room.engine as any).getPokemonAtSideIndex === 'function')
+            ? (room.engine as any).getPokemonAtSideIndex(data.playerId, toIdx)
+            : forceSwitchPlayer.team[toIdx];
           if (!targetMon || targetMon.currentHP <= 0) {
             return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
           }
-          if ((data.action as any).toIndex === forceSwitchPlayer.activeIndex) {
+          const isSameMon = (room.engine instanceof SyncPSEngine && typeof (room.engine as any).isSideIndexActive === 'function')
+            ? (room.engine as any).isSideIndexActive(data.playerId, toIdx)
+            : (toIdx === forceSwitchPlayer.activeIndex);
+          if (isSameMon) {
             return socket.emit("error", { error: "cannot switch to the same Pokemon" });
           }
         }
       }
       // Perform immediate forced switch via engine (supports multi-slot choices array)
-      let res;
+      let res: any;
       try {
         res = room.engine.forceSwitch(data.playerId, (data.action as any).toIndex, Array.isArray(switchChoices) ? switchChoices : undefined);
       } catch (err: any) {
@@ -3623,6 +3629,18 @@ io.on("connection", (socket: Socket) => {
       const switchedPlayer = switchedState.players.find(p => p.id === data.playerId);
       const switchTookEffect = (() => {
         if (!switchedPlayer) return true;
+        if (room.engine instanceof SyncPSEngine) {
+          if (res && res.success === false) return false;
+          if (room.engine.needsForceSwitch(data.playerId)) {
+            const side = (room.engine as any).playerIdToSide?.get(data.playerId);
+            const psSide = side ? (room.engine as any).battle?.sides?.find((s: any) => s.id === side) : null;
+            if (psSide && typeof psSide.isChoiceDone === 'function' && psSide.isChoiceDone()) {
+              return true;
+            }
+            return false;
+          }
+          return true;
+        }
         const toIndex = (data.action as any).toIndex;
         if (!Number.isFinite(toIndex)) return true;
         const target = switchedPlayer.team[toIndex];
@@ -3715,14 +3733,18 @@ io.on("connection", (socket: Socket) => {
       }
       const normalPlayer = normalState.players.find(p => p.id === normalLookupPlayerId);
       if (normalPlayer) {
-        const targetMon = normalPlayer.team[remappedToIndex];
+        const targetMon = (room.engine instanceof SyncPSEngine && typeof (room.engine as any).getPokemonAtSideIndex === 'function')
+          ? (room.engine as any).getPokemonAtSideIndex(normalLookupPlayerId, remappedToIndex)
+          : normalPlayer.team[remappedToIndex];
         if (!targetMon || targetMon.currentHP <= 0) {
           return socket.emit("error", { error: "cannot switch to a fainted Pokemon" });
         }
-        const activeIdx = typeof normalSplitSlot === "number"
-          ? (normalPlayer.activeIndices?.[normalSplitSlot] ?? normalPlayer.activeIndex)
-          : normalPlayer.activeIndex;
-        if (remappedToIndex === activeIdx) {
+        const isSameMon = (room.engine instanceof SyncPSEngine && typeof (room.engine as any).isSideIndexActive === 'function')
+          ? (room.engine as any).isSideIndexActive(normalLookupPlayerId, remappedToIndex)
+          : (remappedToIndex === (typeof normalSplitSlot === "number"
+              ? (normalPlayer.activeIndices?.[normalSplitSlot] ?? normalPlayer.activeIndex)
+              : normalPlayer.activeIndex));
+        if (isSameMon) {
           return socket.emit("error", { error: "cannot switch to the same Pokemon" });
         }
       }

@@ -1969,13 +1969,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
           const switchLines = protocolLines.filter((line) =>
             line.startsWith('|switch|') || line.startsWith('|drag|') || line.startsWith('|replace|')
           );
-          const redundantSwitches = switchLines.length === 0 || switchLines.every((line) => {
+          const isForceSwitch = requestRef.current?.requestType === 'switch' || !!requestRef.current?.forceSwitch;
+          const redundantSwitches = !isForceSwitch && (switchLines.length === 0 || switchLines.every((line) => {
             const parsed = parseActiveSwitchLine(line);
             if (!parsed) return false;
             const slotKey = `${parsed.side}${parsed.slot}`;
             const lastActive = lastActiveBySideRef.current[slotKey];
             return lastActive && lastActive === line;
-          });
+          }));
           if (redundantSwitches) {
             diagLogProtocol('battleUpdate', 'Dropping redundant split/switch batch (no real active change)');
             protocolLines = [];
@@ -2400,8 +2401,8 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
               // In doubles, don't rebuild active for protocol switches — the prompt already has correct multi-slot active.
               // Only rebuild in singles (1 active slot) when the active ID doesn't match.
               const isDoublesActive = (currentRequest.active?.length || 0) > 1;
-              const currentActiveId = currentRequest.active?.[0]?.id || currentRequest.active?.[0]?.pokemonId;
-              const desiredActiveId = activePokemon?.id || activePokemon?.pokemonId;
+              const currentActiveId = derivePokemonId(currentRequest.active?.[0]) || currentRequest.active?.[0]?.id || currentRequest.active?.[0]?.pokemonId;
+              const desiredActiveId = derivePokemonId(activePokemon) || activePokemon?.id || activePokemon?.pokemonId;
 
               if (!isDoublesActive && activePokemon && desiredActiveId && currentActiveId !== desiredActiveId) {
                 console.warn('[PSBattlePanel] Rebuilding request.active from protocol switch:', {
@@ -2526,13 +2527,14 @@ export const PSBattlePanel: React.FC<PSBattlePanelProps> = ({
             const switchLines = filteredLines.filter((line: string) =>
               line.startsWith('|switch|') || line.startsWith('|drag|') || line.startsWith('|replace|')
             );
-            const redundantSwitches = switchLines.length === 0 || switchLines.every((line: string) => {
+            const isForceSwitch = requestRef.current?.requestType === 'switch' || !!requestRef.current?.forceSwitch;
+            const redundantSwitches = !isForceSwitch && (switchLines.length === 0 || switchLines.every((line: string) => {
               const parsed = parseActiveSwitchLine(line);
               if (!parsed) return false;
               const slotKey = `${parsed.side}${parsed.slot}`;
               const lastActive = lastActiveBySideRef.current[slotKey];
               return lastActive && lastActive === line;
-            });
+            }));
             const turnLines = filteredLines.filter((line: string) => line.startsWith('|turn|'));
             const maxTurn = turnLines.reduce((acc: number, line: string) => {
               const num = parseInt(line.split('|')[2] || '0', 10);

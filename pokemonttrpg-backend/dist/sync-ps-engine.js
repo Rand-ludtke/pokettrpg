@@ -1155,6 +1155,18 @@ class SyncPSEngine {
                 p1: { name: players[0].name, avatar: p1Avatar, team: p1Team },
                 p2: { name: players[1].name, avatar: p2Avatar, team: p2Team },
             });
+            // Tag each Showdown Pokemon instance with its original team index and ID.
+            // PS swaps side.pokemon elements when switches occur; these tags ensure
+            // syncStateFromPS() never corrupts our mirrored player.team array.
+            for (let sideIdx = 0; sideIdx < this.battle.sides.length; sideIdx++) {
+                const psSide = this.battle.sides[sideIdx];
+                const player = players[sideIdx];
+                if (!psSide || !player) continue;
+                for (let i = 0; i < psSide.pokemon.length && i < player.team.length; i++) {
+                    psSide.pokemon[i]._originalIndex = i;
+                    psSide.pokemon[i]._pokemonId = player.team[i].id;
+                }
+            }
         } catch (err) {
             console.error(`[SyncPSEngine] PSBattle constructor failed for format ${this.format}:`, err?.stack || err?.message || err);
             console.error(`[SyncPSEngine] p1 team length=${players[0]?.team?.length} p2 team length=${players[1]?.team?.length}`);
@@ -1433,14 +1445,15 @@ class SyncPSEngine {
      */
     forceSwitch(playerId, toIndex, choices) {
         if (!this.battle) {
-            return { state: this.state, events: [], anim: [] };
+            return { state: this.state, events: [], anim: [], success: false };
         }
         const side = this.playerIdToSide.get(playerId);
         if (!side) {
-            return { state: this.state, events: [], anim: [] };
+            return { state: this.state, events: [], anim: [], success: false };
         }
         const events = [];
         const anim = [];
+        let success = false;
         // Multi-slot force switch: choices = [{slotIndex, toIndex}, ...]
         // Also handles empty choices array (all-pass when no bench available)
         if (Array.isArray(choices)) {
@@ -1456,14 +1469,14 @@ class SyncPSEngine {
             }
             const combinedChoice = switchParts.join(', ');
             console.log(`[SyncPSEngine] Multi-slot forceSwitch for ${side}: ${combinedChoice}`);
-            const success = this.battle.choose(side, combinedChoice);
+            success = !!this.battle.choose(side, combinedChoice);
             if (!success) {
                 console.error(`[SyncPSEngine] Multi-slot forceSwitch failed for ${side}: ${combinedChoice}`);
             }
         } else {
             // Single-slot force switch (legacy)
             // PS uses 1-based indices for switches
-            const success = this.battle.choose(side, `switch ${toIndex + 1}`);
+            success = !!this.battle.choose(side, `switch ${toIndex + 1}`);
             if (!success) {
                 console.error(`[SyncPSEngine] forceSwitch failed for ${side}`);
             }
@@ -1474,7 +1487,32 @@ class SyncPSEngine {
         anim.push(...this.parseLogToAnimations(events));
         // Sync state
         this.syncStateFromPS();
-        return { state: this.state, events, anim };
+        return { state: this.state, events, anim, success };
+    }
+    getPokemonAtSideIndex(playerId, sideIndex) {
+        if (!this.battle) return null;
+        const side = this.playerIdToSide.get(playerId);
+        if (!side) return null;
+        const psSide = this.battle.sides.find((s) => s.id === side);
+        if (!psSide) return null;
+        const psMon = psSide.pokemon?.[sideIndex];
+        if (!psMon) return null;
+        const player = this.state.players.find(p => p.id === playerId);
+        if (!player) return null;
+        const targetIndex = typeof psMon._originalIndex === 'number'
+            ? psMon._originalIndex
+            : player.team.findIndex(m => m.id === psMon._pokemonId || m.name === psMon.name || m.species === psMon.species);
+        return targetIndex >= 0 ? player.team[targetIndex] : null;
+    }
+    isSideIndexActive(playerId, sideIndex) {
+        if (!this.battle) return false;
+        const side = this.playerIdToSide.get(playerId);
+        if (!side) return false;
+        const psSide = this.battle.sides.find((s) => s.id === side);
+        if (!psSide) return false;
+        const psMon = psSide.pokemon?.[sideIndex];
+        if (!psMon) return false;
+        return !!psSide.active?.some(a => a === psMon);
     }
     /**
      * Process a turn with the given actions
@@ -2174,17 +2212,16 @@ class SyncPSEngine {
             const activeCount = psSide.active?.length || 1;
             let activePokemon = psSide.active?.[0] || null;
             if (activeCount > 1) {
-                // Multi-active: track all active indices
+                // Multi-active: track all active indices in player.team
                 const activeIndices = [];
                 for (let slotIdx = 0; slotIdx < activeCount; slotIdx++) {
                     const activePoke = psSide.active[slotIdx];
                     if (activePoke) {
-                        let idx = psSide.pokemon.indexOf(activePoke);
-                        if (idx < 0 && typeof activePoke.position === 'number') {
-                            idx = activePoke.position;
-                        }
+                        let idx = typeof activePoke._originalIndex === 'number'
+                            ? activePoke._originalIndex
+                            : player.team.findIndex((m) => m.id === activePoke._pokemonId);
                         if (idx < 0) {
-                            idx = psSide.pokemon.findIndex((p) => p && (p.speciesState?.id === activePoke.speciesState?.id ||
+                            idx = player.team.findIndex((p) => p && (p.speciesState?.id === activePoke.speciesState?.id ||
                                 p.species === activePoke.species || p.name === activePoke.name));
                         }
                         activeIndices.push(idx >= 0 ? idx : slotIdx);
@@ -2196,39 +2233,38 @@ class SyncPSEngine {
                 player.activeIndices = activeIndices;
                 console.log(`[SyncPSEngine] Side ${sideIdx} multi-active: ${JSON.stringify(activeIndices)}`);
             } else {
-            // Find active index - PS's active[0] is a reference to an object in psSide.pokemon
-            activePokemon = psSide.active[0];
-            if (activePokemon) {
-                // Direct object reference check
-                let activeIdx = psSide.pokemon.indexOf(activePokemon);
-                // If indexOf failed, try by position/slot property
-                if (activeIdx < 0) {
-                    // In PS, each pokemon has a 'position' property (0-based index in team)
-                    const pos = activePokemon.position;
-                    if (typeof pos === 'number' && pos >= 0 && pos < psSide.pokemon.length) {
-                        activeIdx = pos;
+                activePokemon = psSide.active[0];
+                if (activePokemon) {
+                    let activeIdx = typeof activePokemon._originalIndex === 'number'
+                        ? activePokemon._originalIndex
+                        : player.team.findIndex((m) => m.id === activePokemon._pokemonId);
+                    if (activeIdx < 0) {
+                        activeIdx = player.team.findIndex((p) => p && (p.speciesState?.id === activePokemon.speciesState?.id ||
+                            p.species === activePokemon.species ||
+                            p.name === activePokemon.name));
+                    }
+                    if (activeIdx >= 0) {
+                        console.log(`[SyncPSEngine] Side ${sideIdx} active: ${activePokemon.name || activePokemon.species}, index ${activeIdx} (was ${player.activeIndex})`);
+                        player.activeIndex = activeIdx;
+                    }
+                    else {
+                        console.warn(`[SyncPSEngine] Could not find active pokemon for side ${sideIdx}`);
                     }
                 }
-                // Final fallback - compare by species/name
-                if (activeIdx < 0) {
-                    activeIdx = psSide.pokemon.findIndex((p) => p && (p.speciesState?.id === activePokemon.speciesState?.id ||
-                        p.species === activePokemon.species ||
-                        p.name === activePokemon.name));
-                }
-                if (activeIdx >= 0) {
-                    console.log(`[SyncPSEngine] Side ${sideIdx} active: ${activePokemon.name || activePokemon.species}, index ${activeIdx} (was ${player.activeIndex})`);
-                    player.activeIndex = activeIdx;
-                }
-                else {
-                    console.warn(`[SyncPSEngine] Could not find active pokemon for side ${sideIdx}`);
-                }
-            }
             } // end single-active branch
-            // Update each pokemon
-            for (let i = 0; i < psSide.pokemon.length && i < player.team.length; i++) {
+            // Update each pokemon in player.team using stable original index
+            for (let i = 0; i < psSide.pokemon.length; i++) {
                 const psMon = psSide.pokemon[i];
-                const ourMon = player.team[i];
                 if (!psMon)
+                    continue;
+                let ourMonIndex = typeof psMon._originalIndex === 'number'
+                    ? psMon._originalIndex
+                    : player.team.findIndex((m) => m.id === psMon._pokemonId);
+                if (ourMonIndex < 0) {
+                    ourMonIndex = player.team.findIndex((p) => p && (p.name === psMon.name || p.species === psMon.species));
+                }
+                const ourMon = ourMonIndex >= 0 ? player.team[ourMonIndex] : player.team[i];
+                if (!ourMon)
                     continue;
                 // Update HP
                 ourMon.currentHP = psMon.hp || 0;

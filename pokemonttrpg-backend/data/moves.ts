@@ -7,6 +7,46 @@
  */
 
 const customMoves: Record<string, any> = {
+  "prismbeam": {
+    "name": "Prism Beam",
+    "type": "Normal",
+    "basePower": 90,
+    "category": "Special",
+    "accuracy": 100,
+    "pp": 10,
+    "target": "normal",
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1
+    },
+    "num": 0,
+    "isNonstandard": "Custom",
+    "desc": "Inflicts damage. Its type is the same as the primary type of the user. It is unaffected by Normalize.",
+    "shortDesc": "Type matches the user's primary type."
+  },
+  "atomsplit": {
+    "name": "Atom Split",
+    "type": "Normal",
+    "basePower": 250,
+    "category": "Special",
+    "accuracy": 100,
+    "pp": 5,
+    "target": "allAdjacent",
+    "priority": 0,
+    "flags": {
+      "protect": 1,
+      "mirror": 1,
+      "metronome": 1,
+      "noparentalbond": 1
+    },
+    "selfdestruct": "always",
+    "num": -20033,
+    "isNonstandard": "Custom",
+    "desc": "The user faints after using this move, even if this move fails for having no target. This move is prevented from executing if any active Pokemon has the Damp Ability. Hits all adjacent Pokemon.",
+    "shortDesc": "Hits adjacent Pokemon. The user faints."
+  },
   "megahorn": {
     "name": "Megahorn",
     "type": "Bug",
@@ -10507,17 +10547,16 @@ const customMoves: Record<string, any> = {
     "desc": "This infectious attack does massive damage to a target affected by status problems.",
     "shortDesc": "This infectious attack does massive damage to a target affected by status problems."
   },
-    "nectartap": {
+  "nectartap": {
     "name": "Nectar Tap",
     "type": "Bug",
     "basePower": 0,
     "category": "Status",
     "accuracy": 100,
     "pp": 10,
-    "target": "self",
+    "target": "normal",
     "priority": 0,
-    "flags": { "heal": 1, "snatch": 1, "metronome": 1 },
-    "heal": [1,2],
+    "flags": {},
     "num": 0,
     "desc": "Drinks nectar and restores its own HP by half of its max HP.",
     "shortDesc": "Drinks nectar and restores its own HP by half of its max HP."
@@ -11404,17 +11443,16 @@ const customMoves: Record<string, any> = {
     "desc": "The user generates a shockwave that hits all opponents. +1 crit rate.",
     "shortDesc": "The user generates a shockwave that hits all opponents. +1 crit rate."
   },
-    "nagaskin": {
+  "nagaskin": {
     "name": "Naga Skin",
     "type": "Dragon",
     "basePower": 0,
     "category": "Status",
     "accuracy": 100,
     "pp": 10,
-    "target": "self",
+    "target": "normal",
     "priority": 0,
-    "flags": { "heal": 1, "snatch": 1, "metronome": 1 },
-    "heal": [1,2],
+    "flags": {},
     "num": 0,
     "desc": "Sheds their skin to heal theirself for half of their max HP.",
     "shortDesc": "Sheds their skin to heal theirself for half of their max HP."

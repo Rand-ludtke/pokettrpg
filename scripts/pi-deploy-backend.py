@@ -28,6 +28,8 @@ LOCAL_ENGINE = r"D:\GitHub\pokettrpg\pokemonttrpg-backend\dist\sync-ps-engine.js
 REMOTE_ENGINE = "/home/randl/pokettrpg/pokemonttrpg-backend/dist/sync-ps-engine.js"
 LOCAL_SERVER = r"D:\GitHub\pokettrpg\pokemonttrpg-backend\dist\server\index.js"
 REMOTE_SERVER = "/home/randl/pokettrpg/pokemonttrpg-backend/dist/server/index.js"
+LOCAL_DIST_MOVES = r"D:\GitHub\pokettrpg\pokemonttrpg-backend\dist\data\moves.js"
+REMOTE_DIST_MOVES = "/home/randl/pokettrpg/pokemonttrpg-backend/dist/data/moves.js"
 # Loader baseRoots on the Pi resolve to these (relative to dist/ and cwd):
 REMOTE_DATA_ROOTS = [
     "/home/randl/pokettrpg/tauri-app/public/data",
@@ -97,11 +99,14 @@ def main() -> int:
 
     # ── 2-3. Upload ─────────────────────────────────────────────────────────
     sftp = ssh.open_sftp()
-    run(ssh, f"mkdir -p /home/randl/pokettrpg/pokemonttrpg-backend/dist")
+    run(ssh, f"mkdir -p /home/randl/pokettrpg/pokemonttrpg-backend/dist/data")
     sftp.put(LOCAL_ENGINE, REMOTE_ENGINE)
     print(f"[pi] uploaded engine ({REMOTE_ENGINE})")
     sftp.put(LOCAL_SERVER, REMOTE_SERVER)
     print(f"[pi] uploaded server ({REMOTE_SERVER})")
+    if os.path.exists(LOCAL_DIST_MOVES):
+        sftp.put(LOCAL_DIST_MOVES, REMOTE_DIST_MOVES)
+        print(f"[pi] uploaded dist moves ({REMOTE_DIST_MOVES})")
 
     for remote_dir, fn, local_path in missing:
         run(ssh, f"mkdir -p '{remote_dir}'")
